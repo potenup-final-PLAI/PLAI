@@ -23,5 +23,8 @@ public:
 	TSubclassOf<USlot>SlotFactory;
 
 	UPROPERTY(EditAnywhere)
-	class USlot* Slot;
+	class USlot* SlotUi;
+
+public:
+	virtual void NativeConstruct() override;
 };

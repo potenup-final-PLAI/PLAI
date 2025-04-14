@@ -3,13 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemStruct.generated.h"
 
-/**
- * 
- */
-class PLAI_API ItemStruct
+USTRUCT(BlueprintType)
+struct FItemStruct
 {
+	GENERATED_BODY()
+	
 public:
-	ItemStruct();
-	~ItemStruct();
+	UPROPERTY(EditAnywhere)
+	FString Name = FString("Name");
+	UPROPERTY(EditAnywhere)
+	int32 ItemIndex = 0;
 };
