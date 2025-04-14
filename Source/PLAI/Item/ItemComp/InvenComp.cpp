@@ -4,6 +4,7 @@
 #include "InvenComp.h"
 
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 
@@ -24,7 +25,7 @@ void UInvenComp::BeginPlay()
 	Super::BeginPlay();
 	MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
 	MenuInven->AddToViewport();
-	MenuInven->SetVisibility(ESlateVisibility::Hidden);
+	// MenuInven->SetVisibility(ESlateVisibility::Hidden);
 	
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	if (TestPlayer)
@@ -54,29 +55,31 @@ void UInvenComp::BeginPlay()
 void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	if (PC && PC->IsLocalController())
-	{
-		if (PC->WasInputKeyJustPressed(EKeys::I))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("컴포넌트에서 입력 받음!"));
-			ItemInvenTory();
-		}
+	// 아이템창 출력
+	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::I))
+	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 I키 !"));
+		EnumKey = EEnumKey::Item;
+			ItemInvenTory(EnumKey, MenuInven->WBP_ItemInven);
 	}
+    // 장비창 출력
+	if (PC && PC->IsLocalController() && PC->WasInputKeyJustReleased(EKeys::E))
+	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 E키 "));
+		EnumKey = EEnumKey::Equip;
+		ItemInvenTory(EnumKey, MenuInven->WBP_EquipInven); }
 }
 
-void UInvenComp::ItemInvenTory()
+void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
 {
 	if (Flipflop == false)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 켯다"));
-		MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Visible);
+		Inven->SetVisibility(ESlateVisibility::Visible);
 		Flipflop = true;
 	}
 	else
 	{
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 껏다"));
-		MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+		Inven->SetVisibility(ESlateVisibility::Hidden);
 		Flipflop = false;
 	}
 }

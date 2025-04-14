@@ -12,6 +12,13 @@
 class APlayerController;
 class ATestPlayer;
 
+UENUM(BlueprintType)
+enum class EEnumKey : uint8
+{
+	Item,
+	Equip
+};
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API UInvenComp : public UItemComp
 {
@@ -30,6 +37,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 public:
+	EEnumKey EnumKey;
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UMenuInven> MenuInvenFactory;
 	
@@ -45,7 +54,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	APlayerController* PC;
 	
-	void ItemInvenTory();
+	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 
 public:
 	UPROPERTY(EditAnywhere)

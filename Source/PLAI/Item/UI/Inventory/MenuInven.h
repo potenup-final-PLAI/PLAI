@@ -17,5 +17,7 @@ class PLAI_API UMenuInven : public UUserWidget
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UItemInven* WBP_ItemInven;
-	
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UEquipInven* WBP_EquipInven;
 };
