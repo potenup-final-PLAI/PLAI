@@ -13,4 +13,8 @@ UCLASS()
 class PLAI_API USlot : public UUserWidget
 {
 	GENERATED_BODY()
+	
+	public:
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UImage* SlotImage;
 };

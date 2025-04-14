@@ -25,7 +25,8 @@ void UInvenComp::BeginPlay()
 	Super::BeginPlay();
 	MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
 	MenuInven->AddToViewport();
-	// MenuInven->SetVisibility(ESlateVisibility::Hidden);
+	MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+	MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 	
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	if (TestPlayer)
