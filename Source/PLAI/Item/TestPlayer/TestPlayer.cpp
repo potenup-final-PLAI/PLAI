@@ -4,6 +4,7 @@
 #include "TestPlayer.h"
 
 #include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/ItemComp/ItemComp.h"
 
 
 // Sets default values
@@ -18,7 +19,15 @@ ATestPlayer::ATestPlayer()
 void ATestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	// InvenComp = Cast<UItemComp>(InvenComp);
+	// if (InvenComp)
+	// {
+	// 	UE_LOG(LogTemp,Warning,TEXT("캐릭터 InvenComp캐스팅성공"));
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp,Warning,TEXT("캐릭터 InvenComp캐스팅실패"));
+	// }
 }
 
 // Called every frame

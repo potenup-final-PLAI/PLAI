@@ -3,16 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemComp.h"
 #include "Components/ActorComponent.h"
 #include "PLAI/Item/Item/ItemStruct.h"
 #include "PLAI/Item/UI/Inventory/MenuInven.h"
-#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "InvenComp.generated.h"
 
+class APlayerController;
 class ATestPlayer;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class PLAI_API UInvenComp : public UActorComponent
+class PLAI_API UInvenComp : public UItemComp
 {
 	GENERATED_BODY()
 
@@ -41,6 +42,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	FItemStruct ItemStruct;
 
+	UPROPERTY(EditAnywhere)
+	APlayerController* PC;
+	
 	void ItemInvenTory();
 
 public:

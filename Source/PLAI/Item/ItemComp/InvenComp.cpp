@@ -4,6 +4,7 @@
 #include "InvenComp.h"
 
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 
 // Sets default values for this component's properties
@@ -34,7 +35,8 @@ void UInvenComp::BeginPlay()
     {
     	UE_LOG(LogTemp, Warning, TEXT("UInvenComp::플레이어없음 BeginPlay()"));
     }
-	APlayerController* PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
+	
+	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
 	if (PC)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UInvenComp: 컨트롤러 있음 BeginPlay()"));
@@ -52,15 +54,14 @@ void UInvenComp::BeginPlay()
 void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (TestPlayer->GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::One))
+	
+	if (PC && PC->IsLocalController())
 	{
-		UE_LOG(LogTemp,Warning,TEXT("UInvenComp:: IKey누르는중"));
-		ItemInvenTory();
-	}
-	else
-	{
-		UE_LOG(LogTemp,Warning,TEXT("UInvenComp:: 컨트롤러없음??"));
+		if (PC->WasInputKeyJustPressed(EKeys::I))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("컴포넌트에서 입력 받음!"));
+			ItemInvenTory();
+		}
 	}
 }
 
@@ -69,13 +70,13 @@ void UInvenComp::ItemInvenTory()
 	if (Flipflop == false)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 켯다"));
-		MenuInven->WBP_MenuInven->SetVisibility(ESlateVisibility::Visible);
+		MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Visible);
 		Flipflop = true;
 	}
-	if (Flipflop == true)
+	else
 	{
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 껏다"));
-		MenuInven->WBP_MenuInven->SetVisibility(ESlateVisibility::Hidden);
+		MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 		Flipflop = false;
 	}
 }

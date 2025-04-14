@@ -15,9 +15,7 @@ class PLAI_API UMenuInven : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UMenuInven* WBP_MenuInven;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UItemInven* WBP_ItemInven;
 	
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	// class UEquipInven* WBP_EquipInven;
 };
