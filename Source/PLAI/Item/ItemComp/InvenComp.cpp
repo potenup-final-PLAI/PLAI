@@ -34,6 +34,15 @@ void UInvenComp::BeginPlay()
     {
     	UE_LOG(LogTemp, Warning, TEXT("UInvenComp::플레이어없음 BeginPlay()"));
     }
+	APlayerController* PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
+	if (PC)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInvenComp: 컨트롤러 있음 BeginPlay()"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInvenComp: 컨트롤러 없음 BeginPlay()"));
+	}
 	// ...
 	
 }
@@ -46,20 +55,26 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 	if (TestPlayer->GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::One))
 	{
-		MenuInven->AddToViewport();
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp:: IKey누르는중"));
+		ItemInvenTory();
 	}
-	// ...
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp:: 컨트롤러없음??"));
+	}
 }
 
 void UInvenComp::ItemInvenTory()
 {
 	if (Flipflop == false)
 	{
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 켯다"));
 		MenuInven->WBP_MenuInven->SetVisibility(ESlateVisibility::Visible);
 		Flipflop = true;
 	}
 	if (Flipflop == true)
 	{
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 껏다"));
 		MenuInven->WBP_MenuInven->SetVisibility(ESlateVisibility::Hidden);
 		Flipflop = false;
 	}
