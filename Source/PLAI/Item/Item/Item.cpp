@@ -22,13 +22,19 @@ AItem::AItem()
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
-	SetMesh();
+	BoxComp->SetWorldScale3D(FVector(2.2));
+	FTimerHandle TimerHandle;
+	UE_LOG(LogTemp,Log,TEXT("AItem::SetMesh 아이템구조체 인덱스 %d"),ItemStruct.ItemIndex);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AItem::SetMesh,0.2f,false);
 }
 
 void AItem::SetMesh()
 {
-	StaticMesh->SetStaticMesh(ItemMeshStructIndexArray[ItemStruct.ItemIndex].
-		ItemMeshStructIndex[ItemStruct.ItemIndex].StaticMeshes[RandIndex()]);
+	int32 rand = FMath::RandRange(0,ItemMeshStructIndexArray[ItemStruct.ItemIndex].
+		ItemMeshStructIndex[ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
+	
+		StaticMesh->SetStaticMesh(ItemMeshStructIndexArray[ItemStruct.ItemIndex].
+		ItemMeshStructIndex[ItemStruct.ItemIndexType].StaticMeshes[rand]);
 }
 int32 AItem::RandIndex()
 {

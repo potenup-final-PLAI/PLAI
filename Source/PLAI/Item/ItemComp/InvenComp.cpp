@@ -63,6 +63,12 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		ItemEquip = GetWorld()->SpawnActor<AItemEquip>(EquipFactory,TestPlayer->GetActorLocation() +
 			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
 	}
+	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Two))
+	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
+		ItemEquip = GetWorld()->SpawnActor<AItemEquip>(EquipFactory,TestPlayer->GetActorLocation() +
+			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+		ItemEquip->ItemStruct.ItemIndex = 1;
+	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::I))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 I키 !"));
 		EnumKey = EEnumKey::Item;
