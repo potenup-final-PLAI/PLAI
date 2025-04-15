@@ -18,9 +18,8 @@ struct FItemStruct: public FTableRowBase
 	GENERATED_BODY()
 	
 public:
-
 	UPROPERTY(EditAnywhere)
-	int32 ItemTop = 0;
+	int32 ItemTop = -1;
 	UPROPERTY(EditAnywhere)
 	int32 ItemIndex = 0;
 	UPROPERTY(EditAnywhere)

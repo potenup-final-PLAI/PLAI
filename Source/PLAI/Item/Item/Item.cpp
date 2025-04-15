@@ -4,6 +4,8 @@
 #include "Item.h"
 
 #include "Components/BoxComponent.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 
 // Sets default values
@@ -23,18 +25,38 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 	BoxComp->SetWorldScale3D(FVector(2.2));
+	BoxComp->OnComponentBeginOverlap.AddDynamic(this,&AItem::OnMyBeginOverlapped);
+	
 	FTimerHandle TimerHandle;
 	UE_LOG(LogTemp,Log,TEXT("AItem::SetMesh 아이템구조체 인덱스 %d"),ItemStruct.ItemIndex);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AItem::SetMesh,0.2f,false);
+}
+
+void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor)
+	{
+		ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor);
+		if (TestPlayer)
+		{
+		UTexture2D* Texture = ItemMeshStructIndexArray[ItemStruct.ItemIndex].
+			ItemMeshStructIndex[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail];
+			
+			TestPlayer->InvenComp->GetItem(ItemStruct, Texture);
+			// UE_LOG(LogTemp,Log,TEXT("AItem::오버랩 발생 엑터는? %s"),*OtherActor->GetName());
+		}
+	}
 }
 
 void AItem::SetMesh()
 {
 	int32 rand = FMath::RandRange(0,ItemMeshStructIndexArray[ItemStruct.ItemIndex].
 		ItemMeshStructIndex[ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
+	    ItemStruct.ItemIndexDetail = rand;
 	
 		StaticMesh->SetStaticMesh(ItemMeshStructIndexArray[ItemStruct.ItemIndex].
-		ItemMeshStructIndex[ItemStruct.ItemIndexType].StaticMeshes[rand]);
+		ItemMeshStructIndex[ItemStruct.ItemIndexType].StaticMeshes[ItemStruct.ItemIndexDetail]);
 }
 int32 AItem::RandIndex()
 {

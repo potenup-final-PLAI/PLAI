@@ -34,6 +34,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;
 
+	UFUNCTION()
+	void OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent*
+		OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	virtual void SetMesh();
 	int32 RandIndex();
 };

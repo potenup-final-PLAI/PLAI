@@ -14,6 +14,7 @@ AItemEquip::AItemEquip()
 void AItemEquip::BeginPlay()
 {
 	Super::BeginPlay();
+	ItemStruct.ItemTop = 0;
 }
 
 // Called every frame

@@ -3,6 +3,8 @@
 
 #include "InvenComp.h"
 
+#include "Components/Image.h"
+#include "Components/WrapBox.h"
 #include "PLAI/Item/Item/Equip/ItemEquip.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
@@ -62,6 +64,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
 		ItemEquip = GetWorld()->SpawnActor<AItemEquip>(EquipFactory,TestPlayer->GetActorLocation() +
 			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+		ItemEquip->ItemStruct.ItemIndex = 0;
 	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Two))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
@@ -96,4 +99,39 @@ void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
 		Flipflop = false;
 	}
 }
+
+void UInvenComp::GetItem(const FItemStruct& ItemStruct, UTexture2D* Texture)
+{
+	UE_LOG(LogTemp,Warning,TEXT("UInvenComp::GetItme()"));
+	
+	bool bSlot = false;
+	for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
+	{
+		USlot* Slot = Cast<USlot>(Widget);
+		if (Slot && Slot->ItemStruct.ItemTop == ItemStruct.ItemTop &&Slot->ItemStruct.ItemIndex == ItemStruct.ItemIndex
+			&&Slot->ItemStruct.ItemIndexType == ItemStruct.ItemIndexType 
+			&&Slot->ItemStruct.ItemIndexDetail == ItemStruct.ItemIndexDetail)
+		{
+			Slot->ItemStruct.ItemNum++;
+			UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯갯수 증가"));
+			bSlot = true;
+		}
+	}
+	if (bSlot == false)
+	{
+		for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
+		{
+			USlot* Slot = Cast<USlot>(Widget);
+			if (Slot->ItemStruct.ItemTop == -1)
+			{
+				Slot->ItemStruct = ItemStruct;
+				FSlateBrush Brush;
+				Brush.SetResourceObject(Texture);
+				Slot->SlotImage->SetBrush(Brush);
+			}
+		}
+	}
+}
+	
+	
 

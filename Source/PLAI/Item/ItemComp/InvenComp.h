@@ -50,9 +50,6 @@ public:
 	ATestPlayer* TestPlayer;
 
 	UPROPERTY(EditAnywhere)
-	FItemStruct ItemStruct;
-
-	UPROPERTY(EditAnywhere)
 	APlayerController* PC;
 
 	UPROPERTY(EditAnywhere)
@@ -62,6 +59,7 @@ public:
 	class AItemEquip* ItemEquip;
 	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
+	void GetItem(const FItemStruct& ItemStruct,UTexture2D* Texture);
 
 public:
 	UPROPERTY(EditAnywhere)
