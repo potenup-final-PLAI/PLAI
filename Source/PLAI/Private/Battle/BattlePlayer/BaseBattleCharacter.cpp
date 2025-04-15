@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PLAI/Battle/Public/BaseBattleCharacter.h"
+#include "PLAI/Public/Battle/BattlePlayer/BaseBattleCharacter.h"
 
 
 // Sets default values
