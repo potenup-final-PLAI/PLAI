@@ -6,6 +6,7 @@
 #include "ItemComp.h"
 #include "Components/ActorComponent.h"
 #include "PLAI/Item/Item/ItemStruct.h"
+#include "PLAI/Item/Item/Equip//ItemEquip.h"
 #include "PLAI/Item/UI/Inventory/MenuInven.h"
 #include "InvenComp.generated.h"
 
@@ -53,6 +54,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	APlayerController* PC;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AItemEquip>WeaponFactory;
+	
+	UPROPERTY(EditAnywhere)
+	class AItemEquip* ItemWeapon;
 	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 

@@ -6,6 +6,13 @@
 #include "ItemStruct.h"
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
+UENUM(BlueprintType)
+enum class EItemIndex : uint8
+{
+	Equip UMETA(DisplayName = "Equip Item"),
+	Consume UMETA(DisplayName = "Consume Item"),
+	Other UMETA(DisplayName = "Other Item"),
+};
 
 UCLASS()
 class PLAI_API AItem : public AActor
@@ -19,13 +26,18 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+public:
+	UPROPERTY(EditAnywhere)
+	int8 Eindex;
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemStruct ItemStruct;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FItemClientStruct ItemClientStruct;
+	TArray<FItemMeshStruct> ItemMeshStructs;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EItemIndex EItemIndex;
 	
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* StaticMesh;
@@ -34,4 +46,5 @@ public:
 	class UBoxComponent* BoxComp;
 
 	virtual void SetMesh();
+	int32 RandIndex();
 };

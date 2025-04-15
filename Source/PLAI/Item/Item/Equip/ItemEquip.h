@@ -4,22 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "PLAI/Item/Item/Item.h"
-#include "ItemWeapon.generated.h"
+#include "ItemEquip.generated.h"
 
 UCLASS()
-class PLAI_API AItemWeapon : public AItem
+class PLAI_API AItemEquip : public AItem
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	AItemWeapon();
+	AItemEquip();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	
 };

@@ -27,22 +27,12 @@ public:
 };
 
 USTRUCT(BlueprintType,Blueprintable)
-struct FItemClientStruct
+struct FItemMeshStruct
 {
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere) // 1번
-	TArray<UStaticMesh*>WeaponMeshes;
+	TArray<UStaticMesh*>StaticMeshes;
 	UPROPERTY(EditAnywhere)
-	TArray<UTexture2D*>WeaponTextures;
-	
-	UPROPERTY(EditAnywhere) // 2번
-	TArray<UStaticMesh*>ConsumeMeshes;
-	UPROPERTY(EditAnywhere)
-	TArray<UTexture2D*>ConsumeTextures;
-	
-	UPROPERTY(EditAnywhere) // 3번
-	TArray<UStaticMesh*>QuestMeshes;
-	UPROPERTY(EditAnywhere)
-	TArray<UTexture2D*>QuestTextures;
+	TArray<UTexture2D*>Textures;
 };

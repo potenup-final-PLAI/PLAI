@@ -25,7 +25,18 @@ void AItem::BeginPlay()
 
 void AItem::SetMesh()
 {
-	StaticMesh->SetStaticMesh(ItemClientStruct.StaticMeshes[ItemStruct.ItemIndex]);
+	Eindex = static_cast<uint8>(EItemIndex);
+	
+	UE_LOG(LogTemp, Warning, TEXT("Item index is ItemIndex %d StaticMeshIndex %d"),
+		EItemIndex, ItemMeshStructs[0].StaticMeshes.Num());
+	
+	// StaticMesh->SetStaticMesh(ItemMeshStructs[Eindex].StaticMeshes[0]);
+}
+
+int32 AItem::RandIndex()
+{
+	int32 Index = FMath::RandRange(0,ItemMeshStructs[Eindex].StaticMeshes.Num()-1);
+	return Index;
 }
 
 

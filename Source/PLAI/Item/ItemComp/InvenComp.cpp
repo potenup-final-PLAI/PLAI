@@ -3,6 +3,7 @@
 
 #include "InvenComp.h"
 
+#include "PLAI/Item/Item/Equip/ItemEquip.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
@@ -57,6 +58,11 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	// 아이템창 출력
+	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::One))
+	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
+		ItemWeapon = GetWorld()->SpawnActor<AItemEquip>(WeaponFactory,TestPlayer->GetActorLocation() +
+			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::I))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 I키 !"));
 		EnumKey = EEnumKey::Item;
