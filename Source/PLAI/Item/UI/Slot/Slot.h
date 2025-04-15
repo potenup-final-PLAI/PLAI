@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "PLAI/Item/Item/ItemStruct.h"
 #include "Slot.generated.h"
 
 /**
@@ -14,7 +15,14 @@ class PLAI_API USlot : public UUserWidget
 {
 	GENERATED_BODY()
 	
-	public:
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FItemStruct ItemStruct;
+	
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UImage* SlotImage;
+
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 };
