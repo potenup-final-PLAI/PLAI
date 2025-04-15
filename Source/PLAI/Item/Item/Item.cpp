@@ -27,12 +27,16 @@ void AItem::BeginPlay()
 
 void AItem::SetMesh()
 {
-	StaticMesh->SetStaticMesh(ItemMeshStructs[0].StaticMeshes[RandIndex()]);
+	StaticMesh->SetStaticMesh(ItemMeshStructIndexArray[ItemStruct.ItemIndex].
+		ItemMeshStructIndex[ItemStruct.ItemIndex].StaticMeshes[RandIndex()]);
 }
-
 int32 AItem::RandIndex()
 {
-	int32 Index = FMath::RandRange(0,ItemMeshStructs[0].StaticMeshes.Num()-1);
+	int32 a = ItemStruct.ItemIndex;
+	int32 b = ItemStruct.ItemIndex;
+	// int32 c = ItemStruct.ItemIndexDetail;
+	int32 Index = FMath::RandRange(0,ItemMeshStructIndexArray[a].ItemMeshStructIndex[b].
+		StaticMeshes.Num()-1);
 	return Index;
 }
 

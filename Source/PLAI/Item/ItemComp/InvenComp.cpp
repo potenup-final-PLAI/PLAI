@@ -60,7 +60,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	// 아이템창 출력
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::One))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
-		ItemWeapon = GetWorld()->SpawnActor<AItemEquip>(WeaponFactory,TestPlayer->GetActorLocation() +
+		ItemEquip = GetWorld()->SpawnActor<AItemEquip>(EquipFactory,TestPlayer->GetActorLocation() +
 			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
 	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::I))
