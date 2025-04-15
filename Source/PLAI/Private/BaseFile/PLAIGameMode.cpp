@@ -1,8 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "PLAIGameMode.h"
-#include "PLAIPlayerController.h"
-#include "PLAICharacter.h"
+#include "PLAI/Public/BaseFile/PLAIGameMode.h"
+#include "PLAI/Public/BaseFile/PLAIPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
 
 APLAIGameMode::APLAIGameMode()
