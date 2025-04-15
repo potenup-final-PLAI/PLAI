@@ -128,6 +128,7 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct, UTexture2D* Texture)
 				FSlateBrush Brush;
 				Brush.SetResourceObject(Texture);
 				Slot->SlotImage->SetBrush(Brush);
+				break;
 			}
 		}
 	}
