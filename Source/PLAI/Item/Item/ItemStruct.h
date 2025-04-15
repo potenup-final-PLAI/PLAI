@@ -4,18 +4,26 @@
 #include "CoreMinimal.h"
 #include "ItemStruct.generated.h"
 
-
-
 USTRUCT(BlueprintType,Blueprintable)
-struct FItemStruct
+struct FItemStruct: public FTableRowBase
 {
 	GENERATED_BODY()
 	
 public:
 	UPROPERTY(EditAnywhere)
+	int32 ItemIndex = 0;
+	UPROPERTY(EditAnywhere)
+	int32 ItemIndexType = 0;
+	UPROPERTY(EditAnywhere)
+	int32 ItemIndexDetail = 0;
+	UPROPERTY(EditAnywhere)
 	FString Name = FString("Name");
 	UPROPERTY(EditAnywhere)
-	int32 ItemIndex = 0;
+	FString NameType = FString("Type");
+	UPROPERTY(EditAnywhere)
+	FString NameDetail = FString("Detail");
+	UPROPERTY(EditAnywhere)
+	int32 ItemNum = 0;
 };
 
 USTRUCT(BlueprintType,Blueprintable)
@@ -23,6 +31,18 @@ struct FItemClientStruct
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere) // 1번
+	TArray<UStaticMesh*>WeaponMeshes;
 	UPROPERTY(EditAnywhere)
-	TArray<UStaticMesh*>StaticMeshes;
+	TArray<UTexture2D*>WeaponTextures;
+	
+	UPROPERTY(EditAnywhere) // 2번
+	TArray<UStaticMesh*>ConsumeMeshes;
+	UPROPERTY(EditAnywhere)
+	TArray<UTexture2D*>ConsumeTextures;
+	
+	UPROPERTY(EditAnywhere) // 3번
+	TArray<UStaticMesh*>QuestMeshes;
+	UPROPERTY(EditAnywhere)
+	TArray<UTexture2D*>QuestTextures;
 };

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemStruct.h"
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
@@ -20,13 +21,17 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FItemStruct ItemStruct;
 
-public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FItemClientStruct ItemClientStruct;
+	
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* StaticMesh;
 	
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* Box;
+	class UBoxComponent* BoxComp;
+
+	virtual void SetMesh();
 };

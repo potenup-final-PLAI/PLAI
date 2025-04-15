@@ -4,7 +4,7 @@
 #include "Itemdata.generated.h"
 
 USTRUCT(BlueprintType)
-struct THEDEADMENSCASTLE_API FItemData: public FTableRowBase
+struct FItemData: public FTableRowBase
 {
 	GENERATED_BODY()
 

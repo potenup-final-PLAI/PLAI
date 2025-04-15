@@ -3,24 +3,32 @@
 
 #include "Item.h"
 
+#include "Components/BoxComponent.h"
+
 
 // Sets default values
 AItem::AItem()
 {
+	BoxComp = CreateDefaultSubobject<UBoxComponent>("BoxComp");
+	SetRootComponent(BoxComp);
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
+	StaticMesh->SetupAttachment(BoxComp);
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SetMesh();
 }
 
-// Called every frame
-void AItem::Tick(float DeltaTime)
+void AItem::SetMesh()
 {
-	Super::Tick(DeltaTime);
+	StaticMesh->SetStaticMesh(ItemClientStruct.StaticMeshes[ItemStruct.ItemIndex]);
 }
+
+
+// Called every frame
+
 
