@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PLAI/BaseFile/PLAICharacter.h"
+#include "PLAI/Public//BaseFile/PLAICharacter.h"
 #include "TestPlayer.generated.h"
 
 UCLASS()

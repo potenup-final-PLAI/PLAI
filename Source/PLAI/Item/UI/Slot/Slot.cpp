@@ -4,7 +4,7 @@
 #include "Slot.h"
 
 #include "Blueprint/DragDropOperation.h"
-
+#include "PLAI/Item/Item/ItemObject.h"
 
 
 FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
@@ -17,6 +17,7 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
                                  UDragDropOperation*& OutOperation)
 {
 	UDragDropOperation* DragOp = NewObject<UDragDropOperation>();
+	UItemObject* ItemObject = NewObject<UItemObject>();
 
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseDrag"));
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
