@@ -13,8 +13,6 @@ AItemEquip::AItemEquip()
 // Called when the game starts or when spawned
 void AItemEquip::BeginPlay()
 {
-	EItemIndex = EItemIndex::Equip;
-	
 	Super::BeginPlay();
 }
 

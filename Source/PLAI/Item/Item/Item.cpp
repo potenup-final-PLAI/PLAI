@@ -10,9 +10,11 @@
 AItem::AItem()
 {
 	BoxComp = CreateDefaultSubobject<UBoxComponent>("BoxComp");
+	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetRootComponent(BoxComp);
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
 	StaticMesh->SetupAttachment(BoxComp);
+	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 }
 
@@ -25,17 +27,12 @@ void AItem::BeginPlay()
 
 void AItem::SetMesh()
 {
-	Eindex = static_cast<uint8>(EItemIndex);
-	
-	UE_LOG(LogTemp, Warning, TEXT("Item index is ItemIndex %d StaticMeshIndex %d"),
-		EItemIndex, ItemMeshStructs[0].StaticMeshes.Num());
-	
-	// StaticMesh->SetStaticMesh(ItemMeshStructs[Eindex].StaticMeshes[0]);
+	StaticMesh->SetStaticMesh(ItemMeshStructs[0].StaticMeshes[RandIndex()]);
 }
 
 int32 AItem::RandIndex()
 {
-	int32 Index = FMath::RandRange(0,ItemMeshStructs[Eindex].StaticMeshes.Num()-1);
+	int32 Index = FMath::RandRange(0,ItemMeshStructs[0].StaticMeshes.Num()-1);
 	return Index;
 }
 

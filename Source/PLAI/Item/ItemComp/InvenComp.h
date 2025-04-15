@@ -56,10 +56,10 @@ public:
 	APlayerController* PC;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AItemEquip>WeaponFactory;
+	TSubclassOf<AItemEquip>EquipFactory;
 	
 	UPROPERTY(EditAnywhere)
-	class AItemEquip* ItemWeapon;
+	class AItemEquip* ItemEquip;
 	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 

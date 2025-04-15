@@ -36,3 +36,13 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<UTexture2D*>Textures;
 };
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FItemMeshStructIndex
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<FItemMeshStruct>ItemMeshStructIndex;
+	
+};

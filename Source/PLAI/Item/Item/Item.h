@@ -36,6 +36,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FItemMeshStruct> ItemMeshStructs;
 
+	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EItemIndex EItemIndex;
 	
