@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GridTileManager.generated.h"
+#include "GridTile.generated.h"
 
 UCLASS()
-class PLAI_API AGridTileManager : public AActor
+class PLAI_API AGridTile : public AActor
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	AGridTileManager();
+	AGridTile();
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,13 +23,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
-	class AGridTile* tile;
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AGridTile> tileFactory;
-	UPROPERTY(EditAnywhere)
-	TMap<FIntPoint, class AGridTile*> map;
+	UPROPERTY(VisibleAnywhere)
+	class UBoxComponent* boxComp;
 
+	UPROPERTY(VisibleAnywhere)
+	FIntPoint gridCoord;
 
-	void InitGridTile();
+	void SetGridCoord(FIntPoint coord);
 };

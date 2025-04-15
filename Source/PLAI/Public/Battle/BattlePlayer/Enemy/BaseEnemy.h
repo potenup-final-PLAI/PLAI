@@ -3,17 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "BaseBattleCharacter.generated.h"
+#include "BaseBattlePawn.h"
+#include "GameFramework/Pawn.h"
+#include "BaseEnemy.generated.h"
 
 UCLASS()
-class PLAI_API ABaseBattleCharacter : public ACharacter
+class PLAI_API ABaseEnemy : public ABaseBattlePawn
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
-	ABaseBattleCharacter();
+	// Sets default values for this pawn's properties
+	ABaseEnemy();
 
 protected:
 	// Called when the game starts or when spawned
@@ -24,5 +25,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(
+		class UInputComponent* PlayerInputComponent) override;
 };

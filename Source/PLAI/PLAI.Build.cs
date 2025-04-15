@@ -8,6 +8,16 @@ public class PLAI : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "EnhancedInput" });
-    }
+		PublicDependencyModuleNames.AddRange(new[]
+		{
+			"Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem",
+			"AIModule", "Niagara", "EnhancedInput"
+		});
+
+		PublicIncludePaths.AddRange(new[]
+		{
+			"PLAI/Public/Battle/BattlePlayer",
+			"PLAI/Public/Battle/Tile"
+		});
+	}
 }
