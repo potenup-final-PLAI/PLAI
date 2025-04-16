@@ -54,9 +54,13 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AItemEquip>EquipFactory;
-	
 	UPROPERTY(EditAnywhere)
 	class AItemEquip* ItemEquip;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AItemMaster> ItemMasterFactory;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AItemMaster* ItemMaster;
 	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 	void GetItem(const FItemStruct& ItemStruct);

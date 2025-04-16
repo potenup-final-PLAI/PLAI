@@ -31,7 +31,7 @@ void AItem::BeginPlay()
 	BoxComp->OnComponentBeginOverlap.AddDynamic(this,&AItem::OnMyBeginOverlapped);
 	
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AItem::SetMesh,0.2f,false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AItem::SetMesh,0.5f,false);
 }
 
 void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -52,23 +52,9 @@ void AItem::SetMesh()
 {
 	if (ItemStruct.ItemTop == -1) { UE_LOG(LogTemp,Warning,TEXT("아이템 탑 -1 초기화전")) return; }
 	
-	int32 rand = FMath::RandRange(0,ItemParent->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].
-		ItemMeshIndexes[ItemStruct.ItemIndex].ItemMeshTypes[ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
-	    ItemStruct.ItemIndexDetail = rand;
-	
 	StaticMesh->SetStaticMesh(ItemParent->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].
-	ItemMeshIndexes[ItemStruct.ItemIndex].ItemMeshTypes[ItemStruct.ItemIndexType].StaticMeshes[rand]);
+	ItemMeshIndexes[ItemStruct.ItemIndex].ItemMeshTypes[ItemStruct.ItemIndexType].StaticMeshes[ItemStruct.ItemIndexDetail]);
 }
-// int32 AItem::RandIndex()
-// {
-// 	int32 a = ItemStruct.ItemIndex;
-// 	int32 b = ItemStruct.ItemIndex;
-// 	// int32 c = ItemStruct.ItemIndexDetail;
-// 	int32 Index = FMath::RandRange(0,ItemParent->ItemMeshStructIndexArray[a].ItemMeshStructIndex[b].
-// 		StaticMeshes.Num()-1);
-// 	return Index;
-// }
-
 
 // Called every frame
 

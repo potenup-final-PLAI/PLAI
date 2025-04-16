@@ -5,6 +5,7 @@
 
 #include "Components/Image.h"
 #include "Components/WrapBox.h"
+#include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Item/Equip/ItemEquip.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
@@ -62,19 +63,40 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	// 아이템창 출력
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Q키 !"));
-		ItemEquip = GetWorld()->SpawnActor<AItemEquip>(EquipFactory,TestPlayer->GetActorLocation() +
-			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-		ItemEquip->ItemStruct.ItemIndex = 0;
+		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
+		TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+		int32 randIndex = FMath::RandRange(0,1);
+		ItemMaster->ItemStruct.ItemTop = 0;
+		ItemMaster->ItemStruct.ItemIndex = randIndex;
+		
+		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
+		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
+		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
 	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::One))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
-		ItemEquip = GetWorld()->SpawnActor<AItemEquip>(EquipFactory,TestPlayer->GetActorLocation() +
+		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
 			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-		ItemEquip->ItemStruct.ItemIndex = 1;
+		int32 randIndex = FMath::RandRange(0,1);
+		ItemMaster->ItemStruct.ItemTop = 1;
+		ItemMaster->ItemStruct.ItemIndex = randIndex;
+		
+		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
+		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
+		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Two))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
+		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
+			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+		ItemMaster->ItemStruct.ItemTop = 2;
+		int32 randIndex = FMath::RandRange(0,1);
+		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
+		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
+		
+		ItemMaster->ItemStruct.ItemIndex = randIndex;
+		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
 	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::I))
