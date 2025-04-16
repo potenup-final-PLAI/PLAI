@@ -40,8 +40,8 @@ USTRUCT(BlueprintType,Blueprintable)
 struct FItemMeshStruct
 {
 	GENERATED_BODY()
-public:
 	
+public:
 	UPROPERTY(EditAnywhere) // 1번
 	TArray<UStaticMesh*>StaticMeshes;
 	UPROPERTY(EditAnywhere)
@@ -49,10 +49,26 @@ public:
 };
 
 USTRUCT(BlueprintType,Blueprintable)
-struct FItemMeshStructIndex
+struct FItemStructType
 {
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere)
-	TArray<FItemMeshStruct>ItemMeshStructIndex;
+	TArray<FItemMeshStruct>ItemMeshTypes;
+};
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FItemStructIndex
+{
+	GENERATED_BODY()
+public:
+	TArray<FItemStructType>ItemMeshIndexes;
+};
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FItemStructTop
+{
+	GENERATED_BODY()
+public:
+	TArray<FItemStructIndex>ItemMeshTops;
 };

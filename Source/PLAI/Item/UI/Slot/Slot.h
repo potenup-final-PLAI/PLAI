@@ -20,9 +20,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemStruct ItemStruct;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FItemMeshStructIndex ItemMeshStructIndex;
-
 	UPROPERTY(EditAnywhere)
 	class UTexture2D* Texture;
 

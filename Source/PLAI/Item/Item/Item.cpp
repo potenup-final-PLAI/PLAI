@@ -24,12 +24,15 @@ AItem::AItem()
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ItemParent = ItemFactory->GetDefaultObject<AItem>();
+	
 	BoxComp->SetWorldScale3D(FVector(2.2));
 	BoxComp->OnComponentBeginOverlap.AddDynamic(this,&AItem::OnMyBeginOverlapped);
 	
 	FTimerHandle TimerHandle;
 	UE_LOG(LogTemp,Log,TEXT("AItem::SetMesh 아이템구조체 인덱스 %d"),ItemStruct.ItemIndex);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AItem::SetMesh,0.2f,false);
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AItem::SetMesh,0.2f,false);
 }
 
 void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -37,37 +40,39 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 {
 	if (OtherActor)
 	{
-		ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor);
-		if (TestPlayer)
-		{
-		UTexture2D* Texture = ItemMeshStructIndexArray[ItemStruct.ItemIndex].
-			ItemMeshStructIndex[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail];
-			
-			TestPlayer->InvenComp->GetItem(ItemStruct, Texture, this);
-			Destroy();
-			// UE_LOG(LogTemp,Log,TEXT("AItem::오버랩 발생 엑터는? %s"),*OtherActor->GetName());
-		}
+		// ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor);
+		// if (TestPlayer)
+		// {
+		// UTexture2D* Texture = ItemMeshStructIndexArray[ItemStruct.ItemIndex].
+		// 	ItemMeshStructIndex[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail];
+		// 	
+		// 	TestPlayer->InvenComp->GetItem(ItemStruct, Texture, this);
+		// 	Destroy();
+		// 	// UE_LOG(LogTemp,Log,TEXT("AItem::오버랩 발생 엑터는? %s"),*OtherActor->GetName());
+		// }
 	}
 }
 
 void AItem::SetMesh()
 {
-	int32 rand = FMath::RandRange(0,ItemMeshStructIndexArray[ItemStruct.ItemIndex].
-		ItemMeshStructIndex[ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
+	// if (ItemStruct.ItemTop == -1){UE_LOG(LogTemp,Warning,TEXT("아이템 탑 -1 초기화전")) return};
+	int32 rand = FMath::RandRange(0,ItemParent->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].
+		ItemMeshIndexes[ItemStruct.ItemIndex].ItemMeshTypes[ItemStruct.ItemIndexType].StaticMeshes.Num());
+	
 	    ItemStruct.ItemIndexDetail = rand;
 	
-		StaticMesh->SetStaticMesh(ItemMeshStructIndexArray[ItemStruct.ItemIndex].
-		ItemMeshStructIndex[ItemStruct.ItemIndexType].StaticMeshes[ItemStruct.ItemIndexDetail]);
+	StaticMesh->SetStaticMesh(ItemParent->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].
+	ItemMeshIndexes[ItemStruct.ItemIndex].ItemMeshTypes[ItemStruct.ItemIndexType].StaticMeshes[rand]);
 }
-int32 AItem::RandIndex()
-{
-	int32 a = ItemStruct.ItemIndex;
-	int32 b = ItemStruct.ItemIndex;
-	// int32 c = ItemStruct.ItemIndexDetail;
-	int32 Index = FMath::RandRange(0,ItemMeshStructIndexArray[a].ItemMeshStructIndex[b].
-		StaticMeshes.Num()-1);
-	return Index;
-}
+// int32 AItem::RandIndex()
+// {
+// 	int32 a = ItemStruct.ItemIndex;
+// 	int32 b = ItemStruct.ItemIndex;
+// 	// int32 c = ItemStruct.ItemIndexDetail;
+// 	int32 Index = FMath::RandRange(0,ItemParent->ItemMeshStructIndexArray[a].ItemMeshStructIndex[b].
+// 		StaticMeshes.Num()-1);
+// 	return Index;
+// }
 
 
 // Called every frame

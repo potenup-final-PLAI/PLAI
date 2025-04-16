@@ -26,7 +26,16 @@ public:
 	FItemStruct ItemStruct;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FItemMeshStructIndex> ItemMeshStructIndexArray;
+	FItemStructTop ItemStructTop;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FItemMeshStruct ItemMeshStruct;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AItem> ItemFactory;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AItem* ItemParent;
 	
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* StaticMesh;
