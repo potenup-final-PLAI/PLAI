@@ -63,6 +63,8 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 	SlotImage->SetBrush(Brush);
 	
     ItemObject->ItemStruct = ItemStruct;
+	ItemStruct = FItemStruct();
+	
 	ItemObject->SlotUi = this;
 	
 	DragOp->DefaultDragVisual = SlotEmpty;
@@ -78,10 +80,15 @@ bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDr
 	UDragDropOperation* InOperation)
 {
 	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
+	Swap(ItemStruct, ItemObject->ItemStruct);
 
 	// FSlateBrush Brush;
-	// Brush.SetResourceObject(Texture);
+	// Brush.SetResourceObject(ParentItem->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].ItemMeshIndexes[ItemStruct.ItemIndex].
+	// 	ItemMeshTypes[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail]);
 	// SlotImage->SetBrush(Brush);
+
+	SlotImageUpdate();
+	SlotCountUpdate(ItemStruct.ItemNum);
 	
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
