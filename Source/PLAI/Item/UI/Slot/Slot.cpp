@@ -52,8 +52,6 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 	UDragDropOperation* DragOp = NewObject<UDragDropOperation>();
 	UItemObject* ItemObject = NewObject<UItemObject>();
 	
-	ItemObject->Texture = Texture;
-
 	DragOp->DefaultDragVisual = this;
 	DragOp->Payload = ItemObject;
 	DragOp->Pivot = EDragPivot::MouseDown;
@@ -68,7 +66,6 @@ bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDr
 	UDragDropOperation* InOperation)
 {
 	UItemObject* ItemObject = Cast<UItemObject>(InOperation);
-	Texture = ItemObject->Texture;
 
 	FSlateBrush Brush;
 	Brush.SetResourceObject(Texture);

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SlotEmpty.h"
 #include "Blueprint/UserWidget.h"
 #include "PLAI/Item/Item/Item.h"
 #include "PLAI/Item/Item/ItemStruct.h"
@@ -22,9 +23,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UTexture2D* Texture;
-
+	
     UPROPERTY(EditAnywhere)
 	TSubclassOf<AItem> ItemFactory;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USlotEmpty> SlotEmptyFactory;
 	
 	UPROPERTY(EditAnywhere)
 	class AItem* ParentItem;

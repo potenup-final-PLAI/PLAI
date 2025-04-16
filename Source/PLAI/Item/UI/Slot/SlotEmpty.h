@@ -3,14 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Slot.h"
+#include "Blueprint/UserWidget.h"
 #include "SlotEmpty.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PLAI_API USlotEmpty : public USlot
+class PLAI_API USlotEmpty : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UImage* SlotImage;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UTextBlock* SlotCount;
 };

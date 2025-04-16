@@ -157,6 +157,7 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 			{
 				UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯추가 증가"));
 				Slot->ItemStruct = ItemStruct;
+				Slot->SlotImageUpdate();
 				break;
 			}
 		}

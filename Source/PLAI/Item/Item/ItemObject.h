@@ -18,7 +18,4 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FItemStruct ItemStruct;
-
-	UPROPERTY(EditAnywhere)
-	UTexture2D* Texture;
 };
