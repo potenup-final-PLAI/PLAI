@@ -5,6 +5,7 @@
 
 #include "Blueprint/DragDropOperation.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "PLAI/Item/Item/ItemObject.h"
 
@@ -35,6 +36,8 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 {
 	UDragDropOperation* DragOp = NewObject<UDragDropOperation>();
 	UItemObject* ItemObject = NewObject<UItemObject>();
+	
+	ItemObject->Texture = Texture;
 
 	DragOp->DefaultDragVisual = this;
 	DragOp->Payload = ItemObject;
@@ -49,6 +52,13 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
 	UDragDropOperation* InOperation)
 {
+	UItemObject* ItemObject = Cast<UItemObject>(InOperation);
+	Texture = ItemObject->Texture;
+
+	FSlateBrush Brush;
+	Brush.SetResourceObject(Texture);
+	SlotImage->SetBrush(Brush);
+	
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
