@@ -43,7 +43,8 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 		UTexture2D* Texture = ItemMeshStructIndexArray[ItemStruct.ItemIndex].
 			ItemMeshStructIndex[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail];
 			
-			TestPlayer->InvenComp->GetItem(ItemStruct, Texture);
+			TestPlayer->InvenComp->GetItem(ItemStruct, Texture, this);
+			Destroy();
 			// UE_LOG(LogTemp,Log,TEXT("AItem::오버랩 발생 엑터는? %s"),*OtherActor->GetName());
 		}
 	}

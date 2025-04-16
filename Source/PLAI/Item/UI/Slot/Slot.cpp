@@ -4,8 +4,14 @@
 #include "Slot.h"
 
 #include "Blueprint/DragDropOperation.h"
+#include "Components/TextBlock.h"
 #include "PLAI/Item/Item/ItemObject.h"
 
+
+void USlot::SlotCountUpdate(const int32 Count)
+{
+	SlotCount->SetText(FText::AsNumber(Count));
+}
 
 FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {

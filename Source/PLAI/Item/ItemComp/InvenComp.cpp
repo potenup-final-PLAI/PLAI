@@ -100,7 +100,7 @@ void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
 	}
 }
 
-void UInvenComp::GetItem(const FItemStruct& ItemStruct, UTexture2D* Texture)
+void UInvenComp::GetItem(const FItemStruct& ItemStruct, UTexture2D* Texture, AItem* Item)
 {
 	UE_LOG(LogTemp,Warning,TEXT("UInvenComp::GetItme()"));
 	
@@ -113,8 +113,10 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct, UTexture2D* Texture)
 			&&Slot->ItemStruct.ItemIndexDetail == ItemStruct.ItemIndexDetail)
 		{
 			Slot->ItemStruct.ItemNum++;
+			Slot->SlotCountUpdate(ItemStruct.ItemNum);
 			UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯갯수 증가"));
 			bSlot = true;
+			break;
 		}
 	}
 	if (bSlot == false)
@@ -124,7 +126,9 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct, UTexture2D* Texture)
 			USlot* Slot = Cast<USlot>(Widget);
 			if (Slot->ItemStruct.ItemTop == -1)
 			{
+				UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯추가 증가"));
 				Slot->ItemStruct = ItemStruct;
+				// Slot->Item = Item;
 				FSlateBrush Brush;
 				Brush.SetResourceObject(Texture);
 				Slot->SlotImage->SetBrush(Brush);
