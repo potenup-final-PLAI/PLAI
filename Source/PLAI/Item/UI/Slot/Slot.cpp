@@ -15,6 +15,14 @@ void USlot::SlotCountUpdate(const int32 Count)
 	SlotCount->SetText(FText::AsNumber(Count));
 }
 
+void USlot::SlotImageUpdate()
+{
+	FSlateBrush Brush;
+	Brush.SetResourceObject(ParentItem->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].ItemMeshIndexes[ItemStruct.ItemIndex].
+		ItemMeshTypes[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail]);
+	SlotImage->SetBrush(Brush);
+}
+
 void USlot::NativeConstruct()
 {
 	Super::NativeConstruct();

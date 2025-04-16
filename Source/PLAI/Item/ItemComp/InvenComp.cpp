@@ -27,6 +27,7 @@ UInvenComp::UInvenComp()
 void UInvenComp::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
 	MenuInven->AddToViewport();
 	MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
@@ -65,6 +66,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Q키 !"));
 		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
 		TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+		
 		int32 randIndex = FMath::RandRange(0,1);
 		ItemMaster->ItemStruct.ItemTop = 0;
 		ItemMaster->ItemStruct.ItemIndex = randIndex;

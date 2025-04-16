@@ -63,6 +63,7 @@ public:
 	class AItemMaster* ItemMaster;
 	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
+
 	void GetItem(const FItemStruct& ItemStruct);
 
 public:

@@ -37,6 +37,8 @@ public:
 
 	void SlotCountUpdate(const int32 Count);
 
+	void SlotImageUpdate();
+
     virtual void NativeConstruct() override;
 	
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;

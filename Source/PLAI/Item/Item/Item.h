@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOnItemOverlapped, const FItemStruct&)
+
 UCLASS()
 class PLAI_API AItem : public AActor
 {
@@ -39,6 +41,8 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;
+
+	// FOnItemOverlapped OnItemOverlapped;
 
 	UFUNCTION()
 	void OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent*

@@ -24,7 +24,6 @@ AItem::AItem()
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
-
 	ItemParent = ItemFactory->GetDefaultObject<AItem>();
 	
 	BoxComp->SetWorldScale3D(FVector(2.2));
@@ -42,6 +41,8 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 		ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor);
 		if (TestPlayer)
 		{
+			// OnItemOverlapped.BindUObject(TestPlayer->InvenComp, &UInvenComp::GetItem);
+			// OnItemOverlapped.ExecuteIfBound(ItemStruct);
 			TestPlayer->InvenComp->GetItem(ItemStruct);
 			Destroy();
 		}
