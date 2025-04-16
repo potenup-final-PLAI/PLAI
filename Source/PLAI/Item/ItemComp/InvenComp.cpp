@@ -60,6 +60,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	// 아이템창 출력
+	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::One))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
 		ItemEquip = GetWorld()->SpawnActor<AItemEquip>(EquipFactory,TestPlayer->GetActorLocation() +
@@ -100,7 +101,7 @@ void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
 	}
 }
 
-void UInvenComp::GetItem(const FItemStruct& ItemStruct, UTexture2D* Texture, AItem* Item)
+void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 {
 	UE_LOG(LogTemp,Warning,TEXT("UInvenComp::GetItme()"));
 	
@@ -113,7 +114,7 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct, UTexture2D* Texture, AIt
 			&&Slot->ItemStruct.ItemIndexDetail == ItemStruct.ItemIndexDetail)
 		{
 			Slot->ItemStruct.ItemNum++;
-			Slot->SlotCountUpdate(ItemStruct.ItemNum);
+			Slot->SlotCountUpdate(Slot->ItemStruct.ItemNum);
 			UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯갯수 증가"));
 			bSlot = true;
 			break;
@@ -128,10 +129,6 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct, UTexture2D* Texture, AIt
 			{
 				UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯추가 증가"));
 				Slot->ItemStruct = ItemStruct;
-				// Slot->Item = Item;
-				FSlateBrush Brush;
-				Brush.SetResourceObject(Texture);
-				Slot->SlotImage->SetBrush(Brush);
 				break;
 			}
 		}

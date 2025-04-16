@@ -15,6 +15,12 @@ void USlot::SlotCountUpdate(const int32 Count)
 	SlotCount->SetText(FText::AsNumber(Count));
 }
 
+void USlot::NativeConstruct()
+{
+	Super::NativeConstruct();
+	ParentItem = ItemFactory->GetDefaultObject<AItem>();
+}
+
 FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
 	if (ItemStruct.ItemTop == -1)
@@ -26,7 +32,8 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Slot::왼쪽마우스 NativeOnMouseButtonDown"));
-		return UWidgetBlueprintLibrary::DetectDragIfPressed(MouseEvent, this, EKeys::LeftMouseButton).NativeReply;
+		return UWidgetBlueprintLibrary::DetectDragIfPressed(MouseEvent, this,
+			EKeys::LeftMouseButton).NativeReply;
 	}
 	return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);
 }

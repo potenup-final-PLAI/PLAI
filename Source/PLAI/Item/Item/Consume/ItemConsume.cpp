@@ -14,8 +14,8 @@ AItemConsume::AItemConsume()
 // Called when the game starts or when spawned
 void AItemConsume::BeginPlay()
 {
+	ItemStruct.ItemTop = 0;
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

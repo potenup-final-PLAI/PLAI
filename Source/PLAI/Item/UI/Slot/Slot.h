@@ -23,11 +23,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UTexture2D* Texture;
 
-	UPROPERTY(EditAnywhere)
-	TArray<TSubclassOf<AItem>> ItemFactorys;
+    UPROPERTY(EditAnywhere)
+	TSubclassOf<AItem> ItemFactory;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<AItem*> Items;
+	UPROPERTY(EditAnywhere)
+	class AItem* ParentItem;
 	
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UImage* SlotImage;
@@ -37,8 +37,9 @@ public:
 
 	void SlotCountUpdate(const int32 Count);
 
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+    virtual void NativeConstruct() override;
 	
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 };

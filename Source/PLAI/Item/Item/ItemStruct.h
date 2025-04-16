@@ -62,6 +62,7 @@ struct FItemStructIndex
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere)
 	TArray<FItemStructType>ItemMeshIndexes;
 };
 
@@ -70,5 +71,6 @@ struct FItemStructTop
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere)
 	TArray<FItemStructIndex>ItemMeshTops;
 };

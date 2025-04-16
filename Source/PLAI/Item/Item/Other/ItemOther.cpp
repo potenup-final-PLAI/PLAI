@@ -14,9 +14,9 @@ AItemOther::AItemOther()
 // Called when the game starts or when spawned
 void AItemOther::BeginPlay()
 {
-	ItemStruct.ItemTop = 0;
+	ItemStruct.ItemTop = 2;
 	Super::BeginPlay();
-	StaticMesh->SetStaticMesh(ItemParent->ItemMeshStruct.StaticMeshes[0]);
+	// StaticMesh->SetStaticMesh(ItemParent->ItemMeshStruct.StaticMeshes[0]);
 }
 
 // Called every frame

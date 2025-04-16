@@ -29,9 +29,6 @@ public:
 	FItemStructTop ItemStructTop;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FItemMeshStruct ItemMeshStruct;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AItem> ItemFactory;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)

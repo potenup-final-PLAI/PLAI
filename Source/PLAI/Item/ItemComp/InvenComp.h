@@ -59,7 +59,7 @@ public:
 	class AItemEquip* ItemEquip;
 	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
-	void GetItem(const FItemStruct& ItemStruct,UTexture2D* Texture, AItem* Item);
+	void GetItem(const FItemStruct& ItemStruct);
 
 public:
 	UPROPERTY(EditAnywhere)
