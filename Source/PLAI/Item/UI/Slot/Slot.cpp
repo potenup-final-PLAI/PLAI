@@ -4,6 +4,7 @@
 #include "Slot.h"
 
 #include "Blueprint/DragDropOperation.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/TextBlock.h"
 #include "PLAI/Item/Item/ItemObject.h"
 
@@ -15,7 +16,17 @@ void USlot::SlotCountUpdate(const int32 Count)
 
 FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseButtonDown"));
+	if (ItemStruct.ItemTop == -1)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseButtonDown 슬롯 템 없음"));
+		return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);
+	}
+
+	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Slot::왼쪽마우스 NativeOnMouseButtonDown"));
+		return UWidgetBlueprintLibrary::DetectDragIfPressed(MouseEvent, this, EKeys::LeftMouseButton).NativeReply;
+	}
 	return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);
 }
 
@@ -24,6 +35,8 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 {
 	UDragDropOperation* DragOp = NewObject<UDragDropOperation>();
 	UItemObject* ItemObject = NewObject<UItemObject>();
+
+	DragOp->DefaultDragVisual = this;
 
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseDrag"));
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "PLAI/Item/Item/Item.h"
 #include "PLAI/Item/Item/ItemStruct.h"
 #include "Slot.generated.h"
 
@@ -26,7 +27,10 @@ public:
 	class UTexture2D* Texture;
 
 	UPROPERTY(EditAnywhere)
-	class AItem* Item;
+	TArray<TSubclassOf<AItem>> ItemFactorys;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<AItem*> Items;
 	
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UImage* SlotImage;
@@ -37,6 +41,7 @@ public:
 	void SlotCountUpdate(const int32 Count);
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 };
