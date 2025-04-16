@@ -60,19 +60,23 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	// 아이템창 출력
+	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
+	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Q키 !"));
+		ItemEquip = GetWorld()->SpawnActor<AItemEquip>(EquipFactory,TestPlayer->GetActorLocation() +
+			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+		ItemEquip->ItemStruct.ItemIndex = 0;
+	}
 	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::One))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
 		ItemEquip = GetWorld()->SpawnActor<AItemEquip>(EquipFactory,TestPlayer->GetActorLocation() +
 			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-		ItemEquip->ItemStruct.ItemIndex = 0;
+		ItemEquip->ItemStruct.ItemIndex = 1;
 	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Two))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
-		ItemEquip = GetWorld()->SpawnActor<AItemEquip>(EquipFactory,TestPlayer->GetActorLocation() +
-			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-		ItemEquip->ItemStruct.ItemIndex = 1;
 	}
+	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::I))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 I키 !"));
 		EnumKey = EEnumKey::Item;
