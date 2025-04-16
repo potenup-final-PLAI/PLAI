@@ -37,9 +37,13 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 	UItemObject* ItemObject = NewObject<UItemObject>();
 
 	DragOp->DefaultDragVisual = this;
+	DragOp->Payload = ItemObject;
+	DragOp->Pivot = EDragPivot::MouseDown;
 
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseDrag"));
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+	
+	OutOperation = DragOp;
 }
 
 bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,

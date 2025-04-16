@@ -24,9 +24,6 @@ public:
 	FItemMeshStructIndex ItemMeshStructIndex;
 
 	UPROPERTY(EditAnywhere)
-	class UTexture2D* Texture;
-
-	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<AItem>> ItemFactorys;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
