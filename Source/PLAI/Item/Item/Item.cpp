@@ -51,9 +51,9 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 void AItem::SetMesh()
 {
 	if (ItemStruct.ItemTop == -1) { UE_LOG(LogTemp,Warning,TEXT("아이템 탑 -1 초기화전")) return; }
+	
 	int32 rand = FMath::RandRange(0,ItemParent->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].
 		ItemMeshIndexes[ItemStruct.ItemIndex].ItemMeshTypes[ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
-	
 	    ItemStruct.ItemIndexDetail = rand;
 	
 	StaticMesh->SetStaticMesh(ItemParent->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].
