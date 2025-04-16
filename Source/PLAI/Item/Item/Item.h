@@ -45,5 +45,5 @@ public:
 		OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	virtual void SetMesh();
-	int32 RandIndex();
+	// int32 RandIndex();
 };

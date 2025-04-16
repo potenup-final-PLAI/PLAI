@@ -74,3 +74,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FItemStructIndex>ItemMeshTops;
 };
+
+
+
