@@ -18,4 +18,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FItemStruct ItemStruct;
+
+	UPROPERTY(EditAnywhere)
+	class USlot* SlotUi;
 };

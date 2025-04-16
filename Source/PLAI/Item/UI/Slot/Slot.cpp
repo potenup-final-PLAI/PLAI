@@ -51,25 +51,37 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 {
 	UDragDropOperation* DragOp = NewObject<UDragDropOperation>();
 	UItemObject* ItemObject = NewObject<UItemObject>();
+
+    USlotEmpty* SlotEmpty = CreateWidget<USlotEmpty>(GetWorld(),SlotEmptyFactory);
+	if (SlotEmpty)
+	{
+		SlotEmpty->SlotImage->SetBrush(SlotImage->GetBrush());
+	}
+	FSlateBrush Brush;
+	Brush.SetResourceObject(nullptr);
+	Brush.DrawAs = ESlateBrushDrawType::Type::NoDrawType;
+	SlotImage->SetBrush(Brush);
 	
-	DragOp->DefaultDragVisual = this;
+    ItemObject->ItemStruct = ItemStruct;
+	ItemObject->SlotUi = this;
+	
+	DragOp->DefaultDragVisual = SlotEmpty;
 	DragOp->Payload = ItemObject;
 	DragOp->Pivot = EDragPivot::MouseDown;
 
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseDrag"));
-	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-	
 	OutOperation = DragOp;
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 }
 
 bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
 	UDragDropOperation* InOperation)
 {
-	UItemObject* ItemObject = Cast<UItemObject>(InOperation);
+	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
 
-	FSlateBrush Brush;
-	Brush.SetResourceObject(Texture);
-	SlotImage->SetBrush(Brush);
+	// FSlateBrush Brush;
+	// Brush.SetResourceObject(Texture);
+	// SlotImage->SetBrush(Brush);
 	
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
