@@ -3,6 +3,7 @@
 
 #include "InvenComp.h"
 
+#include "JsonObjectConverter.h"
 #include "MovieSceneTracksComponentTypes.h"
 #include "Components/Image.h"
 #include "Components/WrapBox.h"
@@ -45,10 +46,8 @@ void UInvenComp::BeginPlay()
 void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	// 아이템창 출력
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
-	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Q키 !"));
+	{   UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Q키 !"));
 		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
 		TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
 		
@@ -60,9 +59,8 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
 		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
-	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::One))
-	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
+	{   UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
 		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
 			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
 		int32 randIndex = FMath::RandRange(0,1);
@@ -74,7 +72,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Two))
-	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
+	    { UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
 		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
 			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
 		ItemMaster->ItemStruct.ItemTop = 2;
@@ -85,6 +83,16 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		ItemMaster->ItemStruct.ItemIndex = randIndex;
 		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
+	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Zero))
+	{
+		SaveItemInventory();
+	}
+	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Nine))
+	{
+	}
+
+	// 아이템창 출력
+	
 	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::I))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 I키 !"));
@@ -119,6 +127,7 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 	UE_LOG(LogTemp,Warning,TEXT("UInvenComp::GetItme()"));
 	
 	bool bSlot = false;
+	if (MenuInven->WBP_ItemInven->WrapBox->GetChildAt(0) == nullptr) return;
 	for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
 	{
 		USlot* Slot = Cast<USlot>(Widget);
@@ -171,6 +180,34 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, TEXT("Weapon_L"));
 		ItemArmor->ItemStruct = ItemStruct;
 	}
+}
+
+void UInvenComp::SaveItemInventory()
+{
+	
+	TArray<FItemStruct> ItemStructs;
+	
+	for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
+	{
+		USlot* Slot = Cast<USlot>(Widget);
+		ItemStructs.Add(Slot->ItemStruct);
+	}
+
+	FItemStructsArray ItemStructsArray;
+	ItemStructsArray.ItemStructs = ItemStructs;
+
+	FString JsonValue;
+	FJsonObjectConverter::UStructToJsonObjectString(ItemStructsArray, JsonValue);
+	
+	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("AllOktest.tst"));
+	FFileHelper::SaveStringToFile(JsonValue,*path);
+	
+	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 json string%s"),*JsonValue);
+}
+
+void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 	
 	

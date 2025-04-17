@@ -1,0 +1,244 @@
+{
+	"itemStructs": [
+		{
+			"itemTop": 1,
+			"itemIndex": 1,
+			"itemIndexType": 0,
+			"itemIndexDetail": 1,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 2
+		},
+		{
+			"itemTop": 2,
+			"itemIndex": 1,
+			"itemIndexType": 0,
+			"itemIndexDetail": 1,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 1
+		},
+		{
+			"itemTop": 1,
+			"itemIndex": 1,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 1
+		},
+		{
+			"itemTop": 2,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 1,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": 2,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 1
+		},
+		{
+			"itemTop": 1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": 0,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 1,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 1
+		},
+		{
+			"itemTop": 0,
+			"itemIndex": 1,
+			"itemIndexType": 0,
+			"itemIndexDetail": 1,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 1
+		},
+		{
+			"itemTop": 0,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		},
+		{
+			"itemTop": -1,
+			"itemIndex": 0,
+			"itemIndexType": 0,
+			"itemIndexDetail": 0,
+			"name": "Name",
+			"nameType": "Type",
+			"nameDetail": "Detail",
+			"itemNum": 0
+		}
+	]
+}

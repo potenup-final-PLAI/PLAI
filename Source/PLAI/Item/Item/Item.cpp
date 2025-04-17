@@ -11,6 +11,7 @@
 // Sets default values
 AItem::AItem()
 {
+	bReplicates = true;
 	BoxComp = CreateDefaultSubobject<UBoxComponent>("BoxComp");
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetRootComponent(BoxComp);

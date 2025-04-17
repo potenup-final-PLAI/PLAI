@@ -39,20 +39,20 @@ bool UEquipInven::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent
 	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
 	if (ItemObject->ItemStruct.ItemTop == 1)
 	{
-		// for (UWidget* Widget : LeftBox->GetAllChildren())
-		// {
-		// 	USlotEquip* ESlot = Cast<USlotEquip>(Widget);
-		// 	if (ESlot->SlotType == EquipSlotType::Weapon && ItemObject->ItemStruct.ItemIndex == 0)
-		// 	{
-		// 		ESlot->ItemStruct = ItemObject->ItemStruct;
-		// 		ESlot->SlotImageUpdate();
-		// 	}
-		// 	if (ESlot->SlotType == EquipSlotType::Armor && ItemObject->ItemStruct.ItemIndex == 1)
-		// 	{
-		// 		ESlot->ItemStruct = ItemObject->ItemStruct;
-		// 		ESlot->SlotImageUpdate();
-		// 	}
-		// }
+		for (UWidget* Widget : LeftBox->GetAllChildren())
+		{
+			// USlotEquip* ESlot = Cast<USlotEquip>(Widget);
+			// if (ESlot->SlotType == EquipSlotType::Weapon && ItemObject->ItemStruct.ItemIndex == 0)
+			// {
+			// 	ESlot->ItemStruct = ItemObject->ItemStruct;
+			// 	ESlot->SlotImageUpdate();
+			// }
+			// if (ESlot->SlotType == EquipSlotType::Armor && ItemObject->ItemStruct.ItemIndex == 1)
+			// {
+			// 	ESlot->ItemStruct = ItemObject->ItemStruct;
+			// 	ESlot->SlotImageUpdate();
+			// }
+		}
 	}
 	
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);

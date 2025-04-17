@@ -21,6 +21,25 @@ enum class EEnumKey : uint8
 	Equip
 };
 
+USTRUCT(BlueprintType,Blueprintable)
+struct FItemStructsArray
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<FItemStruct>ItemStructs;
+};
+
+// USTRUCT(BlueprintType,Blueprintable)
+// struct FItemJsonStructArray
+// {
+// 	GENERATED_BODY()
+//
+// public:
+// 	TArray<FString>ItemJsons;
+// };
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API UInvenComp : public UItemComp
 {
@@ -67,7 +86,7 @@ public:
 	class AItemMaster* ItemWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AItemMaster* ItemArmor;
-
+	
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* CompWeapon;
 	UPROPERTY(EditAnywhere)
@@ -78,6 +97,10 @@ public:
 	void GetItem(const FItemStruct& ItemStruct);
 	
 	void EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
+
+	void SaveItemInventory();
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	UPROPERTY(EditAnywhere)
