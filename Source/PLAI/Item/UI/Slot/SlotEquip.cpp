@@ -39,14 +39,19 @@ bool USlotEquip::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 	if (SlotType == EquipSlotType::Armor && ItemObject->ItemStruct.ItemIndex != 1)
 	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 아머 안맞네")) return false; }
 
-	// if (SlotType != EquipSlotType::Armor || SlotType != EquipSlotType::Weapon)
-	// { UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 아머 무기 둘다 안맞네")) return false; }
+	if (SlotType == EquipSlotType::Helmet && ItemObject->ItemStruct.ItemIndex != 2)
+	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 헬멧 안맞네")) return false; }
+
+	if (SlotType == EquipSlotType::Gloves && ItemObject->ItemStruct.ItemIndex != 3)
+	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 글러브 안맞네")) return false; }
+
+	if (SlotType == EquipSlotType::Boots && ItemObject->ItemStruct.ItemIndex != 4)
+	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 신발 안맞네")) return false; }
 	
 	APlayerController* Pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 	if (Pc->IsLocalController())
-	{   UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnDrop: 플레이어 캐스팅 성공 이름은? %s"),*Pc->Player->GetName());
+	{  UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnDrop: 플레이어 캐스팅 성공 이름은? %s"),*Pc->Player->GetName());
 		ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetPawn());
 		Player->InvenComp->EquipItem(ItemObject->ItemStruct,this); }
-
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }

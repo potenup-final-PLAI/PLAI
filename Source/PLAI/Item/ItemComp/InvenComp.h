@@ -66,7 +66,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AItemMaster* ItemWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AItemMaster* ItemShield;
+	class AItemMaster* ItemArmor;
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* CompWeapon;

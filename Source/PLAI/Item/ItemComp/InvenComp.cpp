@@ -153,12 +153,24 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = GetOwner();
-	ItemWeapon = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,100,0),FRotator(0,0,0),SpawnParams);
-	ItemWeapon->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, TEXT("Weapon_R"));
-	ItemWeapon->ItemStruct = ItemStruct;
-	
-	// SlotEquip->ItemMaster = ItemWeapon;
-	// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비템 소환 %s"),*ItemWeapon->StaticMesh->GetStaticMesh()->GetName());
+	if (Equip->SlotType == EquipSlotType::Weapon)
+	{
+		if (ItemWeapon != nullptr) return;
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
+		ItemWeapon = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,100,0),
+		FRotator(0,0,0),SpawnParams);
+		ItemWeapon->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, TEXT("Weapon_R"));
+		ItemWeapon->ItemStruct = ItemStruct;
+	}
+	else if (Equip->SlotType == EquipSlotType::Armor)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
+		// if (ItemArmor != nullptr) return;
+		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),
+		FRotator(0,0,0),SpawnParams);
+		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, TEXT("Weapon_L"));
+		ItemArmor->ItemStruct = ItemStruct;
+	}
 }
 	
 	
