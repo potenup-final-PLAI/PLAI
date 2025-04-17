@@ -87,16 +87,16 @@ bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDr
 	SlotCountUpdate(ItemStruct.ItemNum);
 	
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
-	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+	return false;
+	// return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 
 void USlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
-	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
-
-	ItemStruct = ItemObject->ItemStruct;
 	
+	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
+	ItemStruct = ItemObject->ItemStruct;
 	SlotImageUpdate();
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop 다른창에 했음"));
 }
