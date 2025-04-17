@@ -64,6 +64,7 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 	
     ItemObject->ItemStruct = ItemStruct;
 	ItemStruct = FItemStruct();
+	SlotCountUpdate(ItemStruct.ItemNum);
 	
 	ItemObject->SlotUi = this;
 	

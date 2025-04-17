@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "EquipInven.generated.h"
 
 /**
@@ -13,4 +14,20 @@ UCLASS()
 class PLAI_API UEquipInven : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<USlotEquip> SlotEquipFactory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USlotEquip* SlotEquip;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UVerticalBox* LeftBox;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UVerticalBox* RightBox;
+
+	virtual void NativeConstruct() override;
 };
