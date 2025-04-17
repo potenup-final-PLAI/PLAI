@@ -16,10 +16,11 @@ FReply USlotEquip::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FP
 		APlayerController* Pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 		if (Pc->IsLocalController())
 		{
-			UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnMouse 왼쪽버튼다운: 플레이어 캐스팅 성공 이름은? %s"),*Pc->Player->GetName());
+			UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnMouse 왼쪽버튼다운: 플레이어 캐스팅 성공 이름은? %s"),*GetName());
 			ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetPawn());
-			Player->InvenComp->ItemWeapon->Destroy();
-			Player->InvenComp->ItemWeapon = nullptr;
+			if (Player->InvenComp->ItemWeapon)
+			{ Player->InvenComp->ItemWeapon->Destroy();
+				Player->InvenComp->ItemWeapon = nullptr; }
 		}
 	}
 	return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);
@@ -31,12 +32,21 @@ bool USlotEquip::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 	if (ItemObject->ItemStruct.ItemTop != 1)
 	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnDrop: Item index is not 1 아이템 인덱스머여 %d"),
 	  ItemObject->ItemStruct.ItemTop); return false; }
+
+	if (SlotType == EquipSlotType::Weapon && ItemObject->ItemStruct.ItemIndex != 0)
+	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 웨폰 안맞네")) return false; }
+	
+	if (SlotType == EquipSlotType::Armor && ItemObject->ItemStruct.ItemIndex != 1)
+	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 아머 안맞네")) return false; }
+
+	// if (SlotType != EquipSlotType::Armor || SlotType != EquipSlotType::Weapon)
+	// { UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 아머 무기 둘다 안맞네")) return false; }
 	
 	APlayerController* Pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 	if (Pc->IsLocalController())
 	{   UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnDrop: 플레이어 캐스팅 성공 이름은? %s"),*Pc->Player->GetName());
 		ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetPawn());
 		Player->InvenComp->EquipItem(ItemObject->ItemStruct,this); }
-	
+
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
