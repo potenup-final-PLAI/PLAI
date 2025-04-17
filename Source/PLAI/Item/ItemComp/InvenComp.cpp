@@ -38,20 +38,16 @@ void UInvenComp::BeginPlay()
 
 	AItemMaster* Item = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,FVector(0,0,0),FRotator(0,0,0));
 	
-	CompWeapon = NewObject<UStaticMeshComponent>(TestPlayer,TEXT("CompWeapon"));
-	CompWeapon->RegisterComponent();
-	CompWeapon->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
-	CompWeapon->SetRelativeLocation(FVector(75,0,0));
-	CompWeapon->SetStaticMesh(Item->ItemParent->ItemStructTop.ItemMeshTops[0].ItemMeshIndexes[0].ItemMeshTypes[0].StaticMeshes[0]);
-	
-	CompShield = NewObject<UStaticMeshComponent>(TestPlayer,TEXT("CompSheild"));
-	CompShield->RegisterComponent();
-	CompShield->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
-	CompShield->SetRelativeLocation(FVector(-75,0,0));
+	ItemShield = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),FRotator(0,0,0));
+	ItemShield->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	ItemShield->ItemStruct.ItemTop = 1; ItemShield->ItemStruct.ItemIndexDetail = 1;
+	ItemShield->SetActorRelativeLocation(FVector(0,-75,0));
 
-	
-	// ...
-	
+	// CompWeapon = NewObject<UStaticMeshComponent>(TestPlayer,TEXT("CompWeapon"));
+	// CompWeapon->RegisterComponent();
+	// CompWeapon->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+	// CompWeapon->SetRelativeLocation(FVector(0,75,0));
+	// CompWeapon->SetStaticMesh(Item->ItemParent->ItemStructTop.ItemMeshTops[2].ItemMeshIndexes[0].ItemMeshTypes[0].StaticMeshes[0]);
 }
 
 
@@ -59,6 +55,7 @@ void UInvenComp::BeginPlay()
 void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
 	// 아이템창 출력
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Q키 !"));
@@ -160,6 +157,24 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 			}
 		}
 	}
+}
+void UInvenComp::EquipItem(const FItemStruct& ItemStruct)
+{
+	// if (ItemWeapon)
+	// {
+	// 	ItemWeapon->Destroy();
+	// 	ItemWeapon = nullptr;
+	// }
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Owner = GetOwner();
+	ItemWeapon = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,100,0),FRotator(0,0,0),SpawnParams);
+	ItemWeapon->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	ItemWeapon->ItemStruct = ItemStruct;
+	ItemWeapon->SetMesh();
+	ItemWeapon->SetActorRelativeLocation(FVector(0,75,0));
+	
+	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비템 소환 %s"),*ItemWeapon->StaticMesh->GetStaticMesh()->GetName());
 }
 	
 	

@@ -5,6 +5,8 @@
 
 #include "Blueprint/DragDropOperation.h"
 #include "PLAI/Item/Item/ItemObject.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 bool USlotEquip::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
                               UDragDropOperation* InOperation)
@@ -17,5 +19,15 @@ bool USlotEquip::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 		
 		return false;
 	}
+	APlayerController* Pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	if (Pc->IsLocalController())
+	{
+		UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnDrop: 플레이어 캐스팅 성공 이름은? %s"),*Pc->Player->GetName());
+		ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetPawn());
+		Player->InvenComp->EquipItem(ItemObject->ItemStruct);
+	}
+
+	DrawD
+	
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
