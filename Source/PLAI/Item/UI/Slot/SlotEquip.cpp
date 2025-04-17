@@ -26,8 +26,5 @@ bool USlotEquip::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 		ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetPawn());
 		Player->InvenComp->EquipItem(ItemObject->ItemStruct);
 	}
-
-	DrawD
-	
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
