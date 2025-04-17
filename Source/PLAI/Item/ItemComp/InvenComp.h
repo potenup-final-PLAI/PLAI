@@ -8,6 +8,7 @@
 #include "PLAI/Item/Item/ItemStruct.h"
 #include "PLAI/Item/Item/Equip//ItemEquip.h"
 #include "PLAI/Item/UI/Inventory/MenuInven.h"
+#include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "InvenComp.generated.h"
 
 class APlayerController;
@@ -76,7 +77,7 @@ public:
 
 	void GetItem(const FItemStruct& ItemStruct);
 	
-	void EquipItem(const FItemStruct& ItemStruct);
+	void EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
 
 public:
 	UPROPERTY(EditAnywhere)

@@ -9,6 +9,7 @@
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Item/Equip/ItemEquip.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
@@ -37,17 +38,6 @@ void UInvenComp::BeginPlay()
 	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
 
 	AItemMaster* Item = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,FVector(0,0,0),FRotator(0,0,0));
-	
-	ItemShield = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),FRotator(0,0,0));
-	ItemShield->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-	ItemShield->ItemStruct.ItemTop = 1; ItemShield->ItemStruct.ItemIndexDetail = 1;
-	ItemShield->SetActorRelativeLocation(FVector(0,-75,0));
-
-	// CompWeapon = NewObject<UStaticMeshComponent>(TestPlayer,TEXT("CompWeapon"));
-	// CompWeapon->RegisterComponent();
-	// CompWeapon->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
-	// CompWeapon->SetRelativeLocation(FVector(0,75,0));
-	// CompWeapon->SetStaticMesh(Item->ItemParent->ItemStructTop.ItemMeshTops[2].ItemMeshIndexes[0].ItemMeshTypes[0].StaticMeshes[0]);
 }
 
 
@@ -158,23 +148,17 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 		}
 	}
 }
-void UInvenComp::EquipItem(const FItemStruct& ItemStruct)
+void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 {
-	// if (ItemWeapon)
-	// {
-	// 	ItemWeapon->Destroy();
-	// 	ItemWeapon = nullptr;
-	// }
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = GetOwner();
 	ItemWeapon = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,100,0),FRotator(0,0,0),SpawnParams);
-	ItemWeapon->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	ItemWeapon->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, TEXT("Weapon_R"));
 	ItemWeapon->ItemStruct = ItemStruct;
-	ItemWeapon->SetMesh();
-	ItemWeapon->SetActorRelativeLocation(FVector(0,75,0));
 	
-	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비템 소환 %s"),*ItemWeapon->StaticMesh->GetStaticMesh()->GetName());
+	// SlotEquip->ItemMaster = ItemWeapon;
+	// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비템 소환 %s"),*ItemWeapon->StaticMesh->GetStaticMesh()->GetName());
 }
 	
 	
