@@ -61,6 +61,11 @@ public:
 	TSubclassOf<class AItemMaster> ItemMasterFactory;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AItemMaster* ItemMaster;
+
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* CompWeapon;
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* CompShield;
 	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 

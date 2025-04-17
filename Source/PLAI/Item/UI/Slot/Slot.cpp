@@ -87,7 +87,7 @@ bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDr
 	SlotCountUpdate(ItemStruct.ItemNum);
 	
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
-	return false;
+	return true;
 	// return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 

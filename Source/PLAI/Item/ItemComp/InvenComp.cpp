@@ -3,6 +3,7 @@
 
 #include "InvenComp.h"
 
+#include "MovieSceneTracksComponentTypes.h"
 #include "Components/Image.h"
 #include "Components/WrapBox.h"
 #include "PLAI/Item/Item/ItemMaster.h"
@@ -18,8 +19,7 @@ UInvenComp::UInvenComp()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	// ..
 }
 
 
@@ -34,24 +34,22 @@ void UInvenComp::BeginPlay()
 	MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 	
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
-	if (TestPlayer)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInvenComp::플레이어 BeginPlay()"));
-	}
-    else
-    {
-    	UE_LOG(LogTemp, Warning, TEXT("UInvenComp::플레이어없음 BeginPlay()"));
-    }
-	
 	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
-	if (PC)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInvenComp: 컨트롤러 있음 BeginPlay()"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInvenComp: 컨트롤러 없음 BeginPlay()"));
-	}
+
+	AItemMaster* Item = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,FVector(0,0,0),FRotator(0,0,0));
+	
+	CompWeapon = NewObject<UStaticMeshComponent>(TestPlayer,TEXT("CompWeapon"));
+	CompWeapon->RegisterComponent();
+	CompWeapon->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+	CompWeapon->SetRelativeLocation(FVector(75,0,0));
+	CompWeapon->SetStaticMesh(Item->ItemParent->ItemStructTop.ItemMeshTops[0].ItemMeshIndexes[0].ItemMeshTypes[0].StaticMeshes[0]);
+	
+	CompShield = NewObject<UStaticMeshComponent>(TestPlayer,TEXT("CompSheild"));
+	CompShield->RegisterComponent();
+	CompShield->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+	CompShield->SetRelativeLocation(FVector(-75,0,0));
+
+	
 	// ...
 	
 }

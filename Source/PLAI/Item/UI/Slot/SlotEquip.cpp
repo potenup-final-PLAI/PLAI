@@ -10,12 +10,12 @@ bool USlotEquip::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
                               UDragDropOperation* InOperation)
 {
 	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
-	if (ItemObject->ItemStruct.ItemIndex != 1)
+	if (ItemObject->ItemStruct.ItemTop != 1)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnDrop: Item index is not 1 아이템 인덱스머여 %d"),
-			ItemObject->ItemStruct.ItemIndex);
+			ItemObject->ItemStruct.ItemTop);
 		
-		return true;
+		return false;
 	}
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
