@@ -5,6 +5,7 @@
 
 #include "Blueprint/DragDropOperation.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "PLAI/Item/Item/ItemObject.h"
@@ -54,13 +55,16 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 		if (PlayerController->IsLocalController())
 		{
 			ATestPlayer* TestPlayer = Cast<ATestPlayer>(PlayerController->GetPawn());
-			FGeometry Geometry = GetCachedGeometry();
-			FVector2D vector = Geometry.GetAbsolutePosition();
-			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->
-			SetPositionInViewport(vector - FVector2D(50.f,0.f),false);
 			
 			bItemDetail = !bItemDetail;
+
 			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(bItemDetail ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+			// FGeometry Geometry = GetCachedGeometry();
+			// FVector2D Position = Geometry.GetAbsolutePosition();
+			// float Scale = UWidgetLayoutLibrary::GetViewportScale(this);
+			// FVector2D ScalePosition = Position / Scale;
+			// TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->
+			// SetRenderTranslation(ScalePosition);
 		}
 	}
 	return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);
