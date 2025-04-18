@@ -7,6 +7,7 @@
 #include "MovieSceneTracksComponentTypes.h"
 #include "Components/BoxComponent.h"
 #include "Components/Image.h"
+#include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Item/Equip/ItemEquip.h"
@@ -95,6 +96,10 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Nine))
 	{
 		LoadItemInventory();
+	}
+	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Eight))
+	{
+		SaveEquipInventory();
 	}
 
 	// 아이템창 출력
@@ -190,10 +195,11 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 	else if (Equip->SlotType == EquipSlotType::Helmet)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
-        ItemHelmet = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,0,100),FRotator(0,0,0));
+        ItemHelmet = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,0,80),FRotator(0,0,0));
 		ItemHelmet->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::KeepWorldTransform, TEXT("headSocket"));
 		ItemHelmet->ItemStruct = ItemStruct;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+		ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
 	}
 	else if (Equip->SlotType == EquipSlotType::Gloves)
 	{
@@ -203,20 +209,18 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		ItemGlove->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemGlove->ItemStruct = ItemStruct;
 		ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
-		ItemGlove->SetActorRelativeRotation(FRotator(0,0,0));
-		ItemGlove->SetActorRotation(FRotator(0,0,0));
+		ItemGlove->SetActorRelativeRotation(FRotator(-90,0,0));
 	}
 	else if (Equip->SlotType == EquipSlotType::Boots)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
-		Itemboots = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,100,100),FRotator(0,0,0));
+		Itemboots = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(75,75,75),FRotator(0,0,0));
 		Itemboots->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
 		Itemboots->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		Itemboots->ItemStruct = ItemStruct;
 		Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
 		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
 	}
-
 }
 
 void UInvenComp::SaveItemInventory()
@@ -258,6 +262,28 @@ void UInvenComp::LoadItemInventory()
 		else
 		{ Slot->SlotImageUpdate(); }
 	}
+}
+
+void UInvenComp::SaveEquipInventory()
+{
+	FItemStructsArray ItemStructsArray;
+	for (UWidget* Widget : MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+	{
+		USlotEquip* SlotEquip = Cast<USlotEquip>(Widget);
+		int32 index = MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(Widget);
+		ItemStructsArray.ItemStructs.Add(SlotEquip->ItemStruct);
+	}
+	FString JsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(ItemStructsArray,JsonString);
+	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨%s"),*JsonString)
+	
+	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Equip.tst"));
+	FFileHelper::SaveStringToFile(JsonString, *path);
+}
+
+void UInvenComp::LoadEquipInventory()
+{
+	
 }
 
 void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
