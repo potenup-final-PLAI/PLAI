@@ -83,6 +83,9 @@ public:
 	class AItemMaster* ItemGlove;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AItemMaster* Itemboots;
+
+	UFUNCTION(Server,Reliable)
+	void Server_SpawnOneItem();
 	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 
@@ -95,8 +98,6 @@ public:
 
 	void SaveEquipInventory();
 	void LoadEquipInventory();
-
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	UPROPERTY(EditAnywhere)

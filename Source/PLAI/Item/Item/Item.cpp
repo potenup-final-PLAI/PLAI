@@ -42,7 +42,7 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 	if (OtherActor)
 	{
 		ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor);
-		if (TestPlayer)
+		if (TestPlayer && TestPlayer->HasAuthority())
 		{
 			if (TestPlayer->InvenComp->MenuInven->WBP_ItemInven == nullptr)
 			{ UE_LOG(LogTemp,Display,TEXT("Item 플레이어 랩박스, 슬롯이 없네?")); return; }

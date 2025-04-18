@@ -63,22 +63,11 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
 		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
-	if (TestPlayer->HasAuthority())
-	{
-		if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::One))
-		{   UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
-			ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
-				TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-			int32 randIndex = FMath::RandRange(0,4);
-			ItemMaster->ItemStruct.ItemTop = 1;
-			ItemMaster->ItemStruct.ItemIndex = randIndex;
-		
-			int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
-			ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
-			ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
-		} 
-	}
-	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Two))
+	
+	if (PC->WasInputKeyJustPressed(EKeys::One))
+		{ Server_SpawnOneItem(); }
+	
+	if (PC->WasInputKeyJustPressed(EKeys::Two))
 	    { UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
 		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
 			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
@@ -114,6 +103,22 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 E키 "));
 		EnumKey = EEnumKey::Equip;
 		ItemInvenTory(EnumKey, MenuInven->WBP_EquipInven); }
+}
+
+void UInvenComp::Server_SpawnOneItem_Implementation()
+{
+	if (!TestPlayer->IsLocallyControlled()) return;
+	
+	UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
+	ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
+		TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+	int32 randIndex = FMath::RandRange(0,4);
+	ItemMaster->ItemStruct.ItemTop = 1;
+	ItemMaster->ItemStruct.ItemIndex = randIndex;
+		
+	int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
+	ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
+	ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 }
 
 void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
@@ -225,7 +230,6 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 
 void UInvenComp::SaveItemInventory()
 {
-	
 	TArray<FItemStruct> ItemStructs;
 	
 	for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
@@ -301,11 +305,4 @@ void UInvenComp::LoadEquipInventory()
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 로드"))
 }
-
-void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-}
-	
-	
 
