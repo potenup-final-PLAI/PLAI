@@ -31,15 +31,6 @@ public:
 	TArray<FItemStruct>ItemStructs;
 };
 
-// USTRUCT(BlueprintType,Blueprintable)
-// struct FItemJsonStructArray
-// {
-// 	GENERATED_BODY()
-//
-// public:
-// 	TArray<FString>ItemJsons;
-// };
-
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API UInvenComp : public UItemComp
 {
@@ -99,6 +90,7 @@ public:
 	void EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
 
 	void SaveItemInventory();
+	void LoadItemInventory();
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 

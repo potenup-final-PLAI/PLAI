@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 
 // Sets default values
@@ -42,10 +43,13 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 		ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor);
 		if (TestPlayer)
 		{
-			// OnItemOverlapped.BindUObject(TestPlayer->InvenComp, &UInvenComp::GetItem);
-			// OnItemOverlapped.ExecuteIfBound(ItemStruct);
+			// if (TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox)
+			// { UE_LOG(LogTemp,Display,TEXT("Item 플레이어 랩박스, 슬롯이 없네?")); return; }
 			TestPlayer->InvenComp->GetItem(ItemStruct);
 			Destroy();
+
+			// OnItemOverlapped.BindUObject(TestPlayer->InvenComp, &UInvenComp::GetItem);
+            			// OnItemOverlapped.ExecuteIfBound(ItemStruct);
 		}
 	}
 }

@@ -89,6 +89,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Nine))
 	{
+		LoadItemInventory();
 	}
 
 	// 아이템창 출력
@@ -188,10 +189,8 @@ void UInvenComp::SaveItemInventory()
 	TArray<FItemStruct> ItemStructs;
 	
 	for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
-	{
-		USlot* Slot = Cast<USlot>(Widget);
-		ItemStructs.Add(Slot->ItemStruct);
-	}
+	{ USlot* Slot = Cast<USlot>(Widget);
+		ItemStructs.Add(Slot->ItemStruct); }
 
 	FItemStructsArray ItemStructsArray;
 	ItemStructsArray.ItemStructs = ItemStructs;
@@ -203,6 +202,26 @@ void UInvenComp::SaveItemInventory()
 	FFileHelper::SaveStringToFile(JsonValue,*path);
 	
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 json string%s"),*JsonValue);
+}
+
+void UInvenComp::LoadItemInventory()
+{
+	FString path = FString::Printf(TEXT("%s%s"), *FPaths::ProjectDir(), TEXT("AllOktest.tst"));
+	FString JsonString;
+	FFileHelper::LoadFileToString(JsonString, *path);
+
+	FItemStructsArray ItemStructsArray;
+	FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &ItemStructsArray);
+
+	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 로드 jsonstring%s"),*JsonString);
+
+	for (int32 i = 0; i < ItemStructsArray.ItemStructs.Num(); i++)
+	{
+		USlot* Slot = Cast<USlot>(MenuInven->WBP_ItemInven->WrapBox->GetChildAt(i));
+		Slot->ItemStruct = ItemStructsArray.ItemStructs[i];
+		if (Slot->ItemStruct.ItemTop == -1) {UE_LOG(LogTemp,Warning,TEXT("인벤컴프 슬롯 itemtop -1 리턴")) return; }
+		Slot->SlotImageUpdate();
+	}
 }
 
 void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
