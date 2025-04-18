@@ -63,21 +63,20 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
 		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
-	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::One))
-	{   UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
-		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
-			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-		int32 randIndex = FMath::RandRange(0,4);
-		ItemMaster->ItemStruct.ItemTop = 1;
-		ItemMaster->ItemStruct.ItemIndex = randIndex;
+	if (TestPlayer->HasAuthority())
+	{
+		if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::One))
+		{   UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
+			ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
+				TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+			int32 randIndex = FMath::RandRange(0,4);
+			ItemMaster->ItemStruct.ItemTop = 1;
+			ItemMaster->ItemStruct.ItemIndex = randIndex;
 		
-		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
-		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
-		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
-
-		FString JasonString;
-		FJsonObjectConverter::UStructToJsonObjectString(ItemMaster->ItemStruct,JasonString);
-		// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 소환한 아이템 구조체 %s"),*JasonString);
+			int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
+			ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
+			ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
+		} 
 	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Two))
 	    { UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));

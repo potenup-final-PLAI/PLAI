@@ -4,15 +4,16 @@
 #include "Item.h"
 
 #include "Components/BoxComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
-#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 
 // Sets default values
 AItem::AItem()
 {
 	bReplicates = true;
+	
 	BoxComp = CreateDefaultSubobject<UBoxComponent>("BoxComp");
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetRootComponent(BoxComp);
@@ -47,7 +48,6 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 			{ UE_LOG(LogTemp,Display,TEXT("Item 플레이어 랩박스, 슬롯이 없네?")); return; }
 			TestPlayer->InvenComp->GetItem(ItemStruct);
 			Destroy();
-
 			// OnItemOverlapped.BindUObject(TestPlayer->InvenComp, &UInvenComp::GetItem);
             			// OnItemOverlapped.ExecuteIfBound(ItemStruct);
 		}
@@ -60,6 +60,12 @@ void AItem::SetMesh()
 	
 	StaticMesh->SetStaticMesh(ItemParent->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].
 	ItemMeshIndexes[ItemStruct.ItemIndex].ItemMeshTypes[ItemStruct.ItemIndexType].StaticMeshes[ItemStruct.ItemIndexDetail]);
+}
+
+void AItem::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AItem,ItemStruct)
 }
 
 // Called every frame

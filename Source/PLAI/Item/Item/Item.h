@@ -24,7 +24,7 @@ protected:
 public:
 
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
 	FItemStruct ItemStruct;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -50,4 +50,6 @@ public:
 
 	virtual void SetMesh();
 	// int32 RandIndex();
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };
