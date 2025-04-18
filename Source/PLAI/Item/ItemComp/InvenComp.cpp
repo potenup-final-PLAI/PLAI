@@ -137,6 +137,10 @@ void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
 	}
 }
 
+void UInvenComp::Server_GetItem_Implementation(const FItemStruct& ItemStruct)
+{
+}
+
 void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 {
 	UE_LOG(LogTemp,Warning,TEXT("UInvenComp::GetItme()"));
@@ -172,6 +176,12 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 		}
 	}
 }
+
+void UInvenComp::Client_GetItem_Implementation(const FItemStruct& ItemStruct)
+{
+	
+}
+
 void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 {
 	FActorSpawnParameters SpawnParams;

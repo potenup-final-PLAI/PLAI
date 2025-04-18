@@ -89,8 +89,13 @@ public:
 	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 
+	UFUNCTION(Server,Reliable)
+	void Server_GetItem(const FItemStruct& ItemStruct);
+	UFUNCTION(Client,Reliable)
+	void Client_GetItem(const FItemStruct& ItemStruct);
+
 	void GetItem(const FItemStruct& ItemStruct);
-	
+
 	void EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
 
 	void SaveItemInventory();

@@ -46,7 +46,7 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 		{
 			if (TestPlayer->InvenComp->MenuInven->WBP_ItemInven == nullptr)
 			{ UE_LOG(LogTemp,Display,TEXT("Item 플레이어 랩박스, 슬롯이 없네?")); return; }
-			TestPlayer->InvenComp->GetItem(ItemStruct);
+			TestPlayer->InvenComp->Server_GetItem(ItemStruct);
 			Destroy();
 			// OnItemOverlapped.BindUObject(TestPlayer->InvenComp, &UInvenComp::GetItem);
             			// OnItemOverlapped.ExecuteIfBound(ItemStruct);
