@@ -212,15 +212,15 @@ void UInvenComp::LoadItemInventory()
 
 	FItemStructsArray ItemStructsArray;
 	FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &ItemStructsArray);
-
-	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 로드 jsonstring%s"),*JsonString);
-
+	
 	for (int32 i = 0; i < ItemStructsArray.ItemStructs.Num(); i++)
 	{
 		USlot* Slot = Cast<USlot>(MenuInven->WBP_ItemInven->WrapBox->GetChildAt(i));
 		Slot->ItemStruct = ItemStructsArray.ItemStructs[i];
-		if (Slot->ItemStruct.ItemTop == -1) {UE_LOG(LogTemp,Warning,TEXT("인벤컴프 슬롯 itemtop -1 리턴")) return; }
-		Slot->SlotImageUpdate();
+		if (Slot->ItemStruct.ItemTop == -1)
+		{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 슬롯 itemtop -1 리턴")); }
+		else
+		{ Slot->SlotImageUpdate(); }
 	}
 }
 
