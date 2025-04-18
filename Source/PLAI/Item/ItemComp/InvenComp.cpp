@@ -5,6 +5,7 @@
 
 #include "JsonObjectConverter.h"
 #include "MovieSceneTracksComponentTypes.h"
+#include "Components/BoxComponent.h"
 #include "Components/Image.h"
 #include "Components/WrapBox.h"
 #include "PLAI/Item/Item/ItemMaster.h"
@@ -63,13 +64,17 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	{   UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
 		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
 			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-		int32 randIndex = FMath::RandRange(0,1);
+		int32 randIndex = FMath::RandRange(0,4);
 		ItemMaster->ItemStruct.ItemTop = 1;
 		ItemMaster->ItemStruct.ItemIndex = randIndex;
 		
 		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
 		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
 		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
+
+		FString JasonString;
+		FJsonObjectConverter::UStructToJsonObjectString(ItemMaster->ItemStruct,JasonString);
+		UE_LOG(LogTemp,Warning,TEXT("인벤컴프 소환한 아이템 구조체 %s"),*JasonString);
 	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Two))
 	    { UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
@@ -128,7 +133,7 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 	UE_LOG(LogTemp,Warning,TEXT("UInvenComp::GetItme()"));
 	
 	bool bSlot = false;
-	if (MenuInven->WBP_ItemInven->WrapBox->GetChildAt(0) == nullptr) return;
+	// if (MenuInven->WBP_ItemInven->WrapBox->GetChildAt(0) == nullptr){return;}
 	for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
 	{
 		USlot* Slot = Cast<USlot>(Widget);
@@ -171,16 +176,47 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		FRotator(0,0,0),SpawnParams);
 		ItemWeapon->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, TEXT("Weapon_R"));
 		ItemWeapon->ItemStruct = ItemStruct;
+		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 	}
 	else if (Equip->SlotType == EquipSlotType::Armor)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
-		// if (ItemArmor != nullptr) return;
 		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),
 		FRotator(0,0,0),SpawnParams);
 		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, TEXT("Weapon_L"));
 		ItemArmor->ItemStruct = ItemStruct;
+		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 	}
+	else if (Equip->SlotType == EquipSlotType::Helmet)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
+        ItemHelmet = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,0,100),FRotator(0,0,0));
+		ItemHelmet->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::KeepWorldTransform, TEXT("headSocket"));
+		ItemHelmet->ItemStruct = ItemStruct;
+		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+	}
+	else if (Equip->SlotType == EquipSlotType::Gloves)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
+		ItemGlove = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(-100,0,-50),FRotator(0,0,0));
+		ItemGlove->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,("HeadSocket"));
+		ItemGlove->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+		ItemGlove->ItemStruct = ItemStruct;
+		ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
+		ItemGlove->SetActorRelativeRotation(FRotator(0,0,0));
+		ItemGlove->SetActorRotation(FRotator(0,0,0));
+	}
+	else if (Equip->SlotType == EquipSlotType::Boots)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
+		Itemboots = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,100,100),FRotator(0,0,0));
+		Itemboots->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
+		Itemboots->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+		Itemboots->ItemStruct = ItemStruct;
+		Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
+		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
+	}
+
 }
 
 void UInvenComp::SaveItemInventory()

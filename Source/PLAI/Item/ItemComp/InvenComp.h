@@ -77,6 +77,12 @@ public:
 	class AItemMaster* ItemWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AItemMaster* ItemArmor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AItemMaster* ItemHelmet;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AItemMaster* ItemGlove;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AItemMaster* Itemboots;
 	
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* CompWeapon;
@@ -91,6 +97,9 @@ public:
 
 	void SaveItemInventory();
 	void LoadItemInventory();
+
+	void SaveEquipInventory();
+	void LoadEquipInventory();
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
