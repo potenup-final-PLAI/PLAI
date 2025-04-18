@@ -32,6 +32,9 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class AItem* ParentItem;
+
+	UPROPERTY(EditAnywhere)
+	bool bItemDetail = true;
 	
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UImage* SlotImage;

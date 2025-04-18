@@ -14,6 +14,7 @@
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 
@@ -36,6 +37,7 @@ void UInvenComp::BeginPlay()
 	MenuInven->AddToViewport();
 	MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 	MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+	MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 	
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
@@ -75,7 +77,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 		FString JasonString;
 		FJsonObjectConverter::UStructToJsonObjectString(ItemMaster->ItemStruct,JasonString);
-		UE_LOG(LogTemp,Warning,TEXT("인벤컴프 소환한 아이템 구조체 %s"),*JasonString);
+		// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 소환한 아이템 구조체 %s"),*JasonString);
 	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Two))
 	    { UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
@@ -89,16 +91,14 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		ItemMaster->ItemStruct.ItemIndex = randIndex;
 		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
-	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Zero))
-	{
-		SaveItemInventory();
-	}
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Nine))
 	{
 		LoadItemInventory();
+		LoadEquipInventory();
 	}
-	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Eight))
+	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Zero))
 	{
+		SaveItemInventory();
 		SaveEquipInventory();
 	}
 
@@ -179,7 +179,7 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
 		ItemWeapon = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,100,0),
 		FRotator(0,0,0),SpawnParams);
-		ItemWeapon->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, TEXT("Weapon_R"));
+		ItemWeapon->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_R"));
 		ItemWeapon->ItemStruct = ItemStruct;
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 	}
@@ -188,7 +188,7 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
 		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),
 		FRotator(0,0,0),SpawnParams);
-		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, TEXT("Weapon_L"));
+		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_L"));
 		ItemArmor->ItemStruct = ItemStruct;
 		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 	}
@@ -220,6 +220,7 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		Itemboots->ItemStruct = ItemStruct;
 		Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
 		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
+		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
 	}
 }
 
@@ -238,15 +239,15 @@ void UInvenComp::SaveItemInventory()
 	FString JsonValue;
 	FJsonObjectConverter::UStructToJsonObjectString(ItemStructsArray, JsonValue);
 	
-	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("AllOktest.tst"));
+	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Inventory.tst"));
 	FFileHelper::SaveStringToFile(JsonValue,*path);
 	
-	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 json string%s"),*JsonValue);
+	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 저장"))
 }
 
 void UInvenComp::LoadItemInventory()
 {
-	FString path = FString::Printf(TEXT("%s%s"), *FPaths::ProjectDir(), TEXT("AllOktest.tst"));
+	FString path = FString::Printf(TEXT("%s%s"), *FPaths::ProjectDir(), TEXT("Inventory.tst"));
 	FString JsonString;
 	FFileHelper::LoadFileToString(JsonString, *path);
 
@@ -262,6 +263,8 @@ void UInvenComp::LoadItemInventory()
 		else
 		{ Slot->SlotImageUpdate(); }
 	}
+	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 로드"))
+
 }
 
 void UInvenComp::SaveEquipInventory()
@@ -275,7 +278,7 @@ void UInvenComp::SaveEquipInventory()
 	}
 	FString JsonString;
 	FJsonObjectConverter::UStructToJsonObjectString(ItemStructsArray,JsonString);
-	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨%s"),*JsonString)
+	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 저장"))
 	
 	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Equip.tst"));
 	FFileHelper::SaveStringToFile(JsonString, *path);
@@ -283,7 +286,21 @@ void UInvenComp::SaveEquipInventory()
 
 void UInvenComp::LoadEquipInventory()
 {
+	FItemStructsArray ItemStructsArray;
+	FString JsonString;
+	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Equip.tst"));
+	FFileHelper::LoadFileToString(JsonString,*path);
 	
+	FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&ItemStructsArray);
+	for (UWidget* Widget : MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+	{
+		USlotEquip* SlotEquip = Cast<USlotEquip>(Widget);
+		int32 index = MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(Widget);
+		SlotEquip->ItemStruct = ItemStructsArray.ItemStructs[index];
+		SlotEquip->SlotImageUpdate();
+		EquipItem(ItemStructsArray.ItemStructs[index],SlotEquip);
+	}
+	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 로드"))
 }
 
 void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

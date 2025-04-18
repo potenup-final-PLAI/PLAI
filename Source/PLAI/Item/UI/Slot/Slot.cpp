@@ -8,6 +8,9 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "PLAI/Item/Item/ItemObject.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 
 
 void USlot::SlotCountUpdate(const int32 Count)
@@ -42,6 +45,23 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 		UE_LOG(LogTemp, Display, TEXT("Slot::왼쪽마우스 NativeOnMouseButtonDown"));
 		return UWidgetBlueprintLibrary::DetectDragIfPressed(MouseEvent, this,
 			EKeys::LeftMouseButton).NativeReply;
+	}
+	if (MouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Slot::오른쪽마우스 NativeOnMouseButtonDown"));
+		APlayerController* PlayerController = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		
+		if (PlayerController->IsLocalController())
+		{
+			ATestPlayer* TestPlayer = Cast<ATestPlayer>(PlayerController->GetPawn());
+			FGeometry Geometry = GetCachedGeometry();
+			FVector2D vector = Geometry.GetAbsolutePosition();
+			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->
+			SetPositionInViewport(vector - FVector2D(50.f,0.f),false);
+			
+			bItemDetail = !bItemDetail;
+			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(bItemDetail ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		}
 	}
 	return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);
 }

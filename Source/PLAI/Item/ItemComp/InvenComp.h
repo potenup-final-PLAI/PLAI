@@ -84,11 +84,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AItemMaster* Itemboots;
 	
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* CompWeapon;
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* CompShield;
-	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 
 	void GetItem(const FItemStruct& ItemStruct);

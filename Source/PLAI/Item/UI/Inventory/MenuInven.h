@@ -20,4 +20,7 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UEquipInven* WBP_EquipInven;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UItemDetail* WBP_ItemDetail;
 };
