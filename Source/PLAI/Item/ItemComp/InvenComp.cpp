@@ -89,12 +89,12 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); }
 	}
 	
-	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Nine))
+	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
 	{
 		LoadItemInventory();
 		LoadEquipInventory();
 	}
-	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Zero))
+	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Zero))
 	{
 		SaveItemInventory();
 		SaveEquipInventory();
