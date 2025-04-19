@@ -138,10 +138,11 @@ void UInvenComp::Server_SpawnOneItem_Implementation()
 	}
 }
 
-void UInvenComp::Server_UnEquip_Implementation(AItem* Item)
+
+void UInvenComp::Server_UnEquip_Implementation()
 {
-	Item->Destroy();
-	Item=nullptr;
+	Itemboots->Destroy();
+	Itemboots = nullptr;
 }
 
 void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)

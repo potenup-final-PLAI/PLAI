@@ -20,19 +20,8 @@ FReply USlotEquip::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FP
 			ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetPawn());
 			
 			if (SlotType == EquipSlotType::Weapon && Player->InvenComp->ItemWeapon)
-			{  AItem* Item = Cast<AItem>(Player->InvenComp->ItemWeapon);
-				if (Item)
-				{
-					UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnMouse 아이템 캐스팅 성공 UnEquip함수호출 성공 "));
-					Player->InvenComp->Server_UnEquip(Item);
-				}
-				else
-				{
-					UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnMouse UnEquip함수호출 실패 "));
-				}
-				// Player->InvenComp->ItemWeapon->Destroy();
-				// Player->InvenComp->ItemWeapon = nullptr;
-			}
+			{  Player->InvenComp->ItemWeapon->Destroy();
+				Player->InvenComp->ItemWeapon = nullptr; }
 			
 			if (SlotType == EquipSlotType::Armor && Player->InvenComp->ItemArmor)
 			{ Player->InvenComp->ItemArmor ->Destroy();
@@ -46,18 +35,9 @@ FReply USlotEquip::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FP
 			{ Player->InvenComp->ItemGlove ->Destroy();
 				Player->InvenComp->ItemGlove = nullptr; }
 			
-			if (SlotType == EquipSlotType::Boots && Player->InvenComp->Itemboots)
+			if (SlotType == EquipSlotType::Boots)
 			{
-				AItem* Item = Cast<AItem>(Player->InvenComp->Itemboots);
-				if (Item)
-				{
-					UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnMouse 아이템 캐스팅 성공 UnEquip함수호출 성공 "));
-					Player->InvenComp->Server_UnEquip(Item);
-				}
-				else
-				{
-					UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnMouse UnEquip함수호출 실패 "));
-				}
+				Player->InvenComp->Server_UnEquip();
 			}
 		}
 	}
