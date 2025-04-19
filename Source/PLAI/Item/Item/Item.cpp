@@ -44,8 +44,8 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 		ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor);
 		if (TestPlayer && TestPlayer->HasAuthority())
 		{
-			if (TestPlayer->InvenComp->MenuInven == nullptr)
-			{ UE_LOG(LogTemp,Display,TEXT("Item 플레이어 랩박스, 슬롯이 없네?")); return; }
+			// if (TestPlayer->InvenComp->MenuInven == nullptr)
+			// { UE_LOG(LogTemp,Display,TEXT("Item 플레이어 랩박스, 슬롯이 없네?")); return; }
 			TestPlayer->InvenComp->Server_GetItem(ItemStruct);
 			Destroy();
 		}

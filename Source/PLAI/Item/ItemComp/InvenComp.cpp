@@ -101,17 +101,18 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	}
 
 	// 아이템창 출력
-	
-	
-	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::I))
+	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::I))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 I키 !"));
-		if (!MenuInven)	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 메뉴인벤 없다 ㅠㅠ")); return;};
+		if (!MenuInven)	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 메뉴인벤 없다 ㅠㅠ %s"),
+			TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); return;};
 		EnumKey = EEnumKey::Item;
 			ItemInvenTory(EnumKey, MenuInven->WBP_ItemInven);
 	}
     // 장비창 출력
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustReleased(EKeys::E))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 E키 "));
+		if (!MenuInven)	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 메뉴인벤 없다 ㅠㅠ %s"),
+			TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); return;};
 		EnumKey = EEnumKey::Equip;
 		ItemInvenTory(EnumKey, MenuInven->WBP_EquipInven); }
 }
