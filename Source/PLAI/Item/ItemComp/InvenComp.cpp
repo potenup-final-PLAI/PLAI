@@ -9,6 +9,7 @@
 #include "Components/Image.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
+#include "Net/UnrealNetwork.h"
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Item/Equip/ItemEquip.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -67,7 +68,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	}
 	
 	if (PC->WasInputKeyJustPressed(EKeys::One))
-		{ Server_SpawnOneItem(); }
+		{  Server_SpawnOneItem(); }
 	
 	if (PC->WasInputKeyJustPressed(EKeys::Two))
 	    { UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
@@ -119,13 +120,12 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 void UInvenComp::Server_SpawnOneItem_Implementation()
 {
-	// if (!TestPlayer->IsLocallyControlled()) return;
 	if (TestPlayer->IsLocallyControlled())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
 		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
 			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
 		int32 randIndex = FMath::RandRange(0,4);
+		if (!ItemMaster) {UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 ItemMaster없음 !"));return;}
 		ItemMaster->ItemStruct.ItemTop = 1;
 		ItemMaster->ItemStruct.ItemIndex = randIndex;
 		
@@ -139,13 +139,13 @@ void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
 {
 	if (Flipflop == false)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 켯다"));
+		// UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 켯다"));
 		Inven->SetVisibility(ESlateVisibility::Visible);
 		Flipflop = true;
 	}
 	else
 	{
-		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 껏다"));
+		// UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 껏다"));
 		Inven->SetVisibility(ESlateVisibility::Hidden);
 		Flipflop = false;
 	}
@@ -238,7 +238,7 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		ItemHelmet->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::KeepWorldTransform, TEXT("headSocket"));
 		ItemHelmet->ItemStruct = ItemStruct;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
-		ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
+		// ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
 	}
 	else if (Equip->SlotType == EquipSlotType::Gloves)
 	{
@@ -247,7 +247,7 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		ItemGlove->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,("HeadSocket"));
 		ItemGlove->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemGlove->ItemStruct = ItemStruct;
-		ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
+		// ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
 		ItemGlove->SetActorRelativeRotation(FRotator(-90,0,0));
 	}
 	else if (Equip->SlotType == EquipSlotType::Boots)
@@ -258,7 +258,6 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		Itemboots->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		Itemboots->ItemStruct = ItemStruct;
 		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
-		Itemboots->ItemScale = FVector(0.5,0.5,0.5);
 		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
 		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
 	}
@@ -340,5 +339,11 @@ void UInvenComp::LoadEquipInventory()
 		EquipItem(ItemStructsArray.ItemStructs[index],SlotEquip);
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 로드"))
+}
+
+void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UInvenComp, ItemMaster);
 }
 

@@ -70,7 +70,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AItemMaster> ItemMasterFactory;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
 	class AItemMaster* ItemMaster;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -103,6 +104,7 @@ public:
 	void SaveEquipInventory();
 	void LoadEquipInventory();
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 public:
 	UPROPERTY(EditAnywhere)
 	bool Flipflop = false;

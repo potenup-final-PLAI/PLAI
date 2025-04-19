@@ -28,8 +28,7 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 	ItemParent = ItemFactory->GetDefaultObject<AItem>();
-	
-	BoxComp->SetWorldScale3D(FVector(2.2));
+	// BoxComp->SetWorldScale3D(FVector(1.5));
 	BoxComp->OnComponentBeginOverlap.AddDynamic(this,&AItem::OnMyBeginOverlapped);
 	
 	FTimerHandle TimerHandle;
@@ -54,7 +53,7 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 			{ UE_LOG(LogTemp,Display,TEXT("Item 플레이어 랩박스, 슬롯이 없네?"))}
 			
 			TestPlayer->InvenComp->Server_GetItem(ItemStruct);
-			Destroy();
+			// Destroy();
 		}
 	}
 }

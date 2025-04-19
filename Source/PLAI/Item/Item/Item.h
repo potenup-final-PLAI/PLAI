@@ -48,14 +48,11 @@ public:
 	UFUNCTION()
 	void OnRep_ItemScale();
 
-	// FOnItemOverlapped OnItemOverlapped;
-
 	UFUNCTION()
 	void OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent*
 		OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	virtual void SetMesh();
-	// int32 RandIndex();
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };
