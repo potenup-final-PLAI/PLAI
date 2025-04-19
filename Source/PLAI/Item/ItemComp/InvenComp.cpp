@@ -53,6 +53,8 @@ void UInvenComp::BeginPlay()
 void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
+	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
 	{   UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Q키 !"));
 		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
@@ -260,6 +262,31 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
 		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
 		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
+	}
+}
+
+void UInvenComp::CatchItem()
+{
+	if (TestPlayer->IsLocallyControlled())
+	{
+		FHitResult Hit;
+		TArray<FHitResult> Hits;
+		FCollisionQueryParams Params;
+		FVector Loc = TestPlayer->GetActorLocation();
+		DrawDebugBox(GetWorld(),Loc+TestPlayer->GetActorForwardVector()*50,FVector(200,200,200),FColor::Red,false, 1.0f);
+		bool hitinfo = GetWorld()->SweepMultiByChannel(Hits,Loc,Loc + TestPlayer->GetActorForwardVector() * 50,
+			FQuat::Identity,ECC_Visibility,FCollisionShape::MakeBox(FVector(200,200,200)),Params);
+		if (hitinfo)
+		{
+			for (int32 i = 0; i < Hits.Num(); i++)
+			{   UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R Hit발생%s"),*Hits[i].GetActor()->GetName())
+				AItem* Item = Cast<AItem>(Hits[i].GetActor());
+				if (Item)
+				{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템먹음"))
+					Server_GetItem(Item->ItemStruct); Item->Destroy(); }
+				else{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템못먹음")) }
+			}
+		}
 	}
 }
 

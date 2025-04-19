@@ -36,25 +36,19 @@ void AItem::BeginPlay()
 
 }
 
-void AItem::OnRep_ItemScale()
-{
-	SetActorScale3D(ItemScale);
-}
-
 void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor)
 	{
-		ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor);
-		if (TestPlayer && TestPlayer->HasAuthority())
-		{
-			if (TestPlayer->InvenComp->MenuInven == nullptr)
-			{ UE_LOG(LogTemp,Display,TEXT("Item 플레이어 랩박스, 슬롯이 없네?"))}
-			
-			TestPlayer->InvenComp->Server_GetItem(ItemStruct);
-			// Destroy();
-		}
+		// ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor);
+		// if (TestPlayer && TestPlayer->HasAuthority())
+		// {
+		// 	if (TestPlayer->InvenComp->MenuInven == nullptr)
+		// 	{ UE_LOG(LogTemp,Display,TEXT("Item 플레이어 랩박스, 슬롯이 없네?"))}
+		// 	TestPlayer->InvenComp->Server_GetItem(ItemStruct);
+		// 	// Destroy();
+		// }
 	}
 }
 
@@ -70,7 +64,6 @@ void AItem::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifet
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AItem,ItemStruct)
-	DOREPLIFETIME(AItem,ItemScale)
 }
 
 // Called every frame

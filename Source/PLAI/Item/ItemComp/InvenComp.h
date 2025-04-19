@@ -98,6 +98,8 @@ public:
 
 	void EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
 
+	void CatchItem();
+
 	void SaveItemInventory();
 	void LoadItemInventory();
 
