@@ -94,8 +94,12 @@ public:
 	void Server_GetItem(const FItemStruct& ItemStruct);
 	UFUNCTION(Client,Reliable)
 	void Client_GetItem(const FItemStruct& ItemStruct);
+	
 	void GetItem(const FItemStruct& ItemStruct);
 
+	UFUNCTION(Server,Reliable)
+	void Server_DestroyItem(AItem* Item);
+	
 	void EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
 
 	void CatchItem();

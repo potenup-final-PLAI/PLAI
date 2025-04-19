@@ -209,6 +209,11 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 	}
 }
 
+void UInvenComp::Server_DestroyItem_Implementation(AItem* Item)
+{
+	Item->Destroy();
+}
+
 void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 {
 	FActorSpawnParameters SpawnParams;
@@ -267,25 +272,23 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 
 void UInvenComp::CatchItem()
 {
-	if (TestPlayer->IsLocallyControlled())
+	TArray<FHitResult> Hits;
+	FCollisionQueryParams Params;
+	FVector Loc = TestPlayer->GetActorLocation();
+		
+	DrawDebugBox(GetWorld(),Loc+TestPlayer->GetActorForwardVector()*250,FVector(100,100,100),FColor::Red,false, 1.0f);
+
+	bool hitinfo = GetWorld()->SweepMultiByChannel(Hits,Loc + TestPlayer->GetActorForwardVector() * 250,Loc + TestPlayer->GetActorForwardVector() * 250,
+		FQuat::Identity,ECC_Visibility,FCollisionShape::MakeBox(FVector(100,100,100)),Params);
+	if (hitinfo)
 	{
-		FHitResult Hit;
-		TArray<FHitResult> Hits;
-		FCollisionQueryParams Params;
-		FVector Loc = TestPlayer->GetActorLocation();
-		DrawDebugBox(GetWorld(),Loc+TestPlayer->GetActorForwardVector()*50,FVector(200,200,200),FColor::Red,false, 1.0f);
-		bool hitinfo = GetWorld()->SweepMultiByChannel(Hits,Loc,Loc + TestPlayer->GetActorForwardVector() * 50,
-			FQuat::Identity,ECC_Visibility,FCollisionShape::MakeBox(FVector(200,200,200)),Params);
-		if (hitinfo)
-		{
-			for (int32 i = 0; i < Hits.Num(); i++)
-			{   UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R Hit발생%s"),*Hits[i].GetActor()->GetName())
-				AItem* Item = Cast<AItem>(Hits[i].GetActor());
-				if (Item)
-				{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템먹음"))
-					Server_GetItem(Item->ItemStruct); Item->Destroy(); }
-				else{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템못먹음")) }
-			}
+		for (int32 i = 0; i < Hits.Num(); i++)
+		{   UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R Hit발생%s"),*Hits[i].GetActor()->GetName())
+			AItem* Item = Cast<AItem>(Hits[i].GetActor());
+			if (Item)
+			{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템먹음"))
+				Server_GetItem(Item->ItemStruct); Server_DestroyItem(Item); }
+			else{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템못먹음")) }
 		}
 	}
 }
