@@ -93,7 +93,6 @@ public:
 	void Server_GetItem(const FItemStruct& ItemStruct);
 	UFUNCTION(Client,Reliable)
 	void Client_GetItem(const FItemStruct& ItemStruct);
-
 	void GetItem(const FItemStruct& ItemStruct);
 
 	void EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);

@@ -8,7 +8,7 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 2
+			"itemNum": 3
 		},
 		{
 			"itemTop": 1,
@@ -18,7 +18,7 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 3
+			"itemNum": 0
 		},
 		{
 			"itemTop": 1,
@@ -28,7 +28,7 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 7
+			"itemNum": 0
 		},
 		{
 			"itemTop": 1,
@@ -38,7 +38,7 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 8
+			"itemNum": 1
 		},
 		{
 			"itemTop": 1,
@@ -48,7 +48,7 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 6
+			"itemNum": 2
 		}
 	]
 }

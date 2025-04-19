@@ -79,6 +79,14 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		ItemMaster->ItemStruct.ItemIndex = randIndex;
 		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
+
+	if (PC->WasInputKeyJustPressed(EKeys::Three))
+	{
+		if (TestPlayer->HasAuthority())
+		{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 %s%s"),*GetOwner()->GetName(),
+			TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); }
+	}
+	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Nine))
 	{
 		LoadItemInventory();
@@ -107,18 +115,20 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 void UInvenComp::Server_SpawnOneItem_Implementation()
 {
-	if (!TestPlayer->IsLocallyControlled()) return;
-	
-	UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
-	ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
-		TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-	int32 randIndex = FMath::RandRange(0,4);
-	ItemMaster->ItemStruct.ItemTop = 1;
-	ItemMaster->ItemStruct.ItemIndex = randIndex;
+	// if (!TestPlayer->IsLocallyControlled()) return;
+	if (TestPlayer->IsLocallyControlled())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 !"));
+		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
+			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+		int32 randIndex = FMath::RandRange(0,4);
+		ItemMaster->ItemStruct.ItemTop = 1;
+		ItemMaster->ItemStruct.ItemIndex = randIndex;
 		
-	int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
-	ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
-	ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
+		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
+		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
+		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
+	}
 }
 
 void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
@@ -139,11 +149,27 @@ void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
 
 void UInvenComp::Server_GetItem_Implementation(const FItemStruct& ItemStruct)
 {
+	Client_GetItem(ItemStruct);
+}
+void UInvenComp::Client_GetItem_Implementation(const FItemStruct& ItemStruct)
+{
+	GetItem(ItemStruct);
+	UE_LOG(LogTemp, Warning, TEXT("Client_GetItem() 실행됨: %s"), GetOwner()->HasAuthority() ? TEXT("서버") : TEXT("클라"));
+	// 또는 IsLocallyControlled() 체크
+	APawn* PawnOwner = Cast<APawn>(GetOwner());
+	if (PawnOwner && PawnOwner->IsLocallyControlled())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("이 Client_GetItem은 로컬 클라이언트에서 실행됨"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("이 Client_GetItem은 로컬이 아님!"));
+	}
 }
 
 void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 {
-	UE_LOG(LogTemp,Warning,TEXT("UInvenComp::GetItme()"));
+	UE_LOG(LogTemp,Warning,TEXT("UInvenComp::GetItme() %s"),TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라"));
 	
 	bool bSlot = false;
 	// if (MenuInven->WBP_ItemInven->WrapBox->GetChildAt(0) == nullptr){return;}
@@ -156,7 +182,7 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 		{
 			Slot->ItemStruct.ItemNum++;
 			Slot->SlotCountUpdate(Slot->ItemStruct.ItemNum);
-			UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯갯수 증가"));
+			// UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯갯수 증가"));
 			bSlot = true;
 			break;
 		}
@@ -168,18 +194,13 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 			USlot* Slot = Cast<USlot>(Widget);
 			if (Slot->ItemStruct.ItemTop == -1)
 			{
-				UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯추가 증가"));
+				// UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯추가 증가"));
 				Slot->ItemStruct = ItemStruct;
 				Slot->SlotImageUpdate();
 				break;
 			}
 		}
 	}
-}
-
-void UInvenComp::Client_GetItem_Implementation(const FItemStruct& ItemStruct)
-{
-	
 }
 
 void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
