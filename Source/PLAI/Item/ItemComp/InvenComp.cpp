@@ -257,7 +257,8 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		Itemboots->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
 		Itemboots->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		Itemboots->ItemStruct = ItemStruct;
-		Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
+		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
+		Itemboots->ItemScale = FVector(0.5,0.5,0.5);
 		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
 		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
 	}

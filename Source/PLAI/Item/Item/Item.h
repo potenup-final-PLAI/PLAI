@@ -42,6 +42,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;
 
+	UPROPERTY(ReplicatedUsing = OnRep_ItemScale)
+	FVector ItemScale = FVector(1.0f, 1.0f, 1.0f);
+
+	UFUNCTION()
+	void OnRep_ItemScale();
+
 	// FOnItemOverlapped OnItemOverlapped;
 
 	UFUNCTION()
