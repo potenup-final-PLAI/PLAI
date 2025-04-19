@@ -33,15 +33,17 @@ void UInvenComp::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
-	MenuInven->AddToViewport();
-	MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
-	MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
-	MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
-	
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
 
+	if (TestPlayer->IsLocallyControlled())
+	{
+		MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
+		MenuInven->AddToViewport();
+		MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+		MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+		MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+	}
 	AItemMaster* Item = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,FVector(0,0,0),FRotator(0,0,0));
 }
 
@@ -103,6 +105,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::I))
 	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 I키 !"));
+		if (!MenuInven)	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 메뉴인벤 없다 ㅠㅠ")); return;};
 		EnumKey = EEnumKey::Item;
 			ItemInvenTory(EnumKey, MenuInven->WBP_ItemInven);
 	}
