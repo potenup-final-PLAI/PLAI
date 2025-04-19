@@ -211,51 +211,51 @@ void UInvenComp::Server_DestroyItem_Implementation(AItem* Item)
 { Item->Destroy(); }
 
 
-void UInvenComp::Server_EquipItem_Implementation(const FItemStruct& ItemStruct, USlotEquip* Equip)
+void UInvenComp::Server_EquipItem_Implementation(const FItemStruct& ItemStruct, EquipSlotType SlotType)
 {
-	EquipItem(ItemStruct, Equip);
+	EquipItem(ItemStruct, SlotType);
 }
 
-void UInvenComp::NetMulticast_EquipItem_Implementation(const FItemStruct& ItemStruct, USlotEquip* Equip)
+void UInvenComp::NetMulticast_EquipItem_Implementation(const FItemStruct& ItemStruct, EquipSlotType SlotType)
 {
 }
 
-void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
+void UInvenComp::EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType)
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = GetOwner();
-	if (Equip->SlotType == EquipSlotType::Weapon)
+	if (SlotType == EquipSlotType::Weapon)
 	{
 		if (ItemWeapon != nullptr) return;
-		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)SlotType));
 		ItemWeapon = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,100,0),
 		FRotator(0,0,0),SpawnParams);
 		ItemWeapon->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_R"));
 		ItemWeapon->ItemStruct = ItemStruct;
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 	}
-	else if (Equip->SlotType == EquipSlotType::Armor)
+	else if (SlotType == EquipSlotType::Armor)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)SlotType));
 		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),
 		FRotator(0,0,0),SpawnParams);
 		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_L"));
 		ItemArmor->ItemStruct = ItemStruct;
 		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 	}
-	else if (Equip->SlotType == EquipSlotType::Helmet)
+	else if (SlotType == EquipSlotType::Helmet)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)SlotType));
         ItemHelmet = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,0,80),FRotator(0,0,0));
 		ItemHelmet->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::KeepWorldTransform, TEXT("headSocket"));
 		ItemHelmet->ItemStruct = ItemStruct;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		// ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
 	}
-	else if (Equip->SlotType == EquipSlotType::Gloves)
+	else if (SlotType == EquipSlotType::Gloves)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)SlotType));
 		ItemGlove = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(-100,0,-50),FRotator(0,0,0));
 		ItemGlove->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,("HeadSocket"));
 		ItemGlove->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
@@ -263,9 +263,9 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
 		// ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
 		ItemGlove->SetActorRelativeRotation(FRotator(-90,0,0));
 	}
-	else if (Equip->SlotType == EquipSlotType::Boots)
+	else if (SlotType == EquipSlotType::Boots)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)Equip->SlotType));
+		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)SlotType));
 		Itemboots = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(75,75,75),FRotator(0,0,0));
 		Itemboots->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
 		Itemboots->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
@@ -373,7 +373,7 @@ void UInvenComp::LoadEquipInventory()
 		SlotEquip->ItemStruct = ItemStructsArray.ItemStructs[index];
 		SlotEquip->SlotImageUpdate();
 		//ServerRpc로 넘기면 SlotEquip정보는 못넘겨서 싹 새로 해야함??
-		EquipItem(ItemStructsArray.ItemStructs[index],SlotEquip);
+		Server_EquipItem(ItemStructsArray.ItemStructs[index],SlotEquip->SlotType);
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 로드"))
 }

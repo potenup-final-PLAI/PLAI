@@ -101,12 +101,12 @@ public:
 	void GetItem(const FItemStruct& ItemStruct);
 	
 	UFUNCTION(Server,Reliable)
-	void Server_EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
+	void Server_EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
 	
 	UFUNCTION(NetMulticast,Reliable)
-	void NetMulticast_EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
+	void NetMulticast_EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
 	
-	void EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
+	void EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
 
 	void CatchItem();
 
