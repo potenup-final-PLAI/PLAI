@@ -66,10 +66,10 @@ bool USlotEquip::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 신발 안맞네")) return false; }
 	
 	APlayerController* Pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	if (Pc->IsLocalController())
+	if (Pc->GetPawn()->IsLocallyControlled())
 	{  UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnDrop: 플레이어 캐스팅 성공 이름은? %s"),*Pc->Player->GetName());
 		ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetPawn());
-		Player->InvenComp->EquipItem(ItemObject->ItemStruct,SlotType); }
+		Player->InvenComp->Server_EquipItem(ItemObject->ItemStruct,SlotType); }
 	
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }

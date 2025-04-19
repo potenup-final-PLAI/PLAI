@@ -100,11 +100,8 @@ public:
 	
 	void GetItem(const FItemStruct& ItemStruct);
 	
-	UFUNCTION(Server,Reliable)
-	void Server_EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
-	
-	UFUNCTION(NetMulticast,Reliable)
-	void NetMulticast_EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
+	UFUNCTION(Server,Reliable) // NetMulticast는 안써도됨 = 아이템이 자동으로 동기화중
+ 	void Server_EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
 	
 	void EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
 

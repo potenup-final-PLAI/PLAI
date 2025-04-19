@@ -93,6 +93,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	}
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
+		if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Nine))
 	{
 		LoadItemInventory();
 		LoadEquipInventory();
@@ -214,10 +215,6 @@ void UInvenComp::Server_DestroyItem_Implementation(AItem* Item)
 void UInvenComp::Server_EquipItem_Implementation(const FItemStruct& ItemStruct, EquipSlotType SlotType)
 {
 	EquipItem(ItemStruct, SlotType);
-}
-
-void UInvenComp::NetMulticast_EquipItem_Implementation(const FItemStruct& ItemStruct, EquipSlotType SlotType)
-{
 }
 
 void UInvenComp::EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType)
