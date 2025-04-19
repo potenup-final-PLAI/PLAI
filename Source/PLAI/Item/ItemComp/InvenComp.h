@@ -87,6 +87,9 @@ public:
 
 	UFUNCTION(Server,Reliable)
 	void Server_SpawnOneItem();
+
+	UFUNCTION(Server,Reliable)
+	void Server_DestroyItem(AItem* Item);
 	
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 
@@ -96,9 +99,12 @@ public:
 	void Client_GetItem(const FItemStruct& ItemStruct);
 	
 	void GetItem(const FItemStruct& ItemStruct);
-
+	
 	UFUNCTION(Server,Reliable)
-	void Server_DestroyItem(AItem* Item);
+	void Server_EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
+	
+	UFUNCTION(NetMulticast,Reliable)
+	void NetMulticast_EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
 	
 	void EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip);
 

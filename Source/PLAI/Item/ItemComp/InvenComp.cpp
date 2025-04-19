@@ -188,7 +188,6 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 		{
 			Slot->ItemStruct.ItemNum++;
 			Slot->SlotCountUpdate(Slot->ItemStruct.ItemNum);
-			// UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯갯수 증가"));
 			bSlot = true;
 			break;
 		}
@@ -200,7 +199,6 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 			USlot* Slot = Cast<USlot>(Widget);
 			if (Slot->ItemStruct.ItemTop == -1)
 			{
-				// UE_LOG(LogTemp,Warning,TEXT("UInvenComp::슬롯추가 증가"));
 				Slot->ItemStruct = ItemStruct;
 				Slot->SlotImageUpdate();
 				break;
@@ -210,8 +208,16 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 }
 
 void UInvenComp::Server_DestroyItem_Implementation(AItem* Item)
+{ Item->Destroy(); }
+
+
+void UInvenComp::Server_EquipItem_Implementation(const FItemStruct& ItemStruct, USlotEquip* Equip)
 {
-	Item->Destroy();
+	EquipItem(ItemStruct, Equip);
+}
+
+void UInvenComp::NetMulticast_EquipItem_Implementation(const FItemStruct& ItemStruct, USlotEquip* Equip)
+{
 }
 
 void UInvenComp::EquipItem(const FItemStruct& ItemStruct, USlotEquip* Equip)
@@ -366,6 +372,7 @@ void UInvenComp::LoadEquipInventory()
 		int32 index = MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(Widget);
 		SlotEquip->ItemStruct = ItemStructsArray.ItemStructs[index];
 		SlotEquip->SlotImageUpdate();
+		//ServerRpc로 넘기면 SlotEquip정보는 못넘겨서 싹 새로 해야함??
 		EquipItem(ItemStructsArray.ItemStructs[index],SlotEquip);
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 로드"))
