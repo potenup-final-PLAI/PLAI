@@ -86,6 +86,9 @@ public:
 	class AItemMaster* Itemboots;
 
 	UFUNCTION(Server,Reliable)
+	void Server_UnEquip(AItem* Item);
+
+	UFUNCTION(Server,Reliable)
 	void Server_SpawnOneItem();
 
 	UFUNCTION(Server,Reliable)

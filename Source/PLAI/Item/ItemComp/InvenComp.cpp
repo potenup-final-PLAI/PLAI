@@ -138,6 +138,12 @@ void UInvenComp::Server_SpawnOneItem_Implementation()
 	}
 }
 
+void UInvenComp::Server_UnEquip_Implementation(AItem* Item)
+{
+	Item->Destroy();
+	Item=nullptr;
+}
+
 void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
 {
 	if (Flipflop == false)
