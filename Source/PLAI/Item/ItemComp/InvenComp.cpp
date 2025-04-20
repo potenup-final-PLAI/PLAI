@@ -143,13 +143,12 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 				if (FlipflopStore == false)
 				{
-					TestPlayer->StoreComp->StoreInven->AddToViewport();
 					TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Visible);
 					FlipflopStore = true;
 				}
 				else
 				{
-					TestPlayer->StoreComp->StoreInven->RemoveFromParent();
+					TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Hidden);
 					FlipflopStore = false;
 				}
 			}
