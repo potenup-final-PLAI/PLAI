@@ -20,6 +20,7 @@
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
+#include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 
 
 // Sets default values for this component's properties
@@ -138,7 +139,19 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			else if (ANpcStore* Store = Cast<ANpcStore>(Hit.GetActor()))
 			{
 				UE_LOG(LogTemp,Warning,TEXT("인벤컴프 마우스 왼쪽 찍은 엑터 스토어 엑터 찎힘"))
-				{ TestPlayer->StoreComp->AddStoreInven(); }
+				TestPlayer->StoreComp->SetStoreInven(Store->ItemStructsArray);
+
+				if (FlipflopStore == false)
+				{
+					TestPlayer->StoreComp->StoreInven->AddToViewport();
+					TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Visible);
+					FlipflopStore = true;
+				}
+				else
+				{
+					TestPlayer->StoreComp->StoreInven->RemoveFromParent();
+					FlipflopStore = false;
+				}
 			}
 			else
 			{

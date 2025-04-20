@@ -4,6 +4,7 @@
 #include "StoreComp.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Components/WrapBox.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 
 
@@ -25,11 +26,16 @@ void UStoreComp::BeginPlay()
 	if (StoreInvenFactory)
 	{
 		StoreInven = CreateWidget<UStoreInven>(GetWorld(),StoreInvenFactory);
+		StoreInven->AddToViewport();
+		StoreInven->SetVisibility(ESlateVisibility::Hidden);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("UStoreComp::BeginPlay 스토인벤 생성불가"));
 	}
+
+	
+
 
 	
 	// ...
@@ -45,8 +51,16 @@ void UStoreComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	// ...
 }
 
-void UStoreComp::AddStoreInven()
+void UStoreComp::SetStoreInven(const FItemStructsArray& ItemStructsArray)
 {
-	StoreInven->AddToViewport();
+	for (UWidget* Widget : StoreInven->WrapBox->GetAllChildren())
+	{
+		USlotStore* Slot = Cast<USlotStore>(Widget);
+		int32 index = StoreInven->WrapBox->GetChildIndex(Slot);
+		if (index > ItemStructsArray.ItemStructs.Num()-1)
+		{ break; }
+		Slot->ItemStruct = ItemStructsArray.ItemStructs[index];
+		Slot->SlotImageUpdate();
+	}
 }
 

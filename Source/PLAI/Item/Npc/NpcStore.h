@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "NpcStore.generated.h"
 
 UCLASS()
@@ -22,6 +23,17 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	UPROPERTY(EditAnywhere)
+	FItemStructsArray ItemStructsArray;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AItem> ItemFactory;
+
+	UPROPERTY(EditAnywhere)
+	AItem* Item;
+
+	void LoadNpcStore();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

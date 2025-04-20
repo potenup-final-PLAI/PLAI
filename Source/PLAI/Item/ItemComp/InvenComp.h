@@ -126,4 +126,5 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	bool Flipflop = false;
+	bool FlipflopStore = false;
 };

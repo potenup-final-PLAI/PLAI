@@ -6,6 +6,7 @@
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/ItemComp/ItemComp.h"
 #include "PLAI/Item/ItemComp/StoreComp.h"
+#include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 
 
 // Sets default values
@@ -21,6 +22,8 @@ ATestPlayer::ATestPlayer()
 void ATestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	StoreComp->StoreInven->AddToViewport();
 }
 
 // Called every frame

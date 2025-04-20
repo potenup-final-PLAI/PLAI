@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InvenComp.h"
 #include "ItemComp.h"
 #include "StoreComp.generated.h"
 
@@ -34,5 +35,5 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UStoreInven* StoreInven;
 
-	void AddStoreInven();
+	void SetStoreInven(const FItemStructsArray& ItemStructsArray);
 };
