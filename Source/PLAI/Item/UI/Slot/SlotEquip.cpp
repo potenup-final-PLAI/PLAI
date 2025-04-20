@@ -16,30 +16,34 @@ FReply USlotEquip::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FP
 		APlayerController* Pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 		if (Pc->GetPawn()->IsLocallyControlled())
 		{
-			UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnMouse 왼쪽버튼다운: 플레이어 캐스팅 성공 이름은? %s"),*GetName());
 			ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetPawn());
-			
-			if (SlotType == EquipSlotType::Weapon && Player->InvenComp->ItemWeapon)
-			{  Player->InvenComp->ItemWeapon->Destroy();
-				Player->InvenComp->ItemWeapon = nullptr; }
-			
-			if (SlotType == EquipSlotType::Armor && Player->InvenComp->ItemArmor)
-			{ Player->InvenComp->ItemArmor ->Destroy();
-				Player->InvenComp->ItemArmor = nullptr; }
-			
-			if (SlotType == EquipSlotType::Helmet && Player->InvenComp->ItemHelmet)
-			{ Player->InvenComp->ItemHelmet ->Destroy();
-				Player->InvenComp->ItemHelmet = nullptr; }
-			
-			if (SlotType == EquipSlotType::Gloves && Player->InvenComp->ItemGlove)
-			{ Player->InvenComp->ItemGlove ->Destroy();
-				Player->InvenComp->ItemGlove = nullptr; }
-			
-			if (SlotType == EquipSlotType::Boots)
-			{
-				Player->InvenComp->Server_UnEquip();
-			}
+			Player->InvenComp->Server_UnEquip(SlotType);
 		}
+		// {
+		// 	UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnMouse 왼쪽버튼다운: 플레이어 캐스팅 성공 이름은? %s"),*GetName());
+		// 	ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetPawn());
+		// 	
+		// 	if (SlotType == EquipSlotType::Weapon && Player->InvenComp->ItemWeapon)
+		// 	{  Player->InvenComp->ItemWeapon->Destroy();
+		// 		Player->InvenComp->ItemWeapon = nullptr; }
+		// 	
+		// 	if (SlotType == EquipSlotType::Armor && Player->InvenComp->ItemArmor)
+		// 	{ Player->InvenComp->ItemArmor ->Destroy();
+		// 		Player->InvenComp->ItemArmor = nullptr; }
+		// 	
+		// 	if (SlotType == EquipSlotType::Helmet && Player->InvenComp->ItemHelmet)
+		// 	{ Player->InvenComp->ItemHelmet ->Destroy();
+		// 		Player->InvenComp->ItemHelmet = nullptr; }
+		// 	
+		// 	if (SlotType == EquipSlotType::Gloves && Player->InvenComp->ItemGlove)
+		// 	{ Player->InvenComp->ItemGlove ->Destroy();
+		// 		Player->InvenComp->ItemGlove = nullptr; }
+		// 	
+		// 	if (SlotType == EquipSlotType::Boots)
+		// 	{
+		// 		Player->InvenComp->Server_UnEquip(SlotType);
+		// 	}
+		// }
 	}
 	return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);
 }

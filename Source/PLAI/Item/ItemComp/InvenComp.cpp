@@ -138,11 +138,33 @@ void UInvenComp::Server_SpawnOneItem_Implementation()
 	}
 }
 
-
-void UInvenComp::Server_UnEquip_Implementation()
+void UInvenComp::Server_UnEquip_Implementation(EquipSlotType SlotType)
 {
-	Itemboots->Destroy();
-	Itemboots = nullptr;
+	if (SlotType == EquipSlotType::Armor)
+	{
+		ItemArmor->Destroy();
+		ItemArmor = nullptr;
+	}
+	if (SlotType == EquipSlotType::Boots)
+	{
+		Itemboots->Destroy();
+		Itemboots = nullptr;
+	}
+	if (SlotType == EquipSlotType::Gloves)
+	{
+		ItemGlove->Destroy();
+		ItemGlove = nullptr;
+	}
+	if (SlotType == EquipSlotType::Helmet)
+	{
+		ItemHelmet->Destroy();
+		ItemHelmet = nullptr;
+	}
+	if (SlotType == EquipSlotType::Weapon)
+	{
+		ItemWeapon->Destroy();
+		ItemWeapon = nullptr;
+	}
 }
 
 void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
