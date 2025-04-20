@@ -129,6 +129,8 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		{
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
+				Start->OnNpcStart.BindUObject(this,&UInvenComp::NpcItem);
+				Start->WarriorStarter();
 				UE_LOG(LogTemp,Warning,TEXT("인벤컴프 왼쪽 마우스버튼 Npc마즘? %s"),*Start->GetName())
 			} else
 			{
@@ -317,6 +319,22 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType
 		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
 		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
 		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
+	}
+}
+
+void UInvenComp::NpcItem(const FItemStructsArray& ItemStructsArray)
+{
+	for (int32 i = 0; ItemStructsArray.ItemStructs.Num() > i; i++)
+	{
+		for (int32 e = 0; e < static_cast<int32>(EquipSlotType::Boots); e++)
+		{
+			StartSlotType = static_cast<EquipSlotType>(e);
+			if (ItemStructsArray.ItemStructs[i].ItemIndex == static_cast<int32>(StartSlotType))
+			{
+				break;
+			}
+		}
+		EquipItem(ItemStructsArray.ItemStructs[i],StartSlotType);
 	}
 }
 

@@ -50,6 +50,8 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 public:
 	EEnumKey EnumKey;
+
+	EquipSlotType StartSlotType;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UMenuInven> MenuInvenFactory;
@@ -105,8 +107,11 @@ public:
 	
 	UFUNCTION(Server,Reliable) // NetMulticast는 안써도됨 = 아이템이 자동으로 동기화중
  	void Server_EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
-	
+
 	void EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
+
+	UFUNCTION()
+	void NpcItem(const FItemStructsArray& ItemStructsArray);
 
 	void CatchItem();
 

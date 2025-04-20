@@ -8,7 +8,7 @@
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "NpcStart.generated.h"
 
-DECLARE_DELEGATE_OneParam(FOnNpcStart, FItemStructsArray)
+DECLARE_DELEGATE_OneParam(FOnNpcStart, const FItemStructsArray&)
 
 UCLASS()
 class PLAI_API ANpcStart : public ACharacter
