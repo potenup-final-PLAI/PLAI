@@ -3,6 +3,9 @@
 
 #include "StoreComp.h"
 
+#include "Blueprint/UserWidget.h"
+#include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
+
 
 // Sets default values for this component's properties
 UStoreComp::UStoreComp()
@@ -19,7 +22,16 @@ UStoreComp::UStoreComp()
 void UStoreComp::BeginPlay()
 {
 	Super::BeginPlay();
+	if (StoreInvenFactory)
+	{
+		StoreInven = CreateWidget<UStoreInven>(GetWorld(),StoreInvenFactory);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UStoreComp::BeginPlay 스토인벤 생성불가"));
+	}
 
+	
 	// ...
 	
 }
@@ -31,5 +43,10 @@ void UStoreComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UStoreComp::AddStoreInven()
+{
+	StoreInven->AddToViewport();
 }
 

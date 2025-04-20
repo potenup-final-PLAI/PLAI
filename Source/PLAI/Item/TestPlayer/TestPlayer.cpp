@@ -5,6 +5,7 @@
 
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/ItemComp/ItemComp.h"
+#include "PLAI/Item/ItemComp/StoreComp.h"
 
 
 // Sets default values
@@ -13,6 +14,7 @@ ATestPlayer::ATestPlayer()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	InvenComp = CreateDefaultSubobject<UInvenComp>(TEXT("InvenComp"));
+	StoreComp = CreateDefaultSubobject<UStoreComp>(TEXT("StoreComp"));
 }
 
 // Called when the game starts or when spawned

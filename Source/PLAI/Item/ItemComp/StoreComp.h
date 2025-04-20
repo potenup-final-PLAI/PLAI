@@ -7,6 +7,8 @@
 #include "StoreComp.generated.h"
 
 
+class UStoreInven;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API UStoreComp : public UItemComp
 {
@@ -24,4 +26,13 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+
+public:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UStoreInven> StoreInvenFactory;
+	
+	UPROPERTY(EditAnywhere)
+	class UStoreInven* StoreInven;
+
+	void AddStoreInven();
 };

@@ -29,4 +29,7 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	class UInvenComp* InvenComp;
+
+	UPROPERTY(EditAnywhere)
+	class UStoreComp* StoreComp;
 };
