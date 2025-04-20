@@ -114,6 +114,10 @@ public:
 	void NpcItem(const FItemStructsArray& ItemStructsArray);
 
 	void CatchItem();
+	
+	void EquipSetting(const FItemStructsArray& ItemStructsArray);
+	
+	void InventorySetting();
 
 	void SaveItemInventory();
 	void LoadItemInventory();

@@ -73,6 +73,7 @@ void ANpcStart::HunterStarter()
 	HunterArmorStruct.ItemIndexDetail = 0;
 
 	ItemStructsArray.ItemStructs.Add(HunterArmorStruct);
+	OnNpcStart.ExecuteIfBound(ItemStructsArray);
 }
 
 

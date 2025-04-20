@@ -139,6 +139,24 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			}
 		}
 	}
+	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::RightMouseButton))
+	{
+		FHitResult Hit;
+		PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+		if (Hit.bBlockingHit)
+		{
+			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
+			{
+				Start->OnNpcStart.BindUObject(this,&UInvenComp::NpcItem);
+				Start->HunterStarter();
+				UE_LOG(LogTemp,Warning,TEXT("인벤컴프 왼쪽 마우스버튼 Npc마즘? %s"),*Start->GetName())
+			} else
+			{
+				UE_LOG(LogTemp,Warning,TEXT("인벤컴프 왼쪽 마우스버튼 Npc 캐스팅 실패"))
+				DrawDebugSphere(GetWorld(), Hit.Location, 20, 20, FColor::Red, false,1);
+			}
+		}
+	}
 }
 
 void UInvenComp::Server_SpawnOneItem_Implementation()
@@ -334,8 +352,20 @@ void UInvenComp::NpcItem(const FItemStructsArray& ItemStructsArray)
 				break;
 			}
 		}
-		EquipItem(ItemStructsArray.ItemStructs[i],StartSlotType);
+		Server_EquipItem(ItemStructsArray.ItemStructs[i],StartSlotType);
 	}
+}
+
+void UInvenComp::EquipSetting(const FItemStructsArray& ItemStructsArray)
+{
+	for (UWidget* Widget : MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+	{
+		USlotEquip* SlotEquip = Cast<USlotEquip>(Widget);
+	}
+}
+
+void UInvenComp::InventorySetting()
+{
 }
 
 void UInvenComp::CatchItem()
@@ -360,6 +390,8 @@ void UInvenComp::CatchItem()
 		}
 	}
 }
+
+
 
 void UInvenComp::SaveItemInventory()
 {
@@ -434,7 +466,7 @@ void UInvenComp::LoadEquipInventory()
 		int32 index = MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(Widget);
 		SlotEquip->ItemStruct = ItemStructsArray.ItemStructs[index];
 		SlotEquip->SlotImageUpdate();
-		//ServerRpc로 넘기면 SlotEquip정보는 못넘겨서 싹 새로 해야함??
+		//ServerRpc로 넘기면 SlotEquip을 바로 넘기는것이 아닌 SlotEquip 정보만 넘김
 		Server_EquipItem(ItemStructsArray.ItemStructs[index],SlotEquip->SlotType);
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 로드"))
