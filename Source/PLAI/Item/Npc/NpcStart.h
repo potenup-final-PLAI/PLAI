@@ -4,16 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "StartNpc.generated.h"
+#include "PLAI/Item/Item/ItemStruct.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
+#include "NpcStart.generated.h"
 
 UCLASS()
-class PLAI_API AStartNpc : public ACharacter
+class PLAI_API ANpcStart : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AStartNpc();
+	ANpcStart();
 
 protected:
 	// Called when the game starts or when spawned
@@ -25,4 +27,19 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+public:
+	// 추후에 다른 곳ㅇ로 옮길 예정
+	UPROPERTY(EditAnywhere)
+	FItemStruct ItemStruct;
+
+    UPROPERTY(EditAnywhere)
+	FItemStructsArray ItemStructsArray;
+	
+	UPROPERTY(EditAnywhere)
+	FItemStruct 
+	
+	void HunterStarter();
+	
+	void WarriorStarter();
 };
