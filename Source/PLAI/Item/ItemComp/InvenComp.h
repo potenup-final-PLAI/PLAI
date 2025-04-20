@@ -116,8 +116,6 @@ public:
 	
 	void EquipSetting(const FItemStructsArray& ItemStructsArray);
 	
-	void InventorySetting();
-
 	void SaveItemInventory();
 	void LoadItemInventory();
 

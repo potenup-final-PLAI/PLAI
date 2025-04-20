@@ -48,7 +48,7 @@ void ANpcStart::WarriorStarter()
 	WarriorArmorStruct.ItemIndexDetail = 0;
 
 	ItemStructsArray.ItemStructs.Add(WarriorArmorStruct);
-
+	//이 딜리게이트는 InvenComp NpcItem함수에 바인딩함
 	OnNpcStart.ExecuteIfBound(ItemStructsArray);
 }
 
@@ -73,6 +73,8 @@ void ANpcStart::HunterStarter()
 	HunterArmorStruct.ItemIndexDetail = 0;
 
 	ItemStructsArray.ItemStructs.Add(HunterArmorStruct);
+	
+	//이 딜리게이트는 InvenComp NpcItem함수에 바인딩함
 	OnNpcStart.ExecuteIfBound(ItemStructsArray);
 }
 

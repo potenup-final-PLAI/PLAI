@@ -147,12 +147,9 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		{
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
+				// 이 딜리게이트는 NpcStart에 있음
 				Start->OnNpcStart.BindUObject(this,&UInvenComp::NpcItem);
 				Start->HunterStarter();
-				UE_LOG(LogTemp,Warning,TEXT("인벤컴프 왼쪽 마우스버튼 Npc마즘? %s"),*Start->GetName())
-			} else
-			{
-				UE_LOG(LogTemp,Warning,TEXT("인벤컴프 왼쪽 마우스버튼 Npc 캐스팅 실패"))
 				DrawDebugSphere(GetWorld(), Hit.Location, 20, 20, FColor::Red, false,1);
 			}
 		}
@@ -371,10 +368,6 @@ void UInvenComp::EquipSetting(const FItemStructsArray& ItemStructsArray)
 			}
 		}
 	}
-}
-
-void UInvenComp::InventorySetting()
-{
 }
 
 void UInvenComp::CatchItem()
