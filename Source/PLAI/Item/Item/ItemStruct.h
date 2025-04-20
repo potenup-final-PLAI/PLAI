@@ -2,7 +2,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "ItemStruct.generated.h"
 
 UENUM()

@@ -354,13 +354,22 @@ void UInvenComp::NpcItem(const FItemStructsArray& ItemStructsArray)
 		}
 		Server_EquipItem(ItemStructsArray.ItemStructs[i],StartSlotType);
 	}
+	EquipSetting(ItemStructsArray);
 }
 
 void UInvenComp::EquipSetting(const FItemStructsArray& ItemStructsArray)
 {
-	for (UWidget* Widget : MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+	for (int32 i = 0; ItemStructsArray.ItemStructs.Num() > i; i++)
 	{
-		USlotEquip* SlotEquip = Cast<USlotEquip>(Widget);
+		for (UWidget* Widget : MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+		{
+			USlotEquip* SlotEquip = Cast<USlotEquip>(Widget);
+			if (ItemStructsArray.ItemStructs[i].ItemIndex == static_cast<int32>(SlotEquip->SlotType))
+			{
+				SlotEquip->ItemStruct = ItemStructsArray.ItemStructs[i];
+				SlotEquip->SlotImageUpdate();
+			}
+		}
 	}
 }
 
