@@ -8,6 +8,8 @@
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "NpcStart.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOnNpcStart, FItemStructsArray)
+
 UCLASS()
 class PLAI_API ANpcStart : public ACharacter
 {
@@ -30,14 +32,14 @@ public:
 
 public:
 	// 추후에 다른 곳ㅇ로 옮길 예정
+	
+	FOnNpcStart OnNpcStart;
+	
 	UPROPERTY(EditAnywhere)
 	FItemStruct ItemStruct;
 
     UPROPERTY(EditAnywhere)
 	FItemStructsArray ItemStructsArray;
-	
-	UPROPERTY(EditAnywhere)
-	FItemStruct 
 	
 	void HunterStarter();
 	

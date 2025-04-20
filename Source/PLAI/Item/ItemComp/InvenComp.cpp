@@ -12,6 +12,7 @@
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Item/Equip/ItemEquip.h"
+#include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
@@ -119,6 +120,23 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); return;};
 		EnumKey = EEnumKey::Equip;
 		ItemInvenTory(EnumKey, MenuInven->WBP_EquipInven); }
+
+	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
+	{
+		FHitResult Hit;
+        PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+		if (Hit.bBlockingHit)
+		{
+			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
+			{
+				UE_LOG(LogTemp,Warning,TEXT("인벤컴프 왼쪽 마우스버튼 Npc마즘? %s"),*Start->GetName())
+			} else
+			{
+				UE_LOG(LogTemp,Warning,TEXT("인벤컴프 왼쪽 마우스버튼 Npc 캐스팅 실패"))
+				DrawDebugSphere(GetWorld(), Hit.Location, 20, 20, FColor::Red, false,1);
+			}
+		}
+	}
 }
 
 void UInvenComp::Server_SpawnOneItem_Implementation()

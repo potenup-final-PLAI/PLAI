@@ -48,6 +48,8 @@ void ANpcStart::WarriorStarter()
 	WarriorArmorStruct.ItemIndexDetail = 0;
 
 	ItemStructsArray.ItemStructs.Add(WarriorArmorStruct);
+
+	OnNpcStart.ExecuteIfBound(ItemStructsArray);
 }
 
 
@@ -66,13 +68,11 @@ void ANpcStart::HunterStarter()
 	FItemStruct HunterArmorStruct;
 	
 	HunterArmorStruct.ItemTop = 1;
-	HunterArmorStruct.ItemIndex = 1;
+	HunterArmorStruct.ItemIndex = 2;
 	HunterArmorStruct.ItemIndexType = 0;
 	HunterArmorStruct.ItemIndexDetail = 0;
 
 	ItemStructsArray.ItemStructs.Add(HunterArmorStruct);
-
-	
 }
 
 
