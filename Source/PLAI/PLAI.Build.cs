@@ -7,11 +7,11 @@ public class PLAI : ModuleRules
 	public PLAI(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
+		
 		PublicDependencyModuleNames.AddRange(new[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem",
-			"AIModule", "Niagara", "EnhancedInput", "UMG"
+			"AIModule", "Niagara", "EnhancedInput", "UMG", "Slate", "SlateCore","JsonUtilities","Json"
 		});
 
 		PublicIncludePaths.AddRange(new[]
