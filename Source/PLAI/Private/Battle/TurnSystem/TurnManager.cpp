@@ -3,6 +3,8 @@
 
 #include "Battle/TurnSystem/TurnManager.h"
 
+#include "Battle/TurnSystem/PhaseManager.h"
+
 
 // Sets default values
 ATurnManager::ATurnManager()
@@ -15,7 +17,7 @@ ATurnManager::ATurnManager()
 void ATurnManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
 }
 
 // Called every frame
@@ -24,3 +26,58 @@ void ATurnManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ATurnManager::SetTurnState(ETurnState newTurnState)
+{
+	curTurnState = newTurnState;
+
+	switch (curTurnState)
+	{
+	case ETurnState::None:
+		break;
+	case ETurnState::PlayerTurn:
+		break;
+	case ETurnState::EnemyTurn:
+		break;
+	case ETurnState::TurnEnd:
+		break;
+	default:
+		break;
+	}
+}
+
+void ATurnManager::SetEnemyTurnList(TArray<ABaseBattlePawn*>& enemies)
+{
+	enemyQueue = enemies;
+}
+
+void ATurnManager::StartEnemyTurn()
+{
+	if (enemyQueue.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Enemy"));
+		return;
+	}
+
+	StartNextEnemyTurn();
+}
+
+void ATurnManager::StartNextEnemyTurn()
+{
+	if (enemyQueue.Num() == 0)
+	{
+		if (phaseManager)
+		{
+			phaseManager->EndEnemyPhase();
+			return;
+		}
+	}
+
+	curEnemy = enemyQueue[0];
+	enemyQueue.RemoveAt(0);
+
+	// FSM 활성화
+	if (curEnemy)
+	{
+		curEnemy->OnTurnStart();
+	}
+}
