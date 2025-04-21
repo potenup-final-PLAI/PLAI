@@ -17,6 +17,15 @@
 				"item_DEF": 0,
 				"item_RES": 0,
 				"item_SHI": 0
+			},
+			"itemStructStatName":
+			{
+				"item_ATK": "ATK",
+				"item_CRIT": "CRIT",
+				"item_CRITDMG": "CRITDMG",
+				"item_DEF": "DEF",
+				"item_RES": "RES",
+				"item_SHI": "SHI"
 			}
 		},
 		{
@@ -36,6 +45,15 @@
 				"item_DEF": 0,
 				"item_RES": 0,
 				"item_SHI": 0
+			},
+			"itemStructStatName":
+			{
+				"item_ATK": "ATK",
+				"item_CRIT": "CRIT",
+				"item_CRITDMG": "CRITDMG",
+				"item_DEF": "DEF",
+				"item_RES": "RES",
+				"item_SHI": "SHI"
 			}
 		},
 		{
@@ -55,6 +73,15 @@
 				"item_DEF": 0,
 				"item_RES": 0,
 				"item_SHI": 0
+			},
+			"itemStructStatName":
+			{
+				"item_ATK": "ATK",
+				"item_CRIT": "CRIT",
+				"item_CRITDMG": "CRITDMG",
+				"item_DEF": "DEF",
+				"item_RES": "RES",
+				"item_SHI": "SHI"
 			}
 		},
 		{
@@ -74,6 +101,15 @@
 				"item_DEF": 0,
 				"item_RES": 0,
 				"item_SHI": 0
+			},
+			"itemStructStatName":
+			{
+				"item_ATK": "ATK",
+				"item_CRIT": "CRIT",
+				"item_CRITDMG": "CRITDMG",
+				"item_DEF": "DEF",
+				"item_RES": "RES",
+				"item_SHI": "SHI"
 			}
 		},
 		{
@@ -93,6 +129,15 @@
 				"item_DEF": 0,
 				"item_RES": 0,
 				"item_SHI": 0
+			},
+			"itemStructStatName":
+			{
+				"item_ATK": "ATK",
+				"item_CRIT": "CRIT",
+				"item_CRITDMG": "CRITDMG",
+				"item_DEF": "DEF",
+				"item_RES": "RES",
+				"item_SHI": "SHI"
 			}
 		}
 	]

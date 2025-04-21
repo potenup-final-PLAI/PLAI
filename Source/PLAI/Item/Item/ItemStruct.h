@@ -12,7 +12,6 @@ enum class EItemIndex : uint8
 	Other UMETA(DisplayName = "Other Item"),
 };
 
-
 USTRUCT(BlueprintType,Blueprintable)
 struct FItemStructStat: public FTableRowBase
 {
@@ -31,6 +30,26 @@ public:
 	int32 item_RES = 0;
 	UPROPERTY(EditAnywhere)
 	int32 item_SHI = 0;
+};
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FItemStructStatName: public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	FString item_ATK = FString("ATK");
+	UPROPERTY(EditAnywhere)
+	FString Item_CRIT = FString("CRIT");
+	UPROPERTY(EditAnywhere)
+	FString item_CRITDMG = FString("CRITDMG");
+
+	UPROPERTY(EditAnywhere)
+	FString item_DEF = FString("DEF");
+	UPROPERTY(EditAnywhere)
+	FString item_RES = FString("RES");
+	UPROPERTY(EditAnywhere)
+	FString item_SHI = FString("SHI");
 };
 
 USTRUCT(BlueprintType,Blueprintable)
@@ -58,6 +77,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
     FItemStructStat ItemStructStat;
+	UPROPERTY(EditAnywhere)
+	FItemStructStatName ItemStructStatName;
 };
 
 USTRUCT(BlueprintType,Blueprintable)

@@ -24,7 +24,18 @@ public:
 	class UTextBlock* NameDetail;
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Description;
+	class UTextBlock* StatA;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StatB;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StatC;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StatNameA;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StatNameB;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StatNameC;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* IconImage; 
