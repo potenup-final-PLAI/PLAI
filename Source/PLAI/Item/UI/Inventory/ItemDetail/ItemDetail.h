@@ -23,5 +23,11 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* NameDetail;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Description;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UImage* IconImage; 
+
 	void SetItemDetail(const FItemStruct& ItemStruct);
 };
