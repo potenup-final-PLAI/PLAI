@@ -3,6 +3,10 @@
 
 #include "Battle/BattlePlayer/BaseBattlePawn.h"
 
+#include "Developer/AITestSuite/Public/AITestsCommon.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
+
 // Sets default values
 ABaseBattlePawn::ABaseBattlePawn()
 {
@@ -14,6 +18,8 @@ ABaseBattlePawn::ABaseBattlePawn()
 void ABaseBattlePawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 }
 
 // Called every frame

@@ -27,6 +27,7 @@ public:
 	virtual void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
 
+	int32 speed = 0;
 	void OnTurnStart();
 	void OnTurnEnd();
 };

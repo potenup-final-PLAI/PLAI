@@ -3,8 +3,16 @@
 
 #include "Battle/TurnSystem/TurnManager.h"
 
+#include "BaseBattlePawn.h"
 #include "Battle/TurnSystem/PhaseManager.h"
+#include "Developer/AITestSuite/Public/AITestsCommon.h"
+#include "Enemy/BaseEnemy.h"
+#include "Engine/Engine.h"
+#include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/BattlePlayer.h"
 
+DEFINE_LOG_CATEGORY(TPS);
 
 // Sets default values
 ATurnManager::ATurnManager()
@@ -24,6 +32,9 @@ void ATurnManager::BeginPlay()
 void ATurnManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	FString s = UEnum::GetValueAsString(curTurnState);
+	// PRINTLOGTOSCREEN(TEXT("%s"), *s);
 }
 
 void ATurnManager::SetTurnState(ETurnState newTurnState)
@@ -45,39 +56,38 @@ void ATurnManager::SetTurnState(ETurnState newTurnState)
 	}
 }
 
-void ATurnManager::SetEnemyTurnList(TArray<ABaseBattlePawn*>& enemies)
+void ATurnManager::StartPlayerTurn()
 {
-	enemyQueue = enemies;
+	if (auto* pawn = Cast<ABattlePlayer>(curUnit))
+	{
+		UE_LOG(LogTemp, Display, TEXT("pawn is Player %s"),
+		       *pawn->GetActorNameOrLabel());
+	}
+}
+
+void ATurnManager::StartNextPlayerTurn()
+{
 }
 
 void ATurnManager::StartEnemyTurn()
 {
-	if (enemyQueue.Num() == 0)
+	// 이쪽에는 예외 처리 하면 좋을 듯
+	if (auto* pawn = Cast<ABaseEnemy>(curUnit))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No Enemy"));
-		return;
+		UE_LOG(LogTemp, Warning, TEXT("pawn is Enemy %s "),
+		       *pawn->GetActorNameOrLabel());
+		// FSM 활성화
+		if (curUnit)
+		{
+			curUnit->OnTurnStart();
+		}
 	}
-
-	StartNextEnemyTurn();
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("pawn is Not Enemy"));
+	}
 }
 
 void ATurnManager::StartNextEnemyTurn()
 {
-	if (enemyQueue.Num() == 0)
-	{
-		if (phaseManager)
-		{
-			phaseManager->EndEnemyPhase();
-			return;
-		}
-	}
-
-	curEnemy = enemyQueue[0];
-	enemyQueue.RemoveAt(0);
-
-	// FSM 활성화
-	if (curEnemy)
-	{
-		curEnemy->OnTurnStart();
-	}
 }

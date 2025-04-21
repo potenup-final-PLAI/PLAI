@@ -11,7 +11,7 @@ public class PLAI : ModuleRules
 		PublicDependencyModuleNames.AddRange(new[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem",
-			"AIModule", "Niagara", "EnhancedInput", "UMG"
+			"AIModule", "Niagara", "EnhancedInput", "UMG", "AITESTSUITE"
 		});
 
 		PublicIncludePaths.AddRange(new[]

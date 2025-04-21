@@ -5,11 +5,20 @@
 
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Components/Button.h"
+#include "Developer/AITestSuite/Public/AITestsCommon.h"
+#include "Enemy/BaseEnemy.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/BattlePlayer.h"
 
 void UActionUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
+	turnManager = Cast<ATurnManager>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
+
+	// UI 바인딩
 	btn_TurnEnd->OnClicked.AddDynamic(this, &UActionUI::OnClickedTurnEnd);
 	btn_Move->OnClicked.AddDynamic(this, &UActionUI::OnClickedMove);
 	btn_FirstSkill->OnClicked.AddDynamic(this, &UActionUI::OnClickedFirstSkill);
@@ -19,11 +28,23 @@ void UActionUI::NativeConstruct()
 
 void UActionUI::OnClickedTurnEnd()
 {
-	auto* PhaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
-	if (PhaseManager)
+	if (phaseManager == nullptr)
 	{
+		UE_LOG(LogTemp, Warning,
+		       TEXT("ActionUI OnClickedTurnEnd phaseManager nullPtr"));
+		return;
+	}
+	if (auto* player = Cast<ABattlePlayer>(turnManager->curUnit))
+	{
+		// 플레이어 턴 종료
 		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
-		PhaseManager->EndPlayerPhase();
+		phaseManager->EndPlayerPhase();
+	}
+	else if (auto* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
+	{
+		// Enemy 턴 종료
+		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
+		phaseManager->EndEnemyPhase();
 	}
 }
 

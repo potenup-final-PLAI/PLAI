@@ -3,8 +3,14 @@
 
 #include "PLAI/Public/Battle/Tile/GridTileManager.h"
 
+#include "BaseBattlePawn.h"
 #include "GridTile.h"
+#include "Algo/RandomShuffle.h"
+#include "Battle/UI/ActionUI.h"
+#include "Developer/AITestSuite/Public/AITestsCommon.h"
+#include "Enemy/BaseEnemy.h"
 #include "Evaluation/MovieSceneTimeWarping.h"
+#include "Player/BattlePlayer.h"
 
 // Sets default values
 AGridTileManager::AGridTileManager()
@@ -28,6 +34,9 @@ void AGridTileManager::Tick(float DeltaTime)
 
 void AGridTileManager::InitGridTile()
 {
+	TArray<FIntPoint> AllCoords;
+	AllCoords.Reserve(625);
+
 	for (int32 Y = 0; Y < 25; ++Y)
 	{
 		for (int32 X = 0; X < 25; ++X)
@@ -36,6 +45,7 @@ void AGridTileManager::InitGridTile()
 				Y * 110, X * 110, 0.0f);
 			FRotator spawnRot = FRotator::ZeroRotator;
 			FActorSpawnParameters spawnParams;
+
 
 			auto* spawnTile = GetWorld()->SpawnActor<AGridTile>(
 				tileFactory, spawnLoc, spawnRot, spawnParams);
@@ -50,7 +60,50 @@ void AGridTileManager::InitGridTile()
 				FString s = map.FindRef(FIntPoint(X, Y))->GetActorNameOrLabel();
 				// UE_LOG(LogTemp, Warning, TEXT("X = %d, Y = %d, TileName = %s"),
 				//        X, Y, *s);
+				AllCoords.Add(Coord); // 좌표 저장
 			}
+		}
+	}
+
+	Algo::RandomShuffle(AllCoords);
+
+	TArray<FIntPoint> PlayerCoords;
+	for (int32 i = 0; i < 5 && i < AllCoords.Num(); ++i)
+	{
+		PlayerCoords.Add(AllCoords[i]);
+	}
+
+	// 다음 10개는 적
+	TArray<FIntPoint> EnemyCoords;
+	for (int32 i = 0; i < 5 && i < AllCoords.Num(); ++i)
+	{
+		EnemyCoords.Add(AllCoords[i]);
+	}
+
+	// 플레이어 유닛 스폰
+	for (const FIntPoint& Coord : PlayerCoords)
+	{
+		if (AGridTile* Tile = map.FindRef(Coord))
+		{
+			FVector SpawnLoc = Tile->GetActorLocation() + FVector(
+				0.f, 0.f, 10.f);
+			auto* player = GetWorld()->SpawnActor<ABattlePlayer>(
+				battlePlayerFactory, SpawnLoc, FRotator::ZeroRotator);
+			player->speed = FMath::RandRange(1, 10);
+		}
+	}
+
+	// 적 유닛 스폰
+	for (const FIntPoint& Coord : EnemyCoords)
+	{
+		if (AGridTile* Tile = map.FindRef(Coord))
+		{
+			FVector SpawnLoc = Tile->GetActorLocation() + FVector(
+				0.f, 0.f, 10.f);
+			auto* enemey = GetWorld()->SpawnActor<ABaseEnemy>(
+				enemyFactory, SpawnLoc,
+				FRotator::ZeroRotator);
+			enemey->speed = FMath::RandRange(1, 10);
 		}
 	}
 }
