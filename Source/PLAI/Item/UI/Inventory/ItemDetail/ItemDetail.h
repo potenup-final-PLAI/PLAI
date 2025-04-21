@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "PLAI/Item/Item/ItemStruct.h"
 #include "ItemDetail.generated.h"
 
 /**
@@ -13,4 +14,14 @@ UCLASS()
 class PLAI_API UItemDetail : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Name;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* NameType;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* NameDetail;
+
+	void SetItemDetail(const FItemStruct& ItemStruct);
 };
