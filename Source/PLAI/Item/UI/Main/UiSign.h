@@ -9,6 +9,29 @@
 /**
  * 
  */
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FSignStruct
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	FString Id = FString("id");
+	UPROPERTY(EditAnywhere)
+	FString Pw = FString("pw");
+};
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FSignStructs : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	
+	UPROPERTY(EditAnywhere)
+	TArray<FSignStruct> SignStructs;
+};
+
 UCLASS()
 class PLAI_API UUiSign : public UUserWidget
 {
@@ -23,6 +46,12 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ButtonSign;
+
+	UPROPERTY(EditAnywhere)
+	FSignStructs SignStructs;
+
+	UPROPERTY(EditAnywhere)
+	FSignStruct SignStruct;
 
 	virtual void NativeConstruct() override;
 

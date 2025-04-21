@@ -1,0 +1,24 @@
+{
+	"signStructs": [
+		{
+			"id": "dfsd",
+			"pw": "sfefs"
+		},
+		{
+			"id": "dfsdawdas",
+			"pw": "sfefs"
+		},
+		{
+			"id": "dfsdawdas",
+			"pw": "sfefsadwdasd"
+		},
+		{
+			"id": "dfsdawdassadawdfd",
+			"pw": "sfefsadwdasd"
+		},
+		{
+			"id": "dfsdawdassadawdfd",
+			"pw": "sfefsadwdasasdadwfd"
+		}
+	]
+}
