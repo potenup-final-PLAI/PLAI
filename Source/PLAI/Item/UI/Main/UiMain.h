@@ -23,5 +23,13 @@ class PLAI_API UUiMain : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ButtonSignin;
 
+	UPROPERTY(meta = (BindWidget))
+	class UUiSign* WbpUiSign;
+
+	bool bUiSign = false;
+	
+	UFUNCTION()
+	void SetUiSign();
+
 	virtual void NativeConstruct() override;
 };
