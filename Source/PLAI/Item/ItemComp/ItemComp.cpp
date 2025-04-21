@@ -3,6 +3,8 @@
 
 #include "ItemComp.h"
 
+#include "PLAI/Item/Item/ItemStruct.h"
+
 
 // Sets default values for this component's properties
 UItemComp::UItemComp()
@@ -19,7 +21,6 @@ UItemComp::UItemComp()
 void UItemComp::BeginPlay()
 {
 	Super::BeginPlay();
-
 	// ...
 	
 }

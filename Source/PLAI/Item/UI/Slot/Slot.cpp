@@ -33,6 +33,49 @@ void USlot::NativeConstruct()
 	ParentItem = ItemFactory->GetDefaultObject<AItem>();
 }
 
+// FItemStruct* USlot::ItemDetailShow()
+// {
+// 	const TArray<FName> Rownames = ItemTable->GetRowNames();
+//
+// 	for (const FName& RowName : Rownames)
+// 	{
+// 		FItemStruct* Row = ItemTable->FindRow<FItemStruct>(RowName, TEXT("ItemTable Slot"));
+// 		if (Row && Row->ItemIndex == ItemStruct.ItemIndex
+// 			&& Row->ItemTop == ItemStruct.ItemTop
+// 			&& Row->ItemIndexType == ItemStruct.ItemIndexType
+// 			&& Row->ItemIndexDetail == ItemStruct.ItemIndexDetail)
+// 		{
+// 			
+// 		}
+// 	}
+// }
+
+FItemStruct* USlot::ItemTableFind()
+{
+	const TArray<FName> Rownames = ItemTable->GetRowNames();
+
+	for (const FName& RowName : Rownames)
+	{
+		FItemStruct* Row = ItemTable->FindRow<FItemStruct>(RowName, TEXT("ItemTable Slot"));
+		if (Row && Row->ItemIndex == ItemStruct.ItemIndex
+			&& Row->ItemTop == ItemStruct.ItemTop
+			&& Row->ItemIndexType == ItemStruct.ItemIndexType
+			&& Row->ItemIndexDetail == ItemStruct.ItemIndexDetail)
+		{
+			return Row;
+		}
+	}
+	return nullptr;
+}
+
+void USlot::ItemTableShow()
+{
+	FItemStruct* ItemStructTable = ItemTableFind();
+	if (ItemStructTable == nullptr){UE_LOG(LogTemp,Warning,TEXT("슬롯 테이블값 없음 리턴")) return;};
+	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() %s%s%s"),*ItemStructTable->Name,*ItemStructTable->NameType,
+		*ItemStructTable->NameDetail);
+}
+
 FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
 	if (ItemStruct.ItemTop == -1)
@@ -49,6 +92,7 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 	}
 	if (MouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
 	{
+		ItemTableShow();
 		UE_LOG(LogTemp, Display, TEXT("Slot::오른쪽마우스 NativeOnMouseButtonDown"));
 		APlayerController* PlayerController = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 		
