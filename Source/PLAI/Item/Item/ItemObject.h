@@ -21,4 +21,5 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class USlot* SlotUi;
+	
 };

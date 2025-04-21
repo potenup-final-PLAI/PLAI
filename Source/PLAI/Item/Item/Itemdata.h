@@ -3,17 +3,6 @@
 #include "CoreMinimal.h"
 #include "Itemdata.generated.h"
 
-USTRUCT(BlueprintType)
-struct FItemData: public FTableRowBase
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Index = 0;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Name = FString("Name");
-};
 
 // ItemShield = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,0,500),FRotator(0,0,0));
 // ItemShield->AttachToComponent(TestPlayer->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
