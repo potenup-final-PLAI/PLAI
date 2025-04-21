@@ -6,6 +6,7 @@
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/ItemComp/ItemComp.h"
 #include "PLAI/Item/ItemComp/StoreComp.h"
+#include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 
 
@@ -16,6 +17,7 @@ ATestPlayer::ATestPlayer()
 	PrimaryActorTick.bCanEverTick = true;
 	InvenComp = CreateDefaultSubobject<UInvenComp>(TEXT("InvenComp"));
 	StoreComp = CreateDefaultSubobject<UStoreComp>(TEXT("StoreComp"));
+	LoginComp = CreateDefaultSubobject<ULoginComp>(TEXT("LoginComp"));
 }
 
 // Called when the game starts or when spawned

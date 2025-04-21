@@ -32,4 +32,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UStoreComp* StoreComp;
+
+	UPROPERTY(EditAnywhere)
+	class ULoginComp* LoginComp;
 };
