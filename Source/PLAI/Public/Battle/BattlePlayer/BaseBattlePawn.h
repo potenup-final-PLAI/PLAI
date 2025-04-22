@@ -27,7 +27,11 @@ public:
 	virtual void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
 
+	//----------Speed State-------------
 	int32 speed = 0;
+	//------------Turn System-----------------
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ATurnManager> turnManagerFactory;
 	void OnTurnStart();
 	void OnTurnEnd();
 };

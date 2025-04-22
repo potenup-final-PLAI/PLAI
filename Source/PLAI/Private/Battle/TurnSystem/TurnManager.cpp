@@ -46,6 +46,10 @@ void ATurnManager::SetTurnState(ETurnState newTurnState)
 	case ETurnState::None:
 		break;
 	case ETurnState::PlayerTurn:
+		// 플레이어 턴으로 변경
+		curTurnState = ETurnState::PlayerTurn;
+	// 유닛 포제스
+	// Player AP 세팅
 		break;
 	case ETurnState::EnemyTurn:
 		break;
@@ -58,15 +62,31 @@ void ATurnManager::SetTurnState(ETurnState newTurnState)
 
 void ATurnManager::StartPlayerTurn()
 {
-	if (auto* pawn = Cast<ABattlePlayer>(curUnit))
+	if (auto* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
-		UE_LOG(LogTemp, Display, TEXT("pawn is Player %s"),
-		       *pawn->GetActorNameOrLabel());
+		UE_LOG(LogTemp, Display, TEXT("playerPawn is Player %s"),
+		       *playerPawn->GetActorNameOrLabel());
+
+		if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
+		{
+			pc->Possess(playerPawn);
+			UE_LOG(LogTemp, Warning, TEXT("possess unit %s"), *playerPawn->GetActorNameOrLabel());
+		}
+
+		playerPawn->OnTurnStart();
 	}
 }
 
 void ATurnManager::StartNextPlayerTurn()
 {
+	// curUnit = FindNextPlayerUnit(); // 아직 턴 안 쓴 유닛
+	
+	APlayerController* pc = GetWorld()->GetFirstPlayerController();
+	if (pc)
+	{
+		pc->Possess(curUnit);
+		curUnit->OnTurnStart(); // FSM Enable
+	}
 }
 
 void ATurnManager::StartEnemyTurn()
@@ -90,4 +110,10 @@ void ATurnManager::StartEnemyTurn()
 
 void ATurnManager::StartNextEnemyTurn()
 {
+	APlayerController* pc = GetWorld()->GetFirstPlayerController();
+	if (pc)
+	{
+		pc->Possess(curUnit);
+		curUnit->OnTurnStart(); // FSM Enable
+	}
 }

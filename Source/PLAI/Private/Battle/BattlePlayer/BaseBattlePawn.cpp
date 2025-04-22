@@ -3,9 +3,12 @@
 
 #include "Battle/BattlePlayer/BaseBattlePawn.h"
 
+#include "Battle/TurnSystem/PhaseManager.h"
+#include "Battle/TurnSystem/TurnManager.h"
 #include "Developer/AITestSuite/Public/AITestsCommon.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABaseBattlePawn::ABaseBattlePawn()
@@ -37,10 +40,17 @@ void ABaseBattlePawn::SetupPlayerInputComponent(
 
 void ABaseBattlePawn::OnTurnStart()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Enemy Turn Start"));
+	UE_LOG(LogTemp, Warning, TEXT("Turn Start"));
 }
 
 void ABaseBattlePawn::OnTurnEnd()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Enemy Turn End"));
+	UE_LOG(LogTemp, Warning, TEXT("Turn End"));
+	// 입력 막고 FSM 종료
+
+	// 다음 턴으로 넘기기
+	if (auto* pm = GetWorld()->GetGameState<AUPhaseManager>())
+	{
+		pm->RequestNextTurn(this);		
+	}
 }

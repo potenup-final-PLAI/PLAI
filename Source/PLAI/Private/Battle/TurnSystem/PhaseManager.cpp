@@ -3,6 +3,7 @@
 
 #include "Battle/TurnSystem/PhaseManager.h"
 
+#include "BasePlayerState.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Developer/AITestSuite/Public/AITestsCommon.h"
 #include "Enemy/BaseEnemy.h"
@@ -49,6 +50,7 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 		break;
 	case EBattlePhase::BattleEnd:
 		// 끝났을 때 결과에 대한 UI 보여주면 될듯함.
+		BattleEnd();
 		break;
 	default:
 		break;
@@ -63,38 +65,6 @@ void AUPhaseManager::InitBattle()
 	SetUnitQueue();
 	// 배틀 시작
 	StartBattle();
-}
-
-void AUPhaseManager::SetPlayerAP()
-{
-	curPlayerAP = maxActionPoints;
-	UE_LOG(LogTemp, Warning, TEXT("Player AP Set %d"), curPlayerAP);
-}
-
-void AUPhaseManager::SetEnemyAP()
-{
-	curEnemyAP = maxActionPoints;
-	UE_LOG(LogTemp, Warning, TEXT("Enemy AP Set %d"), curEnemyAP);
-}
-
-int32 AUPhaseManager::GetAP(int32 ap)
-{
-	// AP 증가시켜서 리턴
-	return ++ap;
-}
-
-int32 AUPhaseManager::ConsumeAP(int32 ap, int32 amount)
-{
-	// 호출하는 대상에 ap를 받아서 AP 증감처리 
-	int32 tempAP = FMath::Max(0, ap - amount);
-	// 처리된 ap를 다시 호출한 대상 AP에 업데이트
-	return tempAP;
-}
-
-bool AUPhaseManager::CanUseSkill(int32 ap, int32 cost)
-{
-	// 호출하는 대상의 AP를 검사해서 크다면 스킬 실행
-	return ap >= cost;
 }
 
 void AUPhaseManager::SetUnitQueue()
@@ -112,6 +82,19 @@ void AUPhaseManager::SetUnitQueue()
 			unitQueue.Add(pawn);
 			UE_LOG(LogTemp, Warning, TEXT("Queue Size %d, Actor Name : %s"),
 			       unitQueue.Num(), *pawn->GetActorNameOrLabel());
+			
+			// Player State를 가져와서 ! 포제스를 하는 부분에서 해야함.
+			// if (auto* ps = Cast<ABasePlayerState>(pawn->GetPlayerState()))
+			// {
+			// 	// 각 유닛마다 PlayerState 세팅
+			// 	ps->SetAP();
+			// 	UE_LOG(LogTemp, Warning, TEXT("UnitName : %s, AP : %d"),
+			// 	       *pawn->GetActorNameOrLabel(), ps->curAP);
+			// }
+			// else
+			// {
+			// 	UE_LOG(LogTemp, Warning, TEXT("Ps Is Fail"));
+			// }
 		}
 	}
 
@@ -135,15 +118,6 @@ void AUPhaseManager::SortUnitQueue()
 
 void AUPhaseManager::StartBattle()
 {
-	if (unitQueue.Num() <= 0)
-	{
-		// 주기 세팅 후 큐 속도에 따라 다시 세팅
-		SetCycle();
-		SetUnitQueue();
-		UE_LOG(LogTemp, Warning, TEXT("unitQueue Empty"));
-		return;
-	}
-
 	ABaseBattlePawn* tempUnit = unitQueue[0];
 	// 현재 턴이 진행 중인 유닛 저장
 	turnManager->curUnit = tempUnit;
@@ -167,18 +141,34 @@ void AUPhaseManager::StartPlayerPhase()
 	UE_LOG(LogTemp, Warning, TEXT("PlayerTurn Start Unit Name : %s"),
 	       *turnManager->curUnit->GetActorNameOrLabel());
 
+	// 턴이 다 지났다면 
+	if (unitQueue.Num() <= 0)
+	{
+		// 주기 세팅 후 큐 속도에 따라 다시 세팅
+		SetCycle();
+		SetUnitQueue();
+		StartBattle();
+		// UE_LOG(LogTemp, Warning, TEXT("unitQueue Empty"));
+	}
+	
 	SetPhase(EBattlePhase::TurnProcessing);
-	turnManager->curTurnState = ETurnState::PlayerTurn;
 
-	// Player AP 세팅
-	SetPlayerAP();
 	// PlayerTurn 시작
 	turnManager->SetTurnState(ETurnState::PlayerTurn);
+	// 첫 번째 유닛 포제스
+	turnManager->StartPlayerTurn();
+	
 }
 
 void AUPhaseManager::EndPlayerPhase()
 {
 	SetPhase(EBattlePhase::TurnProcessing);
+	if (cycle >= 5)
+	{
+		SetPhase(EBattlePhase::BattleEnd);
+		turnManager->SetTurnState(ETurnState::None);
+		return;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("End Player Turn"));
 
 	if (unitQueue.Num() > 0)
@@ -208,13 +198,19 @@ void AUPhaseManager::EndPlayerPhase()
 
 void AUPhaseManager::StartEnemyPhase()
 {
+	// 턴이 다 지났다면 
+	if (unitQueue.Num() <= 0)
+	{
+		// 주기 세팅 후 큐 속도에 따라 다시 세팅
+		SetCycle();
+		SetUnitQueue();
+		StartBattle();
+		// UE_LOG(LogTemp, Warning, TEXT("unitQueue Empty"));
+	}
 	SetPhase(EBattlePhase::TurnProcessing);
 	turnManager->curTurnState = ETurnState::EnemyTurn;
 
 	UE_LOG(LogTemp, Warning, TEXT("Start Enemy Turn"));
-
-	// EnemyAP 세팅
-	SetEnemyAP();
 
 	// 처음 시작할 적 유닛 턴 시작
 	if (turnManager)
@@ -226,12 +222,15 @@ void AUPhaseManager::StartEnemyPhase()
 
 void AUPhaseManager::EndEnemyPhase()
 {
-	SetCycle();
+	// 주기가 5와 같거나 크다면
 	if (cycle >= 5)
 	{
+		// 전투를 끝낸다.
 		SetPhase(EBattlePhase::BattleEnd);
+		turnManager->SetTurnState(ETurnState::None);
 		return;
 	}
+	// 유닛이 있다면 처음 유닛을 현재 유닛으로 지정하고 큐에 저장된 유닛을 지운다.
 	if (unitQueue.Num() > 0)
 	{
 		turnManager->curUnit = unitQueue[0];
@@ -250,4 +249,23 @@ void AUPhaseManager::EndEnemyPhase()
 		// EnemyPhase 시작
 		StartEnemyPhase();
 	}
+}
+
+void AUPhaseManager::RequestNextTurn(ABaseBattlePawn* endUnit)
+{
+	if (endUnit->IsPlayerControlled())
+	{
+		// 플레이어 턴 넘기기
+		EndPlayerPhase();
+	}
+	else
+	{
+		// Enemy 자동 루프
+		turnManager->StartNextEnemyTurn();
+	}
+}
+
+void AUPhaseManager::BattleEnd()
+{
+	UE_LOG(LogTemp, Warning, TEXT("End Battle"));
 }

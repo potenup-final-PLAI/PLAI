@@ -38,13 +38,13 @@ void UActionUI::OnClickedTurnEnd()
 	{
 		// 플레이어 턴 종료
 		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
-		phaseManager->EndPlayerPhase();
+		player->OnTurnEnd();
 	}
 	else if (auto* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
 	{
 		// Enemy 턴 종료
 		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
-		phaseManager->EndEnemyPhase();
+		enemy->OnTurnEnd();
 	}
 }
 
