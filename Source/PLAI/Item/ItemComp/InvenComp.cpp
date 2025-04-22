@@ -454,7 +454,6 @@ void UInvenComp::LoadItemInventory()
 		{ Slot->SlotImageUpdate(); }
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 로드"))
-
 }
 
 void UInvenComp::SaveEquipInventory()

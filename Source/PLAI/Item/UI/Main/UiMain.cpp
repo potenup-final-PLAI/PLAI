@@ -7,6 +7,7 @@
 #include "UiSign.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "PLAI/Item/Login/LoginComp.h"
 
 void UUiMain::SetUiSign()
 {
@@ -33,6 +34,8 @@ void UUiMain::Login()
     	if (SignStruct.Id == LoginId->GetText().ToString()
     		&& SignStruct.Pw == LoginPw->GetText().ToString())
     	{
+    		LoginComp->UserId = LoginId->GetText().ToString();
+    		LoginComp->UserId = LoginPw->GetText().ToString();
     		UE_LOG(LogTemp,Display,TEXT("UiSign 사인 Successful"));
     		bLogin = true;
     	}
@@ -60,6 +63,15 @@ void UUiMain::Login()
 
 void UUiMain::NativeConstruct()
 {
+    if (APlayerController* pc = Cast<APlayerController>(GetOwningPlayer()))
+    {
+	    UE_LOG(LogTemp,Warning,TEXT("UiMain 엑터 연결"))
+    }
+    else
+    {
+    	UE_LOG(LogTemp,Warning,TEXT("UiMain 엑터 연결안됨"))
+    }
+	
 	Super::NativeConstruct();
 
 	ButtonStart->OnClicked.AddDynamic(this,&UUiMain::RemoveFromParent);

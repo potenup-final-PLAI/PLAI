@@ -20,13 +20,20 @@ void UUiSign::OnSignin()
     FString pw = SignPw->GetText().ToString();
 	UE_LOG(LogTemp,Display,TEXT("Sign in Id%s Pw%s"),*id,*pw);
 
+	FString JasonStringLoad;
+	FString Path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("/SaveSign/SignSave.txt"));
+	
+	FSignStructs SignStructs;
+	FFileHelper::LoadFileToString(JasonStringLoad,*Path);
+	FJsonObjectConverter::JsonObjectStringToUStruct(JasonStringLoad,&SignStructs);
+
 	SignStruct.Id = id;
 	SignStruct.Pw = pw;
+	SignStructs.SignStructs.Add(SignStruct);
 
 	FString JsonString;
-	SignStructs.SignStructs.Add(SignStruct);
 	FJsonObjectConverter::UStructToJsonObjectString(SignStructs,JsonString);
-
+	
 	FString path = FString::Printf(TEXT("%s/%s"),*FPaths::ProjectDir(),TEXT("SaveSign/SignSave.txt"));
 	FFileHelper::SaveStringToFile(JsonString,*path);
 }

@@ -70,15 +70,21 @@ FItemStruct* USlot::ItemTableFind()
 
 void USlot::ItemTableShow()
 {
-	FItemStruct* ItemStructTable = ItemTableFind();
-	if (ItemStructTable == nullptr){UE_LOG(LogTemp,Warning,TEXT("슬롯 테이블값 없음 리턴")) return;};
-	ItemStruct = *ItemStructTable;
+	if (APawn* TestPlayer = GetWorld()->GetFirstPlayerController()->GetPawn())
+	{
+		if (TestPlayer->IsLocallyControlled())
+		{
+			FItemStruct* ItemStructTable = ItemTableFind();
+	        if (ItemStructTable == nullptr){UE_LOG(LogTemp,Warning,TEXT("슬롯 테이블값 없음 리턴")) return;};
+	        ItemStruct = *ItemStructTable;
 	
-	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 데이블 구조체 %s%s%s"),*ItemStructTable->Name,*ItemStructTable->NameType,
-		*ItemStructTable->NameDetail);
+        	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 데이블 구조체 %s%s%s"),*ItemStructTable->Name,*ItemStructTable->NameType,
+	    	*ItemStructTable->NameDetail);
 
-	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 구조체 %s%s%s"),*ItemStruct.Name,*ItemStruct.NameType,
-		*ItemStruct.NameDetail);
+        	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 구조체 %s%s%s"),*ItemStruct.Name,*ItemStruct.NameType,
+		    *ItemStruct.NameDetail);
+		}
+	}
 }
 
 FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)

@@ -2,8 +2,14 @@
 
 
 #include "LoginComp.h"
+
+#include "HttpModule.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/VerticalBox.h"
+#include "Interfaces/IHttpRequest.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 
 
 // Sets default values for this component's properties
@@ -21,13 +27,14 @@ ULoginComp::ULoginComp()
 void ULoginComp::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
     TestPlayer = Cast<ATestPlayer>(GetOwner());
-
+	
 	if (TestPlayer->IsLocallyControlled())
 	{
 		UiMain = CreateWidget<UUiMain>(GetWorld(),UiMainFactory);
 		UiMain->AddToViewport();
+		UiMain->LoginComp = this;
 	}
 }
 
@@ -36,6 +43,27 @@ void ULoginComp::BeginPlay()
 void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	// ...
+	
+}
+
+void ULoginComp::SaveEquip()
+{
+	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+	{
+		if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget))
+		{
+			
+		}
+	}
+}
+
+void ULoginComp::HttpLogin()
+{
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+	
+}
+
+void ULoginComp::HttpSignin()
+{
 }
 

@@ -25,8 +25,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
-
-
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUiMain> UiMainFactory;
 	
@@ -35,4 +33,14 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ATestPlayer* TestPlayer;
+
+	UPROPERTY(EditAnywhere)
+	FString UserId;
+	UPROPERTY(EditAnywhere)
+	FString UserPw;
+
+	void SaveEquip();
+
+	void HttpLogin();
+	void HttpSignin();
 };
