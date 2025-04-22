@@ -30,6 +30,7 @@ class PLAI_API UUiMain : public UUserWidget
 	
 	UFUNCTION()
 	void SetUiSign();
+	void Login();
 
 	virtual void NativeConstruct() override;
 };
