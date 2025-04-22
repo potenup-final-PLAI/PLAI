@@ -3,6 +3,7 @@
 #pragma once
 
 DECLARE_DELEGATE_OneParam(FOnLogin, bool bLogin)
+DECLARE_DELEGATE_OneParam(FOnSing, bool bSign)
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"

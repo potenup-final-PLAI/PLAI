@@ -52,6 +52,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ButtonSign;
 
+	UPROPERTY(EditAnywhere)
+	class ULoginComp* LoginComp;
+
 	// UPROPERTY(EditAnywhere)
 	// FSignStructs SignStructs;
 

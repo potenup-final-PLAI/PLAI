@@ -6,6 +6,7 @@
 #include "JsonObjectConverter.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "PLAI/Item/Login/LoginComp.h"
 
 void UUiSign::NativeConstruct()
 {
@@ -16,6 +17,7 @@ void UUiSign::NativeConstruct()
 
 void UUiSign::OnSignin()
 {
+	LoginComp->HttpSignPost();
 	FString id = SignId->GetText().ToString();
     FString pw = SignPw->GetText().ToString();
 	UE_LOG(LogTemp,Display,TEXT("Sign in Id%s Pw%s"),*id,*pw);
