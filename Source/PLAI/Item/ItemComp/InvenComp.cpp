@@ -197,26 +197,31 @@ void UInvenComp::Server_UnEquip_Implementation(EquipSlotType SlotType)
 {
 	if (SlotType == EquipSlotType::Armor)
 	{
+		if (!ItemArmor) return;
 		ItemArmor->Destroy();
 		ItemArmor = nullptr;
 	}
 	if (SlotType == EquipSlotType::Boots)
 	{
+		if (!Itemboots) return;
 		Itemboots->Destroy();
 		Itemboots = nullptr;
 	}
 	if (SlotType == EquipSlotType::Gloves)
 	{
+		if (!ItemGlove) return;
 		ItemGlove->Destroy();
 		ItemGlove = nullptr;
 	}
 	if (SlotType == EquipSlotType::Helmet)
 	{
+		if (!ItemHelmet) return;
 		ItemHelmet->Destroy();
 		ItemHelmet = nullptr;
 	}
 	if (SlotType == EquipSlotType::Weapon)
 	{
+		if (!ItemWeapon) return;
 		ItemWeapon->Destroy();
 		ItemWeapon = nullptr;
 	}

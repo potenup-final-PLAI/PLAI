@@ -51,13 +51,16 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 void ULoginComp::SaveEquip()
 {
+	FSignStruct SignStruct;
 	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
 	{
 		if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget))
 		{
-			
+			SignStruct.ItemStructsEquip.ItemStructs.Add(SlotEquip->ItemStruct);
 		}
 	}
+	
+	
 }
 
 void ULoginComp::HttpLoginPost()
