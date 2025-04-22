@@ -36,12 +36,17 @@ public:
 	UFUNCTION()
 	void OnPlayerExitRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
+	auto IsPlayerInRange() const -> bool; //거리판단
+
 	UPROPERTY()
 	bool bPlayerInRange = false; // 범위 안에 있는지 여부
+	UPROPERTY()
+	bool bNpcTrun=true;
 	
 	//NPC 인터페이스
 	virtual void Interact(ACharacter* Interactor);
-	bool IsPlayerInRange() const; //거리판단
+
+	void InteractTurnBased(ACharacter* Interactor);
 
 
 };

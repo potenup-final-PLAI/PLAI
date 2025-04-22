@@ -74,7 +74,26 @@ void ANPC::Interact(ACharacter* Interactor)
 	UE_LOG(LogTemp,Warning,TEXT("플레이어:안녕하세요"));
 }
 
+void ANPC::InteractTurnBased(ACharacter* Interactor)
+{
+	if (bNpcTrun)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NPC: 안녕"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("플레이어: 안녕하세요"));
+	}
+
+	bNpcTrun = !bNpcTrun;  // 번갈아가며 바뀜
+}
+
 bool ANPC::IsPlayerInRange() const
 {
-	return true;
+	return bPlayerInRange;
 }
+
+// bool ANPC::IsPlayerInRange() const
+// {
+// 	return true;
+// }
