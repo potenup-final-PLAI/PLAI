@@ -1,0 +1,60 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "UiSign.generated.h"
+
+/**
+ * 
+ */
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FSignStruct
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	FString Id = FString("id");
+	UPROPERTY(EditAnywhere)
+	FString Pw = FString("pw");
+};
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FSignStructs : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	
+	UPROPERTY(EditAnywhere)
+	TArray<FSignStruct> SignStructs;
+};
+
+UCLASS()
+class PLAI_API UUiSign : public UUserWidget
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* SignId;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* SignPw;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* ButtonSign;
+
+	UPROPERTY(EditAnywhere)
+	FSignStructs SignStructs;
+
+	UPROPERTY(EditAnywhere)
+	FSignStruct SignStruct;
+
+	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnSignin();
+};
