@@ -2,11 +2,36 @@
 
 #pragma once
 
+DECLARE_DELEGATE_OneParam(FOnLogin, bool bLogin)
+
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Interfaces/IHttpRequest.h"
 #include "PLAI/Item/UI/Main/UiMain.h" 
 #include "LoginComp.generated.h"
 
+USTRUCT()
+struct FLoginStructGet
+{
+	GENERATED_BODY()
+public:
+	FString access_token = TEXT("string");
+	FString refresh_token = TEXT("string");
+	FString token_type = TEXT("string");
+	FString user_id = TEXT("string");
+};
+
+USTRUCT(BlueprintType)
+struct FLoginStruct
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	FString email = TEXT("Email");
+	
+	UPROPERTY(EditAnywhere)
+	FString password = TEXT("PassWord");
+};
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API ULoginComp : public UActorComponent
@@ -27,6 +52,8 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUiMain> UiMainFactory;
+
+	FOnLogin OnLogin;
 	
 	UPROPERTY(EditAnywhere)
 	class UUiMain* UiMain;
@@ -41,6 +68,8 @@ public:
 
 	void SaveEquip();
 
-	void HttpLogin();
-	void HttpSignin();
+	void HttpLoginPost();
+	
+	void HttpSignPost();
+	
 };

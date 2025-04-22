@@ -2,11 +2,13 @@
 
 
 #include "LoginComp.h"
-
 #include "HttpModule.h"
+#include "JsonObjectConverter.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/EditableTextBox.h"
 #include "Components/VerticalBox.h"
 #include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
@@ -57,13 +59,34 @@ void ULoginComp::SaveEquip()
 	}
 }
 
-void ULoginComp::HttpLogin()
+void ULoginComp::HttpLoginPost()
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/users/login"));
+	httpRequest->SetVerb("POST");
+	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	
+	FLoginStruct LoginStruct;
+	
+	LoginStruct.email = UiMain->LoginId->GetText().ToString();
+	LoginStruct.password = UiMain->LoginPw->GetText().ToString();
+
+	FString JsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(LoginStruct, JsonString);
+	httpRequest->SetContentAsString(JsonString);
+	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
+	{
+		if (bProcessedSuccessfully)
+		{ FString JsonString = HttpResponse->GetContentAsString();
+			UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인%s"), *JsonString);
+			OnLogin.ExecuteIfBound(true);
+		}
+	});
+	httpRequest->ProcessRequest();
 }
 
-void ULoginComp::HttpSignin()
+void ULoginComp::HttpSignPost()
 {
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 }
 

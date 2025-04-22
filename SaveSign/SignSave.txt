@@ -117,6 +117,18 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "user@example.co",
+			"pw": "",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }
