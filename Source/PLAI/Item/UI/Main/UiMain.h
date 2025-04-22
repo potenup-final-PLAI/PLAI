@@ -26,11 +26,22 @@ class PLAI_API UUiMain : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	class UUiSign* WbpUiSign;
 
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* LoginId;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* LoginPw;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* LoginFail;
+
 	bool bUiSign = false;
 	
 	UFUNCTION()
 	void SetUiSign();
-	void Login();
 
+	UFUNCTION()
+	void Login();
+	
 	virtual void NativeConstruct() override;
 };

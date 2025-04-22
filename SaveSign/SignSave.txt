@@ -1,44 +1,24 @@
 {
 	"signStructs": [
 		{
-			"id": "smk6931",
+			"id": "123",
 			"pw": "123"
 		},
 		{
-			"id": "smk6931123",
-			"pw": "123123"
+			"id": "qwe",
+			"pw": "qwe"
 		},
 		{
-			"id": "smk693112312",
-			"pw": "12312312"
+			"id": "asd",
+			"pw": "asd"
 		},
 		{
-			"id": "smk693112312sad",
-			"pw": "12312312asdasd"
+			"id": "zxc",
+			"pw": "zxc"
 		},
 		{
-			"id": "smk693112312sad",
-			"pw": "12312312asdasd"
-		},
-		{
-			"id": "smk693112312sad",
-			"pw": "12312312asdasd"
-		},
-		{
-			"id": "smk693112312sad",
-			"pw": "12312312asdasd"
-		},
-		{
-			"id": "smk693112312sad",
-			"pw": "12312312asdasd"
-		},
-		{
-			"id": "smk693112312sad",
-			"pw": "12312312asdasd"
-		},
-		{
-			"id": "smk693112312sad",
-			"pw": "12312312asdasd"
+			"id": "rty",
+			"pw": "rty"
 		}
 	]
 }
