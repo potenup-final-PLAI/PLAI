@@ -3,6 +3,7 @@
 
 #include "KHA/KHACharacter.h"
 
+#include "NPC.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
@@ -62,6 +63,33 @@ void AKHACharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AKHACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AKHACharacter::TryInteract);
+}
+
+void AKHACharacter::TryInteract()
+{
+	UE_LOG(LogTemp, Display, TEXT("e키 눌림"));
+	FVector Start = GetActorLocation();
+	FVector End = Start + GetActorForwardVector() * 300.0f; // 앞 방향으로 300cm 탐지
+
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		ANPC* HitNPC = Cast<ANPC>(Hit.GetActor());
+		if (HitNPC && HitNPC->IsPlayerInRange()) // NPC가 감지 상태인지 확인
+		{
+			HitNPC->Interact(this); // 플레이어가 NPC에게 인사
+		}
+	}
 }
 
 // Called to bind functionality to input

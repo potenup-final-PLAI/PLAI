@@ -73,3 +73,8 @@ void ANPC::Interact(ACharacter* Interactor)
 {
 	UE_LOG(LogTemp,Warning,TEXT("플레이어:안녕하세요"));
 }
+
+bool ANPC::IsPlayerInRange() const
+{
+	return true;
+}

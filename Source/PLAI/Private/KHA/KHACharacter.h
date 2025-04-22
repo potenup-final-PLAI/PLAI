@@ -17,6 +17,7 @@ public:
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
+	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
 
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
@@ -36,5 +37,8 @@ private:
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
+
+	//상호작용
+	void TryInteract();
 
 };

@@ -41,6 +41,8 @@ public:
 	
 	//NPC 인터페이스
 	virtual void Interact(ACharacter* Interactor);
-	bool IsPlayerInRange() const;
+	bool IsPlayerInRange() const; //거리판단
+
+
 };
 
