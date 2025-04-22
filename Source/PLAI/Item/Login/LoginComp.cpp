@@ -76,10 +76,22 @@ void ULoginComp::HttpLoginPost()
 	httpRequest->SetContentAsString(JsonString);
 	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
 	{
+		FLoginStructGet LoginStructGet;
 		if (bProcessedSuccessfully)
 		{ FString JsonString = HttpResponse->GetContentAsString();
 			UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인%s"), *JsonString);
-			OnLogin.ExecuteIfBound(true);
+
+			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &LoginStructGet);
+			if (LoginStructGet.user_id != TEXT("string"))
+			{
+				OnLogin.ExecuteIfBound(true);
+				UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인%s"),*LoginStructGet.user_id);
+			}
+			else
+			{
+				OnLogin.ExecuteIfBound(false);
+				UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인 실패"));
+			}
 		}
 	});
 	httpRequest->ProcessRequest();

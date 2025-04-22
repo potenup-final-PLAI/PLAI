@@ -15,9 +15,13 @@ struct FLoginStructGet
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY()
 	FString access_token = TEXT("string");
+	UPROPERTY()
 	FString refresh_token = TEXT("string");
+	UPROPERTY()
 	FString token_type = TEXT("string");
+	UPROPERTY()
 	FString user_id = TEXT("string");
 };
 
