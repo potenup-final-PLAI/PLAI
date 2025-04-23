@@ -157,7 +157,14 @@ void ULoginComp::HttpInitPost()
 
 void ULoginComp::TransDataTable()
 {
-	const TArray<FName>RowNames = OldDataTable->GetRowNames();
+	UE_LOG(LogTemp, Warning, TEXT("구조체 변경 시작"));
+
+	UDataTable* OldDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Mk_Item/Dt_ItemStruct.Dt_ItemStruct"));
+	OldDataTable->RowStruct = FItemStruct::StaticStruct();
+	UDataTable* NewDataTable = NewObject<UDataTable>();
+	NewDataTable->RowStruct = FItemStructTable::StaticStruct();
+
+	const TArray<FName> RowNames = OldDataTable->GetRowNames();
 	for (const FName& RowName : RowNames)
 	{
 		if (FItemStruct* SrcRow = OldDataTable->FindRow<FItemStruct>(RowName, TEXT("")))
@@ -171,15 +178,19 @@ void ULoginComp::TransDataTable()
 			NewRow.NameType = SrcRow->NameType;
 			NewRow.NameDetail = SrcRow->NameDetail;
 			NewRow.ItemNum = SrcRow->ItemNum;
-
 			NewRow.ItemStructStat = SrcRow->ItemStructStat;
 			NewRow.ItemStructStatName = SrcRow->ItemStructStatName;
 
 			NewDataTable->AddRow(RowName, NewRow);
+
+			UE_LOG(LogTemp, Warning, TEXT("데이터테이블 변환중: %s"), *NewRow.ItemStructStatName.item_SHI);
 		}
 	}
-
-	FString TableCSV = NewDataTable->GetTableAsCSV(EDataTableExportFlags::None);
-	FFileHelper::SaveStringToFile(TableCSV, *(FPaths::ProjectSavedDir() + "MyTable.csv"));
+	UE_LOG(LogTemp, Warning, TEXT("Row Count: %d"), NewDataTable->GetRowNames().Num());
+	
+		FString TableCSV = NewDataTable->GetTableAsCSV(EDataTableExportFlags::None);
+		FFileHelper::SaveStringToFile(TableCSV, *(FPaths::ProjectDir() + "NewDataTable.csv"));
+		
+		UE_LOG(LogTemp, Warning, TEXT("CSV 저장 완료"));
 }
 

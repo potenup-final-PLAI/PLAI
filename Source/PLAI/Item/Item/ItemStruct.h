@@ -13,7 +13,7 @@ enum class EItemIndex : uint8
 };
 
 USTRUCT(BlueprintType,Blueprintable)
-struct FItemStructStat: public FTableRowBase
+struct FItemStructStat
 {
 	GENERATED_BODY()
 public:
@@ -33,7 +33,7 @@ public:
 };
 
 USTRUCT(BlueprintType,Blueprintable)
-struct FItemStructStatName: public FTableRowBase
+struct FItemStructStatName
 {
 	GENERATED_BODY()
 public:
@@ -146,7 +146,7 @@ public:
 	int32 ItemNum = 0;
 
 	UPROPERTY(EditAnywhere)
-	   UStaticMesh* StaticMesh;
+	UStaticMesh* StaticMesh;
 	UPROPERTY(EditAnywhere)
 	UTexture2D* Texture;
 	

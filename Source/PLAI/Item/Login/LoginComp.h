@@ -90,10 +90,6 @@ public:
 	void HttpInitPost();
 
 	//테스트 테이블 변환
-	UPROPERTY(EditAnywhere)
-	class UDataTable* OldDataTable;
-	UPROPERTY(EditAnywhere)
-	class UDataTable* NewDataTable;
 	void TransDataTable();
 	
 };
