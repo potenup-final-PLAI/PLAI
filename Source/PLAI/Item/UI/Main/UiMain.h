@@ -39,6 +39,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* LoginFail;
 
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* CanvasMain;
+
 	bool bUiSign = false;
 	
 	UFUNCTION()

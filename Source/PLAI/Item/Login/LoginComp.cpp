@@ -16,7 +16,6 @@
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Main/UiSign.h"
 
-
 // Sets default values for this component's properties
 ULoginComp::ULoginComp()
 {
@@ -42,6 +41,14 @@ void ULoginComp::BeginPlay()
 		UiMain->LoginComp = this;
 		UiMain->WbpUiSign->LoginComp = this;
 	}
+
+	// if (TestPlayer->IsLocallyControlled())
+	// {Main = CreateWidget<UMain>(GetWorld(),MainFactory);
+	// 	Main->AddToViewport();
+	// 	Main->WbpUiMain->LoginComp = this;
+	// 	Main->WbpUiMain->WbpUiSign->LoginComp = this;
+	// 	UiMain = Main->WbpUiMain;
+	// }
 }
 
 
