@@ -7,11 +7,13 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/EditableTextBox.h"
 #include "Components/VerticalBox.h"
+#include "Components/WrapBox.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Main/UiSign.h"
 
 
@@ -59,8 +61,13 @@ void ULoginComp::SaveEquip()
 			SignStruct.ItemStructsEquip.ItemStructs.Add(SlotEquip->ItemStruct);
 		}
 	}
-	
-	
+	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
+	{
+		if (USlot* Slot = Cast<USlot>(Widget))
+		{
+			SignStruct.ItemStructsInven.ItemStructs.Add(Slot->ItemStruct);
+		}
+	}
 }
 
 void ULoginComp::HttpLoginPost()

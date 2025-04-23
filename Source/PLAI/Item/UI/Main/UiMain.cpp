@@ -70,25 +70,31 @@ void UUiMain::Login()
     		LoginComp->UserId = LoginId->GetText().ToString();
     		LoginComp->UserId = LoginPw->GetText().ToString();
     		UE_LOG(LogTemp,Display,TEXT("UiSign 사인 Successful"));
+    		RemoveFromParent();
+    		
     		bLogin = true;
     	}
     	else
     	{
-    		bLogin = false;
-    		UE_LOG(LogTemp,Display,TEXT("UiSign 사인 실패"));
-    	}
-    	
-    	if (bLogin == false)
-    	{
     		LoginFail->SetVisibility(ESlateVisibility::Visible);
     		FTimerHandle TimerHandle;
     		GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-    		{ LoginFail->SetVisibility(ESlateVisibility::Hidden);},1.5f,false);
+			{ LoginFail->SetVisibility(ESlateVisibility::Hidden);},1.5f,false);
+    		UE_LOG(LogTemp,Display,TEXT("UiSign 사인 실패"));
+    		
+    		bLogin = false;
     	}
-    	else
-    	{
-    		RemoveFromParent();
-    	}
+    	// if (bLogin == false)
+    	// {
+    	// 	LoginFail->SetVisibility(ESlateVisibility::Visible);
+    	// 	FTimerHandle TimerHandle;
+    	// 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+    	// 	{ LoginFail->SetVisibility(ESlateVisibility::Hidden);},1.5f,false);
+    	// }
+    	// else
+    	// {
+    	// 	RemoveFromParent();
+    	// }
     }
 }
 

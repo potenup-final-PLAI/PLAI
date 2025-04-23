@@ -11,6 +11,30 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "smk6931@naver.com",
+			"pw": "123456",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "www@www.www",
+			"pw": "123",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }
