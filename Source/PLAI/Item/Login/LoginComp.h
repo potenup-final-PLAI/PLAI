@@ -36,6 +36,9 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	FString password = TEXT("PassWord");
+
+	UPROPERTY(EditAnywhere)
+	bool bInitCharacter = false;
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -82,5 +85,7 @@ public:
 	void HttpLoginPost();
 	
 	void HttpSignPost();
+
+	void HttpInitPost();
 	
 };

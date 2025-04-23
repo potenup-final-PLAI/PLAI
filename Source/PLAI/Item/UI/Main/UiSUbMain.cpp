@@ -4,6 +4,7 @@
 #include "UiSUbMain.h"
 
 #include "Components/Button.h"
+#include "Kismet/GameplayStatics.h"
 
 void UUiSUbMain::NativeConstruct()
 {
@@ -14,5 +15,6 @@ void UUiSUbMain::NativeConstruct()
 
 void UUiSUbMain::OnButtonSingle()
 {
+	UGameplayStatics::SetGamePaused(GetWorld(),false);
 	RemoveFromParent();
 }

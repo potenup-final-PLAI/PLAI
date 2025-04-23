@@ -8,16 +8,21 @@
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/EditableTextBox.h"
+#include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/Login/LoginComp.h"
 
 void UUiMain::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	UGameplayStatics::SetGamePaused(GetWorld(),true);
+	
 	if (APlayerController* pc = Cast<APlayerController>(GetOwningPlayer()))
 		
 	ButtonStart->OnClicked.AddDynamic(this,&UUiMain::RemoveFromParent);
 	ButtonSignin->OnClicked.AddDynamic(this,&UUiMain::SetUiSign);
 	ButtonLogin->OnClicked.AddDynamic(this,&UUiMain::Login);
+	ButtonInitEnd->OnClicked.AddDynamic(this,&UUiMain::InitEnd);
 
 	LoginFail->SetVisibility(ESlateVisibility::Hidden);;
 	WbpUiSign->SetVisibility(ESlateVisibility::Hidden);
@@ -77,6 +82,12 @@ void UUiMain::Login()
    //  		UE_LOG(LogTemp,Display,TEXT("UiSign 사인 실패"));
    //  	}
     // }
+}
+
+void UUiMain::InitEnd()
+{
+	UE_LOG(LogTemp,Warning,TEXT("UiSubMainInitButtontrue"));
+	CanvasInit->RemoveFromParent();
 }
 
 

@@ -142,3 +142,7 @@ void ULoginComp::HttpSignPost()
 	httpRequest->ProcessRequest();
 }
 
+void ULoginComp::HttpInitPost()
+{
+}
+
