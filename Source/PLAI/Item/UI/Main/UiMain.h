@@ -20,6 +20,9 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ButtonStart;
+
+	UFUNCTION()
+	void OnButtonStart();
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ButtonLogin;

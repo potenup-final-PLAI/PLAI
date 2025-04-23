@@ -2,8 +2,6 @@
 
 
 #include "UiMain.h"
-
-#include "JsonObjectConverter.h"
 #include "UiSign.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
@@ -20,7 +18,7 @@ void UUiMain::NativeConstruct()
 	
 	if (APlayerController* pc = Cast<APlayerController>(GetOwningPlayer()))
 		
-	ButtonStart->OnClicked.AddDynamic(this,&UUiMain::RemoveFromParent);
+	ButtonStart->OnClicked.AddDynamic(this,&UUiMain::OnButtonStart);
 	ButtonSignin->OnClicked.AddDynamic(this,&UUiMain::SetUiSign);
 	ButtonLogin->OnClicked.AddDynamic(this,&UUiMain::Login);
 	
@@ -85,6 +83,12 @@ void UUiMain::Login()
    //  		UE_LOG(LogTemp,Display,TEXT("UiSign 사인 실패"));
    //  	}
     // }
+}
+
+void UUiMain::OnButtonStart()
+{
+	UGameplayStatics::SetGamePaused(GetWorld(),false);
+	RemoveFromParent();
 }
 
 void UUiMain::InitEnd()
