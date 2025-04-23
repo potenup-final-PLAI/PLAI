@@ -33,13 +33,7 @@ void UStoreComp::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("UStoreComp::BeginPlay 스토인벤 생성불가"));
 	}
-
-	
-
-
-	
 	// ...
-	
 }
 
 

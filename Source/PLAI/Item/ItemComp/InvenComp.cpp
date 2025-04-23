@@ -4,7 +4,6 @@
 #include "InvenComp.h"
 
 #include "JsonObjectConverter.h"
-#include "MovieSceneTracksComponentTypes.h"
 #include "StoreComp.h"
 #include "Components/BoxComponent.h"
 #include "Components/Image.h"
@@ -12,7 +11,6 @@
 #include "Components/WrapBox.h"
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/Item/ItemMaster.h"
-#include "PLAI/Item/Item/Equip/ItemEquip.h"
 #include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/Npc/NpcStore.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -49,7 +47,6 @@ void UInvenComp::BeginPlay()
 		MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 		MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 	}
-	AItemMaster* Item = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,FVector(0,0,0),FRotator(0,0,0));
 }
 
 

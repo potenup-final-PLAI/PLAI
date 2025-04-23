@@ -56,26 +56,35 @@ void ULoginComp::BeginPlay()
 void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
 
-void ULoginComp::SaveEquip()
-{
-	FSignStruct SignStruct;
-	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
-	{
-		if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget))
-		{
-			SignStruct.ItemStructsEquip.ItemStructs.Add(SlotEquip->ItemStruct);
-		}
-	}
-	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
-	{
-		if (USlot* Slot = Cast<USlot>(Widget))
-		{
-			SignStruct.ItemStructsInven.ItemStructs.Add(Slot->ItemStruct);
-		}
-	}
+    if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+    { if (PC->WasInputKeyJustPressed(EKeys::H))
+        {
+    	    TransDataTable();
+    	};
+    }
 }
+//
+// void ULoginComp::SaveEquip()
+// {
+// 	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+// 	{
+// 		if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget))
+// 		{
+// 			UiMain->WbpUiSign->SignStruct.ItemStructsEquip.ItemStructs.Add(SlotEquip->ItemStruct);
+// 		}
+// 	}
+// 	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
+// 	{
+// 		if (USlot* Slot = Cast<USlot>(Widget))
+// 		{
+// 			UiMain->WbpUiSign->SignStruct.ItemStructsInven.ItemStructs.Add(Slot->ItemStruct);
+// 		}
+// 	}
+// 	FString JsonString;
+// 	FJsonObjectConverter::UStructToJsonObjectString(UiMain->WbpUiSign->SignStruct, JsonString);
+// 		 UE_LOG(LogTemp,Warning,TEXT("Equipped by %s"),*JsonString);
+// }
 
 void ULoginComp::HttpLoginPost()
 {
@@ -144,5 +153,33 @@ void ULoginComp::HttpSignPost()
 
 void ULoginComp::HttpInitPost()
 {
+}
+
+void ULoginComp::TransDataTable()
+{
+	const TArray<FName>RowNames = OldDataTable->GetRowNames();
+	for (const FName& RowName : RowNames)
+	{
+		if (FItemStruct* SrcRow = OldDataTable->FindRow<FItemStruct>(RowName, TEXT("")))
+		{
+			FItemStructTable NewRow;
+			NewRow.ItemTop = SrcRow->ItemTop;
+			NewRow.ItemIndex = SrcRow->ItemIndex;
+			NewRow.ItemIndexType = SrcRow->ItemIndexType;
+			NewRow.ItemIndexDetail = SrcRow->ItemIndexDetail;
+			NewRow.Name = SrcRow->Name;
+			NewRow.NameType = SrcRow->NameType;
+			NewRow.NameDetail = SrcRow->NameDetail;
+			NewRow.ItemNum = SrcRow->ItemNum;
+
+			NewRow.ItemStructStat = SrcRow->ItemStructStat;
+			NewRow.ItemStructStatName = SrcRow->ItemStructStatName;
+
+			NewDataTable->AddRow(RowName, NewRow);
+		}
+	}
+
+	FString TableCSV = NewDataTable->GetTableAsCSV(EDataTableExportFlags::None);
+	FFileHelper::SaveStringToFile(TableCSV, *(FPaths::ProjectSavedDir() + "MyTable.csv"));
 }
 

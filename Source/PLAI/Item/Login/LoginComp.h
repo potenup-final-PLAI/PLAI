@@ -11,6 +11,7 @@ DECLARE_DELEGATE_OneParam(FOnSing, bool bSign)
 #include "PLAI/Item/UI/Main/UiMain.h" 
 #include "LoginComp.generated.h"
 
+// 서버 가입 요청 토큰
 USTRUCT()
 struct FLoginStructGet
 {
@@ -25,7 +26,7 @@ public:
 	UPROPERTY()
 	FString user_id = TEXT("string");
 };
-
+// 서버 로그인 요청 토큰
 USTRUCT(BlueprintType)
 struct FLoginStruct
 {
@@ -87,5 +88,12 @@ public:
 	void HttpSignPost();
 
 	void HttpInitPost();
+
+	//테스트 테이블 변환
+	UPROPERTY(EditAnywhere)
+	class UDataTable* OldDataTable;
+	UPROPERTY(EditAnywhere)
+	class UDataTable* NewDataTable;
+	void TransDataTable();
 	
 };
