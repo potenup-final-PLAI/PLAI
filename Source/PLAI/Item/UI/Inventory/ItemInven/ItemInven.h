@@ -24,6 +24,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class USlot* SlotUi;
+    // 추후에 바뀔 가능성 Ui 위치
+	UPROPERTY(meta = (BindWidget))
+	class UItemGold* WbpItemGold;
 
 public:
 	virtual void NativeConstruct() override;

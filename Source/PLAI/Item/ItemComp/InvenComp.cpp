@@ -7,6 +7,7 @@
 #include "StoreComp.h"
 #include "Components/BoxComponent.h"
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
 #include "Net/UnrealNetwork.h"
@@ -17,6 +18,7 @@
 #include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 
@@ -55,6 +57,8 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
+    //임시함수임
+	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::P)){ SetGold(500);}
 	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
 	{   UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Q키 !"));
@@ -171,6 +175,12 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			}
 		}
 	}
+}
+
+void UInvenComp::SetGold(int32 Getgold)
+{
+	Gold += Getgold;
+	MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(Gold));
 }
 
 void UInvenComp::Server_SpawnOneItem_Implementation()

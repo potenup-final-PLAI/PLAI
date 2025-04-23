@@ -93,7 +93,6 @@ public:
 	TArray<UTexture2D*>Textures;
 };
 
-
 USTRUCT(BlueprintType,Blueprintable)
 struct FItemStructType
 {
