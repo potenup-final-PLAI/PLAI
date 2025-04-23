@@ -28,6 +28,9 @@ public:
 	class UButton* ButtonSignin;
 
 	UPROPERTY(meta = (BindWidget))
+	class UButton* ButtonInitPost;
+
+	UPROPERTY(meta = (BindWidget))
 	class UUiSign* WbpUiSign;
 
 	UPROPERTY(meta = (BindWidget))
@@ -45,16 +48,20 @@ public:
 	// Init 클래스
     UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* CanvasInit;
-	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ButtonInitEnd;
-
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* InitPost;
-
+	
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* InitResponse;
-
+	
+	UFUNCTION()
+	void InitEnd();
+	
+	UFUNCTION()
+	void HttpPostInit();
+	
 	bool bUiSign = false;
 	
 	UFUNCTION()
@@ -62,9 +69,7 @@ public:
 
 	UFUNCTION()
 	void Login();
-
-	UFUNCTION()
-	void InitEnd();
+	
 	
 	virtual void NativeConstruct() override;
 };

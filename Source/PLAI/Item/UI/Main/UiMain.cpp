@@ -10,6 +10,7 @@
 #include "Components/EditableTextBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/Login/LoginComp.h"
+#include "Components/TextBlock.h"
 
 void UUiMain::NativeConstruct()
 {
@@ -22,6 +23,8 @@ void UUiMain::NativeConstruct()
 	ButtonStart->OnClicked.AddDynamic(this,&UUiMain::RemoveFromParent);
 	ButtonSignin->OnClicked.AddDynamic(this,&UUiMain::SetUiSign);
 	ButtonLogin->OnClicked.AddDynamic(this,&UUiMain::Login);
+	
+	ButtonInitPost->OnClicked.AddDynamic(this,&UUiMain::HttpPostInit);
 	ButtonInitEnd->OnClicked.AddDynamic(this,&UUiMain::InitEnd);
 
 	LoginFail->SetVisibility(ESlateVisibility::Hidden);;
@@ -88,6 +91,11 @@ void UUiMain::InitEnd()
 {
 	UE_LOG(LogTemp,Warning,TEXT("UiSubMainInitButtontrue"));
 	CanvasInit->RemoveFromParent();
+}
+
+void UUiMain::HttpPostInit()
+{
+	InitResponse->SetText(FText::FromString(InitPost->GetText().ToString()));
 }
 
 
