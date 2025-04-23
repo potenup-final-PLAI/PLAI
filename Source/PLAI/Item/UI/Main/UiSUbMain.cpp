@@ -2,3 +2,17 @@
 
 
 #include "UiSUbMain.h"
+
+#include "Components/Button.h"
+
+void UUiSUbMain::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	ButtonSingle->OnClicked.AddDynamic(this,&UUiSUbMain::OnButtonSingle);
+}
+
+void UUiSUbMain::OnButtonSingle()
+{
+	RemoveFromParent();
+}

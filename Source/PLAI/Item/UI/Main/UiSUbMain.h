@@ -13,4 +13,16 @@ UCLASS()
 class PLAI_API UUiSUbMain : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(meta = (BindWidget = "Widget1"))
+	class UButton* ButtonSingle;
+
+	UPROPERTY(meta = (BindWidget = "Widget1"))
+	class UButton* ButtonMulti;
+
+	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnButtonSingle();
 };
