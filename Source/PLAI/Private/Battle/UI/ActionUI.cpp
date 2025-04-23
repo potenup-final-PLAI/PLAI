@@ -28,23 +28,33 @@ void UActionUI::NativeConstruct()
 
 void UActionUI::OnClickedTurnEnd()
 {
-	if (phaseManager == nullptr)
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("ActionUI OnClickedTurnEnd phaseManager nullPtr"));
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
 		return;
 	}
-	if (auto* player = Cast<ABattlePlayer>(turnManager->curUnit))
+	if (phaseManager->currentPhase == EBattlePhase::BattleEnd)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Battle End"));
+		return;
+	}
+	if (phaseManager == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ActionUI OnClickedTurnEnd phaseManager nullPtr"));
+		return;
+	}
+	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
 	{
 		// 플레이어 턴 종료
 		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
-		player->OnTurnEnd();
+		player->OnTurnEnd(player);
 	}
-	else if (auto* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
+	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
 	{
 		// Enemy 턴 종료
 		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
-		enemy->OnTurnEnd();
+		enemy->OnTurnEnd(enemy);
 	}
 }
 

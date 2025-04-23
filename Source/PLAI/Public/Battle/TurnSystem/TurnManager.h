@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseBattlePawn.h"
 #include "Engine/Engine.h"
+#include "BaseBattlePawn.h"
 #include "GameFramework/Actor.h"
 #include "TurnManager.generated.h"
 
@@ -89,5 +89,4 @@ public:
 	void StartEnemyTurn();
 	// 다음 적 유닛 실행
 	void StartNextEnemyTurn();
-	
 };

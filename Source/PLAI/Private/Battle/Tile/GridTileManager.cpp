@@ -73,7 +73,13 @@ void AGridTileManager::InitGridTile()
 		PlayerCoords.Add(AllCoords[i]);
 	}
 
-	// 다음 10개는 적
+	// 플레이어 좌표를 AllCoords에서 제거
+	for (const FIntPoint& Coord : PlayerCoords)
+	{
+		AllCoords.Remove(Coord);
+	}
+
+	// 그 다음 적 좌표 뽑기
 	TArray<FIntPoint> EnemyCoords;
 	for (int32 i = 0; i < 5 && i < AllCoords.Num(); ++i)
 	{

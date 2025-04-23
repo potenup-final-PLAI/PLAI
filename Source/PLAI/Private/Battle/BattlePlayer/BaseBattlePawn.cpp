@@ -6,9 +6,11 @@
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Developer/AITestSuite/Public/AITestsCommon.h"
+#include "Enemy/BaseEnemy.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/BattlePlayer.h"
 
 // Sets default values
 ABaseBattlePawn::ABaseBattlePawn()
@@ -40,17 +42,48 @@ void ABaseBattlePawn::SetupPlayerInputComponent(
 
 void ABaseBattlePawn::OnTurnStart()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Turn Start"));
+	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
+	{
+		FTimerHandle enemyNextTurnimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(enemyNextTurnimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
+			{
+				phaseManager->EndEnemyPhase();
+			}
+		}), 1.5f, false);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
 }
 
-void ABaseBattlePawn::OnTurnEnd()
+void ABaseBattlePawn::OnTurnEnd(ABaseBattlePawn* unit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Turn End"));
+	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *GetName());
 	// 입력 막고 FSM 종료
 
+	// 포제스 풀기
+	// if (auto* pc = GetWorld()->GetFirstPlayerController())
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("%s UnPossess"), *unit->GetActorNameOrLabel());
+	// 	pc->UnPossess();
+	// }
+	
 	// 다음 턴으로 넘기기
-	if (auto* pm = GetWorld()->GetGameState<AUPhaseManager>())
+	// if (auto* pm = GetWorld()->GetGameState<AUPhaseManager>())
+	// {
+	// 	pm->RequestNextTurn(this);		
+	// }
+	// Casting을 통해 현재 유닛이 player 또는 enemy라면 그쪽 함수 실행
+	auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
+	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
-		pm->RequestNextTurn(this);		
+		// PlayerPhaseEnd
+
+		phaseManager->EndPlayerPhase();
+	}
+	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
+	{
+		// EnemyPhaseEnd
+		phaseManager->EndEnemyPhase();
 	}
 }

@@ -46,9 +46,6 @@ void ATurnManager::SetTurnState(ETurnState newTurnState)
 	case ETurnState::None:
 		break;
 	case ETurnState::PlayerTurn:
-		// 플레이어 턴으로 변경
-		curTurnState = ETurnState::PlayerTurn;
-	// 유닛 포제스
 	// Player AP 세팅
 		break;
 	case ETurnState::EnemyTurn:
@@ -62,15 +59,24 @@ void ATurnManager::SetTurnState(ETurnState newTurnState)
 
 void ATurnManager::StartPlayerTurn()
 {
-	if (auto* playerPawn = Cast<ABattlePlayer>(curUnit))
+	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
-		UE_LOG(LogTemp, Display, TEXT("playerPawn is Player %s"),
-		       *playerPawn->GetActorNameOrLabel());
-
+		UE_LOG(LogTemp, Warning, TEXT("playerPawn is Player %s"), *playerPawn->GetActorNameOrLabel());
+		
 		if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
 		{
-			pc->Possess(playerPawn);
-			UE_LOG(LogTemp, Warning, TEXT("possess unit %s"), *playerPawn->GetActorNameOrLabel());
+			// 빠르게 갔다가 천천히 도착 하는 느낌
+			pc->SetViewTargetWithBlend(curUnit, 1.0f, VTBlend_EaseInOut, 4.0f, true);
+			// 좀 더 부드럽게 왔다갔다 하는 느낌
+			// pc->SetViewTargetWithBlend(curUnit, 1.0f, VTBlend_Cubic, 4.0f, true);
+			
+			FTimerHandle possessHandle;
+			// 이후에 값이 변경 및 삭제 될 수 있기 때문에 값 복사로 가져와서 람다 내에서 사용
+			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=]()
+			{
+				pc->Possess(playerPawn);
+				UE_LOG(LogTemp, Warning, TEXT("possess unit %s"), *playerPawn->GetActorNameOrLabel());
+			}), 1.0f, false);
 		}
 
 		playerPawn->OnTurnStart();
@@ -80,7 +86,7 @@ void ATurnManager::StartPlayerTurn()
 void ATurnManager::StartNextPlayerTurn()
 {
 	// curUnit = FindNextPlayerUnit(); // 아직 턴 안 쓴 유닛
-	
+
 	APlayerController* pc = GetWorld()->GetFirstPlayerController();
 	if (pc)
 	{
@@ -92,13 +98,29 @@ void ATurnManager::StartNextPlayerTurn()
 void ATurnManager::StartEnemyTurn()
 {
 	// 이쪽에는 예외 처리 하면 좋을 듯
-	if (auto* pawn = Cast<ABaseEnemy>(curUnit))
+	if (ABaseEnemy* pawn = Cast<ABaseEnemy>(curUnit))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("pawn is Enemy %s "),
 		       *pawn->GetActorNameOrLabel());
 		// FSM 활성화
 		if (curUnit)
 		{
+			if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
+			{
+				// 빠르게 갔다가 천천히 도착 하는 느낌
+				pc->SetViewTargetWithBlend(curUnit, 1.0f, VTBlend_EaseInOut, 4.0f, true);
+				// 좀 더 부드럽게 왔다갔다 하는 느낌
+				// pc->SetViewTargetWithBlend(curUnit, 1.0f, VTBlend_Cubic, 4.0f, true);
+			
+				FTimerHandle possessHandle;
+				// 이후에 값이 변경 및 삭제 될 수 있기 때문에 값 복사로 가져와서 람다 내에서 사용
+				GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
+				{
+					pc->Possess(curUnit);
+					UE_LOG(LogTemp, Warning, TEXT("possess unit %s"), *curUnit->GetActorNameOrLabel());
+				}), 1.0f, false);
+			}
+			
 			curUnit->OnTurnStart();
 		}
 	}

@@ -32,6 +32,7 @@ public:
 	//------------Turn System-----------------
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
+
 	void OnTurnStart();
-	void OnTurnEnd();
+	void OnTurnEnd(ABaseBattlePawn* unit);
 };

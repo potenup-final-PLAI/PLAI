@@ -3,10 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TurnManager.h"
 #include "GameFramework/GameStateBase.h"
+#include "TurnManager.h"
 #include "PhaseManager.generated.h"
-
 
 UENUM()
 enum class EBattlePhase : uint8
@@ -82,8 +81,6 @@ public:
 	void StartEnemyPhase();
 	// 적 턴 종료
 	void EndEnemyPhase();
-	// 턴 처리
-	void RequestNextTurn(ABaseBattlePawn* endUnit);
 	// 전투 종료
 	void BattleEnd();
 };
