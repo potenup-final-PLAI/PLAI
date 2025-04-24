@@ -289,5 +289,5 @@ void AUPhaseManager::BattleEnd()
 {
 	turnManager->SetTurnState(ETurnState::None);
 	UE_LOG(LogTemp, Warning, TEXT("End Battle"));
-	// UGameplayStatics::OpenLevel(GetWorld(), TEXT("LevelName"));
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("OpenWorldTestMap"));
 }

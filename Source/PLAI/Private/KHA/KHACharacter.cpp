@@ -151,7 +151,7 @@ void AKHACharacter::TryLevelChange()
 		if (Monster && Monster->bPlayerIsOverlapping)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("레벨 전환 시작!"));
-			UGameplayStatics::OpenLevel(this, FName("/Game/JS/Maps/TestMap.TestMap"));
+			UGameplayStatics::OpenLevel(this, FName("TestMap"));
 			return;
 		}
 	}

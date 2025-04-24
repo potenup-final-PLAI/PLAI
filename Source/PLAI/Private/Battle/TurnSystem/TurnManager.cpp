@@ -79,9 +79,12 @@ void ATurnManager::StartPlayerTurn()
 			// 이후에 값이 변경 및 삭제 될 수 있기 때문에 값 복사로 가져와서 람다 내에서 사용
 			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=]()
 			{
-				pc->Possess(playerPawn);
-				playerPawn->OnTurnStart();
-				UE_LOG(LogTemp, Warning, TEXT("possess unit %s"), *playerPawn->GetActorNameOrLabel());
+				if (pc && playerPawn)
+				{
+					pc->Possess(playerPawn);
+					playerPawn->OnTurnStart();
+					UE_LOG(LogTemp, Warning, TEXT("possess unit %s"), *playerPawn->GetActorNameOrLabel());
+				}
 			}), 1.0f, false);
 		}
 	}
@@ -115,9 +118,12 @@ void ATurnManager::StartEnemyTurn()
 				// 이후에 값이 변경 및 삭제 될 수 있기 때문에 값 복사로 가져와서 람다 내에서 사용
 				GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
 				{
-					pc->Possess(curUnit);
-					curUnit->OnTurnStart();
-					UE_LOG(LogTemp, Warning, TEXT("possess unit %s"), *curUnit->GetActorNameOrLabel());
+					if (pc && curUnit)
+					{
+						pc->Possess(curUnit);
+						curUnit->OnTurnStart();
+						UE_LOG(LogTemp, Warning, TEXT("possess unit %s"), *curUnit->GetActorNameOrLabel());
+					}
 				}), 1.0f, false);
 			}
 		}
