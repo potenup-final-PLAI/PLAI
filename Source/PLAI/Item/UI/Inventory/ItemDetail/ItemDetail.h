@@ -30,16 +30,16 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StatC;
 
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StatE;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StatNameA;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StatNameB;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StatNameC;
-
-	
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* StatNameE;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* IconImage;
