@@ -25,6 +25,9 @@ void UItemDetail::SetItemDetail(const FItemStructTable& ItemStruct)
 		FSlateBrush Brush;
 		Brush.SetResourceObject(ItemStruct.Texture);
 		IconImage->SetBrush(Brush);
+		FString Index = FString::Printf(TEXT("T[%d] I[%d] Y[%d] D[%d]"), ItemStruct.ItemTop, ItemStruct.ItemIndex, 
+	ItemStruct.ItemIndexType, ItemStruct.ItemIndexDetail);
+		StatNameE->SetText(FText::FromString(Index));
 		
         if (ItemStruct.ItemTop == 1 && ItemStruct.ItemIndex == 0)
         {// 공격아이템

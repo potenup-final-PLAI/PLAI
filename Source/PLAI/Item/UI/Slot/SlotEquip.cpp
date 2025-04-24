@@ -44,30 +44,30 @@ bool USlotEquip::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnDrop: Item index is not 1 아이템 인덱스머여 %d"),
 	  ItemObject->ItemStructTable.ItemTop); return false; }
 	
-    if (static_cast<int32>(SlotType) == EquipInven->LeftBox->GetChildIndex(this)
-    	&& ItemStructTable.ItemIndex != static_cast<int32>(SlotType))
+	if (static_cast<int32>(SlotType) != ItemStructTable.ItemIndex)
     {
-    	UE_LOG(LogTemp,Warning,TEXT("슬롯타입 %d == 슬롯인덱스%d && 아이템테이블 인덱스%d != 슬롯타입%d"),
-    	static_cast<int32>(SlotType),EquipInven->LeftBox->GetChildIndex(this),
-    	ItemStructTable.ItemIndex,static_cast<int32>(SlotType));
-    	
-	   // UE_LOG(LogTemp,Warning,TEXT("SlotEquip 나랑 안맞아 응 %s"),*UEnum::GetValueAsString(SlotType)) return false;
+		UE_LOG(LogTemp,Warning,TEXT("SlotEquip 슬롯인덱스 %d Item인덱스 %d"),SlotType,ItemStructTable.ItemIndex)
+
+    	UE_LOG(LogTemp,Warning,TEXT("SlotEquip 나랑 안맞아 응 %s"),*UEnum::GetValueAsString(SlotType)) return false;
     }
+
+	// if (static_cast<int32>(SlotType) == EquipInven->LeftBox->GetChildIndex(this)
+	// 	&& ItemStructTable.ItemIndex != static_cast<int32>(SlotType))
 	
-	if (SlotType == EquipSlotType::Weapon && ItemObject->ItemStructTable.ItemIndex != 0)
-	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 웨폰 안맞네")) return false; }
-	
-	if (SlotType == EquipSlotType::Armor && ItemObject->ItemStructTable.ItemIndex != 1)
-	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 아머 안맞네")) return false; }
-
-	if (SlotType == EquipSlotType::Helmet && ItemObject->ItemStructTable.ItemIndex != 2)
-	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 헬멧 안맞네")) return false; }
-
-	if (SlotType == EquipSlotType::Gloves && ItemObject->ItemStructTable.ItemIndex != 3)
-	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 글러브 안맞네")) return false; }
-
-	if (SlotType == EquipSlotType::Boots && ItemObject->ItemStructTable.ItemIndex != 4)
-	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 신발 안맞네")) return false; }
+	// if (SlotType == EquipSlotType::Weapon && ItemObject->ItemStructTable.ItemIndex != 0)
+	// { UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 웨폰 안맞네")) return false; }
+	//
+	// if (SlotType == EquipSlotType::Armor && ItemObject->ItemStructTable.ItemIndex != 1)
+	// { UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 아머 안맞네")) return false; }
+	//
+	// if (SlotType == EquipSlotType::Helmet && ItemObject->ItemStructTable.ItemIndex != 2)
+	// { UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 헬멧 안맞네")) return false; }
+	//
+	// if (SlotType == EquipSlotType::Gloves && ItemObject->ItemStructTable.ItemIndex != 3)
+	// { UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 글러브 안맞네")) return false; }
+	//
+	// if (SlotType == EquipSlotType::Boots && ItemObject->ItemStructTable.ItemIndex != 4)
+	// { UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 신발 안맞네")) return false; }
 	
 	// APlayerController* Pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 	// if (Pc->GetPawn()->IsLocallyControlled())

@@ -36,6 +36,10 @@ public:
 	class UTextBlock* StatNameB;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StatNameC;
+
+	
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StatNameE;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* IconImage;
