@@ -32,7 +32,6 @@ void USlot::SlotImageUpdate()
 	Brush.SetResourceObject(ParentItem->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].ItemMeshIndexes[ItemStruct.ItemIndex].
 		ItemMeshTypes[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail]);
 	SlotImage->SetBrush(Brush);
-	
 }
 
 void USlot::NativeConstruct()
@@ -41,34 +40,17 @@ void USlot::NativeConstruct()
 	ParentItem = ItemFactory->GetDefaultObject<AItem>();
 }
 
-// FItemStruct* USlot::ItemDetailShow()
-// {
-// 	const TArray<FName> Rownames = ItemTable->GetRowNames();
-//
-// 	for (const FName& RowName : Rownames)
-// 	{
-// 		FItemStruct* Row = ItemTable->FindRow<FItemStruct>(RowName, TEXT("ItemTable Slot"));
-// 		if (Row && Row->ItemIndex == ItemStruct.ItemIndex
-// 			&& Row->ItemTop == ItemStruct.ItemTop
-// 			&& Row->ItemIndexType == ItemStruct.ItemIndexType
-// 			&& Row->ItemIndexDetail == ItemStruct.ItemIndexDetail)
-// 		{
-// 			
-// 		}
-// 	}
-// }
-
-FItemStruct* USlot::ItemTableFind()
+FItemStructTable* USlot::ItemTableFind()
 {
 	const TArray<FName> Rownames = ItemTable->GetRowNames();
 
 	for (const FName& RowName : Rownames)
 	{
-		FItemStruct* Row = ItemTable->FindRow<FItemStruct>(RowName, TEXT("ItemTable Slot"));
-		if (Row && Row->ItemIndex == ItemStruct.ItemIndex
-			&& Row->ItemTop == ItemStruct.ItemTop
-			&& Row->ItemIndexType == ItemStruct.ItemIndexType
-			&& Row->ItemIndexDetail == ItemStruct.ItemIndexDetail)
+		FItemStructTable* Row = ItemTable->FindRow<FItemStructTable>(RowName, TEXT("ItemTable Slot"));
+		if (Row && Row->ItemIndex == ItemStructTable.ItemIndex
+			&& Row->ItemTop == ItemStructTable.ItemTop
+			&& Row->ItemIndexType == ItemStructTable.ItemIndexType
+			&& Row->ItemIndexDetail == ItemStructTable.ItemIndexDetail)
 		{
 			return Row;
 		}
@@ -76,28 +58,9 @@ FItemStruct* USlot::ItemTableFind()
 	return nullptr;
 }
 
-void USlot::ItemTableShow()
-{
-	// if (APawn* TestPlayer = GetWorld()->GetFirstPlayerController()->GetPawn())
-	// {
-	// 	if (TestPlayer->IsLocallyControlled())
-	// 	{
-	// 		FItemStruct* ItemStructTable = ItemTableFind();
-	//         if (ItemStructTable == nullptr){UE_LOG(LogTemp,Warning,TEXT("슬롯 테이블값 없음 리턴")) return;};
-	//         ItemStruct = *ItemStructTable;
-	//
- //        	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 데이블 구조체 %s%s%s"),*ItemStructTable->Name,*ItemStructTable->NameType,
-	//     	*ItemStructTable->NameDetail);
-	//
- //        	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 구조체 %s%s%s"),*ItemStruct.Name,*ItemStruct.NameType,
-	// 	    *ItemStruct.NameDetail);
-	// 	}
-	// }
-}
-
 FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-	if (ItemStruct.ItemTop == -1)
+	if (ItemStructTable.ItemTop == -1)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseButtonDown 슬롯 템 없음"));
 		return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);
@@ -119,13 +82,9 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 			ATestPlayer* TestPlayer = Cast<ATestPlayer>(PlayerController->GetPawn());
 			
 			bItemDetail = !bItemDetail;
-			ItemTableShow();
-
-			// UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() %s %s %s"),*ItemStruct.Name,*ItemStruct.NameType,
-			// *ItemStruct.NameDetail);
 			
 			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(bItemDetail ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetItemDetail(ItemStruct);
+			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetItemDetail(*ItemTableFind());
 			
 			// FGeometry Geometry = GetCachedGeometry();
 			// FVector2D Position = Geometry.GetAbsolutePosition();
@@ -154,9 +113,9 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 	Brush.DrawAs = ESlateBrushDrawType::Type::NoDrawType;
 	SlotImage->SetBrush(Brush);
 	
-    ItemObject->ItemStruct = ItemStruct;
-	ItemStruct = FItemStruct();
-	SlotCountUpdate(ItemStruct.ItemNum);
+    ItemObject->ItemStructTable = ItemStructTable;
+	ItemStructTable = FItemStructTable();
+	SlotCountUpdate(ItemStructTable.ItemNum);
 	
 	ItemObject->SlotUi = this;
 	
@@ -173,10 +132,10 @@ bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDr
 	UDragDropOperation* InOperation)
 {
 	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
-	Swap(ItemStruct, ItemObject->ItemStruct);
+	Swap(ItemStructTable, ItemObject->ItemStructTable);
 
 	SlotImageUpdate();
-	SlotCountUpdate(ItemStruct.ItemNum);
+	SlotCountUpdate(ItemStructTable.ItemNum);
 	
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
 	return true;
@@ -188,7 +147,7 @@ void USlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDr
 	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
 	
 	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
-	ItemStruct = ItemObject->ItemStruct;
+	ItemStructTable = ItemObject->ItemStructTable;
 	SlotImageUpdate();
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop 다른창에 했음"));
 }

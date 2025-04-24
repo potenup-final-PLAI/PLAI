@@ -14,7 +14,7 @@
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
-void UItemDetail::SetItemDetail(const FItemStruct& ItemStruct)
+void UItemDetail::SetItemDetail(const FItemStructTable& ItemStruct)
 {
 	if (ItemStruct.ItemTop != -1)
 	{
@@ -22,9 +22,12 @@ void UItemDetail::SetItemDetail(const FItemStruct& ItemStruct)
 		Name->SetText(FText::FromString(ItemStruct.Name));
 		NameType->SetText(FText::FromString(ItemStruct.NameType));
 		NameDetail->SetText(FText::FromString(ItemStruct.NameDetail));
+		FSlateBrush Brush;
+		Brush.SetResourceObject(ItemStruct.Texture);
+		IconImage->SetBrush(Brush);
 		
         if (ItemStruct.ItemTop == 1 && ItemStruct.ItemIndex == 0)
-        {
+        {// 공격아이템
 	        StatA->SetText(FText::AsNumber(ItemStruct.ItemStructStat.item_ATK));
         	StatNameA->SetText(FText::FromString(ItemStruct.ItemStructStatName.item_ATK));
 
@@ -33,7 +36,7 @@ void UItemDetail::SetItemDetail(const FItemStruct& ItemStruct)
 
         	StatC->SetText(FText::AsNumber(ItemStruct.ItemStructStat.Item_CRIT));
         	StatNameC->SetText(FText::FromString(ItemStruct.ItemStructStatName.Item_CRIT));
-        }
+        }// 방어아이템
 		if (ItemStruct.ItemTop == 1 && ItemStruct.ItemIndex == 1 || ItemStruct.ItemIndex == 2 || ItemStruct.ItemIndex == 3)
 		{
 			StatA->SetText(FText::AsNumber(ItemStruct.ItemStructStat.item_DEF));
@@ -45,20 +48,17 @@ void UItemDetail::SetItemDetail(const FItemStruct& ItemStruct)
 			StatC->SetText(FText::AsNumber(ItemStruct.ItemStructStat.item_SHI));
 			StatNameC->SetText(FText::FromString(ItemStruct.ItemStructStatName.item_SHI));
 		}
-		
-		if (ATestPlayer* Player = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+		// 소비아이템
+		if (ItemStruct.ItemTop == 0 || ItemStruct.ItemIndex == 0 || ItemStruct.ItemIndex == 0)
 		{
-			if (AItemMaster* ItemMaster = Player->InvenComp->ItemMasterFactory->GetDefaultObject<AItemMaster>())
-			{
-				if (AItem* Item = ItemMaster->ItemFactory->GetDefaultObject<AItem>())
-				{
-					UE_LOG(LogTemp, Error, TEXT("ItemDetail 아이템 있음%d"),Item->ItemStructTop.ItemMeshTops.Num());
-					FSlateBrush Brush;
-					Brush.SetResourceObject(Item->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].ItemMeshIndexes[ItemStruct.ItemIndex].
-					   ItemMeshTypes[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail]);
-					IconImage->SetBrush(Brush);
-				}
-			}
+			StatA->SetText(FText::AsNumber(ItemStruct.ItemStructStat.item_ATK));
+			StatNameA->SetText(FText::FromString(ItemStruct.ItemStructStatName.item_ATK));
+
+			StatB->SetText(FText::AsNumber(ItemStruct.ItemStructStat.item_RES));
+			StatNameB->SetText(FText::FromString(ItemStruct.ItemStructStatName.item_RES));
+
+			StatC->SetText(FText::AsNumber(ItemStruct.ItemStructStat.item_SHI));
+			StatNameC->SetText(FText::FromString(ItemStruct.ItemStructStatName.item_SHI));
 		}
 	}
 }

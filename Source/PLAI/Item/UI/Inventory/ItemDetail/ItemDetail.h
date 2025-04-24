@@ -38,7 +38,7 @@ public:
 	class UTextBlock* StatNameC;
 	
 	UPROPERTY(meta = (BindWidget))
-	class UImage* IconImage; 
+	class UImage* IconImage;
 
-	void SetItemDetail(const FItemStruct& ItemStruct);
+	void SetItemDetail(const FItemStructTable& ItemStruct);
 };

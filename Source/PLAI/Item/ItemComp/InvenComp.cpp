@@ -439,8 +439,10 @@ void UInvenComp::CatchItem()
 		{   UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R Hit발생%s"),*Hits[i].GetActor()->GetName())
 			AItem* Item = Cast<AItem>(Hits[i].GetActor());
 			if (Item)
-			{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템먹음"))
-				Server_GetItem(Item->ItemStructTable); Server_DestroyItem(Item); }
+			{
+				UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템먹음"))
+				Server_GetItem(Item->ItemStructTable); Server_DestroyItem(Item);
+			}
 			else{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템못먹음")) }
 		}
 	}
