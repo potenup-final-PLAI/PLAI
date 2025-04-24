@@ -18,6 +18,15 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
+	//-----------객체 저장-------------------------
+	UPROPERTY(EditAnywhere)
+	class AUPhaseManager* phaseManager;
+	UPROPERTY(EditAnywhere)
+	class ATurnManager* turnManager;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ATurnManager> turnManagerFactory;
+
+
 	//-----------Turn End Button------------------
 	UPROPERTY(meta = (BindWidget))
 	class UButton* btn_TurnEnd;

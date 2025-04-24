@@ -30,6 +30,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	TMap<FIntPoint, class AGridTile*> map;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ABattlePlayer> battlePlayerFactory;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ABaseEnemy> enemyFactory;
 
 	void InitGridTile();
 };
