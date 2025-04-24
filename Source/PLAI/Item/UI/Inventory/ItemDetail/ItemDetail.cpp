@@ -16,6 +16,7 @@
 
 void UItemDetail::SetItemDetail(const FItemStructTable& ItemStruct)
 {
+	if (ItemStruct.ItemTop == -1){UE_LOG(LogTemp,Warning,TEXT("SetItemDetail없음"));return;}
 	if (ItemStruct.ItemTop != -1)
 	{
 		// UE_LOG(LogTemp, Error, TEXT("ItemDetail 아이템 구조체 정보%s %s"),*ItemStruct.Name,*ItemStruct.NameType)
