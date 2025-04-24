@@ -59,6 +59,9 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UMenuInven> MenuInvenFactory;
+
+	UPROPERTY(EditAnywhere)
+	class UDataTable* ItemDataTable;
 	
 	UPROPERTY(EditAnywhere)
 	class UMenuInven* MenuInven;

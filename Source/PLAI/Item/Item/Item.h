@@ -26,6 +26,9 @@ public:
 public:
     UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
 	FItemStruct ItemStruct;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
+	FItemStructTable ItemStructTable;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemStructTop ItemStructTop;

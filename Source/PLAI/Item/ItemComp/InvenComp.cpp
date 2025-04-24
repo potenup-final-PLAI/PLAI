@@ -10,6 +10,7 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
+#include "EnvironmentQuery/EnvQueryDebugHelpers.h"
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Npc/NpcStart.h"
@@ -95,6 +96,23 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		if (TestPlayer->HasAuthority())
 		{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 %s%s"),*GetOwner()->GetName(),
 			TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); }
+	}
+	// 아이템 테이블 Test//
+	if (PC->WasInputKeyJustPressed(EKeys::Four))
+	{
+		if (ItemDataTable)
+		{
+			TArray<FName> RawNames = ItemDataTable->GetRowNames();
+			int32 Rand = FMath::RandRange(0,RawNames.Num()-1);
+			if (RawNames.IsValidIndex(Rand))
+			{
+				FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[Rand],TEXT("InvenComp100"));
+				ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
+				ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
+				ItemMaster->ItemStructTable = *ItemStructTable;
+				ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+			}
+		}
 	}
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
