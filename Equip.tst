@@ -1,9 +1,9 @@
 {
 	"itemStructs": [
 		{
-			"itemTop": 1,
+			"itemTop": -1,
 			"itemIndex": 0,
-			"itemIndexType": 1,
+			"itemIndexType": 0,
 			"itemIndexDetail": 0,
 			"name": "Name",
 			"nameType": "Type",
@@ -57,8 +57,8 @@
 			}
 		},
 		{
-			"itemTop": 1,
-			"itemIndex": 2,
+			"itemTop": -1,
+			"itemIndex": 0,
 			"itemIndexType": 0,
 			"itemIndexDetail": 0,
 			"name": "Name",

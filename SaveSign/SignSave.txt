@@ -155,6 +155,18 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "smk6931123",
+			"pw": "123",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }
