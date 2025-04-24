@@ -68,7 +68,7 @@ void AGridTileManager::InitGridTile()
 	Algo::RandomShuffle(AllCoords);
 
 	TArray<FIntPoint> PlayerCoords;
-	for (int32 i = 0; i < 5 && i < AllCoords.Num(); ++i)
+	for (int32 i = 0; i < 1 && i < AllCoords.Num(); ++i)
 	{
 		PlayerCoords.Add(AllCoords[i]);
 	}
@@ -81,7 +81,7 @@ void AGridTileManager::InitGridTile()
 
 	// 그 다음 적 좌표 뽑기
 	TArray<FIntPoint> EnemyCoords;
-	for (int32 i = 0; i < 5 && i < AllCoords.Num(); ++i)
+	for (int32 i = 0; i < 1 && i < AllCoords.Num(); ++i)
 	{
 		EnemyCoords.Add(AllCoords[i]);
 	}

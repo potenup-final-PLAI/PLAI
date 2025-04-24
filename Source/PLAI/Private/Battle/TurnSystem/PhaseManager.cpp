@@ -23,7 +23,7 @@ void AUPhaseManager::BeginPlay()
 
 void AUPhaseManager::SetCycle()
 {
-	cycle = FMath::Min(5, cycle + 1);
+	cycle = FMath::Min(6, cycle + 1);
 	UE_LOG(LogTemp, Warning, TEXT("Cur Cycle = %d"), cycle);
 }
 
@@ -54,11 +54,7 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 	case EBattlePhase::RoundEnd:
 		// 속도를 기반으로 유닛 정렬 작업 및 다음 턴 시작
 		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundEnd State"));
-		SetCycle();
-		// Unit Queue에 세팅
-		SetUnitQueue();
-		// 전투 시작
-		StartBattle();
+		SetPhase(EBattlePhase::RoundStart);
 		break;
 	case EBattlePhase::BattleEnd:
 		// 끝났을 때 결과에 대한 UI 보여주면 될듯함.
@@ -154,6 +150,13 @@ void AUPhaseManager::StartPlayerPhase()
 	UE_LOG(LogTemp, Warning, TEXT("PlayerTurn Start Unit Name : %s"),
 	       *turnManager->curUnit->GetActorNameOrLabel());
 
+	// 주기가 5거나 보다 크다면
+	if (cycle > 5)
+	{
+		// 전투를 끝낸다.
+		SetPhase(EBattlePhase::BattleEnd);
+		return;
+	}
 	// 턴이 다 지났다면 
 	// if (unitQueue.Num() <= 0)
 	// {
@@ -189,15 +192,9 @@ void AUPhaseManager::EndPlayerPhase()
 		UE_LOG(LogTemp, Warning, TEXT("End Player Phase unitQueue Empty"));
 		// 한 주기가 끝났다고 업데이트
 		SetPhase(EBattlePhase::RoundEnd);
-	}
-
-	// 주기가 5거나 보다 크다면
-	if (cycle >= 5)
-	{
-		// 전투를 끝낸다.
-		SetPhase(EBattlePhase::BattleEnd);
 		return;
 	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("End Player Phase"));
 
 	SetPhase(EBattlePhase::TurnProcessing);
@@ -221,6 +218,13 @@ void AUPhaseManager::StartEnemyPhase()
 	UE_LOG(LogTemp, Warning, TEXT("EnemyTurn Start Unit Name : %s"),
 	       *turnManager->curUnit->GetActorNameOrLabel());
 
+	// 주기가 5와 같거나 크다면
+	if (cycle > 5)
+	{
+		// 전투를 끝낸다.
+		SetPhase(EBattlePhase::BattleEnd);
+		return;
+	}
 	// 턴이 다 지났다면 
 	if (unitQueue.Num() <= 0)
 	{
@@ -259,15 +263,10 @@ void AUPhaseManager::EndEnemyPhase()
 		UE_LOG(LogTemp, Warning, TEXT("End Enemy Phase unitQueue Empty"));
 		// 한 주기가 끝났다고 업데이트
 		SetPhase(EBattlePhase::RoundEnd);
-	}
-	
-	// 주기가 5와 같거나 크다면
-	if (cycle >= 5)
-	{
-		// 전투를 끝낸다.
-		SetPhase(EBattlePhase::BattleEnd);
 		return;
 	}
+	
+	
 	
 	SetPhase(EBattlePhase::TurnProcessing);
 	UE_LOG(LogTemp, Warning, TEXT("End Enemy Phase"));
