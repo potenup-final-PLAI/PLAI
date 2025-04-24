@@ -13,7 +13,7 @@ enum class EItemIndex : uint8
 };
 
 USTRUCT(BlueprintType,Blueprintable)
-struct FItemStructStat: public FTableRowBase
+struct FItemStructStat
 {
 	GENERATED_BODY()
 public:
@@ -33,7 +33,7 @@ public:
 };
 
 USTRUCT(BlueprintType,Blueprintable)
-struct FItemStructStatName: public FTableRowBase
+struct FItemStructStatName
 {
 	GENERATED_BODY()
 public:
@@ -74,7 +74,7 @@ public:
 	FString NameDetail = FString("Detail");
 	UPROPERTY(EditAnywhere)
 	int32 ItemNum = 0;
-
+	
 	UPROPERTY(EditAnywhere)
     FItemStructStat ItemStructStat;
 	UPROPERTY(EditAnywhere)
@@ -120,5 +120,39 @@ public:
 	TArray<FItemStructIndex>ItemMeshTops;
 };
 
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FItemStructTable: public FTableRowBase
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	int32 ItemTop = -1;
+	UPROPERTY(EditAnywhere)
+	int32 ItemIndex = 0;
+	UPROPERTY(EditAnywhere)
+	int32 ItemIndexType = 0;
+	UPROPERTY(EditAnywhere)
+	int32 ItemIndexDetail = 0;
+	UPROPERTY(EditAnywhere)
+	FString Name = FString("Name");
+	UPROPERTY(EditAnywhere)
+	FString NameType = FString("Type");
+	UPROPERTY(EditAnywhere)
+	FString NameDetail = FString("Detail");
+	UPROPERTY(EditAnywhere)
+	int32 ItemNum = 0;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMesh* StaticMesh;
+	UPROPERTY(EditAnywhere)
+	UTexture2D* Texture;
+	
+	UPROPERTY(EditAnywhere)
+	FItemStructStat ItemStructStat;
+	UPROPERTY(EditAnywhere)
+	FItemStructStatName ItemStructStatName;
+};
 
 

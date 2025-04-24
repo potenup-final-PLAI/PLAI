@@ -2,12 +2,14 @@
 
 #pragma once
 
+
 #include "CoreMinimal.h"
 #include "ItemComp.h"
 #include "Components/ActorComponent.h"
 #include "PLAI/Item/Item/ItemStruct.h"
 #include "PLAI/Item/Item/Equip//ItemEquip.h"
 #include "PLAI/Item/UI/Inventory/MenuInven.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "InvenComp.generated.h"
 
 class APlayerController;
@@ -47,9 +49,12 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
-public:
 	EEnumKey EnumKey;
 
+    void SetGold(int32 Getgold);
+	UPROPERTY(EditAnywhere)
+	int32 Gold = 10000;
+	
 	EquipSlotType StartSlotType;
 	
 	UPROPERTY(EditAnywhere)

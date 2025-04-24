@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "UiSign.generated.h"
 
 /**
@@ -20,6 +21,10 @@ public:
 	FString Id = FString("id");
 	UPROPERTY(EditAnywhere)
 	FString Pw = FString("pw");
+	UPROPERTY(EditAnywhere)
+	FItemStructsArray ItemStructsEquip;
+	UPROPERTY(EditAnywhere)
+	FItemStructsArray ItemStructsInven;
 };
 
 USTRUCT(BlueprintType,Blueprintable)
@@ -48,7 +53,10 @@ public:
 	class UButton* ButtonSign;
 
 	UPROPERTY(EditAnywhere)
-	FSignStructs SignStructs;
+	class ULoginComp* LoginComp;
+
+	// UPROPERTY(EditAnywhere)
+	// FSignStructs SignStructs;
 
 	UPROPERTY(EditAnywhere)
 	FSignStruct SignStruct;

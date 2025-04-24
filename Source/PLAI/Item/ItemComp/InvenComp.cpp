@@ -4,21 +4,21 @@
 #include "InvenComp.h"
 
 #include "JsonObjectConverter.h"
-#include "MovieSceneTracksComponentTypes.h"
 #include "StoreComp.h"
 #include "Components/BoxComponent.h"
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/Item/ItemMaster.h"
-#include "PLAI/Item/Item/Equip/ItemEquip.h"
 #include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/Npc/NpcStore.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 
@@ -49,7 +49,6 @@ void UInvenComp::BeginPlay()
 		MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 		MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 	}
-	AItemMaster* Item = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,FVector(0,0,0),FRotator(0,0,0));
 }
 
 
@@ -58,6 +57,8 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
+    //임시함수임
+	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::P)){ SetGold(500);}
 	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
 	{   UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Q키 !"));
@@ -176,6 +177,12 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	}
 }
 
+void UInvenComp::SetGold(int32 Getgold)
+{
+	Gold += Getgold;
+	MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(Gold));
+}
+
 void UInvenComp::Server_SpawnOneItem_Implementation()
 {
 	if (TestPlayer->IsLocallyControlled())
@@ -197,26 +204,31 @@ void UInvenComp::Server_UnEquip_Implementation(EquipSlotType SlotType)
 {
 	if (SlotType == EquipSlotType::Armor)
 	{
+		if (!ItemArmor) return;
 		ItemArmor->Destroy();
 		ItemArmor = nullptr;
 	}
 	if (SlotType == EquipSlotType::Boots)
 	{
+		if (!Itemboots) return;
 		Itemboots->Destroy();
 		Itemboots = nullptr;
 	}
 	if (SlotType == EquipSlotType::Gloves)
 	{
+		if (!ItemGlove) return;
 		ItemGlove->Destroy();
 		ItemGlove = nullptr;
 	}
 	if (SlotType == EquipSlotType::Helmet)
 	{
+		if (!ItemHelmet) return;
 		ItemHelmet->Destroy();
 		ItemHelmet = nullptr;
 	}
 	if (SlotType == EquipSlotType::Weapon)
 	{
+		if (!ItemWeapon) return;
 		ItemWeapon->Destroy();
 		ItemWeapon = nullptr;
 	}
@@ -388,6 +400,7 @@ void UInvenComp::EquipSetting(const FItemStructsArray& ItemStructsArray)
 			}
 		}
 	}
+	SaveEquipInventory();
 }
 
 void UInvenComp::CatchItem()
@@ -454,7 +467,6 @@ void UInvenComp::LoadItemInventory()
 		{ Slot->SlotImageUpdate(); }
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 로드"))
-
 }
 
 void UInvenComp::SaveEquipInventory()
