@@ -3,12 +3,12 @@
 		{
 			"itemTop": 1,
 			"itemIndex": 0,
-			"itemIndexType": 0,
-			"itemIndexDetail": 1,
+			"itemIndexType": 1,
+			"itemIndexDetail": 0,
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 3,
+			"itemNum": 0,
 			"itemStructStat":
 			{
 				"item_ATK": 0,
@@ -32,7 +32,7 @@
 			"itemTop": 1,
 			"itemIndex": 1,
 			"itemIndexType": 0,
-			"itemIndexDetail": 1,
+			"itemIndexDetail": 0,
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
@@ -85,14 +85,14 @@
 			}
 		},
 		{
-			"itemTop": 1,
-			"itemIndex": 3,
+			"itemTop": -1,
+			"itemIndex": 0,
 			"itemIndexType": 0,
 			"itemIndexDetail": 0,
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 1,
+			"itemNum": 0,
 			"itemStructStat":
 			{
 				"item_ATK": 0,
@@ -113,14 +113,14 @@
 			}
 		},
 		{
-			"itemTop": 1,
-			"itemIndex": 4,
+			"itemTop": -1,
+			"itemIndex": 0,
 			"itemIndexType": 0,
 			"itemIndexDetail": 0,
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 2,
+			"itemNum": 0,
 			"itemStructStat":
 			{
 				"item_ATK": 0,

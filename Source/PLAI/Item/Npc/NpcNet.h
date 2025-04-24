@@ -12,10 +12,7 @@ struct FNpcStructNetPost
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere)
-	FString Post = FString("Post");
-	
-	UPROPERTY(EditAnywhere)
-	FString Get = FString("Get");
+	FString question = FString("Post");
 };
 
 USTRUCT(BlueprintType,Blueprintable)
@@ -24,10 +21,7 @@ struct FNpcStructNetGet
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere)
-	FString Get = FString("Get");
-	
-	UPROPERTY(EditAnywhere)
-	FString Post = FString("Post");
+	FString response = FString("Get");
 };
 
 

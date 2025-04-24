@@ -46,12 +46,12 @@ void ANpcNet::NetPost(FString String)
 {
 	UE_LOG(LogTemp, Display, TEXT("ANpcNet::NetPost%s"), *String);
 	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
-	HttpRequest->SetURL("");
+	HttpRequest->SetURL("http://192.168.10.96:8054/npc/chat");
 	HttpRequest->SetVerb("POST");
 	HttpRequest->SetHeader("Content-Type", "application/json");
 
 	FNpcStructNetPost NpcStruct;
-	NpcStruct.Post = String;
+	NpcStruct.question = String;
 	
 	FString JsonString;
 	
@@ -63,6 +63,8 @@ void ANpcNet::NetPost(FString String)
 		{
 			FNpcStructNetGet NpcStruct;
 			FString JsonString = HttpResponse->GetContentAsString();
+			FJsonObjectConverter::UStructToJsonObjectString(NpcStruct,JsonString);
+			UE_LOG(LogTemp, Display, TEXT("ANpcNet::NetPost 실패함"));
 		}
 		else
 		{

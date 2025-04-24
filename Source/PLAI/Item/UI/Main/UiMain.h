@@ -12,7 +12,7 @@ struct FNpcStructPost
 	
 public:
 	UPROPERTY(EditAnywhere)
-	FString Name;
+	FString question = FString("Response");
 };
 
 
@@ -23,7 +23,7 @@ struct FNpcStructGet
 	
 public:
 	UPROPERTY(EditAnywhere)
-	FString Get;
+	FString response = FString("Response");
 };
 
 /**
