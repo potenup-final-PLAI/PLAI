@@ -23,6 +23,7 @@ void ANpcStore::BeginPlay()
 void ANpcStore::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
 }
 
 void ANpcStore::LoadNpcStore()

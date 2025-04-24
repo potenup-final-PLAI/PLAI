@@ -13,6 +13,46 @@ enum class EItemIndex : uint8
 };
 
 USTRUCT(BlueprintType,Blueprintable)
+struct FItemStructStat: public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	int32 item_ATK = 0;
+	UPROPERTY(EditAnywhere)
+	int32 Item_CRIT = 0;
+	UPROPERTY(EditAnywhere)
+	int32 item_CRITDMG = 0;
+
+	UPROPERTY(EditAnywhere)
+	int32 item_DEF = 0;
+	UPROPERTY(EditAnywhere)
+	int32 item_RES = 0;
+	UPROPERTY(EditAnywhere)
+	int32 item_SHI = 0;
+};
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FItemStructStatName: public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	FString item_ATK = FString("ATK");
+	UPROPERTY(EditAnywhere)
+	FString Item_CRIT = FString("CRIT");
+	UPROPERTY(EditAnywhere)
+	FString item_CRITDMG = FString("CRITDMG");
+
+	UPROPERTY(EditAnywhere)
+	FString item_DEF = FString("DEF");
+	UPROPERTY(EditAnywhere)
+	FString item_RES = FString("RES");
+	UPROPERTY(EditAnywhere)
+	FString item_SHI = FString("SHI");
+};
+
+USTRUCT(BlueprintType,Blueprintable)
 struct FItemStruct: public FTableRowBase
 {
 	GENERATED_BODY()
@@ -34,6 +74,11 @@ public:
 	FString NameDetail = FString("Detail");
 	UPROPERTY(EditAnywhere)
 	int32 ItemNum = 0;
+
+	UPROPERTY(EditAnywhere)
+    FItemStructStat ItemStructStat;
+	UPROPERTY(EditAnywhere)
+	FItemStructStatName ItemStructStatName;
 };
 
 USTRUCT(BlueprintType,Blueprintable)

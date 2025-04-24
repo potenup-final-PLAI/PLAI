@@ -8,7 +8,25 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 3
+			"itemNum": 3,
+			"itemStructStat":
+			{
+				"item_ATK": 0,
+				"item_CRIT": 0,
+				"item_CRITDMG": 0,
+				"item_DEF": 0,
+				"item_RES": 0,
+				"item_SHI": 0
+			},
+			"itemStructStatName":
+			{
+				"item_ATK": "ATK",
+				"item_CRIT": "CRIT",
+				"item_CRITDMG": "CRITDMG",
+				"item_DEF": "DEF",
+				"item_RES": "RES",
+				"item_SHI": "SHI"
+			}
 		},
 		{
 			"itemTop": 1,
@@ -18,7 +36,25 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 0
+			"itemNum": 0,
+			"itemStructStat":
+			{
+				"item_ATK": 0,
+				"item_CRIT": 0,
+				"item_CRITDMG": 0,
+				"item_DEF": 0,
+				"item_RES": 0,
+				"item_SHI": 0
+			},
+			"itemStructStatName":
+			{
+				"item_ATK": "ATK",
+				"item_CRIT": "CRIT",
+				"item_CRITDMG": "CRITDMG",
+				"item_DEF": "DEF",
+				"item_RES": "RES",
+				"item_SHI": "SHI"
+			}
 		},
 		{
 			"itemTop": 1,
@@ -28,7 +64,25 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 0
+			"itemNum": 0,
+			"itemStructStat":
+			{
+				"item_ATK": 0,
+				"item_CRIT": 0,
+				"item_CRITDMG": 0,
+				"item_DEF": 0,
+				"item_RES": 0,
+				"item_SHI": 0
+			},
+			"itemStructStatName":
+			{
+				"item_ATK": "ATK",
+				"item_CRIT": "CRIT",
+				"item_CRITDMG": "CRITDMG",
+				"item_DEF": "DEF",
+				"item_RES": "RES",
+				"item_SHI": "SHI"
+			}
 		},
 		{
 			"itemTop": 1,
@@ -38,7 +92,25 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 1
+			"itemNum": 1,
+			"itemStructStat":
+			{
+				"item_ATK": 0,
+				"item_CRIT": 0,
+				"item_CRITDMG": 0,
+				"item_DEF": 0,
+				"item_RES": 0,
+				"item_SHI": 0
+			},
+			"itemStructStatName":
+			{
+				"item_ATK": "ATK",
+				"item_CRIT": "CRIT",
+				"item_CRITDMG": "CRITDMG",
+				"item_DEF": "DEF",
+				"item_RES": "RES",
+				"item_SHI": "SHI"
+			}
 		},
 		{
 			"itemTop": 1,
@@ -48,7 +120,25 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 2
+			"itemNum": 2,
+			"itemStructStat":
+			{
+				"item_ATK": 0,
+				"item_CRIT": 0,
+				"item_CRITDMG": 0,
+				"item_DEF": 0,
+				"item_RES": 0,
+				"item_SHI": 0
+			},
+			"itemStructStatName":
+			{
+				"item_ATK": "ATK",
+				"item_CRIT": "CRIT",
+				"item_CRITDMG": "CRITDMG",
+				"item_DEF": "DEF",
+				"item_RES": "RES",
+				"item_SHI": "SHI"
+			}
 		}
 	]
 }
