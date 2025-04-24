@@ -21,6 +21,7 @@ void USlot::SlotCountUpdate(const int32 Count)
 
 void USlot::SlotImageUpdate()
 {
+	if (ItemStruct.ItemTop == -1)return;
 	FSlateBrush Brush;
 	Brush.SetResourceObject(ParentItem->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].ItemMeshIndexes[ItemStruct.ItemIndex].
 		ItemMeshTypes[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail]);

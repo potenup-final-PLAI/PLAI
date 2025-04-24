@@ -143,6 +143,10 @@ public:
 	FString NameDetail = FString("Detail");
 	UPROPERTY(EditAnywhere)
 	int32 ItemNum = 0;
+	UPROPERTY(EditAnywhere)
+	int32 ItemGold = 0;
+	UPROPERTY(EditAnywhere)
+	int32 ItemLevel = 0;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* StaticMesh;
