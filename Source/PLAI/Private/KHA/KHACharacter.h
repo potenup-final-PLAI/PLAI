@@ -42,4 +42,7 @@ public:
 	void HandleClickLocation();
 	FVector LastClickLocation;
 	bool bShouldMove = false;
+
+	//레벨전환
+	void TryLevelChange();
 };

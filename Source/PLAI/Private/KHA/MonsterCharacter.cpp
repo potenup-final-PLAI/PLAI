@@ -97,4 +97,5 @@ void AMonsterCharacter::OnPlayerOverlap(UPrimitiveComponent* OverlappedComp, AAc
 
 		UE_LOG(LogTemp, Warning, TEXT("플레이어 감지! 몬스터 이동 완전히 중지됨!"));
 	}
+	bPlayerIsOverlapping = true;
 }

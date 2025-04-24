@@ -29,6 +29,7 @@ void ANPC2::BeginPlay()
 	Super::BeginPlay();
 
 	DetectionSphere->OnComponentBeginOverlap.AddDynamic(this, &ANPC2::OnPlayerEnter);
+	DetectionSphere->OnComponentEndOverlap.AddDynamic(this, &ANPC2::OnPlayerExit);
 }
 
 // Called every frame
@@ -70,6 +71,17 @@ void ANPC2::OnPlayerEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActo
 	{
 		Player->bZoomedIn = true;
 		UE_LOG(LogTemp, Warning, TEXT("NPC2 감지됨 → 카메라 줌인!"));
+	}
+}
+
+void ANPC2::OnPlayerExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
+{
+	AKHACharacter* Player = Cast<AKHACharacter>(OtherActor);
+	if (Player)
+	{
+		Player->bZoomedIn = false;
+		UE_LOG(LogTemp, Warning, TEXT("NPC2 범위 벗어남 → 카메라 줌아웃"));
 	}
 }
 

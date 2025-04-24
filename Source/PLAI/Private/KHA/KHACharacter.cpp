@@ -3,6 +3,7 @@
 
 #include "KHA/KHACharacter.h"
 
+#include "MonsterCharacter.h"
 #include "NPC.h"
 #include "NPC2.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
@@ -18,6 +19,7 @@
 #include "Evaluation/Blending/MovieSceneBlendType.h"
 #include "Engine/EngineTypes.h"
 #include "Engine/OverlapResult.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AKHACharacter::AKHACharacter()
@@ -52,7 +54,7 @@ void AKHACharacter::Tick(float DeltaTime)
 		float TargetZoom = bZoomedIn ? 300.f : 800.f;
 		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, TargetZoom, DeltaTime, 5.f);
 	}
-
+	
 	
 }
 
@@ -63,6 +65,7 @@ void AKHACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Interact",IE_Pressed, this, &AKHACharacter::TryInteract);
 	PlayerInputComponent->BindAction("SetDestination", IE_Pressed, this, &AKHACharacter::HandleClickLocation);
 	PlayerInputComponent->BindAction("ZoomOnClick", IE_Pressed, this, &AKHACharacter::TryZoomOnClick);
+	PlayerInputComponent->BindAction("ChangeLevel", IE_Pressed, this, &AKHACharacter::TryLevelChange); //레벨전환
 	
 }
 
@@ -119,6 +122,7 @@ void AKHACharacter::HandleClickLocation()
 }
 
 
+
 void AKHACharacter::TryZoomOnClick()
 {
 	APlayerController* PC = Cast<APlayerController>(GetController());
@@ -134,3 +138,23 @@ void AKHACharacter::TryZoomOnClick()
 		}
 	}
 }
+
+
+void AKHACharacter::TryLevelChange()
+{
+	TArray<AActor*> FoundMonsters;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMonsterCharacter::StaticClass(), FoundMonsters);
+
+	for (AActor* MonsterActor : FoundMonsters)
+	{
+		AMonsterCharacter* Monster = Cast<AMonsterCharacter>(MonsterActor);
+		if (Monster && Monster->bPlayerIsOverlapping)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("레벨 전환 시작!"));
+			UGameplayStatics::OpenLevel(this, FName("/Game/JS/Maps/TestMap.TestMap"));
+			return;
+		}
+	}
+	UE_LOG(LogTemp, Warning, TEXT("레벨 전환 실패: 몬스터 근처 아님"));
+}
+

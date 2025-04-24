@@ -39,4 +39,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	class USphereComponent* DetectionSphere;
+
+	bool bPlayerIsOverlapping = false; //몬스터 오버랩 상태 저장
 };
