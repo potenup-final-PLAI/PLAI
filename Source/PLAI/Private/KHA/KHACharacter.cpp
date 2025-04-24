@@ -4,6 +4,8 @@
 #include "KHA/KHACharacter.h"
 
 #include "NPC.h"
+#include "NPC2.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
@@ -35,6 +37,23 @@ void AKHACharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bShouldMove)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		if (PC)
+		{
+			UAIBlueprintHelperLibrary::SimpleMoveToLocation(PC, LastClickLocation);
+			bShouldMove = false; // 한 번만 실행
+		}
+	}
+
+	if (CameraBoom)
+	{
+		float TargetZoom = bZoomedIn ? 300.f : 800.f;
+		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, TargetZoom, DeltaTime, 5.f);
+	}
+
+	
 }
 
 void AKHACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -42,6 +61,8 @@ void AKHACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction("Interact",IE_Pressed, this, &AKHACharacter::TryInteract);
+	PlayerInputComponent->BindAction("SetDestination", IE_Pressed, this, &AKHACharacter::HandleClickLocation);
+	PlayerInputComponent->BindAction("ZoomOnClick", IE_Pressed, this, &AKHACharacter::TryZoomOnClick);
 	
 }
 
@@ -82,4 +103,34 @@ void AKHACharacter::TryInteract()
 	UE_LOG(LogTemp, Warning, TEXT("주변에 NPC 없음 또는 범위 밖"));
 }
 
+void AKHACharacter::HandleClickLocation()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC) return;
 
+	FHitResult Hit;
+	if (PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit))
+	{
+		LastClickLocation = Hit.Location;
+		bShouldMove = true;
+
+		UE_LOG(LogTemp, Warning, TEXT("클릭된 위치 기록됨: %s"), *LastClickLocation.ToString());
+	}
+}
+
+
+void AKHACharacter::TryZoomOnClick()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC) return;
+
+	FHitResult Hit;
+	if (PC->GetHitResultUnderCursor(ECC_Visibility, false, Hit))
+	{
+		if (Hit.GetActor() && Hit.GetActor()->IsA(ANPC2::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NPC2 클릭됨 → 줌인 시작"));
+			bZoomedIn = true;
+		}
+	}
+}

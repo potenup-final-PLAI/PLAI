@@ -4,42 +4,39 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "PLAI/Public//BaseFile/PLAICharacter.h"
-#include "KHACharacter.generated.h"
+#include "MonsterCharacter.generated.h"
 
 UCLASS()
-class AKHACharacter : public APLAICharacter
+class AMonsterCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AKHACharacter();
+	AMonsterCharacter();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
+public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION()
-	void TryZoomOnClick();
+	// AI가 이동할 랜덤 목적지로 이동
+	void MoveToRandomLocation();
+
+	// 딜레이 반복용 타이머
+	FTimerHandle PatrolTimer;
 	
 	UFUNCTION()
-	void TryInteract();
+	void OnPlayerOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+						 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+						 bool bFromSweep, const FHitResult& SweepResult);
 
-	USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	
-	bool bZoomedIn = false;
-
-	//목적지 관련
-	UFUNCTION()
-	void HandleClickLocation();
-	FVector LastClickLocation;
-	bool bShouldMove = false;
+	UPROPERTY(VisibleAnywhere)
+	class USphereComponent* DetectionSphere;
 };

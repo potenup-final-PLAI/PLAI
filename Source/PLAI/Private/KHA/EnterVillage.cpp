@@ -5,6 +5,7 @@
 
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AEnterVillage::AEnterVillage()
@@ -42,9 +43,12 @@ void AEnterVillage::OnPlayerEnter(UPrimitiveComponent* OverlappedComp, AActor* O
 	if (PlayerChar)
 	{
 		FVector CurrentLocation = PlayerChar->GetActorLocation();
-		FVector NewLocation = CurrentLocation + FVector(500.f, 0.f, 0.f); // +X 방향으로 500cm 이동
+		FVector NewLocation = CurrentLocation + FVector(500.f,500.f,0.f); 
 		PlayerChar->SetActorLocation(NewLocation);
-		UE_LOG(LogTemp, Warning, TEXT("EnterVillage 감지됨 → 캐릭터 5미터 옆으로 이동"));
+		
+		
+		PlayerChar->GetCharacterMovement()->StopMovementImmediately(); //이동 멈춤
+		UE_LOG(LogTemp, Warning, TEXT("EnterVillage 감지됨 → 캐릭터 이동"));
 	}
 }
 
