@@ -21,11 +21,18 @@ void USlot::SlotCountUpdate(const int32 Count)
 
 void USlot::SlotImageUpdate()
 {
+	if (ItemStructTable.ItemTop != -1)
+	{
+		FSlateBrush Brush;
+		Brush.SetResourceObject(ItemStructTable.Texture);
+		SlotImage->SetBrush(Brush);
+	}
 	if (ItemStruct.ItemTop == -1)return;
 	FSlateBrush Brush;
 	Brush.SetResourceObject(ParentItem->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].ItemMeshIndexes[ItemStruct.ItemIndex].
 		ItemMeshTypes[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail]);
 	SlotImage->SetBrush(Brush);
+	
 }
 
 void USlot::NativeConstruct()
@@ -71,21 +78,21 @@ FItemStruct* USlot::ItemTableFind()
 
 void USlot::ItemTableShow()
 {
-	if (APawn* TestPlayer = GetWorld()->GetFirstPlayerController()->GetPawn())
-	{
-		if (TestPlayer->IsLocallyControlled())
-		{
-			FItemStruct* ItemStructTable = ItemTableFind();
-	        if (ItemStructTable == nullptr){UE_LOG(LogTemp,Warning,TEXT("슬롯 테이블값 없음 리턴")) return;};
-	        ItemStruct = *ItemStructTable;
-	
-        	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 데이블 구조체 %s%s%s"),*ItemStructTable->Name,*ItemStructTable->NameType,
-	    	*ItemStructTable->NameDetail);
-
-        	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 구조체 %s%s%s"),*ItemStruct.Name,*ItemStruct.NameType,
-		    *ItemStruct.NameDetail);
-		}
-	}
+	// if (APawn* TestPlayer = GetWorld()->GetFirstPlayerController()->GetPawn())
+	// {
+	// 	if (TestPlayer->IsLocallyControlled())
+	// 	{
+	// 		FItemStruct* ItemStructTable = ItemTableFind();
+	//         if (ItemStructTable == nullptr){UE_LOG(LogTemp,Warning,TEXT("슬롯 테이블값 없음 리턴")) return;};
+	//         ItemStruct = *ItemStructTable;
+	//
+ //        	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 데이블 구조체 %s%s%s"),*ItemStructTable->Name,*ItemStructTable->NameType,
+	//     	*ItemStructTable->NameDetail);
+	//
+ //        	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 구조체 %s%s%s"),*ItemStruct.Name,*ItemStruct.NameType,
+	// 	    *ItemStruct.NameDetail);
+	// 	}
+	// }
 }
 
 FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)

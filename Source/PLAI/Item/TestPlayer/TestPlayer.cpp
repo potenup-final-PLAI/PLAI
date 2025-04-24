@@ -25,7 +25,6 @@ ATestPlayer::ATestPlayer()
 void ATestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
 	StoreComp->StoreInven->AddToViewport();
 }
 

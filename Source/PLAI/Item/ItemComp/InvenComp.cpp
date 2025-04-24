@@ -57,7 +57,9 @@ void UInvenComp::BeginPlay()
 void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    // 데이터테이블 템 먹기
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
+
     //임시함수임
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::P)){ SetGold(500);}
 	
@@ -75,28 +77,28 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
 	
-	if (PC->WasInputKeyJustPressed(EKeys::One))
-		{  Server_SpawnOneItem(); }
-	
-	if (PC->WasInputKeyJustPressed(EKeys::Two))
-	    { UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
-		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
-			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-		ItemMaster->ItemStruct.ItemTop = 2;
-		int32 randIndex = FMath::RandRange(0,1);
-		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
-		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
-		
-		ItemMaster->ItemStruct.ItemIndex = randIndex;
-		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
-	}
-
-	if (PC->WasInputKeyJustPressed(EKeys::Three))
-	{
-		if (TestPlayer->HasAuthority())
-		{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 %s%s"),*GetOwner()->GetName(),
-			TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); }
-	}
+	// if (PC->WasInputKeyJustPressed(EKeys::One))
+	// 	{  Server_SpawnOneItem(); }
+	//
+	// if (PC->WasInputKeyJustPressed(EKeys::Two))
+	//     { UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Two키 !"));
+	// 	ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
+	// 		TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+	// 	ItemMaster->ItemStruct.ItemTop = 2;
+	// 	int32 randIndex = FMath::RandRange(0,1);
+	// 	int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
+	// 	ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
+	// 	
+	// 	ItemMaster->ItemStruct.ItemIndex = randIndex;
+	// 	ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
+	// }
+	//
+	// if (PC->WasInputKeyJustPressed(EKeys::Three))
+	// {
+	// 	if (TestPlayer->HasAuthority())
+	// 	{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 %s%s"),*GetOwner()->GetName(),
+	// 		TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); }
+	// }
 	// 아이템 테이블 Test//
 	if (PC->WasInputKeyJustPressed(EKeys::Four))
 	{
@@ -212,9 +214,9 @@ void UInvenComp::Server_SpawnOneItem_Implementation()
 		ItemMaster->ItemStruct.ItemTop = 1;
 		ItemMaster->ItemStruct.ItemIndex = randIndex;
 		
-		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
-		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
-		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
+		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStructTable.ItemTop].
+		ItemMeshIndexes[ItemMaster->ItemStructTable.ItemIndex].ItemMeshTypes[ItemMaster->ItemStructTable.ItemIndexType].StaticMeshes.Num()-1);
+		ItemMaster->ItemStructTable.ItemIndexDetail = randDetail;
 	}
 }
 
@@ -268,13 +270,13 @@ void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
 	}
 }
 
-void UInvenComp::Server_GetItem_Implementation(const FItemStruct& ItemStruct)
+void UInvenComp::Server_GetItem_Implementation(const FItemStructTable& ItemStructTable)
 {
-	Client_GetItem(ItemStruct);
+	Client_GetItem(ItemStructTable);
 }
-void UInvenComp::Client_GetItem_Implementation(const FItemStruct& ItemStruct)
+void UInvenComp::Client_GetItem_Implementation(const FItemStructTable& ItemStructTable)
 {
-	GetItem(ItemStruct);
+	GetItem(ItemStructTable);
 	UE_LOG(LogTemp, Warning, TEXT("Client_GetItem() 실행됨: %s"), GetOwner()->HasAuthority() ? TEXT("서버") : TEXT("클라"));
 	// 또는 IsLocallyControlled() 체크
 	APawn* PawnOwner = Cast<APawn>(GetOwner());
@@ -288,7 +290,7 @@ void UInvenComp::Client_GetItem_Implementation(const FItemStruct& ItemStruct)
 	}
 }
 
-void UInvenComp::GetItem(const FItemStruct& ItemStruct)
+void UInvenComp::GetItem(const FItemStructTable& ItemStructTable)
 {
 	UE_LOG(LogTemp,Warning,TEXT("UInvenComp::GetItme() %s"),TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라"));
 	
@@ -297,12 +299,12 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 	for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
 	{
 		USlot* Slot = Cast<USlot>(Widget);
-		if (Slot && Slot->ItemStruct.ItemTop == ItemStruct.ItemTop &&Slot->ItemStruct.ItemIndex == ItemStruct.ItemIndex
-			&&Slot->ItemStruct.ItemIndexType == ItemStruct.ItemIndexType 
-			&&Slot->ItemStruct.ItemIndexDetail == ItemStruct.ItemIndexDetail)
+		if (Slot && Slot->ItemStructTable.ItemTop == ItemStructTable.ItemTop &&Slot->ItemStructTable.ItemIndex == ItemStructTable.ItemIndex
+			&&Slot->ItemStructTable.ItemIndexType == ItemStructTable.ItemIndexType 
+			&&Slot->ItemStructTable.ItemIndexDetail == ItemStructTable.ItemIndexDetail)
 		{
-			Slot->ItemStruct.ItemNum++;
-			Slot->SlotCountUpdate(Slot->ItemStruct.ItemNum);
+			Slot->ItemStructTable.ItemNum++;
+			Slot->SlotCountUpdate(Slot->ItemStructTable.ItemNum);
 			bSlot = true;
 			break;
 		}
@@ -312,9 +314,9 @@ void UInvenComp::GetItem(const FItemStruct& ItemStruct)
 		for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
 		{
 			USlot* Slot = Cast<USlot>(Widget);
-			if (Slot->ItemStruct.ItemTop == -1)
+			if (Slot->ItemStructTable.ItemTop == -1)
 			{
-				Slot->ItemStruct = ItemStruct;
+				Slot->ItemStructTable = ItemStructTable;
 				Slot->SlotImageUpdate();
 				break;
 			}
@@ -438,7 +440,7 @@ void UInvenComp::CatchItem()
 			AItem* Item = Cast<AItem>(Hits[i].GetActor());
 			if (Item)
 			{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템먹음"))
-				Server_GetItem(Item->ItemStruct); Server_DestroyItem(Item); }
+				Server_GetItem(Item->ItemStructTable); Server_DestroyItem(Item); }
 			else{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 R 아이템못먹음")) }
 		}
 	}

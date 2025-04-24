@@ -106,11 +106,11 @@ public:
 	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 
 	UFUNCTION(Server,Reliable)
-	void Server_GetItem(const FItemStruct& ItemStruct);
+	void Server_GetItem(const FItemStructTable& ItemStructTable);
 	UFUNCTION(Client,Reliable)
-	void Client_GetItem(const FItemStruct& ItemStruct);
+	void Client_GetItem(const FItemStructTable& ItemStructTable);
 	
-	void GetItem(const FItemStruct& ItemStruct);
+	void GetItem(const FItemStructTable& ItemStructTable);
 	
 	UFUNCTION(Server,Reliable) // NetMulticast는 안써도됨 = 아이템이 자동으로 동기화중
  	void Server_EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
