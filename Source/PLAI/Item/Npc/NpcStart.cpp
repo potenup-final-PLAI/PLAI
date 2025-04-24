@@ -31,51 +31,51 @@ void ANpcStart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ANpcStart::WarriorStarter()
 {
-	FItemStruct WarriorWeaponStruct;
+	FItemStructTable WarriorWeaponStruct;
 	
 	WarriorWeaponStruct.ItemTop = 1;
 	WarriorWeaponStruct.ItemIndex = 0;
 	WarriorWeaponStruct.ItemIndexType = 0;
 	WarriorWeaponStruct.ItemIndexDetail = 0;
 	
-	ItemStructsArray.ItemStructs.Add(WarriorWeaponStruct);
+	ItemStructTables.ItemStructTables.Add(WarriorWeaponStruct);
 
-	FItemStruct WarriorArmorStruct;
+	FItemStructTable WarriorArmorStruct;
 	
 	WarriorArmorStruct.ItemTop = 1;
 	WarriorArmorStruct.ItemIndex = 1;
 	WarriorArmorStruct.ItemIndexType = 0;
 	WarriorArmorStruct.ItemIndexDetail = 0;
 
-	ItemStructsArray.ItemStructs.Add(WarriorArmorStruct);
+	ItemStructTables.ItemStructTables.Add(WarriorArmorStruct);
 	//이 딜리게이트는 InvenComp NpcItem함수에 바인딩함
-	OnNpcStart.ExecuteIfBound(ItemStructsArray);
+	OnNpcStart.ExecuteIfBound(ItemStructTables);
 }
 
 
 void ANpcStart::HunterStarter()
 {
 	// 헌터셋팅
-	FItemStruct HunterWeaponStruct;
+	FItemStructTable HunterWeaponStruct;
 	
 	HunterWeaponStruct.ItemTop = 1;
 	HunterWeaponStruct.ItemIndex = 0;
 	HunterWeaponStruct.ItemIndexType = 1;
 	HunterWeaponStruct.ItemIndexDetail = 0;
 	
-	ItemStructsArray.ItemStructs.Add(HunterWeaponStruct);
+	ItemStructTables.ItemStructTables.Add(HunterWeaponStruct);
 
-	FItemStruct HunterArmorStruct;
+	FItemStructTable HunterArmorStruct;
 	
 	HunterArmorStruct.ItemTop = 1;
 	HunterArmorStruct.ItemIndex = 2;
 	HunterArmorStruct.ItemIndexType = 0;
 	HunterArmorStruct.ItemIndexDetail = 0;
 
-	ItemStructsArray.ItemStructs.Add(HunterArmorStruct);
+	ItemStructTables.ItemStructTables.Add(HunterArmorStruct);
 	
 	//이 딜리게이트는 InvenComp NpcItem함수에 바인딩함
-	OnNpcStart.ExecuteIfBound(ItemStructsArray);
+	OnNpcStart.ExecuteIfBound(ItemStructTables);
 }
 
 

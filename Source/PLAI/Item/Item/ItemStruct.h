@@ -120,7 +120,6 @@ public:
 	TArray<FItemStructIndex>ItemMeshTops;
 };
 
-
 USTRUCT(BlueprintType,Blueprintable)
 struct FItemStructTable: public FTableRowBase
 {
@@ -157,6 +156,16 @@ public:
 	FItemStructStat ItemStructStat;
 	UPROPERTY(EditAnywhere)
 	FItemStructStatName ItemStructStatName;
+};
+
+USTRUCT(Blueprintable,BlueprintType)
+struct FItemStructTables
+{
+	GENERATED_BODY()
+public:
+	
+	UPROPERTY(EditAnywhere)
+	TArray<FItemStructTable>ItemStructTables;
 };
 
 

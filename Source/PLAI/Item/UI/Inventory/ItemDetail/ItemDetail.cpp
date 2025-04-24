@@ -18,7 +18,7 @@ void UItemDetail::SetItemDetail(const FItemStructTable& ItemStruct)
 {
 	if (ItemStruct.ItemTop != -1)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ItemDetail 아이템 구조체 정보%s %s"),*ItemStruct.Name,*ItemStruct.NameType)
+		// UE_LOG(LogTemp, Error, TEXT("ItemDetail 아이템 구조체 정보%s %s"),*ItemStruct.Name,*ItemStruct.NameType)
 		Name->SetText(FText::FromString(ItemStruct.Name));
 		NameType->SetText(FText::FromString(ItemStruct.NameType));
 		NameDetail->SetText(FText::FromString(ItemStruct.NameDetail));

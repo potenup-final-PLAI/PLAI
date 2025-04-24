@@ -113,16 +113,16 @@ public:
 	void GetItem(const FItemStructTable& ItemStructTable);
 	
 	UFUNCTION(Server,Reliable) // NetMulticast는 안써도됨 = 아이템이 자동으로 동기화중
- 	void Server_EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
+ 	void Server_EquipItem(const FItemStructTable& ItemStructTable, EquipSlotType SlotType);
 
-	void EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
+	void EquipItem(const FItemStructTable& ItemStructTable, EquipSlotType SlotType);
 
 	UFUNCTION()
-	void NpcItem(const FItemStructsArray& ItemStructsArray);
+	void NpcItem(const FItemStructTables& ItemStructTables);
 
 	void CatchItem();
 	
-	void EquipSetting(const FItemStructsArray& ItemStructsArray);
+	void EquipSetting(const FItemStructTables& ItemStructTables);
 	
 	void SaveItemInventory();
 	void LoadItemInventory();

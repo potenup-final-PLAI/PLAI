@@ -8,7 +8,7 @@
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "NpcStart.generated.h"
 
-DECLARE_DELEGATE_OneParam(FOnNpcStart, const FItemStructsArray&)
+DECLARE_DELEGATE_OneParam(FOnNpcStart, const FItemStructTables&)
 
 UCLASS()
 class PLAI_API ANpcStart : public ACharacter
@@ -39,7 +39,7 @@ public:
 	FItemStruct ItemStruct;
 
     UPROPERTY(EditAnywhere)
-	FItemStructsArray ItemStructsArray;
+	FItemStructTables ItemStructTables;
 	
 	void HunterStarter();
 	

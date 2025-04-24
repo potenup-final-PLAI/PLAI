@@ -328,12 +328,12 @@ void UInvenComp::Server_DestroyItem_Implementation(AItem* Item)
 { Item->Destroy(); }
 
 
-void UInvenComp::Server_EquipItem_Implementation(const FItemStruct& ItemStruct, EquipSlotType SlotType)
+void UInvenComp::Server_EquipItem_Implementation(const FItemStructTable& ItemStructTable, EquipSlotType SlotType)
 {
-	EquipItem(ItemStruct, SlotType);
+	EquipItem(ItemStructTable, SlotType);
 }
 
-void UInvenComp::EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType)
+void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotType SlotType)
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -345,7 +345,8 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType
 		ItemWeapon = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,100,0),
 		FRotator(0,0,0),SpawnParams);
 		ItemWeapon->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_R"));
-		ItemWeapon->ItemStruct = ItemStruct;
+		ItemWeapon->ItemStructTable = ItemStructTable;
+		ItemWeapon->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 	}
 	else if (SlotType == EquipSlotType::Armor)
@@ -354,7 +355,8 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType
 		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),
 		FRotator(0,0,0),SpawnParams);
 		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_L"));
-		ItemArmor->ItemStruct = ItemStruct;
+		ItemArmor->ItemStructTable = ItemStructTable;
+		ItemArmor->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 	}
 	else if (SlotType == EquipSlotType::Helmet)
@@ -362,8 +364,10 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)SlotType));
         ItemHelmet = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,0,80),FRotator(0,0,0));
 		ItemHelmet->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::KeepWorldTransform, TEXT("headSocket"));
-		ItemHelmet->ItemStruct = ItemStruct;
+		ItemHelmet->ItemStructTable = ItemStructTable;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+		ItemHelmet->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
+
 		// ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
 	}
 	else if (SlotType == EquipSlotType::Gloves)
@@ -372,9 +376,10 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType
 		ItemGlove = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(-100,0,-50),FRotator(0,0,0));
 		ItemGlove->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,("HeadSocket"));
 		ItemGlove->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
-		ItemGlove->ItemStruct = ItemStruct;
+		ItemGlove->ItemStructTable = ItemStructTable;
 		// ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
 		ItemGlove->SetActorRelativeRotation(FRotator(-90,0,0));
+		ItemGlove->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 	}
 	else if (SlotType == EquipSlotType::Boots)
 	{
@@ -382,40 +387,42 @@ void UInvenComp::EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType
 		Itemboots = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(75,75,75),FRotator(0,0,0));
 		Itemboots->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
 		Itemboots->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
-		Itemboots->ItemStruct = ItemStruct;
+		Itemboots->ItemStructTable = ItemStructTable;
+		Itemboots->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
+
 		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
 		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
 		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
 	}
 }
 
-void UInvenComp::NpcItem(const FItemStructsArray& ItemStructsArray)
+void UInvenComp::NpcItem(const FItemStructTables& ItemStructTables)
 {
-	for (int32 i = 0; ItemStructsArray.ItemStructs.Num() > i; i++)
+	for (int32 i = 0; ItemStructTables.ItemStructTables.Num() > i; i++)
 	{
 		for (int32 e = 0; e < static_cast<int32>(EquipSlotType::Boots); e++)
 		{
 			StartSlotType = static_cast<EquipSlotType>(e);
-			if (ItemStructsArray.ItemStructs[i].ItemIndex == static_cast<int32>(StartSlotType))
+			if (ItemStructTables.ItemStructTables[i].ItemIndex == static_cast<int32>(StartSlotType))
 			{
 				break;
 			}
 		}
-		Server_EquipItem(ItemStructsArray.ItemStructs[i],StartSlotType);
+		Server_EquipItem(ItemStructTables.ItemStructTables[i],StartSlotType);
 	}
-	EquipSetting(ItemStructsArray);
+	EquipSetting(ItemStructTables);
 }
 
-void UInvenComp::EquipSetting(const FItemStructsArray& ItemStructsArray)
+void UInvenComp::EquipSetting(const FItemStructTables& ItemStructTables)
 {
-	for (int32 i = 0; ItemStructsArray.ItemStructs.Num() > i; i++)
+	for (int32 i = 0; ItemStructTables.ItemStructTables.Num() > i; i++)
 	{
 		for (UWidget* Widget : MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
 		{
 			USlotEquip* SlotEquip = Cast<USlotEquip>(Widget);
-			if (ItemStructsArray.ItemStructs[i].ItemIndex == static_cast<int32>(SlotEquip->SlotType))
+			if (ItemStructTables.ItemStructTables[i].ItemIndex == static_cast<int32>(SlotEquip->SlotType))
 			{
-				SlotEquip->ItemStruct = ItemStructsArray.ItemStructs[i];
+				SlotEquip->ItemStructTable = ItemStructTables.ItemStructTables[i];
 				SlotEquip->SlotImageUpdate();
 			}
 		}
@@ -493,15 +500,15 @@ void UInvenComp::LoadItemInventory()
 
 void UInvenComp::SaveEquipInventory()
 {
-	FItemStructsArray ItemStructsArray;
+	FItemStructTables ItemStructTables;
 	for (UWidget* Widget : MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
 	{
 		USlotEquip* SlotEquip = Cast<USlotEquip>(Widget);
 		int32 index = MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(Widget);
-		ItemStructsArray.ItemStructs.Add(SlotEquip->ItemStruct);
+		ItemStructTables.ItemStructTables.Add(SlotEquip->ItemStructTable);
 	}
 	FString JsonString;
-	FJsonObjectConverter::UStructToJsonObjectString(ItemStructsArray,JsonString);
+	FJsonObjectConverter::UStructToJsonObjectString(ItemStructTables,JsonString);
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 저장"))
 	
 	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Equip.tst"));
@@ -510,20 +517,20 @@ void UInvenComp::SaveEquipInventory()
 
 void UInvenComp::LoadEquipInventory()
 {
-	FItemStructsArray ItemStructsArray;
+	FItemStructTables ItemStructTables;
 	FString JsonString;
 	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Equip.tst"));
 	FFileHelper::LoadFileToString(JsonString,*path);
 	
-	FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&ItemStructsArray);
+	FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&ItemStructTables);
 	for (UWidget* Widget : MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
 	{
 		USlotEquip* SlotEquip = Cast<USlotEquip>(Widget);
 		int32 index = MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(Widget);
-		SlotEquip->ItemStruct = ItemStructsArray.ItemStructs[index];
+		SlotEquip->ItemStructTable = ItemStructTables.ItemStructTables[index];
 		SlotEquip->SlotImageUpdate();
 		//ServerRpc로 넘기면 SlotEquip을 바로 넘기는것이 아닌 SlotEquip 정보만 넘김
-		Server_EquipItem(ItemStructsArray.ItemStructs[index],SlotEquip->SlotType);
+		Server_EquipItem(ItemStructTables.ItemStructTables[index],SlotEquip->SlotType);
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 로드"))
 }
