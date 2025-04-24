@@ -22,6 +22,7 @@ void UEquipInven::NativeConstruct()
 	{
 		SlotEquip = CreateWidget<USlotEquip>(GetWorld(),SlotEquipFactory);
 		SlotEquip->SlotType = SlotTypes[i];
+		SlotEquip->EquipInven = this;
 		LeftBox->AddChild(SlotEquip);
 	}
 

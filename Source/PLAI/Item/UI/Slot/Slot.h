@@ -45,6 +45,9 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UTextBlock* SlotCount;
 
+    UPROPERTY(EditAnywhere)
+	class UEquipInven* EquipInven;
+	
 	void SlotCountUpdate(const int32 Count);
 
 	void SlotImageUpdate();
