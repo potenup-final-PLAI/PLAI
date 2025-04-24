@@ -2,6 +2,9 @@
 
 
 #include "UiMain.h"
+
+#include "HttpModule.h"
+#include "JsonObjectConverter.h"
 #include "UiSign.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
@@ -9,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "Components/TextBlock.h"
+#include "Interfaces/IHttpResponse.h"
 
 void UUiMain::NativeConstruct()
 {
@@ -99,7 +103,30 @@ void UUiMain::InitEnd()
 
 void UUiMain::HttpPostInit()
 {
-	InitResponse->SetText(FText::FromString(InitPost->GetText().ToString()));
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+
+    UE_LOG(LogTemp,Display,TEXT("HttpPostInit 캐릭터 초기 셋팅"));
+	
+	httpRequest->SetURL("");
+	httpRequest->SetVerb("GET");
+	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	FString JsonString;
+	FNpcStructPost NpcStruct;
+	NpcStruct.Name = InitPost->GetText().ToString();
+	FJsonObjectConverter::UStructToJsonObjectString(NpcStruct,JsonString);
+	httpRequest->SetContentAsString(JsonString);
+	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool WasSuccessful)
+	{
+		if (WasSuccessful)
+		{
+			FNpcStructGet NpcStructGet;
+			FString JsonString = Response->GetContentAsString();
+			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&NpcStructGet);
+			InitResponse->SetText(FText::FromString(NpcStructGet.Get));
+		}
+	});
+	httpRequest->ProcessRequest();
 }
 
 

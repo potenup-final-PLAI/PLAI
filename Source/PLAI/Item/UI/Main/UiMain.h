@@ -5,6 +5,27 @@
 #include "Blueprint/UserWidget.h"
 #include "UiMain.generated.h"
 
+USTRUCT(BlueprintType,Blueprintable)
+struct FNpcStructPost
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	FString Name;
+};
+
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FNpcStructGet
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	FString Get;
+};
+
 /**
  * 
  */

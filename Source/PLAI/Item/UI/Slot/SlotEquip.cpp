@@ -43,7 +43,9 @@ bool USlotEquip::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 	  ItemObject->ItemStruct.ItemTop); return false; }
 
 	if (SlotType == EquipSlotType::Weapon && ItemObject->ItemStruct.ItemIndex != 0)
-	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 웨폰 안맞네")) return false; }
+	{
+		UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 웨폰 안맞네")) return false;
+	}
 	
 	if (SlotType == EquipSlotType::Armor && ItemObject->ItemStruct.ItemIndex != 1)
 	{ UE_LOG(LogTemp,Warning,TEXT("SlotEquip: 아머 안맞네")) return false; }

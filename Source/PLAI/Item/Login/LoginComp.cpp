@@ -11,6 +11,7 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/Npc/NpcNet.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
@@ -57,12 +58,31 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-    if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-    { if (PC->WasInputKeyJustPressed(EKeys::H))
-        {
-    	    TransDataTable();
-    	};
-    }
+    // if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+    // { if (PC->WasInputKeyJustPressed(EKeys::H))
+    //     {
+    // 	    TransDataTable();
+    // 	};
+    // }
+
+	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+	{ if (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
+		{
+		    FHitResult Hit;
+		    PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+		    if (Hit.bBlockingHit)
+		    {
+			    if (ANpcNet * NpcNet = Cast<ANpcNet>(Hit.GetActor()))
+			    {
+				    NpcNet->OpenQuest();
+			    }
+		    	else
+		    	{
+		    		UE_LOG(LogTemp, Error, TEXT("LoginComp NpcNet 없네"));
+		    	}
+		    }
+		};
+	}
 }
 //
 // void ULoginComp::SaveEquip()

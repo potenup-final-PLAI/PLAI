@@ -400,6 +400,7 @@ void UInvenComp::EquipSetting(const FItemStructsArray& ItemStructsArray)
 			}
 		}
 	}
+	SaveEquipInventory();
 }
 
 void UInvenComp::CatchItem()
