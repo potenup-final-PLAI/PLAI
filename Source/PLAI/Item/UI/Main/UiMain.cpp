@@ -107,13 +107,13 @@ void UUiMain::HttpPostInit()
 
     UE_LOG(LogTemp,Display,TEXT("HttpPostInit 캐릭터 초기 셋팅"));
 	
-	httpRequest->SetURL("");
-	httpRequest->SetVerb("GET");
+	httpRequest->SetURL("http://192.168.10.96:8054/npc/chat");
+	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
 	FString JsonString;
 	FNpcStructPost NpcStruct;
-	NpcStruct.Name = InitPost->GetText().ToString();
+	NpcStruct.question = InitPost->GetText().ToString();
 	FJsonObjectConverter::UStructToJsonObjectString(NpcStruct,JsonString);
 	httpRequest->SetContentAsString(JsonString);
 	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool WasSuccessful)
@@ -123,7 +123,7 @@ void UUiMain::HttpPostInit()
 			FNpcStructGet NpcStructGet;
 			FString JsonString = Response->GetContentAsString();
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&NpcStructGet);
-			InitResponse->SetText(FText::FromString(NpcStructGet.Get));
+			InitResponse->SetText(FText::FromString(NpcStructGet.response));
 		}
 	});
 	httpRequest->ProcessRequest();
