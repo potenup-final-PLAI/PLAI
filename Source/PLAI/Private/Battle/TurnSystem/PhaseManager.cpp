@@ -37,10 +37,12 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 		break;
 	case EBattlePhase::BattleStart:
 		// 전투에 필요한 초기화 작업 InitBattle();로 정의
+		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : BattleStart State"));	
 		InitBattle();
 		break;
 	case EBattlePhase::RoundStart:
 		// 속도를 기반으로 유닛 정렬 작업 및 다음 턴 시작
+		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundStart State"));
 		SetCycle();
 		// Unit Queue에 세팅
 		SetUnitQueue();
@@ -51,6 +53,7 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 		break;
 	case EBattlePhase::RoundEnd:
 		// 속도를 기반으로 유닛 정렬 작업 및 다음 턴 시작
+		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundEnd State"));
 		SetCycle();
 		// Unit Queue에 세팅
 		SetUnitQueue();
@@ -68,6 +71,7 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 
 void AUPhaseManager::InitBattle()
 {
+	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : InitBattle"));
 	// 사이클 시작
 	SetPhase(EBattlePhase::RoundStart);
 }
@@ -123,6 +127,8 @@ void AUPhaseManager::SortUnitQueue()
 
 void AUPhaseManager::StartBattle()
 {
+	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : Start Battle"));
+	
 	// 유닛에 0번을 tempUnit에 저장
 	ABaseBattlePawn* tempUnit = unitQueue[0];
 	// 현재 턴이 진행 중인 유닛 저장
@@ -144,27 +150,32 @@ void AUPhaseManager::StartBattle()
 
 void AUPhaseManager::StartPlayerPhase()
 {
+	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : Start PlayerPhase"));
 	UE_LOG(LogTemp, Warning, TEXT("PlayerTurn Start Unit Name : %s"),
 	       *turnManager->curUnit->GetActorNameOrLabel());
 
 	// 턴이 다 지났다면 
-	if (unitQueue.Num() <= 0)
-	{
-		// 주기 세팅 후 큐 속도에 따라 다시 세팅
-		
-		// UE_LOG(LogTemp, Warning, TEXT("unitQueue Empty"));
-	}
+	// if (unitQueue.Num() <= 0)
+	// {
+	// 	// 주기 세팅 후 큐 속도에 따라 다시 세팅
+	// 	
+	// 	// UE_LOG(LogTemp, Warning, TEXT("unitQueue Empty"));
+	// }
 
 	SetPhase(EBattlePhase::TurnProcessing);
 
 	// PlayerTurn 시작
-	turnManager->SetTurnState(ETurnState::PlayerTurn);
+	// turnManager->SetTurnState(ETurnState::PlayerTurn);
 	// 첫 번째 유닛 포제스
 	turnManager->StartPlayerTurn();
 }
 
 void AUPhaseManager::EndPlayerPhase()
 {
+	if (turnManager->curTurnState == ETurnState::TurnEnd) return;
+	// 턴 종료 State로 변경
+	turnManager->SetTurnState(ETurnState::TurnEnd);
+	
 	// 큐에 유닛이 있다면
 	if (unitQueue.Num() > 0)
 	{
@@ -206,6 +217,7 @@ void AUPhaseManager::EndPlayerPhase()
 
 void AUPhaseManager::StartEnemyPhase()
 {
+	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : Start Enemy Phase"));
 	UE_LOG(LogTemp, Warning, TEXT("EnemyTurn Start Unit Name : %s"),
 	       *turnManager->curUnit->GetActorNameOrLabel());
 
@@ -217,20 +229,25 @@ void AUPhaseManager::StartEnemyPhase()
 		// UE_LOG(LogTemp, Warning, TEXT("unitQueue Empty"));
 	}
 	SetPhase(EBattlePhase::TurnProcessing);
-	turnManager->curTurnState = ETurnState::EnemyTurn;
+	// turnManager->curTurnState = ETurnState::EnemyTurn;
 
 	UE_LOG(LogTemp, Warning, TEXT("Start Enemy Turn"));
 
 	// 처음 시작할 적 유닛 턴 시작
 	if (turnManager)
 	{
-		turnManager->SetTurnState(ETurnState::EnemyTurn);
 		turnManager->StartEnemyTurn();
 	}
 }
 
 void AUPhaseManager::EndEnemyPhase()
 {
+	if (turnManager->curTurnState == ETurnState::TurnEnd) return;
+	
+	// 턴 종료 State로 변경
+	turnManager->SetTurnState(ETurnState::TurnEnd);
+	
+	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : EndEnemyPhase"));
 	// 유닛이 있다면 처음 유닛을 현재 유닛으로 지정하고 큐에 저장된 유닛을 지운다.
 	if (unitQueue.Num() > 0)
 	{
@@ -272,4 +289,5 @@ void AUPhaseManager::BattleEnd()
 {
 	turnManager->SetTurnState(ETurnState::None);
 	UE_LOG(LogTemp, Warning, TEXT("End Battle"));
+	// UGameplayStatics::OpenLevel(GetWorld(), TEXT("LevelName"));
 }

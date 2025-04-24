@@ -42,48 +42,50 @@ void ABaseBattlePawn::SetupPlayerInputComponent(
 
 void ABaseBattlePawn::OnTurnStart()
 {
+	// UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn : OnTurnStart"));
+	// if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
+	// {
+	// 	FTimerHandle enemyNextTurnimerHandle;
+	// 	GetWorld()->GetTimerManager().SetTimer(enemyNextTurnimerHandle, FTimerDelegate::CreateLambda([this]()
+	// 	{
+	// 		if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
+	// 		{
+	// 			OnTurnEnd(this);
+	// 		}
+	// 	}), 1.0f, false);
+	// }
+	
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
-		FTimerHandle enemyNextTurnimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(enemyNextTurnimerHandle, FTimerDelegate::CreateLambda([this]()
+		FTimerHandle timerHandle;
+		GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([this]()
 		{
-			if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
-			{
-				phaseManager->EndEnemyPhase();
-			}
-		}), 1.5f, false);
+			OnTurnEnd();
+		}), 1.0f, false);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
 }
 
-void ABaseBattlePawn::OnTurnEnd(ABaseBattlePawn* unit)
+void ABaseBattlePawn::OnTurnEnd()
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *GetName());
 	// 입력 막고 FSM 종료
-
-	// 포제스 풀기
-	// if (auto* pc = GetWorld()->GetFirstPlayerController())
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("%s UnPossess"), *unit->GetActorNameOrLabel());
-	// 	pc->UnPossess();
-	// }
 	
-	// 다음 턴으로 넘기기
-	// if (auto* pm = GetWorld()->GetGameState<AUPhaseManager>())
-	// {
-	// 	pm->RequestNextTurn(this);		
-	// }
 	// Casting을 통해 현재 유닛이 player 또는 enemy라면 그쪽 함수 실행
-	auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
-	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
+	if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 	{
-		// PlayerPhaseEnd
-
-		phaseManager->EndPlayerPhase();
-	}
-	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
-	{
-		// EnemyPhaseEnd
-		phaseManager->EndEnemyPhase();
+		// 턴 종료 상태라면 return
+		if (phaseManager->turnManager->curTurnState == ETurnState::TurnEnd) return;
+		
+		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
+		{
+			// PlayerPhaseEnd
+			phaseManager->EndPlayerPhase();
+		}
+		else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
+		{
+			// EnemyPhaseEnd
+			phaseManager->EndEnemyPhase();
+		}
 	}
 }

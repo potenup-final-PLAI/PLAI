@@ -34,5 +34,5 @@ public:
 	TSubclassOf<class ATurnManager> turnManagerFactory;
 
 	void OnTurnStart();
-	void OnTurnEnd(ABaseBattlePawn* unit);
+	void OnTurnEnd();
 };

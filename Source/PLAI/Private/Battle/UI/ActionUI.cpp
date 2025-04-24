@@ -48,13 +48,13 @@ void UActionUI::OnClickedTurnEnd()
 	{
 		// 플레이어 턴 종료
 		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
-		player->OnTurnEnd(player);
+		player->OnTurnEnd();
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
 	{
 		// Enemy 턴 종료
 		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
-		enemy->OnTurnEnd(enemy);
+		enemy->OnTurnEnd();
 	}
 }
 

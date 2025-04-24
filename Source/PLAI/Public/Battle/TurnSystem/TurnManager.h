@@ -72,21 +72,21 @@ public:
 	//--------------Turn Start---------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
 	class AUPhaseManager* phaseManager;
+	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
 	ABaseBattlePawn* curUnit;
 	// 유닛들의 턴 순서를 저장하는 배열
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
 	TArray<ABaseBattlePawn*> enemyQueue;
 
+	
 	//--------------Player Turn---------------------
 	// 플레이어 첫 유닛 실행
 	void StartPlayerTurn();
-	// 플레이어 다음 유닛 실행
-	void StartNextPlayerTurn();
 
 	//--------------Enemy Turn---------------------
 	// 적 첫 유닛 실행
 	void StartEnemyTurn();
-	// 다음 적 유닛 실행
-	void StartNextEnemyTurn();
+	
+
 };
