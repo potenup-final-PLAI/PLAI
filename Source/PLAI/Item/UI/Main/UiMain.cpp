@@ -114,6 +114,7 @@ void UUiMain::HttpPostInit()
 	FString JsonString;
 	FNpcStructPost NpcStruct;
 	NpcStruct.question = InitPost->GetText().ToString();
+	
 	FJsonObjectConverter::UStructToJsonObjectString(NpcStruct,JsonString);
 	httpRequest->SetContentAsString(JsonString);
 	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool WasSuccessful)

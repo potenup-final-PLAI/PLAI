@@ -14,5 +14,9 @@ void UUiPost::NativeConstruct()
 
 void UUiPost::UiPostEnter(const FText& Text, ETextCommit::Type CommitMethod)
 {
-	OnNetPost.ExecuteIfBound(Text.ToString());
+	if (CommitMethod == ETextCommit::OnEnter)
+	{
+		UE_LOG(LogTemp, Display, TEXT("엔터키 누름 %s"), *Text.ToString());
+		OnNetPost.ExecuteIfBound(Text.ToString());
+	}
 }

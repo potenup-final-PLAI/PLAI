@@ -5,6 +5,7 @@
 
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
+#include "Components/TextBlock.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/UI/Main/UiMain.h"
@@ -44,16 +45,15 @@ void ANpcNet::OpenQuest()
 
 void ANpcNet::NetPost(FString String)
 {
-	UE_LOG(LogTemp, Display, TEXT("ANpcNet::NetPost%s"), *String);
 	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
 	HttpRequest->SetURL("http://192.168.10.96:8054/npc/chat");
 	HttpRequest->SetVerb("POST");
 	HttpRequest->SetHeader("Content-Type", "application/json");
 
-	FNpcStructNetPost NpcStruct;
-	NpcStruct.question = String;
-	
+	UE_LOG(LogTemp,Warning,TEXT("NpcNet String받은값 무엇%s"),*String)
 	FString JsonString;
+	FNpcStructPost NpcStruct;
+	NpcStruct.question = String;
 	
 	FJsonObjectConverter::UStructToJsonObjectString(NpcStruct,JsonString);
 	HttpRequest->SetContentAsString(JsonString);
@@ -61,17 +61,13 @@ void ANpcNet::NetPost(FString String)
 	{
 		if (bSucceeded)
 		{
-			FNpcStructNetGet NpcStruct;
+			FNpcStructGet NpcStruct;
 			FString JsonString = HttpResponse->GetContentAsString();
-			FJsonObjectConverter::UStructToJsonObjectString(NpcStruct,JsonString);
-			UE_LOG(LogTemp, Display, TEXT("ANpcNet::NetPost 실패함"));
+			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&NpcStruct);
+			UE_LOG(LogTemp, Display, TEXT("ANpcNet::NetPost 성공함 %s"),*JsonString);
+			UIPost->TextGet->SetText(FText::FromString(NpcStruct.response));
 		}
-		else
-		{
-			UE_LOG(LogTemp, Display, TEXT("ANpcNet::NetPost 실패함"));
-		}
-	}
-    );
+	});
 	HttpRequest->ProcessRequest();
 }
 
