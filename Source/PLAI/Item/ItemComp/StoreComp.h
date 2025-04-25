@@ -35,5 +35,5 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UStoreInven* StoreInven;
 
-	void SetStoreInven(const FItemStructsArray& ItemStructsArray);
+	void SetStoreInven(UDataTable* ItemTable);
 };

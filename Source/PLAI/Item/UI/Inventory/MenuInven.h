@@ -23,4 +23,7 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UItemDetail* WBP_ItemDetail;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UQuickInven* WBP_QuickInven;
 };

@@ -1,5 +1,5 @@
 {
-	"itemStructs": [
+	"itemStructTables": [
 		{
 			"itemTop": 1,
 			"itemIndex": 0,
@@ -8,7 +8,11 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 2,
+			"itemNum": 0,
+			"itemGold": 0,
+			"itemLevel": 0,
+			"staticMesh": "None",
+			"texture": "None",
 			"itemStructStat":
 			{
 				"item_ATK": 0,
@@ -37,6 +41,10 @@
 			"nameType": "Type",
 			"nameDetail": "Detail",
 			"itemNum": 0,
+			"itemGold": 0,
+			"itemLevel": 0,
+			"staticMesh": "None",
+			"texture": "None",
 			"itemStructStat":
 			{
 				"item_ATK": 0,
@@ -64,7 +72,11 @@
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 2,
+			"itemNum": 0,
+			"itemGold": 0,
+			"itemLevel": 0,
+			"staticMesh": "None",
+			"texture": "None",
 			"itemStructStat":
 			{
 				"item_ATK": 0,
@@ -85,14 +97,18 @@
 			}
 		},
 		{
-			"itemTop": 1,
-			"itemIndex": 3,
+			"itemTop": -1,
+			"itemIndex": 0,
 			"itemIndexType": 0,
 			"itemIndexDetail": 0,
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
 			"itemNum": 0,
+			"itemGold": 0,
+			"itemLevel": 0,
+			"staticMesh": "None",
+			"texture": "None",
 			"itemStructStat":
 			{
 				"item_ATK": 0,
@@ -113,14 +129,18 @@
 			}
 		},
 		{
-			"itemTop": 1,
-			"itemIndex": 4,
+			"itemTop": -1,
+			"itemIndex": 0,
 			"itemIndexType": 0,
 			"itemIndexDetail": 0,
 			"name": "Name",
 			"nameType": "Type",
 			"nameDetail": "Detail",
-			"itemNum": 6,
+			"itemNum": 0,
+			"itemGold": 0,
+			"itemLevel": 0,
+			"staticMesh": "None",
+			"texture": "None",
 			"itemStructStat":
 			{
 				"item_ATK": 0,

@@ -81,8 +81,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString UserPw;
 
-	void SaveEquip();
 
+	void GetEquipInfo();
+	void HttpEquipPost(FString String);
+	
 	void HttpLoginPost();
 	
 	void HttpSignPost();

@@ -42,14 +42,6 @@ void ULoginComp::BeginPlay()
 		UiMain->LoginComp = this;
 		UiMain->WbpUiSign->LoginComp = this;
 	}
-
-	// if (TestPlayer->IsLocallyControlled())
-	// {Main = CreateWidget<UMain>(GetWorld(),MainFactory);
-	// 	Main->AddToViewport();
-	// 	Main->WbpUiMain->LoginComp = this;
-	// 	Main->WbpUiMain->WbpUiSign->LoginComp = this;
-	// 	UiMain = Main->WbpUiMain;
-	// }
 }
 
 
@@ -57,13 +49,12 @@ void ULoginComp::BeginPlay()
 void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-    // if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-    // { if (PC->WasInputKeyJustPressed(EKeys::H))
-    //     {
-    // 	    TransDataTable();
-    // 	};
-    // }
+	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+	{ if (PC->WasInputKeyJustPressed(EKeys::H))
+		{
+			GetEquipInfo();
+		}
+	}
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
@@ -84,27 +75,51 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		};
 	}
 }
-//
-// void ULoginComp::SaveEquip()
-// {
-// 	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
-// 	{
-// 		if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget))
-// 		{
-// 			UiMain->WbpUiSign->SignStruct.ItemStructsEquip.ItemStructs.Add(SlotEquip->ItemStruct);
-// 		}
-// 	}
-// 	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
-// 	{
-// 		if (USlot* Slot = Cast<USlot>(Widget))
-// 		{
-// 			UiMain->WbpUiSign->SignStruct.ItemStructsInven.ItemStructs.Add(Slot->ItemStruct);
-// 		}
-// 	}
-// 	FString JsonString;
-// 	FJsonObjectConverter::UStructToJsonObjectString(UiMain->WbpUiSign->SignStruct, JsonString);
-// 		 UE_LOG(LogTemp,Warning,TEXT("Equipped by %s"),*JsonString);
-// }
+
+
+void ULoginComp::GetEquipInfo()
+{
+	FItemStructTable ItemStructTable;
+	FItemStructTables ItemStructTables;
+	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+	{
+		if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget))
+		{
+			ItemStructTable = SlotEquip->ItemStructTable;
+			ItemStructTables.ItemStructTables.Add(ItemStructTable);
+		}
+	}
+	
+	// 보내는 구조체 형식 맞추기
+
+	// 구조체 Converter로 JsonString 변형하기
+
+	FString JsonString;
+	// ItemSTructTables -> 보내는 전송용 구조체로 넣기
+	FJsonObjectConverter::UStructToJsonObjectString(ItemStructTables, JsonString);
+	HttpEquipPost(JsonString);
+}
+
+void ULoginComp::HttpEquipPost(FString String)
+{
+	UE_LOG(LogTemp, Display, TEXT("로그인 컴프%s"), *String);
+	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
+	HttpRequest->SetURL(TEXT("/LoginComp/EquipInven/Login"));
+	HttpRequest->SetVerb("POST");
+	HttpRequest->SetHeader("Content-Type", "application/json");
+	
+	HttpRequest->SetContentAsString(String);
+    HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest,
+    	FHttpResponsePtr HttpResponse, bool bSucceeded)
+    {
+	  if (bSucceeded)
+	  {
+		  FString JsonString = HttpResponse->GetContentAsString();
+	  	  // 추후에 로그 한번 찍어보자 JsonString
+	  	  // FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,);
+	  }  
+    });
+}
 
 void ULoginComp::HttpLoginPost()
 {

@@ -94,6 +94,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AItemMaster* Itemboots;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ACreature> CreatureFactory;
+	UPROPERTY(EditAnywhere)
+	class ACreature* Creature;
+	
 	UFUNCTION(Server,Reliable)
 	void Server_UnEquip(EquipSlotType SlotType);
 
@@ -118,7 +123,7 @@ public:
 	void EquipItem(const FItemStructTable& ItemStructTable, EquipSlotType SlotType);
 
 	UFUNCTION()
-	void NpcItem(const FItemStructTables& ItemStructTables);
+	void NpcItem(const FItemStructTables ItemStructTables);
 
 	void CatchItem();
 	
