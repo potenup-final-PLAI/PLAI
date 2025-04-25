@@ -7,7 +7,19 @@ public class PLAI : ModuleRules
 	public PLAI(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		
+		PublicDependencyModuleNames.AddRange(new[]
+		{
+			"Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem",
+			"AIModule", "Niagara", "EnhancedInput", "UMG", "Slate", "SlateCore",
+			"JsonUtilities","Json", "HTTP", "AITESTSUITE"
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "EnhancedInput" });
-    }
+		});
+
+		PublicIncludePaths.AddRange(new[]
+		{
+			"PLAI/Public/Battle/BattlePlayer",
+			"PLAI/Public/Battle/Tile"
+		});
+	}
 }

@@ -10,8 +10,8 @@ UCLASS()
 class PLAI_API AGridTileManager : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AGridTileManager();
 
@@ -19,8 +19,22 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	class AGridTile* tile;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AGridTile> tileFactory;
+	UPROPERTY(EditAnywhere)
+	TMap<FIntPoint, class AGridTile*> map;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ABattlePlayer> battlePlayerFactory;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ABaseEnemy> enemyFactory;
+
+	void InitGridTile();
 };

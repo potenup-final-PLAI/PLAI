@@ -19,8 +19,7 @@ APLAIPlayerController::APLAIPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
-	CachedDestination = FVector::ZeroVector;
-	FollowTime = 0.f;
+	
 }
 
 void APLAIPlayerController::BeginPlay()
@@ -87,8 +86,9 @@ void APLAIPlayerController::OnSetDestinationTriggered()
 	// If we hit a surface, cache the location
 	if (bHitSuccessful)
 	{
-		CachedDestination = Hit.Location;
+		CachedDestination = Hit.Location; //위치 저장
 	}
+	
 	
 	// Move towards mouse pointer or touch
 	APawn* ControlledPawn = GetPawn();
@@ -96,6 +96,7 @@ void APLAIPlayerController::OnSetDestinationTriggered()
 	{
 		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
 		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
+		
 	}
 }
 
