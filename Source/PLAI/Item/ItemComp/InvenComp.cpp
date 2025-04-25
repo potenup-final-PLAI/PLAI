@@ -455,8 +455,6 @@ void UInvenComp::CatchItem()
 	}
 }
 
-
-
 void UInvenComp::SaveItemInventory()
 {
 	TArray<FItemStruct> ItemStructs;

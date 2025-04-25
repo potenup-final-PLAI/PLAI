@@ -61,7 +61,6 @@ void AMonsterCharacter::Tick(float DeltaTime)
 void AMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AMonsterCharacter::MoveToRandomLocation()
