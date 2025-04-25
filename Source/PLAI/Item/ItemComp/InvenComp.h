@@ -118,7 +118,7 @@ public:
 	void EquipItem(const FItemStructTable& ItemStructTable, EquipSlotType SlotType);
 
 	UFUNCTION()
-	void NpcItem(const FItemStructTables& ItemStructTables);
+	void NpcItem(const FItemStructTables ItemStructTables);
 
 	void CatchItem();
 	

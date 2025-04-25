@@ -404,7 +404,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	}
 }
 
-void UInvenComp::NpcItem(const FItemStructTables& ItemStructTables)
+void UInvenComp::NpcItem(const FItemStructTables ItemStructTables)
 {
 	for (int32 i = 0; ItemStructTables.ItemStructTables.Num() > i; i++)
 	{
@@ -435,7 +435,6 @@ void UInvenComp::EquipSetting(const FItemStructTables& ItemStructTables)
 			}
 		}
 	}
-	SaveEquipInventory();
 }
 
 void UInvenComp::CatchItem()
