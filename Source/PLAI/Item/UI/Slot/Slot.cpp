@@ -77,7 +77,6 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 			ATestPlayer* TestPlayer = Cast<ATestPlayer>(PlayerController->GetPawn());
 			
 			bItemDetail = !bItemDetail;
-			
 			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(bItemDetail ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetItemDetail(*ItemTableFind());
 			
