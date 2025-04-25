@@ -82,7 +82,8 @@ public:
 	FString UserPw;
 
 
-	void HttpEquipPost();
+	void GetEquipInfo();
+	void HttpEquipPost(FString String);
 	
 	void HttpLoginPost();
 	
