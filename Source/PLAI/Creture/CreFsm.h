@@ -1,20 +1,20 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "InitComp.generated.h"
+#include "CreFsm.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class PLAI_API UInitComp : public UActorComponent
+class PLAI_API UCreFsm : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UInitComp();
+	UCreFsm();
 
 protected:
 	// Called when the game starts
