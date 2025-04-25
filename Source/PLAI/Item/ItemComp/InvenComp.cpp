@@ -314,7 +314,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	{
 		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),
 		FRotator(0,0,0),SpawnParams);
-		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_L"));
+		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("spine_02Socket"));
 		ItemArmor->ItemStructTable = ItemStructTable;
 		ItemArmor->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
