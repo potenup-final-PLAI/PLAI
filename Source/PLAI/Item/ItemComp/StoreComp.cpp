@@ -59,7 +59,10 @@ void UStoreComp::SetStoreInven(UDataTable* ItemTable)
 		if (Slot->ItemStructTable.ItemTop == -1)
 		{
 			UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 X %s"),*Slot->ItemStructTable.Name)
-			return;
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 되었음 %s"),*Slot->ItemStructTable.Name)
 		}
 		Slot->SlotImageUpdate();
 	}
