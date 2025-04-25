@@ -27,11 +27,6 @@ void USlot::SlotImageUpdate()
 		Brush.SetResourceObject(ItemStructTable.Texture);
 		SlotImage->SetBrush(Brush);
 	}
-	if (ItemStruct.ItemTop == -1)return;
-	FSlateBrush Brush;
-	Brush.SetResourceObject(ParentItem->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].ItemMeshIndexes[ItemStruct.ItemIndex].
-		ItemMeshTypes[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail]);
-	SlotImage->SetBrush(Brush);
 }
 
 void USlot::NativeConstruct()

@@ -103,7 +103,7 @@ void ULoginComp::GetEquipInfo()
 void ULoginComp::HttpEquipPost(FString String)
 {
 	UE_LOG(LogTemp, Display, TEXT("로그인 컴프%s"), *String);
-	FHttpRequestRef HttpRequest;
+	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
 	HttpRequest->SetURL(TEXT("/LoginComp/EquipInven/Login"));
 	HttpRequest->SetVerb("POST");
 	HttpRequest->SetHeader("Content-Type", "application/json");
@@ -114,7 +114,9 @@ void ULoginComp::HttpEquipPost(FString String)
     {
 	  if (bSucceeded)
 	  {
-		  FString JsonString = HttpResponse->GetContentAsString();  
+		  FString JsonString = HttpResponse->GetContentAsString();
+	  	  // 추후에 로그 한번 찍어보자 JsonString
+	  	  // FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,);
 	  }  
     });
 }

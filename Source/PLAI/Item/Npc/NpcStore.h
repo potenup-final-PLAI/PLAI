@@ -23,17 +23,15 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 	UPROPERTY(EditAnywhere)
-	FItemStructsArray ItemStructsArray;
+	class UDataTable* ItemTable;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AItem> ItemFactory;
 
 	UPROPERTY(EditAnywhere)
 	AItem* Item;
-
-	void LoadNpcStore();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

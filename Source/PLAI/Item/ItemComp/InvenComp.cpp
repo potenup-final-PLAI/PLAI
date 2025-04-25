@@ -160,7 +160,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			else if (ANpcStore* Store = Cast<ANpcStore>(Hit.GetActor()))
 			{
 				UE_LOG(LogTemp,Warning,TEXT("인벤컴프 마우스 왼쪽 찍은 엑터 스토어 엑터 찎힘"))
-				TestPlayer->StoreComp->SetStoreInven(Store->ItemStructsArray);
+				TestPlayer->StoreComp->SetStoreInven(Store->ItemTable);
 
 				if (FlipflopStore == false)
 				{
@@ -335,6 +335,14 @@ void UInvenComp::Server_EquipItem_Implementation(const FItemStructTable& ItemStr
 
 void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotType SlotType)
 {
+	if (ItemStructTable.ItemTop == -1)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("인벤컴프 이큅아이템 아이템 구조체 없음%s"),*ItemStructTable.NameDetail);
+	}
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("인벤컴프 이큅아이템 아이템 구조체 있음%s"),*ItemStructTable.NameDetail);
+	}
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = GetOwner();
@@ -367,7 +375,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemHelmet->ItemStructTable = ItemStructTable;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemHelmet->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
-
+ 
 		// ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
 	}
 	else if (SlotType == EquipSlotType::Gloves)
@@ -389,7 +397,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		Itemboots->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		Itemboots->ItemStructTable = ItemStructTable;
 		Itemboots->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
-
+ 
 		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
 		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
 		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
@@ -457,17 +465,14 @@ void UInvenComp::CatchItem()
 
 void UInvenComp::SaveItemInventory()
 {
-	TArray<FItemStruct> ItemStructs;
-	
+	FItemStructTables ItemStructTables;
+
 	for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
 	{ USlot* Slot = Cast<USlot>(Widget);
-		ItemStructs.Add(Slot->ItemStruct); }
-
-	FItemStructsArray ItemStructsArray;
-	ItemStructsArray.ItemStructs = ItemStructs;
-
+		ItemStructTables.ItemStructTables.Add(Slot->ItemStructTable); }
+	
 	FString JsonValue;
-	FJsonObjectConverter::UStructToJsonObjectString(ItemStructsArray, JsonValue);
+	FJsonObjectConverter::UStructToJsonObjectString(ItemStructTables, JsonValue);
 	
 	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Inventory.tst"));
 	FFileHelper::SaveStringToFile(JsonValue,*path);
@@ -481,14 +486,14 @@ void UInvenComp::LoadItemInventory()
 	FString JsonString;
 	FFileHelper::LoadFileToString(JsonString, *path);
 
-	FItemStructsArray ItemStructsArray;
-	FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &ItemStructsArray);
+	FItemStructTables ItemStructTables;
+	FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &ItemStructTables);
 	
-	for (int32 i = 0; i < ItemStructsArray.ItemStructs.Num(); i++)
+	for (int32 i = 0; i < ItemStructTables.ItemStructTables.Num(); i++)
 	{
 		USlot* Slot = Cast<USlot>(MenuInven->WBP_ItemInven->WrapBox->GetChildAt(i));
-		Slot->ItemStruct = ItemStructsArray.ItemStructs[i];
-		if (Slot->ItemStruct.ItemTop == -1)
+		Slot->ItemStructTable = ItemStructTables.ItemStructTables[i];
+		if (Slot->ItemStructTable.ItemTop == -1)
 		{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 슬롯 itemtop -1 리턴")); }
 		else
 		{ Slot->SlotImageUpdate(); }
