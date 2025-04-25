@@ -3,7 +3,6 @@
 
 #include "TestPlayer.h"
 
-#include "PLAI/Item/ItemComp/InitComp.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/ItemComp/ItemComp.h"
 #include "PLAI/Item/ItemComp/StoreComp.h"
