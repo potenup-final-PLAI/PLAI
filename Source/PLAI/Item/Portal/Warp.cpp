@@ -112,7 +112,7 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 		Gi->bWorldSpawnInt.Add(index);
 	}
 	if (!TestPlayer){ UE_LOG(LogTemp, Log, TEXT("Walp TestPlayer 없음."));}
-	TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,1000));
+	TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,500));
 	WarpPlayer = nullptr;
 }
 
