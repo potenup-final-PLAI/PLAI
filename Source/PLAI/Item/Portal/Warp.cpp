@@ -4,6 +4,7 @@
 #include "Warp.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Components/CanvasPanel.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Components/SphereComponent.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
@@ -56,6 +57,7 @@ void AWarp::OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* O
 			// WarpLevel(TestPlayer);
 			UiPortal = CreateWidget<UUiPortal>(GetWorld(),UiPortalFactory);
 			UiPortal->AddToViewport();
+			UiPortal->WorldMap->SetVisibility(ESlateVisibility::Hidden);
 			UiPortal->Warp = this;
 		}
 	}
@@ -109,6 +111,7 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 		{ UE_LOG(LogTemp, Log, TEXT("Failed to load level."));}
 		Gi->bWorldSpawnInt.Add(index);
 	}
+	if (!TestPlayer){ UE_LOG(LogTemp, Log, TEXT("Walp TestPlayer 없음."));}
 	TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,1000));
 	WarpPlayer = nullptr;
 }

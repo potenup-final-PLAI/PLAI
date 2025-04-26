@@ -16,6 +16,8 @@ class PLAI_API UUiPortal : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditAnywhere)
+	bool bOpenMap = false;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button_Village;
@@ -25,6 +27,13 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button_Mountain;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Button_OpenMap;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* WorldMap;
+	
 	
 	UPROPERTY(EditAnywhere)
 	class AWarp* Warp;
@@ -39,4 +48,7 @@ public:
 	
 	UFUNCTION()
 	void OnButton_Dessert();
+
+	UFUNCTION()
+	void OnButton_OpenMap();
 };
