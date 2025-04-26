@@ -2,6 +2,8 @@
 
 #pragma once
 
+// DECLARE_DELEGATE_OneParam(FOnWalp,class ATestPlayer* testplayer);
+
 #include "CoreMinimal.h"
 #include "NiagaraComponent.h"
 #include "GameFramework/Actor.h"
@@ -23,6 +25,13 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	// FOnWalp OnWalp;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUiPortal>UiPortalFactory;
+
+	UPROPERTY(EditAnywhere)
+	class UUiPortal* UiPortal;
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComp;
@@ -32,6 +41,9 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphereComp;
+
+	UPROPERTY(EditAnywhere)
+	class ATestPlayer* WarpPlayer;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FString>LevelPath;
@@ -49,7 +61,10 @@ public:
 	UFUNCTION()
 	void OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	
+	UFUNCTION()
+	void OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	void WarpLevel(class ATestPlayer* TestPlayer);
-	void UnLoadDynamicLevel();
+	void WarpLevel(class ATestPlayer* TestPlayer, int32 index);
 };

@@ -2,10 +2,13 @@
 
 
 #include "Warp.h"
+
+#include "Blueprint/UserWidget.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Components/SphereComponent.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Portal/UiPortal.h"
 
 
 // Sets default values
@@ -32,8 +35,9 @@ void AWarp::BeginPlay()
 	WarpLocation.Add(FVector(1000000,0,0));
 	WarpLocation.Add( FVector(-1000000,0,0));
 	WarpLocation.Add(FVector(0,1000000,0));
-	
+
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this,&AWarp::OnOverlappedWarp);
+	SphereComp->OnComponentEndOverlap.AddDynamic(this,&AWarp::OnEndOvelappedWarp);
 }
 
 // Called every frame
@@ -49,20 +53,41 @@ void AWarp::OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* O
 	{
 		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor))
 		{
-			WarpLevel(TestPlayer);
+			// WarpLevel(TestPlayer);
+			UiPortal = CreateWidget<UUiPortal>(GetWorld(),UiPortalFactory);
+			UiPortal->AddToViewport();
+			UiPortal->Warp = this;
 		}
 	}
 }
 
-void AWarp::WarpLevel(class ATestPlayer* TestPlayer)
+void AWarp::OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	int32 randSpawn = FMath::RandRange(0,WarpLocation.Num()-1);
+	if (OtherActor)
+	{
+		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor))
+		{	
+			WarpPlayer = TestPlayer;
+			if (!WarpPlayer){UE_LOG(LogTemp,Warning,TEXT("WarpPlayer")) return;};
+			
+			if (!UiPortal){UE_LOG(LogTemp,Warning,TEXT("Warp 유아이포탈없음")) return;};
+			
+			UiPortal->RemoveFromParent();
+		}
+	}
+}
+
+
+void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
+{
+	// int32 randSpawn = FMath::RandRange(0,WarpLocation.Num()-1);
 	UWorldGi* Gi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
 	
 	bool bSpawn = false;
 	for (int i = 0; i < Gi->bWorldSpawnInt.Num(); i++)
 	{
-		if (Gi->bWorldSpawnInt[i] == randSpawn)
+		if (Gi->bWorldSpawnInt[i] == index)
 		{
 			UE_LOG(LogTemp, Display, TEXT("Warp Spawned"));
 			bSpawn = true;
@@ -74,23 +99,18 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer)
 		bool bSuccess = false; // 성공 여부
 		// 레벨을 동적으로 로드
 		ULevelStreamingDynamic* OldLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
-			OldLevelPath[randSpawn],WarpLocation[randSpawn],FRotator(0,0,0),bSuccess);
+			OldLevelPath[index],WarpLocation[index],FRotator(0,0,0),bSuccess);
 		ULevelStreamingDynamic* NewLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
-			NewLevelPath[randSpawn],WarpLocation[randSpawn],FRotator(0,0,0),bSuccess);
+			NewLevelPath[index],WarpLocation[index],FRotator(0,0,0),bSuccess);
 
 		if (bSuccess)
 		{ UE_LOG(LogTemp, Log, TEXT("Level loaded successfully!")); }
 		else
 		{ UE_LOG(LogTemp, Log, TEXT("Failed to load level."));}
-		Gi->bWorldSpawnInt.Add(randSpawn);
+		Gi->bWorldSpawnInt.Add(index);
 	}
-	TestPlayer->SetActorLocation(WarpLocation[randSpawn]+FVector(0,0,1000));
-	
-}
-
-void AWarp::UnLoadDynamicLevel()
-{
-	
+	TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,1000));
+	WarpPlayer = nullptr;
 }
 
 
