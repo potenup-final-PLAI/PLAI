@@ -14,8 +14,11 @@ AWarp::AWarp()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComponent");
+	SetRootComponent(SphereComp);
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+	MeshComp->SetupAttachment(GetRootComponent());
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("BoxComponent");
+	NiagaraComp->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
