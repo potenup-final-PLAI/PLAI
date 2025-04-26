@@ -15,6 +15,7 @@ class PLAI_API UWorldGi : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	
 	UPROPERTY(EditAnywhere)
-	TArray<bool>bWorldSpawn;
+	TArray<int32>bWorldSpawnInt;
 };
