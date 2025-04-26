@@ -3,6 +3,8 @@
 
 #include "ItemMaster.h"
 
+#include "Net/UnrealNetwork.h"
+
 
 // Sets default values
 AItemMaster::AItemMaster()
@@ -22,5 +24,10 @@ void AItemMaster::BeginPlay()
 void AItemMaster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AItemMaster::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 

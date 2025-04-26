@@ -171,10 +171,13 @@ void UInvenComp::Server_SpawnOneItem_Implementation()
     				FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[Rand],TEXT("InvenComp100"));
     				ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
     				ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
+
     				ItemMaster->ItemStructTable = *ItemStructTable;
     				ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+    				ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
     			}
     		}
+	
 	// if (TestPlayer->IsLocallyControlled())
 	// {
 	// 	ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +

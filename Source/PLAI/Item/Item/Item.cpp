@@ -35,6 +35,12 @@ void AItem::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AItem::SetMesh,0.5f,false);
 }
 
+void AItem::OnRep_ReplicatedItem()
+{
+	if (ItemStructTable.ItemTop == -1) UE_LOG(LogTemp,Error,TEXT("Item. 아이템 테이블 동기화 실패"));
+	StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
+}
+
 void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -56,13 +62,14 @@ void AItem::SetMesh()
 	if (ItemStruct.ItemTop == -1) { UE_LOG(LogTemp,Warning,TEXT("아이템 탑 -1 초기화전")) return; }
 	StaticMesh->SetStaticMesh(ItemParent->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].
 	ItemMeshIndexes[ItemStruct.ItemIndex].ItemMeshTypes[ItemStruct.ItemIndexType].StaticMeshes[ItemStruct.ItemIndexDetail]);
-
 }
 
 void AItem::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
 	DOREPLIFETIME(AItem,ItemStruct)
+	DOREPLIFETIME(AItem,ItemStructTable)
 }
 
 // Called every frame

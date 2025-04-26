@@ -11,7 +11,7 @@ void UItemInven::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	for (int32 i = 0; i < 24; i++)
+	for (int32 i = 0; i < 32; i++)
 	{
 		SlotUi = CreateWidget<USlot>(GetWorld(),SlotFactory);
 		FSlateBrush Brush;

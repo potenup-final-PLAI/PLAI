@@ -27,8 +27,11 @@ public:
     UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
 	FItemStruct ItemStruct;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(ReplicatedUsing = OnRep_ReplicatedItem)
 	FItemStructTable ItemStructTable;
+
+	UFUNCTION()
+	void OnRep_ReplicatedItem();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemStructTop ItemStructTop;
@@ -49,6 +52,8 @@ public:
 	void OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent*
 		OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+
+	
 	virtual void SetMesh();
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
