@@ -18,7 +18,7 @@ void UUiMain::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	UGameplayStatics::SetGamePaused(GetWorld(),true);
+	// UGameplayStatics::SetGamePaused(GetWorld(),true);
 	
 	if (APlayerController* pc = Cast<APlayerController>(GetOwningPlayer()))
 		

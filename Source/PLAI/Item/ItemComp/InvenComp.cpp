@@ -38,6 +38,8 @@ UInvenComp::UInvenComp()
 void UInvenComp::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("UInvenComp::BeginPlay%s"),*TestPlayer->GetName());
 	
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());

@@ -14,7 +14,9 @@ void UUiPortal::NativeConstruct()
 	Button_Village->OnClicked.AddDynamic(this,&UUiPortal::OnButton_Village);
 	Button_Mountain->OnClicked.AddDynamic(this,&UUiPortal::OnButton_Mountain);
 	Button_Dessert->OnClicked.AddDynamic(this,&UUiPortal::OnButton_Dessert);
+	Button_Cave->OnClicked.AddDynamic(this,&UUiPortal::OnButton_Cave);
 	Button_OpenMap->OnClicked.AddDynamic(this,&UUiPortal::OnButton_OpenMap);
+	
 }
 
 void UUiPortal::OnButton_Village()
@@ -30,6 +32,11 @@ void UUiPortal::OnButton_Mountain()
 void UUiPortal::OnButton_Dessert()
 {
 	Warp->WarpLevel(Warp->WarpPlayer,2);
+}
+
+void UUiPortal::OnButton_Cave()
+{
+	Warp->WarpLevel(Warp->WarpPlayer,3);
 }
 
 void UUiPortal::OnButton_OpenMap()

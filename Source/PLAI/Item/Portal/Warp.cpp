@@ -36,6 +36,7 @@ void AWarp::BeginPlay()
 	WarpLocation.Add(FVector(1000000,0,0));
 	WarpLocation.Add( FVector(-1000000,0,0));
 	WarpLocation.Add(FVector(0,1000000,0));
+	WarpLocation.Add(FVector(0,-1000000,0));
 
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this,&AWarp::OnOverlappedWarp);
 	SphereComp->OnComponentEndOverlap.AddDynamic(this,&AWarp::OnEndOvelappedWarp);
@@ -112,8 +113,16 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 		Gi->bWorldSpawnInt.Add(index);
 	}
 	if (!TestPlayer){ UE_LOG(LogTemp, Log, TEXT("Walp TestPlayer 없음."));}
-	TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,500));
-	WarpPlayer = nullptr;
+	
+	if (index == 3)
+	{
+		TestPlayer->SetActorLocation(WarpLocation[index]+FVector(1000,1000,0));
+	}
+	else
+	{
+		TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,1500));
+		WarpPlayer = nullptr;
+	}
 }
 
 

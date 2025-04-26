@@ -30,6 +30,9 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button_OpenMap;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Button_Cave;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* WorldMap;
@@ -48,6 +51,9 @@ public:
 	
 	UFUNCTION()
 	void OnButton_Dessert();
+	
+	UFUNCTION()
+	void OnButton_Cave();
 
 	UFUNCTION()
 	void OnButton_OpenMap();
