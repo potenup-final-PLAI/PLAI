@@ -75,21 +75,9 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
 		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
 	}
-	if (PC->WasInputKeyJustPressed(EKeys::Four))
+	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
-		if (ItemDataTable)
-		{
-			TArray<FName> RawNames = ItemDataTable->GetRowNames();
-			int32 Rand = FMath::RandRange(0,RawNames.Num()-1);
-			if (RawNames.IsValidIndex(Rand))
-			{
-				FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[Rand],TEXT("InvenComp100"));
-				ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
-				ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
-				ItemMaster->ItemStructTable = *ItemStructTable;
-				ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
-			}
-		}
+		Server_SpawnOneItem();
 	}
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
@@ -174,19 +162,32 @@ void UInvenComp::SetGold(int32 Getgold)
 
 void UInvenComp::Server_SpawnOneItem_Implementation()
 {
-	if (TestPlayer->IsLocallyControlled())
-	{
-		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
-			TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-		int32 randIndex = FMath::RandRange(0,4);
-		if (!ItemMaster) {UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 ItemMaster없음 !"));return;}
-		ItemMaster->ItemStruct.ItemTop = 1;
-		ItemMaster->ItemStruct.ItemIndex = randIndex;
-		
-		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStructTable.ItemTop].
-		ItemMeshIndexes[ItemMaster->ItemStructTable.ItemIndex].ItemMeshTypes[ItemMaster->ItemStructTable.ItemIndexType].StaticMeshes.Num()-1);
-		ItemMaster->ItemStructTable.ItemIndexDetail = randDetail;
-	}
+    if (TestPlayer->IsLocallyControlled() && ItemDataTable)
+    		{
+    			TArray<FName> RawNames = ItemDataTable->GetRowNames();
+    			int32 Rand = FMath::RandRange(0,RawNames.Num()-1);
+    			if (RawNames.IsValidIndex(Rand))
+    			{
+    				FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[Rand],TEXT("InvenComp100"));
+    				ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
+    				ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
+    				ItemMaster->ItemStructTable = *ItemStructTable;
+    				ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+    			}
+    		}
+	// if (TestPlayer->IsLocallyControlled())
+	// {
+	// 	ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
+	// 		TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+	// 	int32 randIndex = FMath::RandRange(0,4);
+	// 	if (!ItemMaster) {UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 ItemMaster없음 !"));return;}
+	// 	ItemMaster->ItemStruct.ItemTop = 1;
+	// 	ItemMaster->ItemStruct.ItemIndex = randIndex;
+	// 	
+	// 	int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStructTable.ItemTop].
+	// 	ItemMeshIndexes[ItemMaster->ItemStructTable.ItemIndex].ItemMeshTypes[ItemMaster->ItemStructTable.ItemIndexType].StaticMeshes.Num()-1);
+	// 	ItemMaster->ItemStructTable.ItemIndexDetail = randDetail;
+	// }
 }
 
 void UInvenComp::Server_UnEquip_Implementation(EquipSlotType SlotType)
