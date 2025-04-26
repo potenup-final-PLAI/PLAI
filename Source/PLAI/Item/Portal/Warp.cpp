@@ -28,7 +28,11 @@ AWarp::AWarp()
 void AWarp::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	WarpLocation.Add(FVector(1000000,0,0));
+	WarpLocation.Add( FVector(-1000000,0,0));
+	WarpLocation.Add(FVector(0,1000000,0));
+	
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this,&AWarp::OnOverlappedWarp);
 }
 
@@ -43,29 +47,41 @@ void AWarp::OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* O
 {
 	if (OtherActor)
 	{
-		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor)){}
+		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor))
 		{
-			WarpLevel(TEXT("LandscapeAutoMaterial_Island_Example"),true);
+			WarpLevel(TestPlayer);
 		}
 	}
 }
 
-void AWarp::WarpLevel(FName LevelName, bool bShouldLoad)
+void AWarp::WarpLevel(class ATestPlayer* TestPlayer)
 {
-	// 어디서든 호출
-	FString LevelPath = TEXT("/Game/AdvancedVillagePack/Maps/AdvancedVillagePack_Showcase.AdvancedVillagePack_Showcase"); // 레벨 경로 (Content 밑부터)
-	FVector SpawnLocation(0.f, 0.f, 0.f); // 레벨 생성 위치
-	FRotator SpawnRotation(0.f, 0.f, 0.f); // 레벨 생성 회전
-	bool bSuccess = false;
-
-	ULevelStreamingDynamic* StreamingLevel = ULevelStreamingDynamic::LoadLevelInstance(
-		GetWorld(), LevelPath, SpawnLocation, SpawnRotation, /*Out Success*/ bSuccess);
-
-	if (StreamingLevel)
-	{ UE_LOG(LogTemp, Warning, TEXT("동적 스트리밍 레벨 로딩 성공: %s"), *LevelPath); }
-	else
-	{ UE_LOG(LogTemp, Error, TEXT("동적 스트리밍 레벨 로딩 실패: %s"), *LevelPath); }
+	int32 randSpawn = FMath::RandRange(0,WarpLocation.Num()-1);
 	
+	bool bSuccess = false; // 성공 여부
+	// 레벨을 동적으로 로드
+	ULevelStreamingDynamic* OldLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
+		OldLevelPath[randSpawn],WarpLocation[randSpawn],FRotator(0,0,0),bSuccess);
+	ULevelStreamingDynamic* NewLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
+		NewLevelPath[randSpawn],WarpLocation[randSpawn],FRotator(0,0,0),bSuccess);
+	TestPlayer->SetActorLocation(WarpLocation[randSpawn]+FVector(0,0,2000));
+
+	if (bSuccess)
+	{ UE_LOG(LogTemp, Log, TEXT("Level loaded successfully!")); }
+	else
+	{ UE_LOG(LogTemp, Log, TEXT("Failed to load level."));}
+	
+	// bool bShouldLoad = false;
+	// // 어디서든 호출
+	// FVector SpawnLocation(0.f, 0.f, 0.f); // Spawn 위치
+	// FRotator SpawnRotation(0.f, 0.f, 0.f); // Spawn 회전
+	// // OldLevel을 NewLevel에서 스트리밍
+	// ULevelStreamingDynamic* OldLevelStreaming = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
+	// 	OldPathVillage,SpawnLocation,SpawnRotation,bShouldLoad);
+	// ULevelStreamingDynamic* NewLevelStreaming = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
+	// NewPathVillage,SpawnLocation,SpawnRotation,bShouldLoad);
+	
+	// NewLevel을 로드
 	// if (bShouldLoad)
 	// {UE_LOG(LogTemp, Display, TEXT("Wrap OnOverlappedWarp: 레벨 이동 시작"));
 	// 	// 레벨을 오픈 (현재 월드 새로 로드)
@@ -74,6 +90,24 @@ void AWarp::WarpLevel(FName LevelName, bool bShouldLoad)
 	// {    // OpenLevel은 레벨을 열기만 하지 "언로드" 개념은 없음
 	// 	// 필요하면 여기서 따로 처리를 추가해야 함
 	// 	UE_LOG(LogTemp, Warning, TEXT("Wrap OnOverlappedWarp: 레벨 언로드는 OpenLevel 방식에선 별도 처리 필요"));
+	// }
+}
+
+void AWarp::UnLoadDynamicLevel()
+{
+	// FString StreamingLevelPath = TEXT("/Game/Mk_Item/Mk_LevelDessert.Mk_LevelDessert");
+	//
+	// // 동적으로 로드한 스트리밍 레벨을 Unload
+	// ULevelStreamingDynamic* StreamingLevel = ULevelStreamingDynamic::GetStreamingLevel(GetWorld(), FName(*StreamingLevelPath));
+	//
+	// if (StreamingLevel)
+	// {
+	// 	StreamingLevel->UnloadLevelInstance();
+	// 	UE_LOG(LogTemp, Warning, TEXT("동적 스트리밍 레벨 언로드 성공: %s"), *StreamingLevelPath);
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("동적 스트리밍 레벨을 찾을 수 없습니다: %s"), *StreamingLevelPath);
 	// }
 }
 

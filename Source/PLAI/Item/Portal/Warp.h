@@ -34,17 +34,22 @@ public:
 	class USphereComponent* SphereComp;
 
 	UPROPERTY(EditAnywhere)
-	FName VillagePath = FName(TEXT("/Game/AdvancedVillagePack/Maps/AdvancedVillagePack_Showcase.AdvancedVillagePack_Showcase"));
-
+	TArray<FString>LevelPath;
 	UPROPERTY(EditAnywhere)
-	FName DessertPath = FName(TEXT("/Game/MWLandscapeAutoMaterial/Maps/LandscapeAutoMaterial_Desert_Example.LandscapeAutoMaterial_Desert_Example"));
-
+	TArray<FString>OldLevelPath;
 	UPROPERTY(EditAnywhere)
-	FName MountainPath = FName(TEXT("/Game/MWLandscapeAutoMaterial/Maps/LandscapeAutoMaterial_MountainRange_Example.LandscapeAutoMaterial_MountainRange_Example"));
+	TArray<FString>NewLevelPath;
+	
+    UPROPERTY(EditAnywhere)
+	TArray<bool>bWarpLevel;
+	
+	UPROPERTY(EditAnywhere)
+	TArray<FVector>WarpLocation;
 	
 	UFUNCTION()
 	void OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
-	void WarpLevel(FName LevelName, bool bShouldLoad);
+	void WarpLevel(class ATestPlayer* TestPlayer);
+	void UnLoadDynamicLevel();
 };
