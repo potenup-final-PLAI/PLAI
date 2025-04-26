@@ -32,10 +32,19 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphereComp;
+
+	UPROPERTY(EditAnywhere)
+	FName VillagePath = FName(TEXT("/Game/AdvancedVillagePack/Maps/AdvancedVillagePack_Showcase.AdvancedVillagePack_Showcase"));
+
+	UPROPERTY(EditAnywhere)
+	FName DessertPath = FName(TEXT("/Game/MWLandscapeAutoMaterial/Maps/LandscapeAutoMaterial_Desert_Example.LandscapeAutoMaterial_Desert_Example"));
+
+	UPROPERTY(EditAnywhere)
+	FName MountainPath = FName(TEXT("/Game/MWLandscapeAutoMaterial/Maps/LandscapeAutoMaterial_MountainRange_Example.LandscapeAutoMaterial_MountainRange_Example"));
 	
 	UFUNCTION()
 	void OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
-	void WarpLevel();
+	void WarpLevel(FName LevelName, bool bShouldLoad);
 };
