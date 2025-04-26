@@ -12,11 +12,13 @@ AWarp::AWarp()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComponent");
-	SetRootComponent(SphereComp);
+	
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
-	MeshComp->SetupAttachment(GetRootComponent());
+    SetRootComponent(MeshComp);
+	
+	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComponent");
+    SphereComp->SetupAttachment(GetRootComponent());
+	
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("BoxComponent");
 	NiagaraComp->SetupAttachment(GetRootComponent());
 }
@@ -46,6 +48,10 @@ void AWarp::OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* O
 			UE_LOG(LogTemp, Display, TEXT("Wrap OnOverlappedWarp 레벨이동 들가자"));
 		}
 	}
+}
+
+void AWarp::WarpLevel()
+{
 }
 
 
