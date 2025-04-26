@@ -3,14 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Object.h"
+#include "Engine/GameInstance.h"
 #include "WorldGi.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class PLAI_API UWorldGi : public UObject
+UCLASS(Blueprintable,Blueprintable)
+class PLAI_API UWorldGi : public UGameInstance
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<bool>bWorldSpawn;
 };
