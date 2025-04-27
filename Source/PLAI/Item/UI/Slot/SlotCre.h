@@ -14,8 +14,6 @@ class PLAI_API USlotCre : public USlot
 {
 	GENERATED_BODY()
 public:
-
-	void SetSlotItem();
 	
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	

@@ -34,4 +34,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class APlayerController* PC;
+
+	void EquipCreature(ACreature* SpawnCreature);
 };

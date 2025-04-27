@@ -12,39 +12,51 @@
 
 FReply USlotCre::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	// TArray<FName>RawNames = ItemTable->GetRowNames();
-	// for (FName RawName : RawNames)
-	// {
-	// 	FItemStructTable* Table = ItemTable->FindRow<FItemStructTable>(RawName,TEXT("SlotCre"));
-	// 	if (ItemStructTable->ItemIndex)
-	// }
-	
+	if (ItemStructTable.CreatureFactory != nullptr)
+	{
+		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+		{
+			TestPlayer->CreComp->Creature->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this, TestPlayer]()
+			{
+				TestPlayer->CreComp->Creature->Destroy(); TestPlayer->CreComp->Creature=nullptr;
+			},2,false);
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("USlotCre:: CretureFactory 없음"));
+		}
+	}
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
 bool USlotCre::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
                             UDragDropOperation* InOperation)
 {
+	if (ItemStructTable.ItemTop != -1)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("USlotCre:: ItemTop != -1 아이템 있음")); return false;
+	}
 	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
-    if (ItemObject && ItemObject->ItemStructTable.ItemTop == 3
-    	&& ItemObject && ItemObject->ItemStructTable.CreatureFactory != nullptr)
-    {
-	    UE_LOG(LogTemp,Warning,TEXT("USlotCre::크리처 들어왔음 NativeOnDrop"));
-    	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
-    	{
-    		TestPlayer->CreComp->Creature = GetWorld()->SpawnActor<ACreature>(ItemObject->ItemStructTable.CreatureFactory);
-    		TestPlayer->CreComp->Creature->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
-    		TestPlayer->CreComp->Creature->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
-    	}
-    	else
-    	{
-    		UE_LOG(LogTemp,Warning,TEXT("USlotCre:: TestPlayer캐스팅 실패 NativeOnDrop"));
-    	}
-    }
+	if (ItemObject && ItemObject->ItemStructTable.CreatureFactory != nullptr)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("USlotCre::크리처 들어왔음 NativeOnDrop"));
+	}
+	Swap(ItemStructTable, ItemObject->ItemStructTable);
+	SlotImageUpdate();
+	SlotCountUpdate(ItemStructTable.ItemNum);
+	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	{
+		ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTable.CreatureFactory);
+		TestPlayer->CreComp->EquipCreature(Creature);
+	}
 	else
 	{
-		UE_LOG(LogTemp,Warning,TEXT("USlotCre::크리처 안들어왔음 NativeOnDrop"));
-		return false;
+		UE_LOG(LogTemp,Warning,TEXT("USlotCre:: TestPlayer캐스팅 실패 NativeOnDrop"));
 	}
-	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+	
+	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
+	return true;
+	// return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }

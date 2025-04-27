@@ -38,17 +38,18 @@ void UCreComp::BeginPlay()
 void UCreComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
 
-	// if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Five))
-	// {
-	// 	if (TestPlayer->IsLocallyControlled())
-	// 	{
-	// 		Creature = GetWorld()->SpawnActor<ACreature>(CreatureFactory);
-	// 		Creature->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
-	// 		Creature->SetActorLocation(TestPlayer->GetActorLocation() + FVector(120,-120,120));
-	// 	}
-	// }
-
-	// ...
+void UCreComp::EquipCreature(ACreature* SpawnCreature)
+{
+	if (!SpawnCreature)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("CreComp CretureFactory없음")); return;
+	}
+	UE_LOG(LogTemp,Warning,TEXT("CreComp CretureFactory있음"))
+	Creature = SpawnCreature;
+	Creature->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
+	Creature->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
+	// Creature->SetOwner(TestPlayer);
 }
 
