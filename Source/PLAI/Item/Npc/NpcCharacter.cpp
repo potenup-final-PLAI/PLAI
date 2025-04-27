@@ -22,7 +22,6 @@ void ANpcCharacter::BeginPlay()
 	Super::BeginPlay();
 	UiNpc = CreateWidget<UUiNpc>(GetWorld(),UiNpcFactory);
 	WidgetComp->SetWidget(UiNpc);
-	UiNpc->AddToViewport();
 }
 
 // Called every frame

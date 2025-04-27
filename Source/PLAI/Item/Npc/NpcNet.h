@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NpcCharacter.h"
 #include "GameFramework/Character.h"
 #include "PLAI/Item/UI/Net/UiPost.h"
 #include "NpcNet.generated.h"
 
 UCLASS()
-class PLAI_API ANpcNet : public ACharacter
+class PLAI_API ANpcNet : public ANpcCharacter
 {
 	GENERATED_BODY()
 
@@ -30,7 +31,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUiPost>UIPostFactory;
-	
 	UPROPERTY(EditAnywhere)
 	class UUiPost* UIPost;
 

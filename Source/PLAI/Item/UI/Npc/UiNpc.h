@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "NpcUi.generated.h"
+#include "UiNpc.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PLAI_API UNpcUi : public UUserWidget
+class PLAI_API UUiNpc : public UUserWidget
 {
 	GENERATED_BODY()
 };

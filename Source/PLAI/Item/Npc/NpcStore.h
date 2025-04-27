@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NpcCharacter.h"
 #include "GameFramework/Character.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "NpcStore.generated.h"
 
 UCLASS()
-class PLAI_API ANpcStore : public ACharacter
+class PLAI_API ANpcStore : public ANpcCharacter
 {
 	GENERATED_BODY()
 
