@@ -12,6 +12,7 @@
 #include "Components/WrapBox.h"
 #include "EnvironmentQuery/EnvQueryDebugHelpers.h"
 #include "Net/UnrealNetwork.h"
+#include "PLAI/Item/Creture/Creature.h"
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/Npc/NpcStore.h"
@@ -82,8 +83,17 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		Server_SpawnOneItem();
 	}
 	
+	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Five))
+	{
+		if (TestPlayer->IsLocallyControlled())
+		{
+			Creature = GetWorld()->SpawnActor<ACreature>(CreatureFactory);
+			Creature->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
+			Creature->SetActorLocation(TestPlayer->GetActorLocation() + FVector(120,-120,120));
+		}
+	}
+	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
-		if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Nine))
 	{
 		LoadItemInventory();
 		LoadEquipInventory();
@@ -328,7 +338,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	else if (SlotType == EquipSlotType::Helmet)
 	{
         ItemHelmet = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,0,80),FRotator(0,0,0));
-		ItemHelmet->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::KeepWorldTransform, TEXT("headSocket"));
+		ItemHelmet->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("headSocket"));
 		ItemHelmet->ItemStructTable = ItemStructTable;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemHelmet->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
