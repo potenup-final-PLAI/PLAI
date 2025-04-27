@@ -7,6 +7,7 @@
 #include "Components/CanvasPanel.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Portal/UiPortal.h"
@@ -84,7 +85,6 @@ void AWarp::OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* Othe
 
 void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 {
-	// int32 randSpawn = FMath::RandRange(0,WarpLocation.Num()-1);
 	UWorldGi* Gi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
 	
 	bool bSpawn = false;
@@ -92,7 +92,7 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 	{
 		if (Gi->bWorldSpawnInt[i] == index)
 		{
-			UE_LOG(LogTemp, Display, TEXT("Warp Spawned"));
+			UE_LOG(LogTemp, Display, TEXT("Warp Spawned %d"),index);
 			bSpawn = true;
 			break;
 		}
@@ -116,12 +116,33 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 	
 	if (index == 3)
 	{
-		TestPlayer->SetActorLocation(WarpLocation[index]+FVector(1000,1000,0));
+		FTimerHandle TimerHandle;
+
+		FVector TargetLocation = WarpLocation[index] + FVector(1000, 1000, 500);
+		AActor* TargetPlayer = WarpPlayer; // WarpPlayer도 캡쳐해줘야 안정적
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [TargetPlayer, TargetLocation]()
+		{
+			if (TargetPlayer)
+			{
+				TargetPlayer->SetActorLocation(TargetLocation);
+			}
+		}, 1.0f, false);
 	}
 	else
 	{
-		TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,1500));
-		WarpPlayer = nullptr;
+		FTimerHandle TimerHandle;
+		FVector TargetLocation = WarpLocation[index] + FVector(0,0,1500);
+		AActor* TargetPlayer = WarpPlayer; // WarpPlayer도 캡쳐해줘야 안정적
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [TargetPlayer, TargetLocation]()
+		{
+			if (TargetPlayer)
+			{
+				TargetPlayer->SetActorLocation(TargetLocation);
+			}
+		}, 1.0f, false);
+		// TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,1500));
 	}
 }
 
