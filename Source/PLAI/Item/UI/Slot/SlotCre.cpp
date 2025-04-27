@@ -16,12 +16,19 @@ FReply USlotCre::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoi
 	{
 		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 		{
-			TestPlayer->CreComp->Creature->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this, TestPlayer]()
+			if (TestPlayer->CreComp->Creature != nullptr)
 			{
-				TestPlayer->CreComp->Creature->Destroy(); TestPlayer->CreComp->Creature=nullptr;
-			},2,false);
+				UE_LOG(LogTemp,Warning,TEXT("slotcre cre없음"));
+			}
+			else
+			{
+				TestPlayer->CreComp->Creature->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this, TestPlayer]()
+				{
+					TestPlayer->CreComp->Creature->Destroy(); TestPlayer->CreComp->Creature=nullptr;
+				},2,false);
+			}
 		}
 		else
 		{
@@ -48,7 +55,13 @@ bool USlotCre::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& I
 	SlotCountUpdate(ItemStructTable.ItemNum);
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{
-		ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTable.CreatureFactory);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.bNoFail = true; // 실패하지 않게 설정
+		SpawnParams.bDeferConstruction = true;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTable.CreatureFactory,SpawnParams);
+		Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
+			
 		TestPlayer->CreComp->EquipCreature(Creature);
 	}
 	else
