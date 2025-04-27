@@ -51,5 +51,5 @@ void UCreComp::EquipCreature(ACreature* SpawnCreature)
 	Creature = SpawnCreature;
 	Creature->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
 	Creature->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
-	Creature->SetOwner(TestPlayer);
+	TestPlayer->SetOwner(Creature);
 }

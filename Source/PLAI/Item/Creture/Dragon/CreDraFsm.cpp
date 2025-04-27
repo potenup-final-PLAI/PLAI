@@ -4,6 +4,7 @@
 #include "CreDraFsm.h"
 
 #include "CreDragon.h"
+#include "MovieSceneTracksComponentTypes.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 
@@ -21,33 +22,32 @@ UCreDraFsm::UCreDraFsm()
 void UCreDraFsm::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (TestPlayer)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("UCreDraFsm::BeginPlay PC->캐릭터 캐스팅 성공"));
+	}
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("UCreDraFsm::BeginPlay PC->캐릭터 캐스팅 실패"));
+	}
 	if (ACreDragon* Dra = Cast<ACreDragon>(GetOwner()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay 드래곤있음"))
 		Dragon = Dra;
-		if (ATestPlayer* Player = Cast<ATestPlayer>(Dragon->CreFsm->GetOwner()))
+		if (ACreature* Creature = Cast<ACreature>(Dragon->CreFsm->GetOwner()))
 		{
-			TestPlayer = Player;
-			UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay TestPlayer있음"))
+			UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature있음"))
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay TestPlayer없음"))
+			UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature없음"))
 		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay 드래곤없음"))
 	}
-	// if (ACreature* Creature = Cast<ACreature>(Dragon))
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature Owner는?%s"),*Creature->GetOwner()->GetName())
-	// }
-	// else
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Dragon ->Creature 캐스팅 실패"))
-	// }
 }
 
 
@@ -76,22 +76,29 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 void UCreDraFsm::DraIdle()
 {
+	Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
+	
 	MyTimer(&UCreDraFsm::NextState,1);
+	Dragon->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
 }
 
 void UCreDraFsm::DraAround()
 {
-	RotateTime += GetWorld()->GetDeltaSeconds() * 10;
+	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	
+	if (!TestPlayer) return;
+	RotateTime += GetWorld()->GetDeltaSeconds() * 100;
 	FRotator Rot = FRotator(0,RotateTime,0);
-	UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::DraAround RotTime %f 회전벡터 X %.2f Y %.2f Z %.2f"),RotateTime,Rot.Vector().X,Rot.Vector().Y,Rot.Vector().Z);
+	// UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::DraAround RotTime %f 회전벡터 X %.2f Y %.2f Z %.2f"),RotateTime,Rot.Vector().X,Rot.Vector().Y,Rot.Vector().Z);
 	
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation() + Rot.Vector() * 500);
-	MyTimer(&UCreDraFsm::NextState,2);
+	MyTimer(&UCreDraFsm::NextState,1);
 }
 
 void UCreDraFsm::DraAttack()
 {
-	MyTimer(&UCreDraFsm::NextState,1);
+	MyTimer(&UCreDraFsm::NextState,10);
+	
 }
 
 void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), int32 time = 2.0f)
