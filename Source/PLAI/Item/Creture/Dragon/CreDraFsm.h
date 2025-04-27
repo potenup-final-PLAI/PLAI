@@ -3,18 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
-#include "CreComp.generated.h"
+#include "PLAI/Item/Creture/CreFsm.h"
+#include "CreDraFsm.generated.h"
 
+UENUM(BlueprintType)
+enum class EDraState : uint8
+{
+	Weapon UMETA(DisplayName = "Weapon"),
+	Idle UMETA(DisplayName = "Idle"),
+};
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class PLAI_API UCreComp : public UActorComponent
+class PLAI_API UCreDraFsm : public UCreFsm
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UCreComp();
+	UCreDraFsm();
 
 protected:
 	// Called when the game starts
@@ -24,17 +30,5 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
-
-public:
-	UPROPERTY(EditAnywhere)
-	class ATestPlayer* TestPlayer;
 	
-	UPROPERTY(EditAnywhere)
-	class ACreature* Creature;
-
-	UPROPERTY(EditAnywhere)
-	class APlayerController* PC;
-
-	void EquipCreature(ACreature* SpawnCreature);
-	void CastCreature();
 };

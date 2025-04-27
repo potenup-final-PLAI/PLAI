@@ -3,6 +3,8 @@
 
 #include "CreDragon.h"
 
+#include "CreDraFsm.h"
+
 
 // Sets default values
 ACreDragon::ACreDragon()
@@ -15,7 +17,15 @@ ACreDragon::ACreDragon()
 void ACreDragon::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	CreFsm = Cast<UCreDraFsm>(CreFsm);
+	if (CreFsm)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CreDragon CreFsm -> DraFSm 성공"));
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CreDragon CreFsm -> DraFSm 실패"));
+	}
 }
 
 // Called every frame

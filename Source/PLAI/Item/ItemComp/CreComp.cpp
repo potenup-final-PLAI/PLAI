@@ -4,6 +4,7 @@
 #include "CreComp.h"
 
 #include "PLAI/Item/Creture/Creature.h"
+#include "PLAI/Item/Creture/Dragon/CreDragon.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 
@@ -50,6 +51,5 @@ void UCreComp::EquipCreature(ACreature* SpawnCreature)
 	Creature = SpawnCreature;
 	Creature->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
 	Creature->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
-	// Creature->SetOwner(TestPlayer);
+	Creature->SetOwner(TestPlayer);
 }
-
