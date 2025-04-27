@@ -21,22 +21,22 @@ void UUiPortal::NativeConstruct()
 
 void UUiPortal::OnButton_Village()
 {
-	Warp->WarpLevel(Warp->WarpPlayer,0);
+	Warp->WarpLevel(TestPlayer,0);
 }
 
 void UUiPortal::OnButton_Mountain()
 {
-	Warp->WarpLevel(Warp->WarpPlayer,1);
+	Warp->WarpLevel(TestPlayer,1);
 }
 
 void UUiPortal::OnButton_Dessert()
 {
-	Warp->WarpLevel(Warp->WarpPlayer,2);
+	Warp->WarpLevel(TestPlayer,2);
 }
 
 void UUiPortal::OnButton_Cave()
 {
-	Warp->WarpLevel(Warp->WarpPlayer,3);
+	Warp->WarpLevel(TestPlayer,3);
 }
 
 void UUiPortal::OnButton_OpenMap()

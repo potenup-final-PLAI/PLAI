@@ -43,9 +43,6 @@ public:
 	class USphereComponent* SphereComp;
 
 	UPROPERTY(EditAnywhere)
-	class ATestPlayer* WarpPlayer;
-
-	UPROPERTY(EditAnywhere)
 	TArray<FString>LevelPath;
 	UPROPERTY(EditAnywhere)
 	TArray<FString>OldLevelPath;

@@ -36,7 +36,9 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* WorldMap;
-	
+
+	UPROPERTY(editAnywhere)
+	class ATestPlayer* TestPlayer;
 	
 	UPROPERTY(EditAnywhere)
 	class AWarp* Warp;

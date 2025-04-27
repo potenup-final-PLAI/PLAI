@@ -56,11 +56,11 @@ void AWarp::OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* O
 	{
 		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor))
 		{
-			// WarpLevel(TestPlayer);
 			UiPortal = CreateWidget<UUiPortal>(GetWorld(),UiPortalFactory);
 			UiPortal->AddToViewport();
 			UiPortal->WorldMap->SetVisibility(ESlateVisibility::Hidden);
 			UiPortal->Warp = this;
+			UiPortal->TestPlayer = TestPlayer;
 		}
 	}
 }
@@ -72,11 +72,11 @@ void AWarp::OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	{
 		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor))
 		{	
-			WarpPlayer = TestPlayer;
-			if (!WarpPlayer){UE_LOG(LogTemp,Warning,TEXT("WarpPlayer")) return;};
+			// if (!UiPortal->TestPlayer){UE_LOG(LogTemp,Warning,TEXT("Warp에 Player 없음")) return;};
 			
-			if (!UiPortal){UE_LOG(LogTemp,Warning,TEXT("Warp 유아이포탈없음")) return;};
-			
+			if (!UiPortal){UE_LOG(LogTemp,Warning,TEXT("Warp에 유아이포탈없음")) return;};
+
+			UiPortal->TestPlayer = nullptr;
 			UiPortal->RemoveFromParent();
 		}
 	}
@@ -117,34 +117,25 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 	if (index == 3)
 	{
 		FTimerHandle TimerHandle;
-
-		FVector TargetLocation = WarpLocation[index] + FVector(1000, 1000, 500);
-		AActor* TargetPlayer = WarpPlayer; // WarpPlayer도 캡쳐해줘야 안정적
-
+		FVector TargetLocation = WarpLocation[index] + FVector(750,750,400);
+		ATestPlayer* TargetPlayer = UiPortal->TestPlayer; // WarpPlayer도 캡쳐해줘야 안정적
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [TargetPlayer, TargetLocation]()
 		{
 			if (TargetPlayer)
 			{
 				TargetPlayer->SetActorLocation(TargetLocation);
+				// FVector Forward = TargetPlayer->CameraBoom->GetForwardVector(); // 전방 방향
+	   //          TargetPlayer->CameraBoom->SetRelativeLocation(TargetPlayer->CameraBoom->GetRelativeLocation() - Forward * 600);
 			}
-		}, 1.0f, false);
+		}, 2.0f, false);
 	}
 	else
 	{
-		FTimerHandle TimerHandle;
-		FVector TargetLocation = WarpLocation[index] + FVector(0,0,1500);
-		AActor* TargetPlayer = WarpPlayer; // WarpPlayer도 캡쳐해줘야 안정적
-
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [TargetPlayer, TargetLocation]()
-		{
-			if (TargetPlayer)
-			{
-				TargetPlayer->SetActorLocation(TargetLocation);
-			}
-		}, 1.0f, false);
-		// TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,1500));
+		TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,1500));
 	}
 }
+
+
 
 
 
