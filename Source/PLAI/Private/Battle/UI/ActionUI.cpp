@@ -61,6 +61,10 @@ void UActionUI::OnClickedTurnEnd()
 void UActionUI::OnClickedMove()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Move"));
+	// 왼쪽 마우스 누르면 다음에 한 번 더 눌렀을 때 골이 되도록 활성화
+	turnManager->curUnit->bIsMoveMode = true;
+	turnManager->curUnit->openArray.Empty();
+	turnManager->curUnit->closedArray.Empty();
 }
 
 void UActionUI::OnClickedFirstSkill()

@@ -13,5 +13,11 @@ UCLASS()
 class PLAI_API ABattlePlayer : public ABaseBattlePawn
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void PossessedBy(AController* NewController) override;	
+public:
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	
 	
 };

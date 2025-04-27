@@ -30,4 +30,15 @@ public:
 	FIntPoint gridCoord;
 
 	void SetGridCoord(FIntPoint coord);
+
+	//--------------------Move System------------------------
+	float sCostValue = 0;
+	float tCostValue = 0;
+	AGridTile* parentTile;
+
+	UPROPERTY(EditAnywhere)
+	class UImage* outLine;
+	
+	void SetCost(AGridTile* s, AGridTile* g);
+	void SetColor(FLinearColor color);
 };
