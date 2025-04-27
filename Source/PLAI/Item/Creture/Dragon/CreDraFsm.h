@@ -48,7 +48,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ATestPlayer* TestPlayer;
 
-	bool bRotateTimer = true;
+	bool bTimer = true;
 	float RotateTime;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FVector>PatrolPoints;
+	
+	UPROPERTY(EditAnywhere)
+	int32 PatrolIndex = 0;
+
 	float CurrentTime = 0;
 };

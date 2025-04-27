@@ -71,38 +71,93 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		break;
 	}
 
+	// if (bTimer == true)
+	// {
+	// 	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm bool값은? %s"),bTimer ? TEXT("참") : TEXT("거짓"));
+	// }
+
 	// ...
 }
 
 void UCreDraFsm::DraIdle()
 {
-	Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
+	// Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	// Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
 	
-	MyTimer(&UCreDraFsm::NextState,1);
-	Dragon->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
+	MyTimer(&UCreDraFsm::NextState,0.1);
+	// Dragon->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
 }
 
 void UCreDraFsm::DraAround()
 {
 	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	
-	if (!TestPlayer) return;
-	RotateTime += GetWorld()->GetDeltaSeconds() * 100;
-	FRotator Rot = FRotator(0,RotateTime,0);
-	// UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::DraAround RotTime %f 회전벡터 X %.2f Y %.2f Z %.2f"),RotateTime,Rot.Vector().X,Rot.Vector().Y,Rot.Vector().Z);
+	// if (!TestPlayer) return;
+	// RotateTime += GetWorld()->GetDeltaSeconds() * 100;
+	// FRotator Rot = FRotator(0,RotateTime,0);
+	// float Sine = sin(RotateTime);
+	// Dragon->SetActorLocation(TestPlayer->GetActorLocation() + Rot.Vector() * 500
+	// 	+FVector(0,0,200 + sin(RotateTime/30) * 100));
 	
-	Dragon->SetActorLocation(TestPlayer->GetActorLocation() + Rot.Vector() * 500);
-	MyTimer(&UCreDraFsm::NextState,1);
+	if (bTimer)
+	{
+		PatrolPoints.Empty();
+		FVector Loc = TestPlayer->GetActorLocation();
+		for (int32 i = 0; i < 7; i++)
+		{
+			float x = FMath::RandRange(-1000,1000);
+			float y = FMath::RandRange(-1000,1000);   
+			float z = FMath::RandRange(200,500);
+			PatrolPoints.Add(Loc + FVector(x,y,z));
+			if (i == 0)
+			{ DrawDebugSphere(GetWorld(),PatrolPoints[i],75,20,FColor::Black,false,10); }
+			else
+			{ DrawDebugCircle(GetWorld(),PatrolPoints[i],50,10,FColor::Red,false,10); }
+			UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 위치는 %0.2f,%0.2f,%0.2f"),
+				PatrolPoints[i].X,PatrolPoints[i].Y,PatrolPoints[i].Z);
+		}
+		FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
+		dir.Normalize();
+		Dragon->SetActorRotation(dir.Rotation());
+		
+		DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),
+			PatrolPoints[0] ,FColor::Blue,false,3);
+
+		DrawDebugCircle(GetWorld(),PatrolPoints[0] * 100,50,10,FColor::Blue,false,3);
+	}
+	MyTimer(&UCreDraFsm::NextState,2);
 }
 
 void UCreDraFsm::DraAttack()
 {
-	MyTimer(&UCreDraFsm::NextState,10);
+	DrawDebugCircle(GetWorld(),PatrolPoints[PatrolIndex],50,10,FColor::Red,false,0.1);
+	DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),PatrolPoints[PatrolIndex],FColor::Red,false);
 	
+	Dragon->AddActorLocalOffset(FVector(1,0,0) * 30);
+	
+	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm %f"),
+		FVector::Dist(PatrolPoints[PatrolIndex] , Dragon->GetActorLocation()));
+	if (FVector::Dist(PatrolPoints[PatrolIndex] , Dragon->GetActorLocation()) < 50)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("CreDraFsm Patrol넘어감 %d 위치는 X 0.2%f 0.2%f Z 0.2Y%f"),PatrolIndex
+			,PatrolPoints[PatrolIndex].X,PatrolPoints[PatrolIndex].Y,PatrolPoints[PatrolIndex].Z);
+		
+		PatrolIndex++;
+		FVector dir = PatrolPoints[PatrolIndex] - Dragon->GetActorLocation();
+		dir.Normalize();
+		Dragon->SetActorRotation(dir.Rotation());
+		
+		if (PatrolIndex > PatrolPoints.Num()-1 || bTimer == true)
+		{
+			PatrolIndex = 0;
+		}
+	}
+	MyTimer(&UCreDraFsm::NextState,3);
 }
 
 void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), int32 time = 2.0f)
 {
+	bTimer = false;
 	if (Func)
 	{
 		CurrentTime += GetWorld()->GetDeltaSeconds();
@@ -111,6 +166,7 @@ void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), int32 time = 2.0f)
 			(this->*Func)(); 
 			UE_LOG(LogTemp, Display, TEXT("CreDraFsm 현 DraState는 %s"),
 				*UEnum::GetValueAsString(EDraState(static_cast<int32>(Drastate))));
+			bTimer = true;
 			CurrentTime = 0.0f;
 		}
 	}
