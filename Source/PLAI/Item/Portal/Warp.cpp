@@ -56,11 +56,14 @@ void AWarp::OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* O
 	{
 		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor))
 		{
-			UiPortal = CreateWidget<UUiPortal>(GetWorld(),UiPortalFactory);
-			UiPortal->AddToViewport();
-			UiPortal->WorldMap->SetVisibility(ESlateVisibility::Hidden);
-			UiPortal->Warp = this;
-			UiPortal->TestPlayer = TestPlayer;
+			if (TestPlayer->HasAuthority() && TestPlayer->IsLocallyControlled())
+			{
+				UiPortal = CreateWidget<UUiPortal>(GetWorld(),UiPortalFactory);
+				UiPortal->AddToViewport();
+				UiPortal->TestPlayer = TestPlayer;
+				UiPortal->Warp = this;
+				UiPortal->WorldMap->SetVisibility(ESlateVisibility::Hidden);
+			}
 		}
 	}
 }
@@ -70,14 +73,16 @@ void AWarp::OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* Othe
 {
 	if (OtherActor)
 	{
+		
 		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor))
-		{	
+		{
+			if (TestPlayer->HasAuthority() && TestPlayer->IsLocallyControlled())
+			{
+				if (!UiPortal){UE_LOG(LogTemp,Warning,TEXT("Warp에 유아이포탈없음")) return;};
+				UiPortal->TestPlayer = nullptr;
+				UiPortal->RemoveFromParent();
+			}
 			// if (!UiPortal->TestPlayer){UE_LOG(LogTemp,Warning,TEXT("Warp에 Player 없음")) return;};
-			
-			if (!UiPortal){UE_LOG(LogTemp,Warning,TEXT("Warp에 유아이포탈없음")) return;};
-
-			UiPortal->TestPlayer = nullptr;
-			UiPortal->RemoveFromParent();
 		}
 	}
 }
