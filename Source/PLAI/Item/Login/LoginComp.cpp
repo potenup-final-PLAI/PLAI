@@ -5,9 +5,11 @@
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
 #include "Blueprint/UserWidget.h"
+#include "Camera/CameraComponent.h"
 #include "Components/EditableTextBox.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
@@ -73,6 +75,23 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		    	}
 		    }
 		};
+	}
+
+	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+	{
+		if (PC->WasInputKeyJustPressed(EKeys::P))
+		{
+			float CurrentDistance = TestPlayer->CameraBoom->TargetArmLength;
+			TestPlayer->CameraBoom->TargetArmLength = CurrentDistance + 300;
+		}
+	}
+	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+	{
+		if (PC->WasInputKeyJustPressed(EKeys::O))
+		{
+			float CurrentDistance = TestPlayer->CameraBoom->TargetArmLength;
+			TestPlayer->CameraBoom->TargetArmLength = CurrentDistance - 300;
+		}
 	}
 }
 
