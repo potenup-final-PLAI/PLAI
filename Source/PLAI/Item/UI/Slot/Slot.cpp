@@ -33,6 +33,12 @@ void USlot::NativeConstruct()
 {
 	Super::NativeConstruct();
 	ParentItem = ItemFactory->GetDefaultObject<AItem>();
+
+	FSlateBrush Brush;
+	Brush.SetResourceObject(nullptr);
+	Brush.DrawAs = ESlateBrushDrawType::NoDrawType;
+	Brush.TintColor = FLinearColor(1.0f, 1.0f, 1.0f, 0.15f);
+	SlotImage->SetBrush(Brush);
 }
 
 FItemStructTable* USlot::ItemTableFind()
@@ -64,6 +70,7 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Slot::왼쪽마우스 NativeOnMouseButtonDown"));
+		
 		return UWidgetBlueprintLibrary::DetectDragIfPressed(MouseEvent, this,
 			EKeys::LeftMouseButton).NativeReply;
 	}

@@ -96,6 +96,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACreature> CreatureFactory;
+	
 	UPROPERTY(EditAnywhere)
 	class ACreature* Creature;
 	

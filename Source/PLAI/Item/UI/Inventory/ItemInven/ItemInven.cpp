@@ -15,9 +15,6 @@ void UItemInven::NativeConstruct()
 	{
 		SlotUi = CreateWidget<USlot>(GetWorld(),SlotFactory);
 		FSlateBrush Brush;
-		Brush.SetResourceObject(nullptr);
-		Brush.DrawAs = ESlateBrushDrawType::NoDrawType;
-		SlotUi->SlotImage->SetBrush(Brush);
 		
 		WrapBox->AddChild(SlotUi);
 	}

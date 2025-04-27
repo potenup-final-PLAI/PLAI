@@ -152,8 +152,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	UTexture2D* Texture;
 	
-    UPROPERTY(EditAnywhere)
-	class ACreature* Creature;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ACreature>CreatureFactory;
 	
 	UPROPERTY(EditAnywhere)
 	FItemStructStat ItemStructStat;
