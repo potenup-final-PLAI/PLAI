@@ -9,8 +9,9 @@
 UENUM(BlueprintType)
 enum class EDraState : uint8
 {
-	Weapon UMETA(DisplayName = "Weapon"),
-	Idle UMETA(DisplayName = "Idle"),
+	DraIdle UMETA(DisplayName = "Idle"),
+	DraAround UMETA(DisplayName = "Around"),
+	DraAttack UMETA(DisplayName = "Attack"),
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -30,5 +31,24 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+public:
+	UPROPERTY(EditAnywhere)
+	EDraState Drastate = EDraState::DraIdle;
+
+	void DraIdle();
+	void DraAround();
+	void DraAttack();
+	void MyTimer(void(UCreDraFsm::*Func)(), int32 time);
+
+	void NextState();
+
+	UPROPERTY(EditAnywhere)
+	class ACreDragon* Dragon;
 	
+	UPROPERTY(EditAnywhere)
+	class ATestPlayer* TestPlayer;
+
+	bool bRotateTimer = true;
+	float RotateTime;
+	float CurrentTime = 0;
 };

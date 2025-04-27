@@ -137,7 +137,18 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 	}
 	else
 	{
-		TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,2000));
+		FTimerHandle TimerHandle;
+		FVector TargetLocation = (WarpLocation[index]+FVector(0,0,2000));
+		ATestPlayer* TargetPlayer = UiPortal->TestPlayer; // WarpPlayer도 캡쳐해줘야 안정적
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [TargetPlayer, TargetLocation]()
+		{
+			if (TargetPlayer)
+			{
+				TargetPlayer->SetActorLocation(TargetLocation);
+				FVector Forward = TargetPlayer->CameraBoom->GetForwardVector(); // 전방 방향
+			}
+		}, 2.0f, false);
+		
 	}
 }
 

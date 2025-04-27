@@ -4,13 +4,12 @@
 #include "Creature.h"
 
 #include "CreFsm.h"
+#include "Dragon/CreDragon.h"
 
 
 // Sets default values
 ACreature::ACreature()
 {
-	CreFsm = CreateDefaultSubobject<UCreFsm>(TEXT("Creature"));
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 

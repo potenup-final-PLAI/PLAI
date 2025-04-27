@@ -16,7 +16,7 @@ FReply USlotCre::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoi
 	{
 		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 		{
-			if (TestPlayer->CreComp->Creature != nullptr)
+			if (TestPlayer->CreComp->Creature == nullptr)
 			{
 				UE_LOG(LogTemp,Warning,TEXT("slotcre cre없음"));
 			}

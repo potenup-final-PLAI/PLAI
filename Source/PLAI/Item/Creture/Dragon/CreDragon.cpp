@@ -9,6 +9,7 @@
 // Sets default values
 ACreDragon::ACreDragon()
 {
+	CreFsm = CreateDefaultSubobject<UCreDraFsm>("CreFsm");
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -18,6 +19,7 @@ void ACreDragon::BeginPlay()
 {
 	Super::BeginPlay();
 	CreFsm = Cast<UCreDraFsm>(CreFsm);
+	
 	if (CreFsm)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("CreDragon CreFsm -> DraFSm 성공"));
