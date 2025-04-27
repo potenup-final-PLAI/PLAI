@@ -15,6 +15,7 @@ ATestPlayer::ATestPlayer()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 	InvenComp = CreateDefaultSubobject<UInvenComp>(TEXT("InvenComp"));
 	StoreComp = CreateDefaultSubobject<UStoreComp>(TEXT("StoreComp"));
 	LoginComp = CreateDefaultSubobject<ULoginComp>(TEXT("LoginComp"));

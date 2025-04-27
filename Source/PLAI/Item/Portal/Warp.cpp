@@ -34,7 +34,7 @@ void AWarp::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	WarpLocation.Add(FVector(1000000,0,0));
+	WarpLocation.Add(FVector(0,0,0));
 	WarpLocation.Add( FVector(-1000000,0,0));
 	WarpLocation.Add(FVector(0,1000000,0));
 	WarpLocation.Add(FVector(0,-1000000,0));
@@ -104,21 +104,23 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 	}
 	if (bSpawn == false)
 	{
-		bool bSuccess = false; // 성공 여부
-		// 레벨을 동적으로 로드
-		ULevelStreamingDynamic* OldLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
-			OldLevelPath[index],WarpLocation[index],FRotator(0,0,0),bSuccess);
-		ULevelStreamingDynamic* NewLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
-			NewLevelPath[index],WarpLocation[index],FRotator(0,0,0),bSuccess);
+		if (index == 0){UE_LOG(LogTemp,Warning,TEXT("Warp Village 소환 XX"))}
+		else{
+			bool bSuccess = false; // 성공 여부
+			// 레벨을 동적으로 로드
+			ULevelStreamingDynamic* OldLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
+				OldLevelPath[index],WarpLocation[index],FRotator(0,0,0),bSuccess);
+			ULevelStreamingDynamic* NewLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
+				NewLevelPath[index],WarpLocation[index],FRotator(0,0,0),bSuccess);
 
-		if (bSuccess)
-		{ UE_LOG(LogTemp, Log, TEXT("Level loaded successfully!")); }
-		else
-		{ UE_LOG(LogTemp, Log, TEXT("Failed to load level."));}
-		Gi->bWorldSpawnInt.Add(index);
+			if (bSuccess)
+			{ UE_LOG(LogTemp, Log, TEXT("Level loaded successfully!")); }
+			else
+			{ UE_LOG(LogTemp, Log, TEXT("Failed to load level."));}
+			Gi->bWorldSpawnInt.Add(index);
+		}
 	}
 	if (!TestPlayer){ UE_LOG(LogTemp, Log, TEXT("Walp TestPlayer 없음."));}
-	
 	if (index == 3)
 	{
 		FTimerHandle TimerHandle;
@@ -135,7 +137,7 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 	}
 	else
 	{
-		TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,1500));
+		TestPlayer->SetActorLocation(WarpLocation[index]+FVector(0,0,2000));
 	}
 }
 
