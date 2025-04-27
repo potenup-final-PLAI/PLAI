@@ -4,7 +4,9 @@
 #include "SlotCre.h"
 
 #include "Blueprint/DragDropOperation.h"
+#include "PLAI/Item/Creture/Creature.h"
 #include "PLAI/Item/Item/ItemObject.h"
+#include "PLAI/Item/ItemComp/CreComp.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
@@ -24,11 +26,20 @@ bool USlotCre::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& I
                             UDragDropOperation* InOperation)
 {
 	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
-    if (ItemObject && ItemObject->ItemStructTable.ItemTop == 3)
+    if (ItemObject && ItemObject->ItemStructTable.ItemTop == 3
+    	&& ItemObject && ItemObject->ItemStructTable.CreatureFactory != nullptr)
     {
 	    UE_LOG(LogTemp,Warning,TEXT("USlotCre::크리처 들어왔음 NativeOnDrop"));
-    	// ATestPlayer* TestPlayer = Cast<APlayerController>(GetWorld()->GetFirstPlayerController()->GetPawn);
-    	// TestPlayer->InvenComp->Creature = ItemStructTable.Creature;
+    	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+    	{
+    		TestPlayer->CreComp->Creature = GetWorld()->SpawnActor<ACreature>(ItemObject->ItemStructTable.CreatureFactory);
+    		TestPlayer->CreComp->Creature->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
+    		TestPlayer->CreComp->Creature->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
+    	}
+    	else
+    	{
+    		UE_LOG(LogTemp,Warning,TEXT("USlotCre:: TestPlayer캐스팅 실패 NativeOnDrop"));
+    	}
     }
 	else
 	{

@@ -83,16 +83,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		Server_SpawnOneItem();
 	}
 	
-	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Five))
-	{
-		if (TestPlayer->IsLocallyControlled())
-		{
-			Creature = GetWorld()->SpawnActor<ACreature>(CreatureFactory);
-			Creature->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
-			Creature->SetActorLocation(TestPlayer->GetActorLocation() + FVector(120,-120,120));
-		}
-	}
-	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
 	{
 		LoadItemInventory();

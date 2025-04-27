@@ -35,4 +35,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ULoginComp* LoginComp;
+
+	UPROPERTY(EditAnywhere)
+	class UCreComp* CreComp;
 };
