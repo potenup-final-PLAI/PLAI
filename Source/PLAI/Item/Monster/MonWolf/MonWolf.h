@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "Monster.generated.h"
+#include "PLAI/Item/Monster/Monster.h"
+#include "MonWolf.generated.h"
 
 UCLASS()
-class PLAI_API AMonster : public ACharacter
+class PLAI_API AMonWolf : public AMonster
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AMonster();
+	AMonWolf();
 
 protected:
 	// Called when the game starts or when spawned
@@ -25,8 +25,4 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-public:
-	UPROPERTY(EditAnywhere)
-	class UMonFsm* MonFsm;
 };
