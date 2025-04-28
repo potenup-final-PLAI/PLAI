@@ -70,10 +70,12 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			    	if (bQuest == true)
 			    	{
 			    		NpcNet->OpenQuest();
+			    		bQuest = false;
 			    	}
 			    	else
 			    	{
 			    		NpcNet->UIPost->RemoveFromParent();
+			    		bQuest = true;
 			    	}
 			    }
 		    	else

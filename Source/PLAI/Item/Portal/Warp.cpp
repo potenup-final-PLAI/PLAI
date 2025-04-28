@@ -124,7 +124,7 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 	if (index == 3)
 	{
 		FTimerHandle TimerHandle;
-		FVector TargetLocation = WarpLocation[index] + FVector(750,750,400);
+		FVector TargetLocation = WarpLocation[index] + FVector(0,0,400);
 		ATestPlayer* TargetPlayer = UiPortal->TestPlayer; // WarpPlayer도 캡쳐해줘야 안정적
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [TargetPlayer, TargetLocation]()
 		{
