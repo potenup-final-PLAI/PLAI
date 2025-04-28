@@ -57,7 +57,7 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 					  "나의 CharacterId [%s]"),*User_id, *character_id),nullptr,FColor::Red,0.f,false);
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{ if (PC->WasInputKeyJustPressed(EKeys::One)) // C 캐릭터 생성 요청
+	{ if (PC->WasInputKeyJustPressed(EKeys::One)) // 1 캐릭터 생성 요청
 	{   UE_LOG(LogTemp,Display,TEXT("로그인 컴프 1키 User 구조체 UserId 정보조회 %s"),*UserFullInfo.user_id);
 		UE_LOG(LogTemp,Display,TEXT("로그인 컴프 1키 User Character Id 정보조회 %s"),*character_id);
 	}
@@ -74,6 +74,13 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	{ if (PC->WasInputKeyJustPressed(EKeys::M)) // M 캐릭터 생성 내 정보 요청
 	{   UE_LOG(LogTemp,Display,TEXT("Input M 내 정보 주셈 Key JustPressed"));
 		HttpMePost();
+	}
+	}
+
+	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+	{ if (PC->WasInputKeyJustPressed(EKeys::N)) // N 내아이템 주셈
+	{   UE_LOG(LogTemp,Display,TEXT("Input N 내 아이템 주셈 Key JustPressed"));
+		LoadEquipItem();
 	}
 	}
 	
@@ -233,9 +240,64 @@ void ULoginComp::HttpMePost()
 	httpRequest->ProcessRequest();
 }
 
+void ULoginComp::LoadEquipItem()
+{
+	for (int32 i = 0; i < UserFullInfo.equipment_info.item_list.Num() ; i++)
+	{
+		for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+		{
+			if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget)) // 1번부터 5번까지 슬롯 돈다
+			{
+				TArray<FName>RawNames = SlotEquip->ItemTable->GetRowNames();
+			    for (FName RawName : RawNames)
+			    {
+			    	FItemStructTable* ItemStructTable = SlotEquip->ItemTable->FindRow<FItemStructTable>(RawName,"로그인컴프");
+			    	if (UserFullInfo.equipment_info.item_list[i].item_id == RawName &&
+			    		static_cast<int32>(SlotEquip->SlotType) == ItemStructTable->ItemIndex)
+			    	{
+			    		TestPlayer->InvenComp->EquipItem(*ItemStructTable,SlotEquip->SlotType);
+			    		SlotEquip->ItemStructTable = *ItemStructTable;
+			    		SlotEquip->SlotImageUpdate();
+			    		break;
+			    	}
+			    }
+			}
+		}
+	}
+	
+		
+	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+	{
+		if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget)) // 1번부터 5번까지 슬롯 돈다
+		{
+			
+		}
+	}
 
 
 
+	
+	// for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+	// {
+	// 	if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget)) // 1번부터 5번까지 슬롯 돈다
+	// 	{
+ //            for (int32 i = 0; i < UserFullInfo.equipment_info.item_list.Num(); i++)
+ //            {
+ //            	TArray<FName>RawNames = SlotEquip->ItemTable->GetRowNames();
+ //            	for (FName Raw : RawNames)
+ //            	{
+ //            		FItemStructTable* ItemStructTable = SlotEquip->ItemTable->FindRow<FItemStructTable>(Raw,("LoginComp 240"));
+ //                    if (ItemStructTable->Item_Id == UserFullInfo.equipment_info.item_list[i].item_id)
+ //                    {
+ //                    	UE_LOG(LogTemp,Warning,TEXT("로그인컴프 ItemId는 %s"),*UserFullInfo.equipment_info.item_list[i].item_id)
+ //                    	TestPlayer->InvenComp->EquipItem(*ItemStructTable,SlotEquip->SlotType);
+ //                    	break;
+ //                    }
+ //            	}  
+ //            }
+	// 	}
+	// }
+}
 
 
 //

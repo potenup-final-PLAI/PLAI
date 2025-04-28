@@ -167,7 +167,7 @@ public:
 	
 	void HttpMePost();
 
-	
+	void LoadEquipItem();
 	//테스트 테이블 변환
 	// void TransDataTable();
 
