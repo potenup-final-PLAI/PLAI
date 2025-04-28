@@ -42,7 +42,7 @@ void AGridTileManager::InitGridTile()
 		for (int32 X = 0; X < 25; ++X)
 		{
 			FVector spawnLoc = GetActorLocation() + FVector(
-				Y * 110, X * 110, 0.0f);
+				Y * 100, X * 100, 0.0f);
 			FRotator spawnRot = FRotator::ZeroRotator;
 			FActorSpawnParameters spawnParams;
 

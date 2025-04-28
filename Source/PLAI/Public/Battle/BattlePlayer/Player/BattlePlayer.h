@@ -19,5 +19,8 @@ protected:
 public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	
-	
+	UPROPERTY(EditAnywhere)
+	class UInputMappingContext* IMC_Player;
+	UPROPERTY(EditAnywhere)
+	class UInputAction* IA_Move;
 };

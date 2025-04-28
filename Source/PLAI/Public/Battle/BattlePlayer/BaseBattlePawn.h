@@ -50,11 +50,7 @@ public:
 	// 현재 체크하고 있는 block
 	UPROPERTY(EditAnywhere)
 	class AGridTile* currentTile;
-
-	UPROPERTY(EditAnywhere)
-	class UInputMappingContext* IMC_Player;
-	UPROPERTY(EditAnywhere)
-	class UInputAction* IA_Move;
+	
 	// 움직임 플래그
 	bool bIsMoveMode = false;
 	
@@ -64,7 +60,24 @@ public:
 	void PathFind();
 	void BuildPath();
 	void AddOpenArray(FVector dir);
+	
+	//--------------Unit Move-------------------
+	// 이동 경로 저장 Array
+	TArray<AGridTile*> pathArray;
+	// 현재 경로 인덱스
+	int32 currentPathIndex = 0;
+	// 이동 중인지 체크
+	bool bIsMoving = false;
+	// 이동 속도
+	float moveSpeed = 300.0f;
+
+	// 이동력 테스트 코드
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 moveRange = 7;
+	
 	// 골 위치를 클릭 했을 때 그쪽으로 이동
 	void UnitMove();
+	void OnMoveEnd();
+	void InitValues();
 	
 };
