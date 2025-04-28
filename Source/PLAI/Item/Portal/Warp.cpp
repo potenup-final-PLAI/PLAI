@@ -108,8 +108,8 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 		else{
 			bool bSuccess = false; // 성공 여부
 			// 레벨을 동적으로 로드
-			// ULevelStreamingDynamic* OldLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
-			// 	OldLevelPath[index],WarpLocation[index],FRotator(0,0,0),bSuccess);
+			ULevelStreamingDynamic* OldLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
+				OldLevelPath[index],WarpLocation[index],FRotator(0,0,0),bSuccess);
 			ULevelStreamingDynamic* NewLevelStream = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(),
 				NewLevelPath[index],WarpLocation[index],FRotator(0,0,0),bSuccess);
 
