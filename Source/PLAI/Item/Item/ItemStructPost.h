@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "ItemStruct.generated.h"
+#include "ItemStructPost.generated.h"
 
 
 USTRUCT(BlueprintType,Blueprintable)

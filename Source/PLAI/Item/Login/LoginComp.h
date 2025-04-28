@@ -59,6 +59,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+    
+	
 	FOnLogin OnLogin;
 
 	UPROPERTY(EditAnywhere)
@@ -80,9 +82,7 @@ public:
 	FString UserId;
 	UPROPERTY(EditAnywhere)
 	FString UserPw;
-
-
-	void GetEquipInfo();
+	
 	void HttpEquipPost(FString String);
 	
 	void HttpLoginPost();
@@ -90,9 +90,11 @@ public:
 	void HttpSignPost();
 
 	void HttpInitPost();
+	
+	void GetEquipInfo();
 
 	//테스트 테이블 변환
-	void TransDataTable();
+	// void TransDataTable();
 
 	bool bQuest = true;
 	

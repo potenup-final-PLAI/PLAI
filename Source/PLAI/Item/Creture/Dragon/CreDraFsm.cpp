@@ -155,8 +155,10 @@ void UCreDraFsm::DraAttack()
 			PatrolIndex = 0;
 		}
 	}
-	MyTimer(&UCreDraFsm::NextState,3);
+	MyTimer(&UCreDraFsm::NextState,10);
 }
+
+
 
 void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), int32 time = 2.0f)
 {

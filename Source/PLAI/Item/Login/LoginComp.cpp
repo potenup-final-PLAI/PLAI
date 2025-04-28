@@ -130,6 +130,8 @@ void ULoginComp::GetEquipInfo()
 
 void ULoginComp::HttpEquipPost(FString String)
 {
+    
+	
 	UE_LOG(LogTemp, Display, TEXT("로그인 컴프%s"), *String);
 	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
 	HttpRequest->SetURL(TEXT("/LoginComp/EquipInven/Login"));
@@ -218,42 +220,45 @@ void ULoginComp::HttpInitPost()
 {
 }
 
-void ULoginComp::TransDataTable()
-{
-	UE_LOG(LogTemp, Warning, TEXT("구조체 변경 시작"));
 
-	UDataTable* OldDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Mk_Item/Dt_ItemStruct.Dt_ItemStruct"));
-	OldDataTable->RowStruct = FItemStruct::StaticStruct();
-	UDataTable* NewDataTable = NewObject<UDataTable>();
-	NewDataTable->RowStruct = FItemStructTable::StaticStruct();
-
-	const TArray<FName> RowNames = OldDataTable->GetRowNames();
-	for (const FName& RowName : RowNames)
-	{
-		if (FItemStruct* SrcRow = OldDataTable->FindRow<FItemStruct>(RowName, TEXT("")))
-		{
-			FItemStructTable NewRow;
-			NewRow.ItemTop = SrcRow->ItemTop;
-			NewRow.ItemIndex = SrcRow->ItemIndex;
-			NewRow.ItemIndexType = SrcRow->ItemIndexType;
-			NewRow.ItemIndexDetail = SrcRow->ItemIndexDetail;
-			NewRow.Name = SrcRow->Name;
-			NewRow.NameType = SrcRow->NameType;
-			NewRow.NameDetail = SrcRow->NameDetail;
-			NewRow.ItemNum = SrcRow->ItemNum;
-			NewRow.ItemStructStat = SrcRow->ItemStructStat;
-			NewRow.ItemStructStatName = SrcRow->ItemStructStatName;
-
-			NewDataTable->AddRow(RowName, NewRow);
-
-			UE_LOG(LogTemp, Warning, TEXT("데이터테이블 변환중: %s"), *NewRow.ItemStructStatName.item_SHI);
-		}
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Row Count: %d"), NewDataTable->GetRowNames().Num());
-	
-		FString TableCSV = NewDataTable->GetTableAsCSV(EDataTableExportFlags::None);
-		FFileHelper::SaveStringToFile(TableCSV, *(FPaths::ProjectDir() + "NewDataTable.csv"));
-		
-		UE_LOG(LogTemp, Warning, TEXT("CSV 저장 완료"));
-}
+//
+//
+// void ULoginComp::TransDataTable()
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("구조체 변경 시작"));
+//
+// 	UDataTable* OldDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Mk_Item/Dt_ItemStruct.Dt_ItemStruct"));
+// 	OldDataTable->RowStruct = FItemStruct::StaticStruct();
+// 	UDataTable* NewDataTable = NewObject<UDataTable>();
+// 	NewDataTable->RowStruct = FItemStructTable::StaticStruct();
+//
+// 	const TArray<FName> RowNames = OldDataTable->GetRowNames();
+// 	for (const FName& RowName : RowNames)
+// 	{
+// 		if (FItemStruct* SrcRow = OldDataTable->FindRow<FItemStruct>(RowName, TEXT("")))
+// 		{
+// 			FItemStructTable NewRow;
+// 			NewRow.ItemTop = SrcRow->ItemTop;
+// 			NewRow.ItemIndex = SrcRow->ItemIndex;
+// 			NewRow.ItemIndexType = SrcRow->ItemIndexType;
+// 			NewRow.ItemIndexDetail = SrcRow->ItemIndexDetail;
+// 			NewRow.Name = SrcRow->Name;
+// 			NewRow.NameType = SrcRow->NameType;
+// 			NewRow.NameDetail = SrcRow->NameDetail;
+// 			NewRow.ItemNum = SrcRow->ItemNum;
+// 			NewRow.ItemStructStat = SrcRow->ItemStructStat;
+// 			NewRow.ItemStructStatName = SrcRow->ItemStructStatName;
+//
+// 			NewDataTable->AddRow(RowName, NewRow);
+//
+// 			UE_LOG(LogTemp, Warning, TEXT("데이터테이블 변환중: %s"), *NewRow.ItemStructStatName.item_SHI);
+// 		}
+// 	}
+// 	UE_LOG(LogTemp, Warning, TEXT("Row Count: %d"), NewDataTable->GetRowNames().Num());
+// 	
+// 		FString TableCSV = NewDataTable->GetTableAsCSV(EDataTableExportFlags::None);
+// 		FFileHelper::SaveStringToFile(TableCSV, *(FPaths::ProjectDir() + "NewDataTable.csv"));
+// 		
+// 		UE_LOG(LogTemp, Warning, TEXT("CSV 저장 완료"));
+// }
 
