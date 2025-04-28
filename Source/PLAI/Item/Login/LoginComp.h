@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+#include "UserStruct.h"
 
 DECLARE_DELEGATE_OneParam(FOnLogin, bool bLogin)
 DECLARE_DELEGATE_OneParam(FOnSing, bool bSign)
@@ -97,12 +98,15 @@ public:
 	FString user_id = TEXT("Email");
 };
 
-
-
-
-
-// USTRUCT(BlueprintType)
-
+USTRUCT(BlueprintType)
+struct FMeStructGet
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	FString user_id = TEXT("Email");
+};
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API ULoginComp : public UActorComponent
@@ -122,9 +126,13 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+
+	UPROPERTY(EditAnywhere)
+	FUserFullInfo UserFullInfo;
 	
     UPROPERTY(EditAnywhere)
 	FString User_id = FString("user_id");
+	
 	UPROPERTY(EditAnywhere)
 	FString character_id = FString("");
 	
@@ -159,11 +167,7 @@ public:
 	
 	void HttpMePost();
 
-
 	
-	
-	void GetEquipInfo();
-	void HttpEquipPost(FString String);
 	//테스트 테이블 변환
 	// void TransDataTable();
 

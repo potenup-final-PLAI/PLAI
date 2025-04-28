@@ -4,6 +4,7 @@
 #include "LoginComp.h"
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
+#include "UserStruct.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/EditableTextBox.h"
 #include "Components/VerticalBox.h"
@@ -56,6 +57,13 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 					  "나의 CharacterId [%s]"),*User_id, *character_id),nullptr,FColor::Red,0.f,false);
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+	{ if (PC->WasInputKeyJustPressed(EKeys::One)) // C 캐릭터 생성 요청
+	{   UE_LOG(LogTemp,Display,TEXT("로그인 컴프 1키 User 구조체 UserId 정보조회 %s"),*UserFullInfo.user_id);
+		UE_LOG(LogTemp,Display,TEXT("로그인 컴프 1키 User Character Id 정보조회 %s"),*character_id);
+	}
+	}
+	
+	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::C)) // C 캐릭터 생성 요청
 		{   UE_LOG(LogTemp,Display,TEXT("Input C 캐릭터 생성 요청 Key JustPressed"));
 		    HttpCreatePost();
@@ -69,12 +77,6 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	}
 	}
 	
-	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{ if (PC->WasInputKeyJustPressed(EKeys::H))
-		{
-			GetEquipInfo();
-		}
-	}
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
@@ -120,49 +122,6 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			TestPlayer->CameraBoom->TargetArmLength = CurrentDistance - 300;
 		}
 	}
-}
-
-
-void ULoginComp::GetEquipInfo()
-{
-	FItemStructTable ItemStructTable;
-	FItemStructTables ItemStructTables;
-	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
-	{
-		if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget))
-		{
-			ItemStructTable = SlotEquip->ItemStructTable;
-			ItemStructTables.ItemStructTables.Add(ItemStructTable);
-		}
-	}
-	
-	// 보내는 구조체 형식 맞추기
-
-	// 구조체 Converter로 JsonString 변형하기
-
-	FString JsonString;
-	// ItemSTructTables -> 보내는 전송용 구조체로 넣기
-	FJsonObjectConverter::UStructToJsonObjectString(ItemStructTables, JsonString);
-	HttpEquipPost(JsonString);
-}
-
-void ULoginComp::HttpEquipPost(FString String)
-{
-	UE_LOG(LogTemp, Display, TEXT("로그인 컴프%s"), *String);
-	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
-	HttpRequest->SetURL(TEXT("/LoginComp/EquipInven/Login"));
-	HttpRequest->SetVerb("POST");
-	HttpRequest->SetHeader("Content-Type", "application/json");
-	
-	HttpRequest->SetContentAsString(String);
-    HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest,
-    	FHttpResponsePtr HttpResponse, bool bSucceeded)
-    {
-    	if (bSucceeded)
-    	{
-    		
-    	}  
-    });
 }
 
 void ULoginComp::HttpLoginPost()
@@ -255,6 +214,16 @@ void ULoginComp::HttpMePost()
 		{
 			FString JsonString = HttpResponse->GetContentAsString();
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 성공 %s"),*JsonString);
+			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &UserFullInfo);
+			
+			character_id = UserFullInfo.user_id;
+			
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 Logitem Comp CharId%s"),*TestPlayer->LogItemComp->Char_id)
+
+			for (int32 i = 0; i < UserFullInfo.equipment_info.item_list.Num(); i++)
+			{
+				UE_LOG(LogTemp,Warning,TEXT("로그인컴프 장비이름%s"),*UserFullInfo.equipment_info.item_list[i].item_id)
+			}
 		}
 		else
 		{

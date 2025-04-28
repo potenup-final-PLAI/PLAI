@@ -7,6 +7,7 @@
 #include "LoginComp.h"
 #include "Components/VerticalBox.h"
 #include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 
@@ -46,31 +47,24 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	// ...
 }
 
-void ULogItemComp::HttpEquipPost(FPostEquipId PostEquipId)
+void ULogItemComp::HttpEquipPost(FString JsonString)
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 	
-	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/me/"));
+	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/items/upsert/equipment"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-
-	FString JsonString;
-	// FMeStruct MeStruct;
-	
-	// MeStruct.user_id = User_id;
-	
-	// FJsonObjectConverter::UStructToJsonObjectString(MeStruct,JsonString);
 	httpRequest->SetContentAsString(JsonString);
 	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
 	{
 		if (bProcessedSuccessfully)
 		{
-			// FString JsonString = HttpResponse->GetContentAsString();
-			// UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 성공 %s"),*JsonString);
+			FString JsonString = HttpResponse->GetContentAsString();
+			UE_LOG(LogTemp,Warning,TEXT("LogItemComp 장비정보 집어넣기 성공 %s"),*JsonString);
 		}
 		else
 		{
-			// UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 실패 %d"),HttpResponse->GetResponseCode());
+			UE_LOG(LogTemp,Warning,TEXT("LogItemComp 장비정보 집어넣기 실패"));
 		}
 	});
 	httpRequest->ProcessRequest();
@@ -92,17 +86,19 @@ void ULogItemComp::GetEquipInfo()
 			equipment_info.options.critical_rate = SlotEquip->ItemStructTable.ItemStructStat.Item_CRIT;
 			equipment_info.options.critical_damage = SlotEquip->ItemStructTable.ItemStructStat.item_CRITDMG;
 			equipment_info.item_id = SlotEquip->ItemStructTable.Item_Id;
-			
 			PostEquipId.equipment_info.Add(equipment_info);
 		}
-		else
-		{
-			UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo 실패함"));
-		}
 	}
-	PostEquipId.character_id = TestPlayer->LoginComp->character_id;
+	
+	PostEquipId.character_id = TestPlayer->LoginComp->UserFullInfo.user_id;
+	
+	UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo 캐릭터 아이디 PostEquipId %s"),*PostEquipId.character_id);
+	UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo 캐릭터 아이디 구조체 LoginComp %s"),*TestPlayer->LoginComp->UserFullInfo.user_id);
+	
 	FString jsonString;
 	FJsonObjectConverter::UStructToJsonObjectString(PostEquipId,jsonString);
 	UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo PostEquipId: %s"), *jsonString);
+
+	HttpEquipPost(jsonString);
 }
 

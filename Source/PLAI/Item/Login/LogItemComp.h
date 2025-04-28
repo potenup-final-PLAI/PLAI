@@ -47,7 +47,7 @@ struct FPostEquipId
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere)
-	FString character_id = TEXT("char");
+	FString character_id = FString("char");
 	UPROPERTY(EditAnywhere)
 	TArray<Fequipment_info>equipment_info;
 };
@@ -76,6 +76,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APlayerController* PC;
 	
-	void HttpEquipPost(FPostEquipId PostEquipId);
+	UPROPERTY(EditAnywhere)
+	FString Char_id = FString("char");
+	
+	void HttpEquipPost(FString JsonString);
 	void GetEquipInfo();
 };
