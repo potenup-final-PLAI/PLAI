@@ -93,5 +93,7 @@ public:
 
 	//테스트 테이블 변환
 	void TransDataTable();
+
+	bool bQuest = true;
 	
 };

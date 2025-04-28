@@ -67,7 +67,14 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		    {
 			    if (ANpcNet * NpcNet = Cast<ANpcNet>(Hit.GetActor()))
 			    {
-				    NpcNet->OpenQuest();
+			    	if (bQuest == true)
+			    	{
+			    		NpcNet->OpenQuest();
+			    	}
+			    	else
+			    	{
+			    		NpcNet->UIPost->RemoveFromParent();
+			    	}
 			    }
 		    	else
 		    	{
