@@ -87,6 +87,17 @@ public:
 	FString character_id = TEXT("Cha None");
 };
 
+USTRUCT(BlueprintType)
+struct FMeStruct
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	FString user_id = TEXT("Email");
+};
+
+
 
 
 
@@ -111,9 +122,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+	
     UPROPERTY(EditAnywhere)
 	FString User_id = FString("user_id");
-	
 	UPROPERTY(EditAnywhere)
 	FString character_id = FString("");
 	
@@ -139,17 +150,14 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ATestPlayer* TestPlayer;
-
-	UPROPERTY(EditAnywhere)
-	FString UserId;
-	UPROPERTY(EditAnywhere)
-	FString UserPw;
 	
 	void HttpSignPost();
 
 	void HttpLoginPost();
 	
 	void HttpCreatePost();
+	
+	void HttpMePost();
 
 
 	

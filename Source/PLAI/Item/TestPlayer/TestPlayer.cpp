@@ -8,6 +8,7 @@
 #include "PLAI/Item/ItemComp/ItemComp.h"
 #include "PLAI/Item/ItemComp/StoreComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
+#include "PLAI/Item/Login/LogItemComp.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 
 
@@ -20,7 +21,8 @@ ATestPlayer::ATestPlayer()
 	InvenComp = CreateDefaultSubobject<UInvenComp>(TEXT("InvenComp"));
 	StoreComp = CreateDefaultSubobject<UStoreComp>(TEXT("StoreComp"));
 	LoginComp = CreateDefaultSubobject<ULoginComp>(TEXT("LoginComp"));
-	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("ItemComp"));
+	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("UCreComp"));
+	LogItemComp = CreateDefaultSubobject<ULogItemComp>(TEXT("ItemComp"));
 }
 
 // Called when the game starts or when spawned

@@ -37,5 +37,8 @@ public:
 	class ULoginComp* LoginComp;
 
 	UPROPERTY(EditAnywhere)
+	class ULogItemComp* LogItemComp;
+	
+	UPROPERTY(EditAnywhere)
 	class UCreComp* CreComp;
 };

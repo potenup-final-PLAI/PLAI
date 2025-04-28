@@ -5,7 +5,6 @@
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
 #include "Blueprint/UserWidget.h"
-#include "Camera/CameraComponent.h"
 #include "Components/EditableTextBox.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
@@ -57,10 +56,17 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 					  "나의 CharacterId [%s]"),*User_id, *character_id),nullptr,FColor::Red,0.f,false);
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{ if (PC->WasInputKeyJustPressed(EKeys::C)) // 캐릭터 생성 요청
-		{   UE_LOG(LogTemp,Display,TEXT("Input C Key JustPressed"));
+	{ if (PC->WasInputKeyJustPressed(EKeys::C)) // C 캐릭터 생성 요청
+		{   UE_LOG(LogTemp,Display,TEXT("Input C 캐릭터 생성 요청 Key JustPressed"));
 		    HttpCreatePost();
 		}
+	}
+
+	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+	{ if (PC->WasInputKeyJustPressed(EKeys::M)) // M 캐릭터 생성 내 정보 요청
+	{   UE_LOG(LogTemp,Display,TEXT("Input M 내 정보 주셈 Key JustPressed"));
+		HttpMePost();
+	}
 	}
 	
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
@@ -193,46 +199,8 @@ void ULoginComp::HttpLoginPost()
 		}
 	});
 	httpRequest->ProcessRequest();
-
-	// FLoginStruct LoginStruct;
-	// FString JsonString = HttpResponse->GetContentAsString();
-	// UE_LOG(LogTemp,Warning,TEXT("loginComp Login 답변 %s"),*JsonString)
-	// FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&LoginStruct);
-	// user_id = LoginStruct.
 }
 
-void ULoginComp::HttpCreatePost()
-{
-	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
-	
-	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/characters/create"));
-	httpRequest->SetVerb("POST");
-	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-
-	FCreateStruct CreateStruct;
-	CreateStruct.user_id = User_id;
-
-	FString JsonString;
-	FJsonObjectConverter::UStructToJsonObjectString(CreateStruct, JsonString);
-	httpRequest->SetContentAsString(JsonString);
-	
-	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
-	{
-		if (bProcessedSuccessfully)
-		{
-			FCreateStructGet CreateStructGet;
-			FString JsonString = HttpResponse->GetContentAsString();
-			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 캐릭터 생성 성공 %s"),*JsonString);
-			FJsonObjectConverter::UStructToJsonObjectString(CreateStructGet,JsonString);
-			character_id = CreateStructGet.character_id;
-		}
-		else
-		{
-			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 캐릭터 생성 실패 %d"),HttpResponse->GetResponseCode());
-		}
-	});
-	httpRequest->ProcessRequest();
-}
 
 void ULoginComp::HttpSignPost()
 {
@@ -264,6 +232,40 @@ void ULoginComp::HttpSignPost()
 	});
 	httpRequest->ProcessRequest();
 }
+
+
+void ULoginComp::HttpMePost()
+{
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+	
+	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/me/"));
+	httpRequest->SetVerb("POST");
+	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	FString JsonString;
+	FMeStruct MeStruct;
+	
+	MeStruct.user_id = User_id;
+	
+	FJsonObjectConverter::UStructToJsonObjectString(MeStruct,JsonString);
+	httpRequest->SetContentAsString(JsonString);
+	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
+	{
+		if (bProcessedSuccessfully)
+		{
+			FString JsonString = HttpResponse->GetContentAsString();
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 성공 %s"),*JsonString);
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 실패 %d"),HttpResponse->GetResponseCode());
+		}
+	});
+	httpRequest->ProcessRequest();
+}
+
+
+
 
 
 
@@ -308,3 +310,35 @@ void ULoginComp::HttpSignPost()
 // 		UE_LOG(LogTemp, Warning, TEXT("CSV 저장 완료"));
 // }
 
+void ULoginComp::HttpCreatePost()
+{
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+	
+	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/characters/create"));
+	httpRequest->SetVerb("POST");
+	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	FCreateStruct CreateStruct;
+	CreateStruct.user_id = User_id;
+
+	FString JsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(CreateStruct, JsonString);
+	httpRequest->SetContentAsString(JsonString);
+	
+	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
+	{
+		if (bProcessedSuccessfully)
+		{
+			FCreateStructGet CreateStructGet;
+			FString JsonString = HttpResponse->GetContentAsString();
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 캐릭터 생성 성공 %s"),*JsonString);
+			FJsonObjectConverter::UStructToJsonObjectString(CreateStructGet,JsonString);
+			character_id = CreateStructGet.character_id;
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 캐릭터 생성 실패 %d"),HttpResponse->GetResponseCode());
+		}
+	});
+	httpRequest->ProcessRequest();
+}
