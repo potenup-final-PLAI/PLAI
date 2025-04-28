@@ -138,7 +138,7 @@ void UCreDraFsm::DraAttack()
 	
 	FVector Dir = PatrolPoints[PatrolIndex] - Dragon->GetActorLocation();
 	Dir.Normalize();
-	Dragon->AddActorWorldOffset(Dir * 10);
+	Dragon->AddActorWorldOffset(Dir * 25);
 	
 	if (FVector::Dist(PatrolPoints[PatrolIndex] , Dragon->GetActorLocation()) < 50)
 	{
