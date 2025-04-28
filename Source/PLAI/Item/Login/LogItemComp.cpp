@@ -19,6 +19,7 @@ ULogItemComp::ULogItemComp()
 void ULogItemComp::BeginPlay()
 {
 	Super::BeginPlay();
+	TestPlayer = Cast<ATestPlayer>(GetOwner());
 
 	// ...
 	

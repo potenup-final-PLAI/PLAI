@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "LogItemComp.generated.h"
 
 USTRUCT(BlueprintType)
@@ -31,4 +32,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ATestPlayer* TestPlayer;
 };
