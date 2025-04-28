@@ -3,6 +3,8 @@
 
 #include "LogItemComp.h"
 #include "HttpModule.h"
+#include "JsonObjectConverter.h"
+#include "LoginComp.h"
 #include "Components/VerticalBox.h"
 #include "Interfaces/IHttpRequest.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
@@ -25,7 +27,7 @@ void ULogItemComp::BeginPlay()
 {
 	Super::BeginPlay();
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
-	// ...
+	PC = Cast<APlayerController>(TestPlayer->GetController());
 	
 }
 
@@ -35,10 +37,16 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::L))//장비창 불러오기
+	{
+		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::L키 장비창 불러오기"));
+		GetEquipInfo();
+	}
+
 	// ...
 }
 
-void ULogItemComp::HttpEquipPost()
+void ULogItemComp::HttpEquipPost(FPostEquipId PostEquipId)
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 	
@@ -70,17 +78,31 @@ void ULogItemComp::HttpEquipPost()
 
 void ULogItemComp::GetEquipInfo()
 {
-	for (UWidget* widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->RightBox->GetAllChildren())
+	FPostEquipId PostEquipId;
+	Fequipment_info equipment_info;
+	
+	for (UWidget* widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
 	{
 		if (USlotEquip* SlotEquip = Cast<USlotEquip>(widget))
 		{
-			Foptions options;
-			options.hp = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
-			options.attack = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
-			options.defense = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
-			options.resistance = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
-			options.critical_rate = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
+			equipment_info.options.hp = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
+			equipment_info.options.attack = SlotEquip->ItemStructTable.ItemStructStat.item_ATK;
+			equipment_info.options.defense = SlotEquip->ItemStructTable.ItemStructStat.item_DEF;
+			equipment_info.options.resistance = SlotEquip->ItemStructTable.ItemStructStat.item_RES;
+			equipment_info.options.critical_rate = SlotEquip->ItemStructTable.ItemStructStat.Item_CRIT;
+			equipment_info.options.critical_damage = SlotEquip->ItemStructTable.ItemStructStat.item_CRITDMG;
+			equipment_info.item_id = SlotEquip->ItemStructTable.Item_Id;
+			
+			PostEquipId.equipment_info.Add(equipment_info);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo 실패함"));
 		}
 	}
+	PostEquipId.character_id = TestPlayer->LoginComp->character_id;
+	FString jsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(PostEquipId,jsonString);
+	UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo PostEquipId: %s"), *jsonString);
 }
 

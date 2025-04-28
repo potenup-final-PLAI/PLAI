@@ -70,9 +70,13 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Slot::왼쪽마우스 NativeOnMouseButtonDown"));
+		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item id %s"),*ItemStructTable.Item_Id)
+		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Attack%d"),ItemStructTable.ItemStructStat.item_ATK)
+		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Defense%d"),ItemStructTable.ItemStructStat.item_DEF)
 		
 		return UWidgetBlueprintLibrary::DetectDragIfPressed(MouseEvent, this,
 			EKeys::LeftMouseButton).NativeReply;
+	
 	}
 	if (MouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
 	{

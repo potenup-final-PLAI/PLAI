@@ -73,8 +73,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ATestPlayer* TestPlayer;
-
-	void HttpEquipPost();
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	APlayerController* PC;
+	
+	void HttpEquipPost(FPostEquipId PostEquipId);
 	void GetEquipInfo();
 };

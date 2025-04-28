@@ -127,6 +127,8 @@ struct FItemStructTable: public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere)
+	FString Item_Id = FString("Item_Id");
+	UPROPERTY(EditAnywhere)
 	int32 ItemTop = -1;
 	UPROPERTY(EditAnywhere)
 	int32 ItemIndex = 0;
