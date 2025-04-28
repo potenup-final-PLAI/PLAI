@@ -24,5 +24,23 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AMonster> Monster;
+	TArray<TSubclassOf<class AMonster>> MonsterFactory;
+
+	UPROPERTY(EditAnywhere)
+	class AMonster* Monster;
+
+	UPROPERTY(EditAnywhere)
+	TArray<class AMonster*> Monsters;
+
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(EditAnywhere)
+	bool bTimer = false;
+	
+	UPROPERTY(EditAnywhere)
+	float CurrentTime = 0;
+
+	void MyTimer(void(AMonSpawn::*Func)(),float Second = 2.0f);
+	void MyTimer(TFunction<void()> Func, float Second = 2.0f);
 };

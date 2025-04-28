@@ -7,7 +7,6 @@ DECLARE_DELEGATE_OneParam(FOnSing, bool bSign)
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Interfaces/IHttpRequest.h"
 #include "PLAI/Item/UI/Main/UiMain.h" 
 #include "LoginComp.generated.h"
 
@@ -59,7 +58,12 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
-    
+
+	UPROPERTY(EditAnywhere)
+	FName OldLevelStreamName;
+	
+	UPROPERTY(EditAnywhere)
+    FName NewLevelStreamName;
 	
 	FOnLogin OnLogin;
 

@@ -7,6 +7,14 @@
 #include "MonFsm.generated.h"
 
 
+UENUM(BlueprintType,Blueprintable)
+enum class EMonSpawnType : uint8
+{
+	Idle UMETA(DisplayName = "Idle"),
+	Around UMETA(DisplayName = "Arround"),
+	Attack UMETA(DisplayName = "Attack"),
+};
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API UMonFsm : public UActorComponent
 {
@@ -24,4 +32,5 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+
 };
