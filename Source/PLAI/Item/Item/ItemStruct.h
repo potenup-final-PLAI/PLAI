@@ -56,7 +56,7 @@ USTRUCT(BlueprintType,Blueprintable)
 struct FItemStruct: public FTableRowBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	UPROPERTY(EditAnywhere)
 	int32 ItemTop = -1;

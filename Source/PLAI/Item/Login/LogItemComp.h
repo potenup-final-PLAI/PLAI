@@ -8,12 +8,50 @@
 #include "LogItemComp.generated.h"
 
 USTRUCT(BlueprintType)
-struct FHttpEquipStruct
+struct Foptions
 {
 	GENERATED_BODY()
 public:
-	
+	UPROPERTY(EditAnywhere)
+	int32 hp = 0;
+	UPROPERTY(EditAnywhere)
+	int32 attack = 0;
+	UPROPERTY(EditAnywhere)
+	int32 defense = 0;
+	UPROPERTY(EditAnywhere)
+	int32 resistance = 0;
+	UPROPERTY(EditAnywhere)
+	int32 critical_rate = 0;
+	UPROPERTY(EditAnywhere)
+	int32 critical_damage = 0;
+	UPROPERTY(EditAnywhere)
+	int32 move_range = 0;
+	UPROPERTY(EditAnywhere)
+	int32 speed = 0;
 };
+
+USTRUCT(BlueprintType)
+struct Fequipment_info
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	FString item_id = TEXT("");
+	UPROPERTY(EditAnywhere)
+	Foptions options;
+};
+
+USTRUCT(BlueprintType)
+struct FPostEquipId
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	FString character_id = TEXT("char");
+	UPROPERTY(EditAnywhere)
+	TArray<Fequipment_info>equipment_info;
+};
+
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API ULogItemComp : public UActorComponent
@@ -35,4 +73,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ATestPlayer* TestPlayer;
+
+	void HttpEquipPost();
+
+	void GetEquipInfo();
 };
