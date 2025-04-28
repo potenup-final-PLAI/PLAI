@@ -51,6 +51,18 @@ void ULoginComp::BeginPlay()
 void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 100),
+	FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
+					  "나의 CharacterId [%s]"),*User_id, *character_id),nullptr,FColor::Red,0.f,false);
+
+	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+	{ if (PC->WasInputKeyJustPressed(EKeys::C)) // 캐릭터 생성 요청
+		{   UE_LOG(LogTemp,Display,TEXT("Input C Key JustPressed"));
+		    HttpCreatePost();
+		}
+	}
+	
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::H))
 		{
@@ -130,8 +142,6 @@ void ULoginComp::GetEquipInfo()
 
 void ULoginComp::HttpEquipPost(FString String)
 {
-    
-	
 	UE_LOG(LogTemp, Display, TEXT("로그인 컴프%s"), *String);
 	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
 	HttpRequest->SetURL(TEXT("/LoginComp/EquipInven/Login"));
@@ -142,12 +152,10 @@ void ULoginComp::HttpEquipPost(FString String)
     HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest,
     	FHttpResponsePtr HttpResponse, bool bSucceeded)
     {
-	  if (bSucceeded)
-	  {
-		  FString JsonString = HttpResponse->GetContentAsString();
-	  	  // 추후에 로그 한번 찍어보자 JsonString
-	  	  // FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,);
-	  }  
+    	if (bSucceeded)
+    	{
+    		
+    	}  
     });
 }
 
@@ -176,10 +184,51 @@ void ULoginComp::HttpLoginPost()
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &LoginStructGet);
 			if (LoginStructGet.user_id != TEXT("string"))
 			{ OnLogin.ExecuteIfBound(true);
-				UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인%s"),*LoginStructGet.user_id); }
+				UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인%s"),*LoginStructGet.user_id);
+				User_id = LoginStructGet.user_id;
+			}
 			else
 			{ OnLogin.ExecuteIfBound(false);
 				UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인 실패")); }
+		}
+	});
+	httpRequest->ProcessRequest();
+
+	// FLoginStruct LoginStruct;
+	// FString JsonString = HttpResponse->GetContentAsString();
+	// UE_LOG(LogTemp,Warning,TEXT("loginComp Login 답변 %s"),*JsonString)
+	// FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&LoginStruct);
+	// user_id = LoginStruct.
+}
+
+void ULoginComp::HttpCreatePost()
+{
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+	
+	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/characters/create"));
+	httpRequest->SetVerb("POST");
+	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	FCreateStruct CreateStruct;
+	CreateStruct.user_id = User_id;
+
+	FString JsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(CreateStruct, JsonString);
+	httpRequest->SetContentAsString(JsonString);
+	
+	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
+	{
+		if (bProcessedSuccessfully)
+		{
+			FCreateStructGet CreateStructGet;
+			FString JsonString = HttpResponse->GetContentAsString();
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 캐릭터 생성 성공 %s"),*JsonString);
+			FJsonObjectConverter::UStructToJsonObjectString(CreateStructGet,JsonString);
+			character_id = CreateStructGet.character_id;
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 캐릭터 생성 실패 %d"),HttpResponse->GetResponseCode());
 		}
 	});
 	httpRequest->ProcessRequest();
@@ -201,7 +250,7 @@ void ULoginComp::HttpSignPost()
 	FJsonObjectConverter::UStructToJsonObjectString(LoginStruct, JsonString);
 	httpRequest->SetContentAsString(JsonString);
 	
-	httpRequest->OnProcessRequestComplete().BindLambda([](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
+	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
 	{
 		if (bProcessedSuccessfully)
 		{
@@ -216,9 +265,6 @@ void ULoginComp::HttpSignPost()
 	httpRequest->ProcessRequest();
 }
 
-void ULoginComp::HttpInitPost()
-{
-}
 
 
 //

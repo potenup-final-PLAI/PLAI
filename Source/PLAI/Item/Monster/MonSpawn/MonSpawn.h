@@ -27,9 +27,6 @@ public:
 	TArray<TSubclassOf<class AMonster>> MonsterFactory;
 
 	UPROPERTY(EditAnywhere)
-	class AMonster* Monster;
-
-	UPROPERTY(EditAnywhere)
 	TArray<class AMonster*> Monsters;
 
 	UPROPERTY(EditAnywhere)

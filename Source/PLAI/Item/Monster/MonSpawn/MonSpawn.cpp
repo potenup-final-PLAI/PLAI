@@ -26,27 +26,52 @@ void AMonSpawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//몬스터 생성 타이머
-	MyTimer([this]()
+	// CurrentTime += DeltaTime;
+	
+	if (CurrentTime > 2)
 	{
-		if (Monsters.Num() > 10){UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 그만만들라"))}
 		UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 실행중"));
+		float x = FMath::RandRange(-1000,1000);
+		float y = FMath::RandRange(-1000,1000);
+		float z = FMath::RandRange(0,100);
 		
 		int32 RandMonsterIndex = FMath::RandRange(0, MonsterFactory.Num() - 1);
-		
 		AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[RandMonsterIndex]);
 		
-		float x = FMath::RandRange(-1000,1000);
-        float y = FMath::RandRange(-1000,1000);
-        float z = FMath::RandRange(0,100);
+		Monster->SetActorLocation(GetActorLocation() + FVector(x,y,z));
+		DrawDebugSphere(GetWorld(),GetActorLocation() + FVector(x,y,z),20,20,FColor::Red);
 		
-		Monster->SetActorLocation(FVector(x,y,z));
+		UE_LOG(LogTemp,Warning,TEXT("MonSpawn 어디서 떨어지냐 %f %f %f"),x,y,z);
+		UE_LOG(LogTemp,Warning,TEXT("MonSpawn 몬스터는 어디서 떨어지냐 %f %f %f"),Monster->GetActorLocation().X,
+			Monster->GetActorLocation().Y,Monster->GetActorLocation().Z);
+		
 		Monsters.Add(Monster);
-		if (bTimer == false)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("AMonSpawn:: 타이머 false"));
-		}
-	}, 3);
+		CurrentTime = 0;
+	}
+
+	//몬스터 생성 타이머
+	// MyTimer([this]()
+	// {
+	// 	UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 실행중"));
+	// 	float x = FMath::RandRange(-1000,1000);
+	// 	float y = FMath::RandRange(-1000,1000);
+	// 	float z = FMath::RandRange(0,100);
+	// 	
+	// 	int32 RandMonsterIndex = FMath::RandRange(0, MonsterFactory.Num() - 1);
+	// 	AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[RandMonsterIndex]);
+	// 	
+	// 	Monster->SetActorLocation(GetActorLocation() + FVector(x,y,z));
+	// 	DrawDebugSphere(GetWorld(),GetActorLocation() + FVector(x,y,z),20,20,FColor::Red);
+	// 	
+	// 	UE_LOG(LogTemp,Warning,TEXT("MonSpawn 어디서 떨어지냐 %f %f %f"),x,y,z);
+	// 	
+	// 	Monsters.Add(Monster);
+	// 	
+	// 	if (bTimer == true)
+	// 	{
+	// 		UE_LOG(LogTemp, Warning, TEXT("AMonSpawn:: 타이머 true"));
+	// 	}
+	// }, 2);
 
 }
 

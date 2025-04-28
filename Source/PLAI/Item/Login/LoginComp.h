@@ -11,8 +11,8 @@ DECLARE_DELEGATE_OneParam(FOnSing, bool bSign)
 #include "LoginComp.generated.h"
 
 // 서버 가입 요청 토큰
-USTRUCT()
-struct FLoginStructGet
+USTRUCT(BlueprintType)
+struct FLoginStructRes
 {
 	GENERATED_BODY()
 public:
@@ -25,6 +25,7 @@ public:
 	UPROPERTY()
 	FString user_id = TEXT("string");
 };
+
 // 서버 로그인 요청 토큰
 USTRUCT(BlueprintType)
 struct FLoginStruct
@@ -32,14 +33,65 @@ struct FLoginStruct
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere)
-	FString email = TEXT("Email");
-	
+	FString email = TEXT("string");
 	UPROPERTY(EditAnywhere)
-	FString password = TEXT("PassWord");
-
-	UPROPERTY(EditAnywhere)
-	bool bInitCharacter = false;
+	FString password = TEXT("string");
 };
+
+// 서버 로그인 답변 토큰
+USTRUCT(BlueprintType)
+struct FLoginStructGet
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	FString massage = TEXT("Email");
+	UPROPERTY(EditAnywhere)
+	FString access_token = TEXT("Email");
+	UPROPERTY(EditAnywhere)
+	FString refresh_token = TEXT("PassWord");
+	UPROPERTY(EditAnywhere)
+	FString token_type = TEXT("Email");
+	UPROPERTY(EditAnywhere)
+	FString user_id = TEXT("Email");
+};
+
+USTRUCT(BlueprintType)
+struct FCreateStruct
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	FString user_id = TEXT("Email");
+	UPROPERTY(EditAnywhere)
+	FString character_name = TEXT("Char_non");
+	UPROPERTY(EditAnywhere)
+	FString job = TEXT("warrior");
+	UPROPERTY(EditAnywhere)
+	FString gender = TEXT("M");
+	UPROPERTY(editanywhere)
+	TArray<FString> Traits;
+};
+
+USTRUCT(BlueprintType)
+struct FCreateStructGet
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	FString massage = TEXT("Email");
+	UPROPERTY(EditAnywhere)
+	FString character_id = TEXT("Cha None");
+};
+
+
+
+
+// USTRUCT(BlueprintType)
+
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API ULoginComp : public UActorComponent
@@ -59,6 +111,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+    UPROPERTY(EditAnywhere)
+	FString User_id = FString("user_id");
+	
+	UPROPERTY(EditAnywhere)
+	FString character_id = FString("");
+	
 	UPROPERTY(EditAnywhere)
 	FName OldLevelStreamName;
 	
@@ -87,16 +145,17 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString UserPw;
 	
-	void HttpEquipPost(FString String);
-	
-	void HttpLoginPost();
-	
 	void HttpSignPost();
 
-	void HttpInitPost();
+	void HttpLoginPost();
+	
+	void HttpCreatePost();
+
+
+	
 	
 	void GetEquipInfo();
-
+	void HttpEquipPost(FString String);
 	//테스트 테이블 변환
 	// void TransDataTable();
 
