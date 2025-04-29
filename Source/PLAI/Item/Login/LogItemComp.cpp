@@ -90,9 +90,9 @@ void ULogItemComp::GetEquipInfo()
 		}
 	}
 	
-	PostEquipId.character_id = TestPlayer->LoginComp->UserFullInfo.user_id;
+	PostEquipId.character_id = TestPlayer->LoginComp->UserFullInfo.character_info.character_id;
 	
-	UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo 캐릭터 아이디 PostEquipId %s"),*PostEquipId.character_id);
+	UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo Test->Character Id = PostEquipId  [%s]"),*TestPlayer->LoginComp->UserFullInfo.character_info.character_id);
 	UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo 캐릭터 아이디 구조체 LoginComp %s"),*TestPlayer->LoginComp->UserFullInfo.user_id);
 	
 	FString jsonString;
@@ -101,4 +101,12 @@ void ULogItemComp::GetEquipInfo()
 
 	HttpEquipPost(jsonString);
 }
+
+
+
+void ULogItemComp::GetInvenInfo()
+{
+}
+
+
 

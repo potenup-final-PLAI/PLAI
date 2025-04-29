@@ -54,7 +54,7 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 	DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 100),
 	FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
-					  "나의 CharacterId [%s]"),*User_id, *character_id),nullptr,FColor::Red,0.f,false);
+					  "나의 CharacterId [%s]"),*User_id, *UserFullInfo.character_info.character_id),nullptr,FColor::Red,0.f,false);
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::One)) // 1 캐릭터 생성 요청
@@ -222,15 +222,19 @@ void ULoginComp::HttpMePost()
 			FString JsonString = HttpResponse->GetContentAsString();
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 성공 %s"),*JsonString);
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &UserFullInfo);
+			FString GetJson;
 			
-			character_id = UserFullInfo.user_id;
+			FJsonObjectConverter::UStructToJsonObjectString(UserFullInfo,GetJson);
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
+			
+			character_id = UserFullInfo.character_info.character_id;
 			
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 Logitem Comp CharId%s"),*TestPlayer->LogItemComp->Char_id)
 
-			for (int32 i = 0; i < UserFullInfo.equipment_info.item_list.Num(); i++)
-			{
-				UE_LOG(LogTemp,Warning,TEXT("로그인컴프 장비이름%s"),*UserFullInfo.equipment_info.item_list[i].item_id)
-			}
+			// for (int32 i = 0; i < UserFullInfo.equipment_info.item_list.Num(); i++)
+			// {
+			// 	UE_LOG(LogTemp,Warning,TEXT("로그인컴프 장비이름%s"),*UserFullInfo.equipment_info.item_list[i].item_id)
+			// }
 		}
 		else
 		{

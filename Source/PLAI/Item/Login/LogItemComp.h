@@ -80,5 +80,8 @@ public:
 	FString Char_id = FString("char");
 	
 	void HttpEquipPost(FString JsonString);
+	
 	void GetEquipInfo();
+
+	void GetInvenInfo();
 };

@@ -446,9 +446,13 @@ void UInvenComp::LoadItemInventory()
 		USlot* Slot = Cast<USlot>(MenuInven->WBP_ItemInven->WrapBox->GetChildAt(i));
 		Slot->ItemStructTable = ItemStructTables.ItemStructTables[i];
 		if (Slot->ItemStructTable.ItemTop == -1)
-		{ UE_LOG(LogTemp,Warning,TEXT("인벤컴프 슬롯 itemtop -1 리턴")); }
+		{
+			// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 슬롯 itemtop -1 리턴"));
+		}
 		else
-		{ Slot->SlotImageUpdate(); }
+		{
+			Slot->SlotImageUpdate();
+		}
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 로드"))
 }

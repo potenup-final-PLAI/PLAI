@@ -21,7 +21,7 @@ ATestPlayer::ATestPlayer()
 	InvenComp = CreateDefaultSubobject<UInvenComp>(TEXT("InvenComp"));
 	StoreComp = CreateDefaultSubobject<UStoreComp>(TEXT("StoreComp"));
 	LoginComp = CreateDefaultSubobject<ULoginComp>(TEXT("LoginComp"));
-	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("UcretureComp"));
+	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("CreComp"));
 	LogItemComp = CreateDefaultSubobject<ULogItemComp>(TEXT("ItemComp"));
 }
 

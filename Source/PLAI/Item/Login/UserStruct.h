@@ -45,7 +45,7 @@ public:
     int32 points;
 };
 
-// USTRUCT(BlueprintType)
+// USTRUCT(BlueprintType) 얘네는 아이템 인벤 컴프? 장비 보내는 곳에서 정의해놨음
 // struct FOptions
 // {
 //     GENERATED_BODY()

@@ -130,6 +130,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	FUserFullInfo UserFullInfo;
 	
+	
     UPROPERTY(EditAnywhere)
 	FString User_id = FString("user_id");
 	
