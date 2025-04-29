@@ -203,6 +203,18 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "123@q.q",
+			"pw": "q",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }

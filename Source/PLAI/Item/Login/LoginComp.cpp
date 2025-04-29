@@ -134,7 +134,7 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 void ULoginComp::HttpLoginPost()
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
-	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/users/login"));
+	httpRequest->SetURL(TEXT("https://ada5-221-148-189-129.ngrok-free.app/users/login"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	
@@ -230,15 +230,6 @@ void ULoginComp::HttpMePost()
 			character_id = UserFullInfo.character_info.character_id;
 			
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 Logitem Comp CharId%s"),*TestPlayer->LogItemComp->Char_id)
-
-			// for (int32 i = 0; i < UserFullInfo.equipment_info.item_list.Num(); i++)
-			// {
-			// 	UE_LOG(LogTemp,Warning,TEXT("로그인컴프 장비이름%s"),*UserFullInfo.equipment_info.item_list[i].item_id)
-			// }
-		}
-		else
-		{
-			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 실패 %d"),HttpResponse->GetResponseCode());
 		}
 	});
 	httpRequest->ProcessRequest();
