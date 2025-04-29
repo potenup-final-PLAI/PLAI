@@ -47,21 +47,21 @@ void ABattleHttpActor::HttpPost()
 
 	// 서버에게 보내고 싶은 데이터 값 (Json) 
 	// battle start 구조체 부분 더미데이터 부분
-	FCharacterDetail startInfo;
-	startInfo.id = TEXT("monster1");
-	startInfo.name = TEXT("아이스 골램");
-	startInfo.type = TEXT("monster");
-	startInfo.personality = TEXT("충동적");
-	startInfo.skills.Add(TEXT("얼음 창"));
-	startInfo.skills.Add(TEXT("수비 자세"));
+	FCharacterData characterInfo;
+	characterInfo.id = TEXT("monster1");
+	characterInfo.name = TEXT("아이스 골램");
+	characterInfo.type = TEXT("monster");
+	characterInfo.traits.Add(TEXT("충동적"));
+	characterInfo.skills.Add(TEXT("얼음 창"));
+	characterInfo.skills.Add(TEXT("수비 자세"));
 
 	FEnvironmentState environmentInfo;
-	environmentInfo.characters.Add(startInfo);
+	environmentInfo.characters.Add(characterInfo);
 	environmentInfo.terrain = TEXT("설산");
 	environmentInfo.weather = TEXT("눈");
 
 	// action 더미데이터 구조체 부분
-	FCharacterInfo info;
+	FCharacterStatus info;
 	info.id = TEXT("monster1");
 	info.position.Add(1);
 	info.position.Add(10);
@@ -70,7 +70,7 @@ void ABattleHttpActor::HttpPost()
 
 	battleState.cycle = 2;
 	battleState.turn = 5;
-	battleState.target_monster_id = TEXT("monster1");
+	battleState.current_character_id = TEXT("monster1");
 	battleState.characters.Add(info);
 
 

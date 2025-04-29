@@ -27,12 +27,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY(EditAnywhere)
-	class ABasePlayerState* state;
 	
-	FTimerHandle TimerHandle;
-	void TryInitStatus();
 
 	//--------------Test---------------------
 	void MoveToPlayer(class ABattlePlayer* player, class AGridTileManager* tileManager);

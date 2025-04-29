@@ -27,7 +27,7 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
 	ELifeState playerLifeState;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
-	ELifeState EnemyLifeState;
+	ELifeState enemyLifeState;
 
 	//--------------------AP System--------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")

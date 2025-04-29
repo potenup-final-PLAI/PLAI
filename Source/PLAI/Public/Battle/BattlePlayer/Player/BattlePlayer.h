@@ -27,11 +27,7 @@ public:
 	class UInputAction* IA_Move;
 
 	//--------------Player Status--------------------
-	UPROPERTY(EditAnywhere)
-	class ABasePlayerState* state;
-	
-	FTimerHandle TimerHandle;
-	void TryInitStatus();
+
 
 	
 	

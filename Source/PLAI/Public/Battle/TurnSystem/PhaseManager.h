@@ -63,6 +63,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	TArray<ABaseBattlePawn*> unitQueue;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	TArray<ABaseBattlePawn*> httpUnitQueue;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase")
 	TSubclassOf<ABaseBattlePawn> unitFactory;
 
@@ -83,4 +86,12 @@ public:
 	void EndEnemyPhase();
 	// 전투 종료
 	void BattleEnd();
+
+	//--------------Test ------------------
+
+	bool bAPITest = true;
+	FTimerHandle timerAPIHandle;
+	void TrySendInitialState();
+	void SetStartBattleAPI();
+	bool AreAllUnitsInitialized() const;
 };

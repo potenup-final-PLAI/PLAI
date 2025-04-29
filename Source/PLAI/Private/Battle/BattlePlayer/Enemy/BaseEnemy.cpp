@@ -22,7 +22,7 @@ void ABaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseEnemy::TryInitStatus, 0.1f, true);
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABaseBattlePawn::TryInitStatus, 0.1f, true);
 }
 
 // Called every frame
@@ -37,16 +37,6 @@ void ABaseEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-}
-
-void ABaseEnemy::TryInitStatus()
-{
-	if (ABasePlayerState* MyState = Cast<ABasePlayerState>(GetPlayerState()))
-	{
-		SetStatus(this);
-		state = MyState;
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle); // 타이머 멈춤
-	}
 }
 
 void ABaseEnemy::MoveToPlayer(ABattlePlayer* player, AGridTileManager* tileManager)
@@ -114,9 +104,13 @@ void ABaseEnemy::FindAndAttackPlayer()
 		// 탐색 했을 때 그 객체가 Player라면
 		if (ABattlePlayer* detectedPlayer = Cast<ABattlePlayer>(overlap.GetActor()))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Detected Player"));
 			// 플레이어가 있다면 공격
-			detectedPlayer->BaseAttack(detectedPlayer);
+			this->BaseAttack(detectedPlayer);
 			break;
 		}
 	}
+	
+	// 끝났으면 턴 종료 처리
+	OnTurnEnd();
 }

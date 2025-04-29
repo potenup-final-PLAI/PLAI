@@ -4,13 +4,14 @@
 #include "Battle/TurnSystem/PhaseManager.h"
 
 #include "BasePlayerState.h"
+#include "GridTile.h"
+#include "JsonObjectConverter.h"
 #include "Battle/TurnSystem/TurnManager.h"
-#include "Developer/AITestSuite/Public/AITestsCommon.h"
 #include "Enemy/BaseEnemy.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
-
+#include "Battle/Util/BattleType/BattleTypes.h"
 void AUPhaseManager::BeginPlay()
 {
 	Super::BeginPlay();
@@ -19,6 +20,9 @@ void AUPhaseManager::BeginPlay()
 		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
 
 	SetPhase(EBattlePhase::BattleStart);
+
+
+	GetWorld()->GetTimerManager().SetTimer(timerAPIHandle, this, &AUPhaseManager::TrySendInitialState, 0.2f, true);
 }
 
 void AUPhaseManager::SetCycle()
@@ -52,8 +56,9 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 	case EBattlePhase::TurnProcessing:
 		break;
 	case EBattlePhase::RoundEnd:
-		// 속도를 기반으로 유닛 정렬 작업 및 다음 턴 시작
-		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundEnd State"));
+		// 턴 카운트 초기화
+		turnManager->turnCount = 0;
+		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundEnd State Turn CNT : %d"), turnManager->turnCount);
 		SetPhase(EBattlePhase::RoundStart);
 		break;
 	case EBattlePhase::BattleEnd:
@@ -79,12 +84,15 @@ void AUPhaseManager::SetUnitQueue()
 
 	// 큐 초기화
 	unitQueue.Empty();
+	httpUnitQueue.Empty();
+	
 	// 월드 상에 있는 Actor들을 모아서 유닛 큐에 하나씩 집어 넣기
 	for (AActor* unit : unitArr)
 	{
 		if (ABaseBattlePawn* pawn = Cast<ABaseBattlePawn>(unit))
 		{
 			unitQueue.Add(pawn);
+			httpUnitQueue.Add(pawn);
 			UE_LOG(LogTemp, Warning, TEXT("Queue Size %d, Actor Name : %s"),
 			       unitQueue.Num(), *pawn->GetActorNameOrLabel());
 
@@ -266,8 +274,6 @@ void AUPhaseManager::EndEnemyPhase()
 		return;
 	}
 	
-	
-	
 	SetPhase(EBattlePhase::TurnProcessing);
 	UE_LOG(LogTemp, Warning, TEXT("End Enemy Phase"));
 	
@@ -289,4 +295,94 @@ void AUPhaseManager::BattleEnd()
 	turnManager->SetTurnState(ETurnState::None);
 	UE_LOG(LogTemp, Warning, TEXT("End Battle"));
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("OpenWorldTestMap"));
+}
+
+void AUPhaseManager::TrySendInitialState()
+{
+	if (AreAllUnitsInitialized())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(timerAPIHandle);
+		SetStartBattleAPI(); // 이때 JSON 전송
+	}
+}
+
+void AUPhaseManager::SetStartBattleAPI()
+{
+	// 1. 새 구조체 인스턴스 준비
+	FBattleTurnState turnStateData;
+	turnStateData.cycle = cycle; // 현재 싸이클
+	turnStateData.turn = turnManager->turnCount; // Turn 수를 별도로 관리 중이면 여기서 가져오기
+	turnStateData.current_character_id = turnManager->curUnit->GetName(); // 혹은 유닛에 정의된 ID
+
+	// 2. 현재 존재하는 모든 유닛 정보 담기
+	TArray<ABaseBattlePawn*> AllUnits = httpUnitQueue;
+
+	// Queue 점검용 테스트 코드 
+	for (ABaseBattlePawn* unit : httpUnitQueue)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Checking unit: %s"), *unit->GetName());
+	
+		if (!IsValid(unit))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Invalid unit!"));
+			continue;
+		}
+	
+		if (!unit->state)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Unit %s has no state"), *unit->GetName());
+			continue;
+		}
+	
+		if (!unit->currentTile)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Unit %s has no current tile"), *unit->GetName());
+			continue;
+		}
+	
+		// 여기에 도달한 경우만 추가됨
+		UE_LOG(LogTemp, Warning, TEXT("✅ Unit %s passed all checks"), *unit->GetName());
+	}
+	for (ABaseBattlePawn* unit : AllUnits)
+	{
+		if (!IsValid(unit) || !unit->state || !unit->currentTile) continue;
+
+		FCharacterStatus charStatus;
+		charStatus.id = unit->GetName(); // 혹은 별도의 ID 필드
+		charStatus.position = { unit->currentTile->gridCoord.X, unit->currentTile->gridCoord.Y };
+
+		if (ABattlePlayer* Player = Cast<ABattlePlayer>(unit))
+		{
+			charStatus.hp = unit->state->playerStatus.hp;
+			charStatus.ap = unit->state->curAP;
+			charStatus.mov = unit->state->playerStatus.move_Range;
+		}
+		else if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(unit))
+		{
+			charStatus.hp = unit->state->enemyStatus.hp;
+			charStatus.ap = unit->state->curAP;
+			charStatus.mov = unit->state->enemyStatus.move_Range;
+		}
+
+		// 상태 이상 정보는 추후 시스템에 따라 추가
+		charStatus.status_effects = {}; // 임시로 빈 배열
+
+		turnStateData.characters.Add(charStatus);
+	}
+	FString jsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(turnStateData, jsonString);
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonString);
+}
+
+bool AUPhaseManager::AreAllUnitsInitialized() const
+{
+	for (ABaseBattlePawn* Unit : httpUnitQueue)
+	{
+		if (!Unit || !Unit->state || !Unit->currentTile)
+		{
+			return false;
+		}
+	}
+	return true;
 }

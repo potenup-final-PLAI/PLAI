@@ -28,6 +28,8 @@ void ABaseBattlePawn::BeginPlay()
 	Super::BeginPlay();
 	
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+
+	turnManager = Cast<ATurnManager>(UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
 	
 }
 
@@ -56,8 +58,16 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 				currentTile = pathArray.Last();
 				pathArray.Empty();
 
-				// 이동 끝났으면 턴 종료 처리
-				OnTurnEnd();
+				if (auto* enemy = Cast<ABaseEnemy>(this))
+				{
+					// Player 찾아서 공격
+					enemy->FindAndAttackPlayer();
+				}
+				else
+				{
+					// 이동 끝났으면 턴 종료 처리
+					OnTurnEnd();
+				}
 			}
 		}
 	}
@@ -65,6 +75,9 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 
 void ABaseBattlePawn::OnTurnStart()
 {
+	// 턴이 시작됐으면 턴 카운트 1 증가
+	if (turnManager) turnManager->turnCount++;
+	
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
 		AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
@@ -84,8 +97,6 @@ void ABaseBattlePawn::OnTurnStart()
 		if (ABattlePlayer* target = enemy->FindClosestPlayer(players))
 		{
 			enemy->MoveToPlayer(target, tileManger);
-			// Player 찾아서 공격
-			enemy->FindAndAttackPlayer();
 		}
 		
 		// FTimerHandle timerHandle;
@@ -140,6 +151,7 @@ void ABaseBattlePawn::TestClick()
 				SetActorLocation(targetLoc);
 				// goalTile 쪽으로 이동
 				targetTile = testTile;
+				currentTile = testTile;
 			}
 			else
 			{
@@ -191,77 +203,81 @@ void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 	}
 }
 
-void ABaseBattlePawn::SetStatus(ABaseBattlePawn* unit)
+void ABaseBattlePawn::TryInitStatus()
+{
+	if (ABasePlayerState* MyState = Cast<ABasePlayerState>(GetPlayerState()))
+	{
+		state = MyState;
+		SetStatus();
+		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+	}
+}
+void ABaseBattlePawn::SetStatus()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Set state Start"));
-	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
+	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Cast BattlePlayer"));
-		if (auto* state = Cast<ABasePlayerState>(unit->GetPlayerState()))
+		if (!state)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Cast ABasePlayerState"));
-
-			UE_LOG(LogTemp, Warning, TEXT("!!! Before setting PlayerStatus"));
-			state->playerStatus.hp = 100;
-			state->playerStatus.attack = 7;
-			state->playerStatus.defense = 10;
-			state->playerStatus.resistance = 7;
-			state->playerStatus.move_Range = 5;
-			state->playerStatus.critical_Rate = 0.05f;
-			state->playerStatus.critical_Damage = 1.5f;
-			state->playerStatus.speed = 5;
-
-			state->playerLifeState = ELifeState::Alive;
-			UE_LOG(LogTemp, Warning, TEXT("!!! After setting PlayerStatus"));
-			
-			UE_LOG(LogTemp, Warning, TEXT("Player State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "
-					", crit : %f, crit_Damge : %f, spd : %d"),
-					state->playerStatus.hp,
-					state->playerStatus.attack,
-					state->playerStatus.defense,
-					state->playerStatus.resistance,
-					state->playerStatus.move_Range,
-					state->playerStatus.critical_Rate,
-					state->playerStatus.critical_Damage,
-					state->playerStatus.speed);
-			
-			UE_LOG(LogTemp, Warning, TEXT("state : %s"), *UEnum::GetValueAsString(state->playerLifeState));
+			UE_LOG(LogTemp, Error, TEXT("SetStatus called but 'state' is null!"));
+			return;
 		}
+		
+		UE_LOG(LogTemp, Warning, TEXT("!!! Before setting PlayerStatus"));
+		state->playerStatus.hp = 100;
+		state->playerStatus.attack = 7;
+		state->playerStatus.defense = 10;
+		state->playerStatus.resistance = 7;
+		state->playerStatus.move_Range = 5;
+		state->playerStatus.critical_Rate = 0.05f;
+		state->playerStatus.critical_Damage = 1.5f;
+		state->playerStatus.speed = 5;
+
+		state->playerLifeState = ELifeState::Alive;
+		UE_LOG(LogTemp, Warning, TEXT("!!! After setting PlayerStatus"));
+		
+		UE_LOG(LogTemp, Warning, TEXT("Player State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "
+				", crit : %f, crit_Damge : %f, spd : %d"),
+				state->playerStatus.hp,
+				state->playerStatus.attack,
+				state->playerStatus.defense,
+				state->playerStatus.resistance,
+				state->playerStatus.move_Range,
+				state->playerStatus.critical_Rate,
+				state->playerStatus.critical_Damage,
+				state->playerStatus.speed);
+					
+		UE_LOG(LogTemp, Warning, TEXT("state : %s"), *UEnum::GetValueAsString(state->playerLifeState));
 	}
-	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
+	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
-		if (auto* state = Cast<ABasePlayerState>(enemy->GetPlayerState()))
-		{
-			// enemy 세팅
-			UE_LOG(LogTemp, Warning, TEXT("Cast ABasePlayerState"));
+		// 오크 세팅
+		UE_LOG(LogTemp, Warning, TEXT("!!! Before setting PlayerStatus"));
+		state->enemyStatus.hp = 80;
+		state->enemyStatus.attack = 9;
+		state->enemyStatus.defense = 6;
+		state->enemyStatus.resistance = 3;
+		state->enemyStatus.move_Range = 5;
+		state->enemyStatus.critical_Rate = 0.04f;
+		state->enemyStatus.critical_Damage = 1.5f;
+		state->enemyStatus.speed = 4;
 
-			// 오크 세팅
-			UE_LOG(LogTemp, Warning, TEXT("!!! Before setting PlayerStatus"));
-			state->playerStatus.hp = 80;
-			state->playerStatus.attack = 9;
-			state->playerStatus.defense = 6;
-			state->playerStatus.resistance = 3;
-			state->playerStatus.move_Range = 5;
-			state->playerStatus.critical_Rate = 0.04f;
-			state->playerStatus.critical_Damage = 1.5f;
-			state->playerStatus.speed = 4;
+		state->enemyLifeState = ELifeState::Alive;
+		UE_LOG(LogTemp, Warning, TEXT("!!! After setting PlayerStatus"));
+		
+		UE_LOG(LogTemp, Warning, TEXT("Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "
+				", crit : %f, crit_Damge : %f, spd : %d"),
+				state->enemyStatus.hp,
+				state->enemyStatus.attack,
+				state->enemyStatus.defense,
+				state->enemyStatus.resistance,
+				state->enemyStatus.move_Range,
+				state->enemyStatus.critical_Rate,
+				state->enemyStatus.critical_Damage,
+				state->enemyStatus.speed);
+		
+		UE_LOG(LogTemp, Warning, TEXT("state : %s"), *UEnum::GetValueAsString(state->enemyLifeState));
 
-			state->playerLifeState = ELifeState::Alive;
-			UE_LOG(LogTemp, Warning, TEXT("!!! After setting PlayerStatus"));
-			
-			UE_LOG(LogTemp, Warning, TEXT("Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "
-					", crit : %f, crit_Damge : %f, spd : %d"),
-					state->playerStatus.hp,
-					state->playerStatus.attack,
-					state->playerStatus.defense,
-					state->playerStatus.resistance,
-					state->playerStatus.move_Range,
-					state->playerStatus.critical_Rate,
-					state->playerStatus.critical_Damage,
-					state->playerStatus.speed);
-			
-			UE_LOG(LogTemp, Warning, TEXT("state : %s"), *UEnum::GetValueAsString(state->playerLifeState));
-		}
 	}
 	else{
 		UE_LOG(LogTemp, Warning, TEXT("Set state fail"));
@@ -274,26 +290,44 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	UE_LOG(LogTemp, Warning, TEXT("In GetDamage"));
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
-		
-	}
-	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
-	{
 		UE_LOG(LogTemp, Warning, TEXT("Cast ABaseEnemy"));
-		if (enemy->state && enemy->state->playerStatus.hp > 0)
+		if (state && state->playerStatus.hp > 0)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("state && state->playerStatus.hp > 0"));
 			// 피를 깎는다.
-			if (enemy && enemy->state)
+			if (player && state)
 			{
-				enemy->state->playerStatus.hp = FMath::Max(0, enemy->state->playerStatus.hp - damage);
-				UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage, enemy->state->playerStatus.hp);
+				state->playerStatus.hp = FMath::Max(0, state->playerStatus.hp - damage);
+				UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage, state->playerStatus.hp);
 			}
 		}
 		else
 		{
-			if (enemy && enemy->state)
+			if (player && state)
 			{
-				enemy->state->playerLifeState = ELifeState::Dead;
-				UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(enemy->state->playerLifeState));
+				state->playerLifeState = ELifeState::Dead;
+				UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(state->playerLifeState));
+			}
+		}
+	}
+	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Cast ABaseEnemy"));
+		if (state && state->enemyStatus.hp > 0)
+		{
+			// 피를 깎는다.
+			if (enemy && state)
+			{
+				state->enemyStatus.hp = FMath::Max(0, state->enemyStatus.hp - damage);
+				UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage, state->enemyStatus.hp);
+			}
+		}
+		else
+		{
+			if (enemy && state)
+			{
+				state->enemyLifeState = ELifeState::Dead;
+				UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(state->enemyLifeState));
 			}
 		}
 	}
@@ -305,6 +339,41 @@ void ABaseBattlePawn::BaseAttack(ABaseBattlePawn* targetUnit)
 	if (auto* player = Cast<ABattlePlayer>(targetUnit))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Enemy Attack Player"));
+		if (auto* enemy = Cast<ABaseEnemy>(this))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("In Cast Enemy"));
+			
+			if (!state)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("state nullptr"));
+				return;
+			}
+			
+			int32 atk = state->enemyStatus.attack;
+			int32 weapon = 2;
+			float critical = state->enemyStatus.critical_Rate;
+			int32 personality = 2;
+			int32 status_effect = 4;
+			int32 damage = 0;
+
+			// 반올림 처리
+			int32 chance = FMath::RoundToInt(critical * 100.0f);
+			int32 roll = FMath::RandRange(1, 100);
+
+			
+			if (bool bIsCrit = roll <= chance)
+			{
+				int32 critical_Damage = state->enemyStatus.critical_Damage;
+				damage = ((atk + weapon) * 1.0f * (1 + (personality + status_effect))) * critical_Damage;
+				UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
+			}
+			else
+			{
+				damage = (atk + weapon) * 1.0f * (1 + (personality + status_effect));
+				UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
+			}
+			GetDamage(player, damage);
+		}
 	}
 	else if (auto* enemy = Cast<ABaseEnemy>(targetUnit))
 	{
@@ -312,7 +381,6 @@ void ABaseBattlePawn::BaseAttack(ABaseBattlePawn* targetUnit)
 		if (auto* baseAttackPlayer = Cast<ABattlePlayer>(this))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("In Cast baseAttackPlayer"));
-			auto* state = baseAttackPlayer->state;
 			
 			if (!state)
 			{

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BasePlayerState.h"
 #include "InputActionValue.h"
 #include "GameFramework/Pawn.h"
 #include "BaseBattlePawn.generated.h"
@@ -28,7 +29,8 @@ public:
 	//------------Turn System-----------------
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
-	
+	UPROPERTY(EditAnywhere)
+	class ATurnManager* turnManager;
 	void OnTurnStart();
 	void OnTurnEnd();
 
@@ -41,11 +43,19 @@ public:
 	class AGridTile* targetTile;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
 	TSubclassOf<class AGridTileManager> TileManagerFactory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
+	class ABasePlayerState* state;
+	
 	void TestClick();
 	void AddOpenByOffset(FIntPoint offset);
+
+	FTimerHandle timerHandle;
+	UFUNCTION()
+	virtual void TryInitStatus();
 	
 	//-------------Set Status-----------------------
-	void SetStatus(ABaseBattlePawn* unit);
+	void SetStatus();
 	//-------------Get Damage-----------------------
 	void GetDamage(ABaseBattlePawn* unit, int32 damage);
 	//-------------Base Attack-----------------------

@@ -6,82 +6,86 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "BattleTypes.generated.h"
 
-//-------Battle Start 할 때 넘겨줘야 할 데이터 구조체-------
+//-------Battle Start 할 때 넘겨줘야 할 캐릭터 데이터 구조체-------
 USTRUCT(BlueprintType)
-struct FCharacterDetail
+struct FCharacterData
 {
 	GENERATED_BODY()
-
-	UPROPERTY()
+	// 플레이어 / 몬스터 ID 값
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString id = "";
-
-	UPROPERTY()
+	// 플레이어 / 몬스터 이름
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString name = "";
-
-	UPROPERTY()
+	// 플레이어인지 몬스터인지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString type = "";
-
-	UPROPERTY()
-	FString personality = "";
-
-	UPROPERTY()
+	// 플레이어 / 몬스터 성격
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FString> traits = {};
+	// 플레이어 / 몬스터 스킬
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> skills = {};
 };
-
+// 캐릭터 정보들과 지역, 날씨 정보용 구조체 
 USTRUCT(BlueprintType)
 struct FEnvironmentState
 {
 	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FCharacterData> characters = {};
 
-	UPROPERTY()
-	TArray<FCharacterDetail> characters = {};
-
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString terrain = "";
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString weather = "";
 };
 
-//-------AI 행동 판단을 위한 데이터 구조체-------
+//-------Action API 캐릭터 상태 정보-------
 USTRUCT(BlueprintType)
-struct FCharacterInfo
+struct FCharacterStatus
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString id = "";
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<int32> position;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 hp = 0;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 ap = 0;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 mov = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> status_effects = {};
 };
-
+//-------Action API 전체 게임 상태 데이터-------
 USTRUCT(BlueprintType)
-struct FBattleState
+struct FBattleTurnState
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 cycle = 0;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 turn = 0;
 
-	UPROPERTY()
-	FString target_monster_id = "";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString current_character_id = "";
 
-	UPROPERTY()
-	TArray<FCharacterInfo> characters = {};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FCharacterStatus> characters = {};
 };
+
 // 캐릭터 스텟
 USTRUCT(BlueprintType)
 struct FBaseStatus
