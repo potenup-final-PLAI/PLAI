@@ -13,19 +13,19 @@ struct FCharacterDetail
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FString id;
+	FString id = "";
 
 	UPROPERTY()
-	FString name;
+	FString name = "";
 
 	UPROPERTY()
-	FString type;
+	FString type = "";
 
 	UPROPERTY()
-	FString personality;
+	FString personality = "";
 
 	UPROPERTY()
-	TArray<FString> skills;
+	TArray<FString> skills = {};
 };
 
 USTRUCT(BlueprintType)
@@ -34,13 +34,13 @@ struct FEnvironmentState
 	GENERATED_BODY()
 
 	UPROPERTY()
-	TArray<FCharacterDetail> characters;
+	TArray<FCharacterDetail> characters = {};
 
 	UPROPERTY()
-	FString terrain;
+	FString terrain = "";
 
 	UPROPERTY()
-	FString weather;
+	FString weather = "";
 };
 
 //-------AI 행동 판단을 위한 데이터 구조체-------
@@ -50,19 +50,19 @@ struct FCharacterInfo
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FString id;
+	FString id = "";
 
 	UPROPERTY()
 	TArray<int32> position;
 
 	UPROPERTY()
-	int32 hp;
+	int32 hp = 0;
 
 	UPROPERTY()
-	int32 ap;
+	int32 ap = 0;
 
 	UPROPERTY()
-	TArray<FString> status_effects;
+	TArray<FString> status_effects = {};
 };
 
 USTRUCT(BlueprintType)
@@ -71,43 +71,48 @@ struct FBattleState
 	GENERATED_BODY()
 
 	UPROPERTY()
-	int32 cycle;
+	int32 cycle = 0;
 
 	UPROPERTY()
-	int32 turn;
+	int32 turn = 0;
 
 	UPROPERTY()
-	FString target_monster_id;
+	FString target_monster_id = "";
 
 	UPROPERTY()
-	TArray<FCharacterInfo> characters;
+	TArray<FCharacterInfo> characters = {};
 };
-
+// 캐릭터 스텟
 USTRUCT(BlueprintType)
 struct FBaseStatus
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
-	int32 hp;
+	int32 hp = 0;
 	UPROPERTY()
-	int32 attack;
+	int32 attack = 0;
 	UPROPERTY()
-	int32 defense;
+	int32 defense = 0;
 	UPROPERTY()
-	int32 resistance;
+	int32 resistance = 0;
 	UPROPERTY()
-	float critical_Rate;
+	float critical_Rate = 0.0f;
 	UPROPERTY()
-	float critical_Damage;
+	float critical_Damage = 0.0f;
 	UPROPERTY()
-	int32 move_Range;
+	int32 move_Range = 0;
 	UPROPERTY()
-	int32 speed;
+	int32 speed = 0;
 	UPROPERTY()
-	int32 points;
+	int32 points = 0;
 };
-
+UENUM(BlueprintType)
+enum class ELifeState : uint8
+{
+	Alive UMETA(DisplayName = "Alive"),
+	Dead UMETA(DisplayName = "Dead"),
+};
 /**
  * 
  */

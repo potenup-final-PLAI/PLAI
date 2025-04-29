@@ -3,8 +3,18 @@
 
 #include "Battle/BattlePlayer/Player/BattlePlayer.h"
 
+#include "BasePlayerState.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+
+void ABattlePlayer::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// 플레이어 세팅
+	
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABattlePlayer::TryInitStatus, 0.1f, true);
+}
 
 void ABattlePlayer::PossessedBy(AController* NewController)
 {
@@ -26,6 +36,18 @@ void ABattlePlayer::SetupPlayerInputComponent(
 
 	if (UEnhancedInputComponent* pi = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		pi->BindAction(IA_Move, ETriggerEvent::Completed, this, &ABaseBattlePawn::MouseClick);
+		pi->BindAction(IA_Move, ETriggerEvent::Completed, this, &ABaseBattlePawn::TestClick);
 	}
 }
+
+void ABattlePlayer::TryInitStatus()
+{
+	if (ABasePlayerState* MyState = Cast<ABasePlayerState>(GetPlayerState()))
+	{
+		SetStatus(this);
+		state = MyState;
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle); // 타이머 멈춤
+	}
+}
+
+

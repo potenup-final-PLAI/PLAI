@@ -3,10 +3,8 @@
 
 #include "Battle/Tile/GridTile.h"
 
-#include "Animation/AnimPhysicsSolver.h"
 #include "Components/BoxComponent.h"
-#include "Components/Image.h"
-#include "Components/WidgetComponent.h"
+
 
 // Sets default values
 AGridTile::AGridTile()
@@ -30,10 +28,6 @@ AGridTile::AGridTile()
 void AGridTile::BeginPlay()
 {
 	Super::BeginPlay();
-	UWidgetComponent* widget = GetComponentByClass<UWidgetComponent>();
-	UUserWidget* costWidget = widget->GetUserWidgetObject();
-	// costUi에 배치된 위젯을 가져오자
-	outLine = Cast<UImage>(costWidget->GetWidgetFromName(TEXT("Outline")));
 }
 
 // Called every frame
@@ -51,7 +45,11 @@ void AGridTile::SetGridCoord(FIntPoint coord)
 
 void AGridTile::SetCost(AGridTile* s, AGridTile* g)
 {
-
+	if (!IsValid(s) || !IsValid(g))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetCost : Invalid pointers passed"));
+		return;
+	}
 	// 이전 타일의 위치
 	FVector prevPos = s->GetActorLocation();
 	// 목적지 타일의 위치
@@ -62,19 +60,15 @@ void AGridTile::SetCost(AGridTile* s, AGridTile* g)
 	// sCost 구하기
 	sCostValue = FMath::Abs(prevPos.X - curPos.X) + FMath::Abs(prevPos.Y - curPos.Y);
 	sCostValue += s->sCostValue;
-
+	
 	// gCost 구하기
 	float gCostValue = FMath::Abs(goalPos.X - curPos.X) + FMath::Abs(goalPos.Y - curPos.Y);
 
 	// tCost 구하기
 	tCostValue = sCostValue + gCostValue;
-
-	SetColor(FLinearColor::Green);
+	
 	// 누구를 기준으로 Cost를 계산했냐?
 	parentTile = s;
 }
 
-void AGridTile::SetColor(FLinearColor color)
-{
-	outLine->SetColorAndOpacity(color);
-}
+

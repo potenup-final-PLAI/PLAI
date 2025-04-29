@@ -33,7 +33,23 @@ public:
 	void OnTurnEnd();
 
 	//------------Skill System-----------------
+
+	//---------------TEST-------------------
+	// Player 움직임
+	// UI 눌렀을 때 그쪽으로 이동하도록
+	UPROPERTY(EditAnywhere)
+	class AGridTile* targetTile;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
+	TSubclassOf<class AGridTileManager> TileManagerFactory;
+	void TestClick();
+	void AddOpenByOffset(FIntPoint offset);
 	
+	//-------------Set Status-----------------------
+	void SetStatus(ABaseBattlePawn* unit);
+	//-------------Get Damage-----------------------
+	void GetDamage(ABaseBattlePawn* unit, int32 damage);
+	//-------------Base Attack-----------------------
+	void BaseAttack(ABaseBattlePawn* targetUnit);
 	//------------Move System-----------------
 	// 이 변수에 들어있는 Block 들을 기준으로 상, 하, 좌, 우 검색 후 Cost 구해야 한다.
 	UPROPERTY(EditAnywhere)
@@ -63,12 +79,16 @@ public:
 	
 	//--------------Unit Move-------------------
 	// 이동 경로 저장 Array
+	UPROPERTY(EditAnywhere)
 	TArray<AGridTile*> pathArray;
 	// 현재 경로 인덱스
+	UPROPERTY(EditAnywhere)
 	int32 currentPathIndex = 0;
 	// 이동 중인지 체크
+	UPROPERTY(EditAnywhere)
 	bool bIsMoving = false;
 	// 이동 속도
+	UPROPERTY(EditAnywhere)
 	float moveSpeed = 300.0f;
 
 	// 이동력 테스트 코드
@@ -79,5 +99,8 @@ public:
 	void UnitMove();
 	void OnMoveEnd();
 	void InitValues();
+
+
+	
 	
 };
