@@ -107,7 +107,7 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			    }
 		    	else
 		    	{
-		    		UE_LOG(LogTemp, Error, TEXT("LoginComp NpcNet 없네"));
+		    		// UE_LOG(LogTemp, Error, TEXT("LoginComp NpcNet 없네"));
 		    	}
 		    }
 		};
