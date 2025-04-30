@@ -48,5 +48,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* SpringArmComp;
 
+	UPROPERTY(EditAnywhere)
+	class USceneCaptureComponent2D* CaptureComp;
+
 	bool bCameraChane = false;
 };
