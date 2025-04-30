@@ -58,7 +58,10 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button_Me;
-
+	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Button_SelectMode;
+	
 	UPROPERTY(EditAnywhere)
 	class UUiMain* UiMain;
 
@@ -66,6 +69,9 @@ public:
 
 	UFUNCTION()
 	void OnLoadMeInfo();
+
+	UFUNCTION()
+	void OnSelectMode();
 	
 	virtual void NativeConstruct() override;
 };

@@ -13,6 +13,7 @@ void UUIChaMain::NativeConstruct()
 {
 	Super::NativeConstruct();
 	Button_Me->OnClicked.AddDynamic(this,&UUIChaMain::OnLoadMeInfo);
+	Button_SelectMode->OnClicked.AddDynamic(this,&UUIChaMain::UUIChaMain::OnSelectMode);
 }
 
 void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
@@ -52,5 +53,10 @@ void UUIChaMain::OnLoadMeInfo()
 		return;
 	}
 	UiMain->LoginComp->HttpMePost();
+}
+
+void UUIChaMain::OnSelectMode()
+{
+	RemoveFromParent();
 }
 
