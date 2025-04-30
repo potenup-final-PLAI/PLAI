@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GridTile.h"
 #include "GridTileManager.h"
+#include "Battle/Http/BattleHttpActor.h"
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Enemy/BaseEnemy.h"
@@ -76,38 +77,60 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 void ABaseBattlePawn::OnTurnStart()
 {
 	// 턴이 시작됐으면 턴 카운트 1 증가
-	if (turnManager) turnManager->turnCount++;
+	if (turnManager)
+	{
+		turnManager->turnCount++;
+		UE_LOG(LogTemp, Warning, TEXT("Turn Count %d"), turnManager->turnCount);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TurnManager is nullptr"));
+	}
 	
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
-		AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
-
-		TArray<AActor*> playerActors;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABattlePlayer::StaticClass(), playerActors);
-
-		TArray<ABattlePlayer*> players;
-		for (AActor* actor : playerActors)
-		{
-			if (ABattlePlayer* p = Cast<ABattlePlayer>(actor))
-			{
-				players.Add(p);
-			}
-		}
-
-		if (ABattlePlayer* target = enemy->FindClosestPlayer(players))
-		{
-			enemy->MoveToPlayer(target, tileManger);
-		}
 		
-		// FTimerHandle timerHandle;
-		// GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([this]()
-		// {
-		// 	OnTurnEnd();
-		// }), 5.0f, false);
+		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnTurnStart"));
+		ABaseBattlePawn* CapturedUnit = this;
+		
+		FTimerHandle battleAPIHandle;
+		GetWorld()->GetTimerManager().SetTimer(battleAPIHandle, FTimerDelegate::CreateLambda([this, CapturedUnit]()
+		{
+			UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::In Lambda"));
+			if (turnManager && turnManager->phaseManager)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::turnManager, phaseManager is Set"));
+				turnManager->phaseManager->TrySendbattleState(CapturedUnit);
+			}
+		}), 4.0f, false);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
 }
-
+// 자동 탐색 전 가까운 적을 찾는 로직
+// AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
+//
+// TArray<AActor*> playerActors;
+// UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABattlePlayer::StaticClass(), playerActors);
+//
+// TArray<ABattlePlayer*> players;
+// for (AActor* actor : playerActors)
+// {
+// 	if (ABattlePlayer* p = Cast<ABattlePlayer>(actor))
+// 	{
+// 		players.Add(p);
+// 	}
+// }
+//
+// if (ABattlePlayer* target = enemy->FindClosestPlayer(players))
+// {
+// 	enemy->MoveToPlayer(target, tileManger);
+// }
+		
+// FTimerHandle timerHandle;
+// GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([this]()
+// {
+// 	OnTurnEnd();
+// }), 5.0f, false);
 void ABaseBattlePawn::OnTurnEnd()
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *GetName());
@@ -205,10 +228,13 @@ void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 
 void ABaseBattlePawn::TryInitStatus()
 {
-	if (ABasePlayerState* MyState = Cast<ABasePlayerState>(GetPlayerState()))
+	if (ABasePlayerState* myState = Cast<ABasePlayerState>(GetPlayerState()))
 	{
-		state = MyState;
+		
+		state = myState;
 		SetStatus();
+		bIsInitialized = true;
+		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::TryInitStatus bIsInitialized %d"), bIsInitialized);
 		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
 	}
 }

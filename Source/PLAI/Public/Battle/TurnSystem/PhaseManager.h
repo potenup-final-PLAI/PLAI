@@ -88,10 +88,22 @@ public:
 	void BattleEnd();
 
 	//--------------Test ------------------
-
 	bool bAPITest = true;
 	FTimerHandle timerAPIHandle;
+	FTimerHandle timerSetStateHandle;
+
+	bool bAllUnitsReady = false;
+	
 	void TrySendInitialState();
-	void SetStartBattleAPI();
+	FEnvironmentState SetStartBattleAPI();
+
+	void CheckAllUnitsReady();
+	
+	// HttpActor 탐색용
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Phase")
+	TSubclassOf<class ABattleHttpActor> httpActorFactory;
+	
+	FBattleTurnState SetBattleProcessingAPI();
+	void TrySendbattleState(ABaseBattlePawn* unit);
 	bool AreAllUnitsInitialized() const;
 };

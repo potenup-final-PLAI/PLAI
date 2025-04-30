@@ -40,4 +40,5 @@ public:
 	AGridTile* parentTile;
 	
 	void SetCost(AGridTile* s, AGridTile* g);
+	
 };

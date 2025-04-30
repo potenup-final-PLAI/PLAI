@@ -69,6 +69,42 @@ struct FCharacterStatus
 };
 //-------Action API 전체 게임 상태 데이터-------
 USTRUCT(BlueprintType)
+struct FBattleAction
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<int32> move_to = {};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString skill = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString target_character_id = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString reason = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 remaining_ap = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 remaining_mov = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FActionRequest
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString current_character_id = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FBattleAction> actions = {};
+};
+
+USTRUCT(BlueprintType)
 struct FBattleTurnState
 {
 	GENERATED_BODY()

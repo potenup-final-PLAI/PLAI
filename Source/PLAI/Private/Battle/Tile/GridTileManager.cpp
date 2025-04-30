@@ -123,3 +123,8 @@ AGridTile* AGridTileManager::FindCurrentTile(FVector worldLoc)
 	
 	return map.FindRef(FIntPoint(x, y));
 }
+
+AGridTile* AGridTileManager::GetTile(int32 x, int32 y)
+{
+	return map.FindRef(FIntPoint(x, y));
+}

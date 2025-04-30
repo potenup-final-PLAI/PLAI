@@ -50,10 +50,13 @@ public:
 	void TestClick();
 	void AddOpenByOffset(FIntPoint offset);
 
+	bool bIsInitialized = false;
 	FTimerHandle timerHandle;
 	UFUNCTION()
 	virtual void TryInitStatus();
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
+	TSubclassOf<class ABattleHttpActor> httpActorFactory;
 	//-------------Set Status-----------------------
 	void SetStatus();
 	//-------------Get Damage-----------------------

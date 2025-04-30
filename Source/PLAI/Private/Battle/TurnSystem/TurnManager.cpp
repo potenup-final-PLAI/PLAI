@@ -60,6 +60,7 @@ void ATurnManager::StartPlayerTurn()
 	if (curTurnState == ETurnState::TurnEnd && curTurnState == ETurnState::PlayerTurn && curTurnState == ETurnState::EnemyTurn) return;
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Player Turn"));
 	SetTurnState(ETurnState::PlayerTurn);
+	
 	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("playerPawn is Player %s"), *playerPawn->GetActorNameOrLabel());

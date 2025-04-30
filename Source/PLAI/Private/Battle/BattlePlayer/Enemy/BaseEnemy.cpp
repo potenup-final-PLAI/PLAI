@@ -6,7 +6,9 @@
 #include "BasePlayerState.h"
 #include "GridTile.h"
 #include "GridTileManager.h"
+#include "Battle/TurnSystem/PhaseManager.h"
 #include "Engine/OverlapResult.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
 
 // Sets default values
@@ -41,10 +43,23 @@ void ABaseEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void ABaseEnemy::MoveToPlayer(ABattlePlayer* player, AGridTileManager* tileManager)
 {
-	if (!player || !tileManager) return;
+	if (!tileManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - tileManager is nullptr"));
+		return;
+	}
+	if (!player && !goalTile)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - player/goalTile is nullptr"));
+		return;
+	}
 	
 	InitValues();
-	goalTile = tileManager->FindCurrentTile(player->GetActorLocation());
+
+	if (player)
+	{
+		goalTile = tileManager->FindCurrentTile(player->GetActorLocation());
+	}
 	startTile = tileManager->FindCurrentTile(GetActorLocation());
 
 	if (!IsValid(startTile) || !IsValid(goalTile)) return;
@@ -113,4 +128,74 @@ void ABaseEnemy::FindAndAttackPlayer()
 	
 	// 끝났으면 턴 종료 처리
 	OnTurnEnd();
+}
+
+void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
+{
+	// 본인이 서버에서 지시된 캐릭터인지 확인
+	if (actionRequest.current_character_id != GetName())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("actionRequest not for this enemy: %s"), *GetName());
+		return;
+	}
+
+	if (actionRequest.actions.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No actions provided"));
+		return;
+	}
+
+	const FBattleAction& Action = actionRequest.actions[0];
+
+	// 1. 이동 처리
+	if (Action.move_to.Num() == 2)
+	{
+		int32 targetX = Action.move_to[0];
+		int32 targetY = Action.move_to[1];
+
+		// 예시: GridTileManager 통해 목표 타일 찾기
+		if (AGridTileManager* tileManager = Cast<AGridTileManager>(
+			UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory)))
+		{
+			AGridTile* goal = tileManager->GetTile(targetX, targetY);
+			if (goal)
+			{
+				goalTile = goal; // ✅ 기존 goalTile 변수에 대입
+				MoveToPlayer(nullptr, tileManager); // ✅ 타겟 null로 넘기고 이동만 실행
+			}
+		}
+	}
+
+	// 2. 스킬 처리 (예: 타격이면 공격)
+	if (Action.skill == TEXT("타격"))
+	{
+		ABaseBattlePawn* Target = FindUnitById(Action.target_character_id);
+		if (Target)
+		{
+			BaseAttack(Target); // 공격 실행
+		}
+	}
+
+	// 3. 이동/행동력 소진 후 턴 종료
+	if (Action.remaining_ap <= 0 && Action.remaining_mov <= 0)
+	{
+		OnTurnEnd();
+	}
+}
+ABaseBattlePawn* ABaseEnemy::FindUnitById(const FString& Id)
+{
+	TArray<AActor*> FoundUnits;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseBattlePawn::StaticClass(), FoundUnits);
+
+	for (AActor* Actor : FoundUnits)
+	{
+		if (ABaseBattlePawn* Unit = Cast<ABaseBattlePawn>(Actor))
+		{
+			if (Unit->GetName() == Id)
+			{
+				return Unit;
+			}
+		}
+	}
+	return nullptr;
 }

@@ -25,6 +25,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	FBattleTurnState battleState;
-
-	void HttpPost();
+	FActionRequest ActionRequestData;
+	
+	void HttpPost(FEnvironmentState environmentState = FEnvironmentState(), FBattleTurnState battleTurnState = FBattleTurnState(), class ABaseBattlePawn* unit = nullptr);
+	bool IsEmptyEnvironmentState(const FEnvironmentState& state);
+	bool IsEmptyBattleTurnState(const FBattleTurnState& state);
 };

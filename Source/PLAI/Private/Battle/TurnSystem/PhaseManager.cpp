@@ -5,13 +5,14 @@
 
 #include "BasePlayerState.h"
 #include "GridTile.h"
-#include "JsonObjectConverter.h"
+#include "Battle/Http/BattleHttpActor.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Enemy/BaseEnemy.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
 #include "Battle/Util/BattleType/BattleTypes.h"
+
 void AUPhaseManager::BeginPlay()
 {
 	Super::BeginPlay();
@@ -23,6 +24,8 @@ void AUPhaseManager::BeginPlay()
 
 
 	GetWorld()->GetTimerManager().SetTimer(timerAPIHandle, this, &AUPhaseManager::TrySendInitialState, 0.2f, true);
+	GetWorld()->GetTimerManager().SetTimer(timerSetStateHandle, this, &AUPhaseManager::CheckAllUnitsReady, 0.2f, true);
+	
 }
 
 void AUPhaseManager::SetCycle()
@@ -302,13 +305,66 @@ void AUPhaseManager::TrySendInitialState()
 	if (AreAllUnitsInitialized())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(timerAPIHandle);
-		SetStartBattleAPI(); // 이때 JSON 전송
+		FEnvironmentState envData = SetStartBattleAPI();
+
+		if (auto* httpActor = Cast<ABattleHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), httpActorFactory)))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Start Battle API"));
+			httpActor->HttpPost(envData);
+		}
 	}
 }
 
-void AUPhaseManager::SetStartBattleAPI()
+FEnvironmentState AUPhaseManager::SetStartBattleAPI()
 {
-	// 1. 새 구조체 인스턴스 준비
+	FEnvironmentState env;
+
+	TArray<AActor*> unitArr;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseBattlePawn::StaticClass(), unitArr);
+
+	int32 i = 0;
+	for (AActor* actor : unitArr)
+	{
+		if (ABaseBattlePawn* unit = Cast<ABaseBattlePawn>(actor))
+		{
+			if (!unit->state) continue; // PlayerState 아직 안 됐으면 건너뜀
+
+			FCharacterData charData;
+			charData.id = unit->GetName(); // 또는 unit->UniqueId
+			FString name = Cast<ABattlePlayer>(unit) ? FString::Printf(TEXT("player%d"), i) : TEXT("monster");
+			unit->Rename(*name);
+			charData.name = Cast<ABattlePlayer>(unit) ? name : TEXT("오크"); // 따로 이름 필드 있으면
+			charData.type = Cast<ABattlePlayer>(unit) ? TEXT("player") : TEXT("monster");
+
+			// traits, skills는 유닛이 미리 들고 있다고 가정
+			charData.traits.Add(TEXT("호전적"));
+			charData.skills.Add(TEXT("타격"));
+			// charData.skills.Add(unit->skills);
+
+			env.characters.Add(charData);
+		}
+	}
+
+	// 맵 지형/날씨는 수동 세팅하거나 타일매니저에서 가져올 수 있음
+	env.terrain = TEXT("desert");
+	env.weather = TEXT("sunny");
+
+	return env;
+}
+
+
+void AUPhaseManager::CheckAllUnitsReady()
+{
+	if (AreAllUnitsInitialized())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(timerSetStateHandle);
+		bAllUnitsReady = true; // ✅ 전송 가능 플래그 세팅
+	}
+}
+
+FBattleTurnState AUPhaseManager::SetBattleProcessingAPI()
+{
+	// 1. 구조체 인스턴스 준비
 	FBattleTurnState turnStateData;
 	turnStateData.cycle = cycle; // 현재 싸이클
 	turnStateData.turn = turnManager->turnCount; // Turn 수를 별도로 관리 중이면 여기서 가져오기
@@ -369,17 +425,37 @@ void AUPhaseManager::SetStartBattleAPI()
 
 		turnStateData.characters.Add(charStatus);
 	}
-	FString jsonString;
-	FJsonObjectConverter::UStructToJsonObjectString(turnStateData, jsonString);
+	
+	return turnStateData;
+}
 
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonString);
+void AUPhaseManager::TrySendbattleState(ABaseBattlePawn* unit)
+{
+	UE_LOG(LogTemp, Warning, TEXT("TrySendbattleState In"));
+	if (bAllUnitsReady)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("bAllUnitsReady clear!! "));
+		if (AreAllUnitsInitialized())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AreAllUnitsInitizlized clear!! "));
+		
+			GetWorld()->GetTimerManager().ClearTimer(timerAPIHandle);
+			FBattleTurnState battleData = SetBattleProcessingAPI();
+
+			if (auto* httpActor = Cast<ABattleHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), httpActorFactory)))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Start Battle API"));
+				httpActor->HttpPost({}, battleData, unit);
+			}
+		}
+	}
 }
 
 bool AUPhaseManager::AreAllUnitsInitialized() const
 {
 	for (ABaseBattlePawn* Unit : httpUnitQueue)
 	{
-		if (!Unit || !Unit->state || !Unit->currentTile)
+		if (!IsValid(Unit) || !Unit->bIsInitialized)
 		{
 			return false;
 		}

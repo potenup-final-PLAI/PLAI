@@ -34,4 +34,8 @@ public:
 	class ABattlePlayer* FindClosestPlayer(TArray<class ABattlePlayer*>& allPlayers);
 
 	void FindAndAttackPlayer();
+
+	// 받은 데이터로 enemy 움직임
+	void ProcessAction(const FActionRequest& actionRequest);
+	ABaseBattlePawn* FindUnitById(const FString& Id);
 };
