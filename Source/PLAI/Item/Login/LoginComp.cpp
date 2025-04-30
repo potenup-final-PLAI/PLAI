@@ -65,12 +65,12 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	}
 	}
 	
-	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{ if (PC->WasInputKeyJustPressed(EKeys::C)) // C 캐릭터 생성 요청
-		{   UE_LOG(LogTemp,Display,TEXT("Input C 캐릭터 생성 요청 Key JustPressed"));
-		    HttpCreatePost();
-		}
-	}
+	// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+	// { if (PC->WasInputKeyJustPressed(EKeys::C)) // C 캐릭터 생성 요청
+	// 	{   UE_LOG(LogTemp,Display,TEXT("Input C 캐릭터 생성 요청 Key JustPressed"));
+	// 	    HttpCreatePost();
+	// 	}
+	// }
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::M)) // M 캐릭터 생성 내 정보 요청
@@ -294,7 +294,7 @@ void ULoginComp::LoadEquipItem()
 	}
 }
 
-void ULoginComp::HttpCreatePost()
+void ULoginComp::HttpCreatePost(FString CharacterName)
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 	
@@ -303,10 +303,13 @@ void ULoginComp::HttpCreatePost()
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
 	FCreateStruct CreateStruct;
+	
 	CreateStruct.user_id = User_id;
+	CreateStruct.character_name = CharacterName;
 
 	FString JsonString;
 	FJsonObjectConverter::UStructToJsonObjectString(CreateStruct, JsonString);
+	UE_LOG(LogTemp,Display,TEXT("로그인컴프 Json String 쏘기전 : %s"),*JsonString);
 	httpRequest->SetContentAsString(JsonString);
 	
 	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)

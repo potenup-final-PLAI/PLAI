@@ -32,6 +32,8 @@ void UUiMain::NativeConstruct()
 	ButtonInitPost->OnClicked.AddDynamic(this,&UUiMain::HttpPostInit);
 	ButtonInitEnd->OnClicked.AddDynamic(this,&UUiMain::InitEnd);
 
+	ButtonCreate->OnClicked.AddDynamic(this,&UUiMain::CreateCharacter);
+
 	LoginFail->SetVisibility(ESlateVisibility::Hidden);;
 	WbpUiSign->SetVisibility(ESlateVisibility::Hidden);
 }
@@ -90,6 +92,13 @@ void UUiMain::Login()
    //  		UE_LOG(LogTemp,Display,TEXT("UiSign 사인 실패"));
    //  	}
     // }
+}
+
+void UUiMain::CreateCharacter()
+{
+	FString CharacterName = CreatePost->GetText().ToString();
+	LoginComp->HttpCreatePost(CharacterName);
+	CanvasInit->RemoveFromParent();
 }
 
 void UUiMain::OnButtonStart()

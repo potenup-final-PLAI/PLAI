@@ -172,7 +172,7 @@ public:
 
 	void HttpLoginPost();
 	
-	void HttpCreatePost();
+	void HttpCreatePost(FString CharacterName);
 	
 	void HttpMePost();
 
