@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "PLAI/Item/TestPlayer/TestPlayer.h"
+// #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "LogItemComp.generated.h"
+
+class ATestPlayer;
 
 USTRUCT(BlueprintType)
 struct Foptions

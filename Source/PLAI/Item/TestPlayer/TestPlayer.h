@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PLAI/Item/UI/Main/UIChaMain.h"
 #include "PLAI/Public//BaseFile/PLAICharacter.h"
 #include "TestPlayer.generated.h"
 

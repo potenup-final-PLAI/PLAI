@@ -3,6 +3,7 @@
 
 #include "MonSpawn.h"
 
+#include "Blueprint/UserWidget.h"
 #include "PLAI/Item/Monster/Monster.h"
 #include "Templates/Function.h"
 
@@ -18,6 +19,10 @@ AMonSpawn::AMonSpawn()
 void AMonSpawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// UIChaMain = CreateWidget<UUIChaMain>(GetWorld(),UUIChaMainFactory);
+	// UIChaMain->AddToViewport();
+	
 	UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 생성됨"));
 }
 

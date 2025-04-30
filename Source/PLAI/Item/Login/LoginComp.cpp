@@ -4,6 +4,7 @@
 #include "LoginComp.h"
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
+#include "LogItemComp.h"
 #include "UserStruct.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/EditableTextBox.h"
@@ -17,6 +18,7 @@
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
+#include "PLAI/Item/UI/Main/UIChaMain.h"
 #include "PLAI/Item/UI/Main/UiSign.h"
 
 // Sets default values for this component's properties
@@ -220,12 +222,33 @@ void ULoginComp::HttpMePost()
 		if (bProcessedSuccessfully)
 		{
 			FString JsonString = HttpResponse->GetContentAsString();
+
+			if (JsonString.IsEmpty())
+			{
+				UE_LOG(LogTemp, Error, TEXT("Login Comp // 서버 응답은 성공했지만 내용이 비었습니다."));
+				return;
+			}
+			// 2. JSON → Struct 파싱 시도
+			if (!FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &UserFullInfo))
+			{
+				UE_LOG(LogTemp, Error, TEXT("Login Comp // JSON 파싱 실패: 구조체 변환에 실패했습니다."));
+				return;
+			}
+			// 3. 파싱 성공했더라도, 필수 값이 들어있는지 유효성 검사
+			if (UserFullInfo.character_info.character_id.IsEmpty())
+			{
+				UE_LOG(LogTemp, Error, TEXT("Login Comp // UserFullInfo 필수 값이 비어 있음 (character_id 없음)."));
+				return;
+			}
+			
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 성공 %s"),*JsonString);
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &UserFullInfo);
 			FString GetJson;
 			
 			FJsonObjectConverter::UStructToJsonObjectString(UserFullInfo,GetJson);
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
+
+			UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
 			
 			character_id = UserFullInfo.character_info.character_id;
 			

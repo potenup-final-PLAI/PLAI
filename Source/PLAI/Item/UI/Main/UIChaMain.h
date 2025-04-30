@@ -56,5 +56,16 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Spe;
 
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Button_Me;
+
+	UPROPERTY(EditAnywhere)
+	class UUiMain* UiMain;
+
 	void SetUiChaStat(FUserFullInfo* UserFullInfo);
+
+	UFUNCTION()
+	void OnLoadMeInfo();
+	
+	virtual void NativeConstruct() override;
 };

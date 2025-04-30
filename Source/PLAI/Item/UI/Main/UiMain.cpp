@@ -5,6 +5,7 @@
 
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
+#include "UIChaMain.h"
 #include "UiSign.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
@@ -19,6 +20,8 @@ void UUiMain::NativeConstruct()
 	Super::NativeConstruct();
 
 	UGameplayStatics::SetGamePaused(GetWorld(),true);
+
+    Wbp_UIChaMain->UiMain = this;
 	
 	if (APlayerController* pc = Cast<APlayerController>(GetOwningPlayer()))
 		

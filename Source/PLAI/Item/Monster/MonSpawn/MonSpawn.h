@@ -40,4 +40,10 @@ public:
 
 	void MyTimer(void(AMonSpawn::*Func)(),float Second = 2.0f);
 	void MyTimer(TFunction<void()> Func, float Second = 2.0f);
+
+	// UPROPERTY(EditAnywhere)
+	// TSubclassOf<UUIChaMain>UUIChaMainFactory;
+	//
+	// UPROPERTY(EditAnywhere)
+	// class UUIChaMain* UIChaMain;
 };
