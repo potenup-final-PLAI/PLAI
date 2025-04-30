@@ -222,7 +222,8 @@ void ULoginComp::HttpMePost()
 		if (bProcessedSuccessfully)
 		{
 			FString JsonString = HttpResponse->GetContentAsString();
-
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 GetAsContetAsString된 제이슨값 성공 %s"),*JsonString);
+			
 			if (JsonString.IsEmpty())
 			{
 				UE_LOG(LogTemp, Error, TEXT("Login Comp // 서버 응답은 성공했지만 내용이 비었습니다."));
@@ -283,7 +284,6 @@ void ULoginComp::LoadEquipItem()
 			}
 		}
 	}
-	
 		
 	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
 	{
@@ -292,73 +292,7 @@ void ULoginComp::LoadEquipItem()
 			
 		}
 	}
-
-
-
-	
-	// for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
-	// {
-	// 	if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget)) // 1번부터 5번까지 슬롯 돈다
-	// 	{
- //            for (int32 i = 0; i < UserFullInfo.equipment_info.item_list.Num(); i++)
- //            {
- //            	TArray<FName>RawNames = SlotEquip->ItemTable->GetRowNames();
- //            	for (FName Raw : RawNames)
- //            	{
- //            		FItemStructTable* ItemStructTable = SlotEquip->ItemTable->FindRow<FItemStructTable>(Raw,("LoginComp 240"));
- //                    if (ItemStructTable->Item_Id == UserFullInfo.equipment_info.item_list[i].item_id)
- //                    {
- //                    	UE_LOG(LogTemp,Warning,TEXT("로그인컴프 ItemId는 %s"),*UserFullInfo.equipment_info.item_list[i].item_id)
- //                    	TestPlayer->InvenComp->EquipItem(*ItemStructTable,SlotEquip->SlotType);
- //                    	break;
- //                    }
- //            	}  
- //            }
-	// 	}
-	// }
 }
-
-
-//
-//
-// void ULoginComp::TransDataTable()
-// {
-// 	UE_LOG(LogTemp, Warning, TEXT("구조체 변경 시작"));
-//
-// 	UDataTable* OldDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Mk_Item/Dt_ItemStruct.Dt_ItemStruct"));
-// 	OldDataTable->RowStruct = FItemStruct::StaticStruct();
-// 	UDataTable* NewDataTable = NewObject<UDataTable>();
-// 	NewDataTable->RowStruct = FItemStructTable::StaticStruct();
-//
-// 	const TArray<FName> RowNames = OldDataTable->GetRowNames();
-// 	for (const FName& RowName : RowNames)
-// 	{
-// 		if (FItemStruct* SrcRow = OldDataTable->FindRow<FItemStruct>(RowName, TEXT("")))
-// 		{
-// 			FItemStructTable NewRow;
-// 			NewRow.ItemTop = SrcRow->ItemTop;
-// 			NewRow.ItemIndex = SrcRow->ItemIndex;
-// 			NewRow.ItemIndexType = SrcRow->ItemIndexType;
-// 			NewRow.ItemIndexDetail = SrcRow->ItemIndexDetail;
-// 			NewRow.Name = SrcRow->Name;
-// 			NewRow.NameType = SrcRow->NameType;
-// 			NewRow.NameDetail = SrcRow->NameDetail;
-// 			NewRow.ItemNum = SrcRow->ItemNum;
-// 			NewRow.ItemStructStat = SrcRow->ItemStructStat;
-// 			NewRow.ItemStructStatName = SrcRow->ItemStructStatName;
-//
-// 			NewDataTable->AddRow(RowName, NewRow);
-//
-// 			UE_LOG(LogTemp, Warning, TEXT("데이터테이블 변환중: %s"), *NewRow.ItemStructStatName.item_SHI);
-// 		}
-// 	}
-// 	UE_LOG(LogTemp, Warning, TEXT("Row Count: %d"), NewDataTable->GetRowNames().Num());
-// 	
-// 		FString TableCSV = NewDataTable->GetTableAsCSV(EDataTableExportFlags::None);
-// 		FFileHelper::SaveStringToFile(TableCSV, *(FPaths::ProjectDir() + "NewDataTable.csv"));
-// 		
-// 		UE_LOG(LogTemp, Warning, TEXT("CSV 저장 완료"));
-// }
 
 void ULoginComp::HttpCreatePost()
 {
@@ -382,6 +316,7 @@ void ULoginComp::HttpCreatePost()
 			FCreateStructGet CreateStructGet;
 			FString JsonString = HttpResponse->GetContentAsString();
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 캐릭터 생성 성공 %s"),*JsonString);
+			
 			FJsonObjectConverter::UStructToJsonObjectString(CreateStructGet,JsonString);
 			character_id = CreateStructGet.character_id;
 		}
