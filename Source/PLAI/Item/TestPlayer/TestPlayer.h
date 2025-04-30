@@ -47,4 +47,6 @@ public:
 	class UCameraComponent* CameraComp;
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* SpringArmComp;
+
+	bool bCameraChane = false;
 };

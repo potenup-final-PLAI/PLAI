@@ -26,9 +26,11 @@ ATestPlayer::ATestPlayer()
 	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("CreComp"));
 	LogItemComp = CreateDefaultSubobject<ULogItemComp>(TEXT("ItemComp"));
 	
-	// CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
-	// SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	SpringArmComp->SetupAttachment(GetRootComponent());
 	
+	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
+	CameraComp->SetupAttachment(SpringArmComp);
 }
 
 // Called when the game starts or when spawned
@@ -36,12 +38,44 @@ void ATestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	StoreComp->StoreInven->AddToViewport();
+	
+	if (APlayerController* Pc = Cast<APlayerController>(GetController()))
+	{
+		TopDownCameraComponent->SetActive(false);
+		Pc->SetViewTarget(this);
+	}
+	// //카메라붐 카메라 회전값적용
+	// CameraBoom->bUsePawnControlRotation = true;
 }
 
 // Called every frame
 void ATestPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (APlayerController* Pc = Cast<APlayerController>(GetController()))
+	{
+		if (Pc->WasInputKeyJustPressed(EKeys::Y))
+		{
+			UE_LOG(LogTemp, Display, TEXT("TestPlayer Y키 인풋 You input"));
+			if (bCameraChane == true)
+			{
+				CameraComp->SetActive(false);
+				TopDownCameraComponent->SetActive(true);
+				Pc->SetViewTarget(this);
+				
+				bCameraChane = false;
+			}
+			else
+			{
+				CameraComp->SetActive(true);
+				TopDownCameraComponent->SetActive(false);
+				Pc->SetViewTarget(this);
+
+				bCameraChane = true;
+			}
+		}
+	}
 }
 
 // Called to bind functionality to input
