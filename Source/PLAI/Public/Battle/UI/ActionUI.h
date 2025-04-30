@@ -50,4 +50,5 @@ public:
 
 	UFUNCTION()
 	void OnClickedSecondSkill();
+	
 };

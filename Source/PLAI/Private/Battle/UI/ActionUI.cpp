@@ -5,7 +5,6 @@
 
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Components/Button.h"
-#include "Developer/AITestSuite/Public/AITestsCommon.h"
 #include "Enemy/BaseEnemy.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
@@ -61,6 +60,12 @@ void UActionUI::OnClickedTurnEnd()
 void UActionUI::OnClickedMove()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Move"));
+	// 왼쪽 마우스 누르면 다음에 한 번 더 눌렀을 때 골이 되도록 활성화
+	// if (auto* unit = turnManager->curUnit)
+	// {z
+	// 	unit->InitValues();
+	// 	unit->bIsMoveMode = true;
+	// }
 }
 
 void UActionUI::OnClickedFirstSkill()

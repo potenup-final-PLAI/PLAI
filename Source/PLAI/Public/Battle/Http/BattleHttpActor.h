@@ -24,7 +24,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	FBattleState battleState;
-
-	void HttpPost();
+	FBattleTurnState battleState;
+	FActionRequest ActionRequestData;
+	
+	void HttpPost(FEnvironmentState environmentState = FEnvironmentState(), FBattleTurnState battleTurnState = FBattleTurnState(), class ABaseBattlePawn* unit = nullptr);
+	bool IsEmptyEnvironmentState(const FEnvironmentState& state);
+	bool IsEmptyBattleTurnState(const FBattleTurnState& state);
 };

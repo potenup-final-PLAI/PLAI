@@ -13,5 +13,26 @@ UCLASS()
 class PLAI_API ABattlePlayer : public ABaseBattlePawn
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;	
+public:
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+	//-------------Input Mapping--------------------
+	UPROPERTY(EditAnywhere)
+	class UInputMappingContext* IMC_Player;
+	UPROPERTY(EditAnywhere)
+	class UInputAction* IA_Move;
+
+	//--------------Player Status--------------------
+
+
+	
+	
 	
 };
+
+
+

@@ -16,9 +16,18 @@ class PLAI_API ABasePlayerState : public APlayerState
 	GENERATED_BODY()
 
 public:
-	// Player, Enemy 공통 사항
+	// Player, Enemy
 	//--------------------Status--------------------
-	FBaseStatus* baseStatus;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
+	FBaseStatus playerStatus;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
+	FBaseStatus enemyStatus;
+
+	//--------------------LifeState--------------------
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
+	ELifeState playerLifeState;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
+	ELifeState enemyLifeState;
 
 	//--------------------AP System--------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")

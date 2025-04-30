@@ -4,12 +4,14 @@
 #include "Battle/TurnSystem/PhaseManager.h"
 
 #include "BasePlayerState.h"
+#include "GridTile.h"
+#include "Battle/Http/BattleHttpActor.h"
 #include "Battle/TurnSystem/TurnManager.h"
-#include "Developer/AITestSuite/Public/AITestsCommon.h"
 #include "Enemy/BaseEnemy.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
+#include "Battle/Util/BattleType/BattleTypes.h"
 
 void AUPhaseManager::BeginPlay()
 {
@@ -19,11 +21,16 @@ void AUPhaseManager::BeginPlay()
 		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
 
 	SetPhase(EBattlePhase::BattleStart);
+
+
+	GetWorld()->GetTimerManager().SetTimer(timerAPIHandle, this, &AUPhaseManager::TrySendInitialState, 0.2f, true);
+	GetWorld()->GetTimerManager().SetTimer(timerSetStateHandle, this, &AUPhaseManager::CheckAllUnitsReady, 0.2f, true);
+	
 }
 
 void AUPhaseManager::SetCycle()
 {
-	cycle = FMath::Min(5, cycle + 1);
+	cycle = FMath::Min(6, cycle + 1);
 	UE_LOG(LogTemp, Warning, TEXT("Cur Cycle = %d"), cycle);
 }
 
@@ -52,13 +59,10 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 	case EBattlePhase::TurnProcessing:
 		break;
 	case EBattlePhase::RoundEnd:
-		// 속도를 기반으로 유닛 정렬 작업 및 다음 턴 시작
-		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundEnd State"));
-		SetCycle();
-		// Unit Queue에 세팅
-		SetUnitQueue();
-		// 전투 시작
-		StartBattle();
+		// 턴 카운트 초기화
+		turnManager->turnCount = 0;
+		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundEnd State Turn CNT : %d"), turnManager->turnCount);
+		SetPhase(EBattlePhase::RoundStart);
 		break;
 	case EBattlePhase::BattleEnd:
 		// 끝났을 때 결과에 대한 UI 보여주면 될듯함.
@@ -83,12 +87,15 @@ void AUPhaseManager::SetUnitQueue()
 
 	// 큐 초기화
 	unitQueue.Empty();
+	httpUnitQueue.Empty();
+	
 	// 월드 상에 있는 Actor들을 모아서 유닛 큐에 하나씩 집어 넣기
 	for (AActor* unit : unitArr)
 	{
 		if (ABaseBattlePawn* pawn = Cast<ABaseBattlePawn>(unit))
 		{
 			unitQueue.Add(pawn);
+			httpUnitQueue.Add(pawn);
 			UE_LOG(LogTemp, Warning, TEXT("Queue Size %d, Actor Name : %s"),
 			       unitQueue.Num(), *pawn->GetActorNameOrLabel());
 
@@ -154,6 +161,13 @@ void AUPhaseManager::StartPlayerPhase()
 	UE_LOG(LogTemp, Warning, TEXT("PlayerTurn Start Unit Name : %s"),
 	       *turnManager->curUnit->GetActorNameOrLabel());
 
+	// 주기가 5거나 보다 크다면
+	if (cycle > 5)
+	{
+		// 전투를 끝낸다.
+		SetPhase(EBattlePhase::BattleEnd);
+		return;
+	}
 	// 턴이 다 지났다면 
 	// if (unitQueue.Num() <= 0)
 	// {
@@ -189,15 +203,9 @@ void AUPhaseManager::EndPlayerPhase()
 		UE_LOG(LogTemp, Warning, TEXT("End Player Phase unitQueue Empty"));
 		// 한 주기가 끝났다고 업데이트
 		SetPhase(EBattlePhase::RoundEnd);
-	}
-
-	// 주기가 5거나 보다 크다면
-	if (cycle >= 5)
-	{
-		// 전투를 끝낸다.
-		SetPhase(EBattlePhase::BattleEnd);
 		return;
 	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("End Player Phase"));
 
 	SetPhase(EBattlePhase::TurnProcessing);
@@ -221,6 +229,13 @@ void AUPhaseManager::StartEnemyPhase()
 	UE_LOG(LogTemp, Warning, TEXT("EnemyTurn Start Unit Name : %s"),
 	       *turnManager->curUnit->GetActorNameOrLabel());
 
+	// 주기가 5와 같거나 크다면
+	if (cycle > 5)
+	{
+		// 전투를 끝낸다.
+		SetPhase(EBattlePhase::BattleEnd);
+		return;
+	}
 	// 턴이 다 지났다면 
 	if (unitQueue.Num() <= 0)
 	{
@@ -259,13 +274,6 @@ void AUPhaseManager::EndEnemyPhase()
 		UE_LOG(LogTemp, Warning, TEXT("End Enemy Phase unitQueue Empty"));
 		// 한 주기가 끝났다고 업데이트
 		SetPhase(EBattlePhase::RoundEnd);
-	}
-	
-	// 주기가 5와 같거나 크다면
-	if (cycle >= 5)
-	{
-		// 전투를 끝낸다.
-		SetPhase(EBattlePhase::BattleEnd);
 		return;
 	}
 	
@@ -290,4 +298,167 @@ void AUPhaseManager::BattleEnd()
 	turnManager->SetTurnState(ETurnState::None);
 	UE_LOG(LogTemp, Warning, TEXT("End Battle"));
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("OpenWorldTestMap"));
+}
+
+void AUPhaseManager::TrySendInitialState()
+{
+	if (AreAllUnitsInitialized())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(timerAPIHandle);
+		FEnvironmentState envData = SetStartBattleAPI();
+
+		if (auto* httpActor = Cast<ABattleHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), httpActorFactory)))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Start Battle API"));
+			httpActor->HttpPost(envData);
+		}
+	}
+}
+
+FEnvironmentState AUPhaseManager::SetStartBattleAPI()
+{
+	FEnvironmentState env;
+
+	TArray<AActor*> unitArr;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseBattlePawn::StaticClass(), unitArr);
+
+	int32 i = 0;
+	for (AActor* actor : unitArr)
+	{
+		if (ABaseBattlePawn* unit = Cast<ABaseBattlePawn>(actor))
+		{
+			if (!unit->state) continue; // PlayerState 아직 안 됐으면 건너뜀
+
+			FCharacterData charData;
+			charData.id = unit->GetName(); // 또는 unit->UniqueId
+			FString name = Cast<ABattlePlayer>(unit) ? FString::Printf(TEXT("player%d"), i) : TEXT("monster");
+			unit->Rename(*name);
+			charData.name = Cast<ABattlePlayer>(unit) ? name : TEXT("오크"); // 따로 이름 필드 있으면
+			charData.type = Cast<ABattlePlayer>(unit) ? TEXT("player") : TEXT("monster");
+
+			// traits, skills는 유닛이 미리 들고 있다고 가정
+			charData.traits.Add(TEXT("호전적"));
+			charData.skills.Add(TEXT("타격"));
+			// charData.skills.Add(unit->skills);
+
+			env.characters.Add(charData);
+		}
+	}
+
+	// 맵 지형/날씨는 수동 세팅하거나 타일매니저에서 가져올 수 있음
+	env.terrain = TEXT("desert");
+	env.weather = TEXT("sunny");
+
+	return env;
+}
+
+
+void AUPhaseManager::CheckAllUnitsReady()
+{
+	if (AreAllUnitsInitialized())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(timerSetStateHandle);
+		bAllUnitsReady = true; // ✅ 전송 가능 플래그 세팅
+	}
+}
+
+FBattleTurnState AUPhaseManager::SetBattleProcessingAPI()
+{
+	// 1. 구조체 인스턴스 준비
+	FBattleTurnState turnStateData;
+	turnStateData.cycle = cycle; // 현재 싸이클
+	turnStateData.turn = turnManager->turnCount; // Turn 수를 별도로 관리 중이면 여기서 가져오기
+	turnStateData.current_character_id = turnManager->curUnit->GetName(); // 혹은 유닛에 정의된 ID
+
+	// 2. 현재 존재하는 모든 유닛 정보 담기
+	TArray<ABaseBattlePawn*> AllUnits = httpUnitQueue;
+
+	// Queue 점검용 테스트 코드 
+	for (ABaseBattlePawn* unit : httpUnitQueue)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Checking unit: %s"), *unit->GetName());
+	
+		if (!IsValid(unit))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Invalid unit!"));
+			continue;
+		}
+	
+		if (!unit->state)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Unit %s has no state"), *unit->GetName());
+			continue;
+		}
+	
+		if (!unit->currentTile)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Unit %s has no current tile"), *unit->GetName());
+			continue;
+		}
+	
+		// 여기에 도달한 경우만 추가됨
+		UE_LOG(LogTemp, Warning, TEXT("✅ Unit %s passed all checks"), *unit->GetName());
+	}
+	for (ABaseBattlePawn* unit : AllUnits)
+	{
+		if (!IsValid(unit) || !unit->state || !unit->currentTile) continue;
+
+		FCharacterStatus charStatus;
+		charStatus.id = unit->GetName(); // 혹은 별도의 ID 필드
+		charStatus.position = { unit->currentTile->gridCoord.X, unit->currentTile->gridCoord.Y };
+
+		if (ABattlePlayer* Player = Cast<ABattlePlayer>(unit))
+		{
+			charStatus.hp = unit->state->playerStatus.hp;
+			charStatus.ap = unit->state->curAP;
+			charStatus.mov = unit->state->playerStatus.move_Range;
+		}
+		else if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(unit))
+		{
+			charStatus.hp = unit->state->enemyStatus.hp;
+			charStatus.ap = unit->state->curAP;
+			charStatus.mov = unit->state->enemyStatus.move_Range;
+		}
+
+		// 상태 이상 정보는 추후 시스템에 따라 추가
+		charStatus.status_effects = {}; // 임시로 빈 배열
+
+		turnStateData.characters.Add(charStatus);
+	}
+	
+	return turnStateData;
+}
+
+void AUPhaseManager::TrySendbattleState(ABaseBattlePawn* unit)
+{
+	UE_LOG(LogTemp, Warning, TEXT("TrySendbattleState In"));
+	if (bAllUnitsReady)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("bAllUnitsReady clear!! "));
+		if (AreAllUnitsInitialized())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AreAllUnitsInitizlized clear!! "));
+		
+			GetWorld()->GetTimerManager().ClearTimer(timerAPIHandle);
+			FBattleTurnState battleData = SetBattleProcessingAPI();
+
+			if (auto* httpActor = Cast<ABattleHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), httpActorFactory)))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Start Battle API"));
+				httpActor->HttpPost({}, battleData, unit);
+			}
+		}
+	}
+}
+
+bool AUPhaseManager::AreAllUnitsInitialized() const
+{
+	for (ABaseBattlePawn* Unit : httpUnitQueue)
+	{
+		if (!IsValid(Unit) || !Unit->bIsInitialized)
+		{
+			return false;
+		}
+	}
+	return true;
 }

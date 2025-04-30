@@ -37,4 +37,8 @@ public:
 	TSubclassOf<class ABaseEnemy> enemyFactory;
 
 	void InitGridTile();
+	
+	//------------Test--------------------------
+	AGridTile* FindCurrentTile(FVector worldLoc);
+	AGridTile* GetTile(int32 x, int32 y);
 };

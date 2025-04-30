@@ -35,14 +35,15 @@ void AGridTileManager::Tick(float DeltaTime)
 void AGridTileManager::InitGridTile()
 {
 	TArray<FIntPoint> AllCoords;
-	AllCoords.Reserve(625);
+	// AllCoords.Reserve(625);
+	AllCoords.Reserve(49);
 
-	for (int32 Y = 0; Y < 25; ++Y)
+	for (int32 Y = 0; Y < 7; ++Y)
 	{
-		for (int32 X = 0; X < 25; ++X)
+		for (int32 X = 0; X < 7; ++X)
 		{
 			FVector spawnLoc = GetActorLocation() + FVector(
-				Y * 110, X * 110, 0.0f);
+				Y * 100, X * 100, 0.0f);
 			FRotator spawnRot = FRotator::ZeroRotator;
 			FActorSpawnParameters spawnParams;
 
@@ -68,7 +69,7 @@ void AGridTileManager::InitGridTile()
 	Algo::RandomShuffle(AllCoords);
 
 	TArray<FIntPoint> PlayerCoords;
-	for (int32 i = 0; i < 5 && i < AllCoords.Num(); ++i)
+	for (int32 i = 0; i < 1 && i < AllCoords.Num(); ++i)
 	{
 		PlayerCoords.Add(AllCoords[i]);
 	}
@@ -81,7 +82,7 @@ void AGridTileManager::InitGridTile()
 
 	// 그 다음 적 좌표 뽑기
 	TArray<FIntPoint> EnemyCoords;
-	for (int32 i = 0; i < 5 && i < AllCoords.Num(); ++i)
+	for (int32 i = 0; i < 1 && i < AllCoords.Num(); ++i)
 	{
 		EnemyCoords.Add(AllCoords[i]);
 	}
@@ -112,4 +113,18 @@ void AGridTileManager::InitGridTile()
 			enemey->speed = FMath::RandRange(1, 10);
 		}
 	}
+}
+AGridTile* AGridTileManager::FindCurrentTile(FVector worldLoc)
+{
+
+	FVector loc = worldLoc - GetActorLocation();
+	int32 x = FMath::RoundToInt(loc.Y / 100.0f);
+	int32 y = FMath::RoundToInt(loc.X / 100.0f);
+	
+	return map.FindRef(FIntPoint(x, y));
+}
+
+AGridTile* AGridTileManager::GetTile(int32 x, int32 y)
+{
+	return map.FindRef(FIntPoint(x, y));
 }
