@@ -19,7 +19,7 @@ void UUiMain::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	UGameplayStatics::SetGamePaused(GetWorld(),true);
+	// UGameplayStatics::SetGamePaused(GetWorld(),true);
 
     Wbp_UIChaMain->UiMain = this;
 	

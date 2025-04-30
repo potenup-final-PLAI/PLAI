@@ -215,6 +215,30 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "rlaqudtka1@w.w",
+			"pw": "123",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "rlaqudtka1@w.w",
+			"pw": "123",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }

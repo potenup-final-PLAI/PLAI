@@ -44,11 +44,6 @@ public:
 	class UCreComp* CreComp;
 
 	UPROPERTY(EditAnywhere)
-	class UCameraComponent* CameraComp;
-	UPROPERTY(EditAnywhere)
-	class USpringArmComponent* SpringArmComp;
-
-	UPROPERTY(EditAnywhere)
 	class USceneCaptureComponent2D* CaptureComp;
 
 	bool bCameraChane = false;
