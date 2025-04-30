@@ -249,6 +249,7 @@ void ULoginComp::HttpMePost()
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
 
 			UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
+			LoadEquipItem();
 			
 			character_id = UserFullInfo.character_info.character_id;
 			

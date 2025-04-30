@@ -42,4 +42,9 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class UCreComp* CreComp;
+
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* CameraComp;
+	UPROPERTY(EditAnywhere)
+	class USpringArmComponent* SpringArmComp;
 };

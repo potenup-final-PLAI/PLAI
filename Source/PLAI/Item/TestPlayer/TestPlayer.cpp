@@ -3,6 +3,8 @@
 
 #include "TestPlayer.h"
 
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "PLAI/Item/ItemComp/CreComp.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/ItemComp/ItemComp.h"
@@ -23,6 +25,10 @@ ATestPlayer::ATestPlayer()
 	LoginComp = CreateDefaultSubobject<ULoginComp>(TEXT("LoginComp"));
 	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("CreComp"));
 	LogItemComp = CreateDefaultSubobject<ULogItemComp>(TEXT("ItemComp"));
+	
+	// CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
+	// SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	
 }
 
 // Called when the game starts or when spawned

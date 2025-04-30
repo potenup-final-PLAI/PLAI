@@ -11,6 +11,15 @@ DECLARE_DELEGATE_OneParam(FOnSing, bool bSign)
 #include "PLAI/Item/UI/Main/UiMain.h" 
 #include "LoginComp.generated.h"
 
+USTRUCT(BlueprintType)
+struct FNgrok
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	FString Ngrok = FString("https://ada5-221-148-189-129.ngrok-free.app/");
+};
+
 // 서버 가입 요청 토큰
 USTRUCT(BlueprintType)
 struct FLoginStructRes
