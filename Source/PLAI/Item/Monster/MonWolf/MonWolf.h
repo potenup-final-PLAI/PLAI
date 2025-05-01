@@ -28,7 +28,7 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere)
-	TArray<FName>SocketNames;
+	TArray<FName> SocketNames;
 
 	void SetGravity();
 };

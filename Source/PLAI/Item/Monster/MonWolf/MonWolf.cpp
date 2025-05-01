@@ -14,8 +14,8 @@ AMonWolf::AMonWolf()
 	MonFsm = CreateDefaultSubobject<UMonFsmWolf>("MonFsm");
 
 	SocketNames = {
-		TEXT("FootFrontRight")
 		TEXT("FootFrontLeft"),
+		TEXT("FootFrontRight"),
 		TEXT("FootBackRight"),
 		TEXT("FootBackLeft"),
 	};
@@ -25,13 +25,13 @@ AMonWolf::AMonWolf()
 void AMonWolf::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame
 void AMonWolf::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	SetGravity();
 }
 
 // Called to bind functionality to input
@@ -42,5 +42,55 @@ void AMonWolf::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AMonWolf::SetGravity()
 {
+	// 1) Mesh 유효성 확인
+	USkeletalMeshComponent* SkelMesh = GetMesh();
+	if (!IsValid(SkelMesh))
+	{ UE_LOG(LogTemp, Error, TEXT("SetGravity: Mesh가 유효하지 않습니다."));
+		return; }
+	constexpr float DesiredHeight = 5.f;
+	constexpr float TraceDistance = 3000.f;
+	
+	FVector TotalOffset = FVector::ZeroVector;
+	int32 ContactCount = 0;
+
+	// 2) 각 소켓에서 라인트레이스
+	for (const FName& SocketName : SocketNames)
+	{
+		const FVector FootLoc = SkelMesh->GetSocketLocation(SocketName);
+		const FVector End = FootLoc - FVector(0.f, 0.f, TraceDistance);
+
+		FHitResult Hit;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		bool bHit = GetWorld()->LineTraceSingleByChannel(
+			Hit, FootLoc, End, ECC_Visibility, Params);
+		
+		if (bHit)
+		{
+			DrawDebugSphere(GetWorld(), GetMesh()->GetSocketLocation(SocketName), 15, 10, FColor::Red, false);
+			
+			DrawDebugLine(GetWorld(), FootLoc, Hit.ImpactPoint, FColor::Green , false);
+			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 15, 10, FColor::Green, false);
+			float Dist = Hit.Distance;
+			if (Dist > DesiredHeight)
+			{
+				float Diff = Dist - DesiredHeight;
+				// 지면으로 향하는 벡터 = -ImpactNormal
+				FVector Offset = -Hit.ImpactNormal * Diff;
+				// TotalOffset += Offset;
+				TotalOffset = Offset;
+				ContactCount++;
+			}
+		}
+	}
+
+	// 3) 평균 오프셋을 계산하여 한 번에 적용
+	if (ContactCount > 0)
+	{
+		FVector AvgOffset = TotalOffset / ContactCount;
+		// 실물 Physics 없이 위치 보정
+		AddActorWorldOffset(AvgOffset, true);
+	}
 }
 
