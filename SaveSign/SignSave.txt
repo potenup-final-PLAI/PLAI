@@ -431,6 +431,42 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "w@w.w",
+			"pw": "w",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "e@e.e",
+			"pw": "e",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "r@r.r",
+			"pw": "r",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }

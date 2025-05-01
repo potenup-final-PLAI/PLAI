@@ -6,8 +6,13 @@
 #include "UiMain.h"
 #include "Components/Button.h"
 #include "Components/ProgressBar.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "Components/TextBlock.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 void UUIChaMain::NativeConstruct()
 {
@@ -41,7 +46,14 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 	Spe->SetText(FText::AsNumber(UserFullInfo->character_info.stats.speed));
 
 	Gold->SetText(FText::AsNumber(UserFullInfo->inventory_info.gold));
-	Exp->SetPercent(UserFullInfo->character_info.current_exp/UserFullInfo->character_info.max_exp);
+	if (UserFullInfo->character_info.current_exp > 0 && UserFullInfo->character_info.max_exp > 0)
+	{
+		Exp->SetPercent(UserFullInfo->character_info.current_exp/UserFullInfo->character_info.max_exp);
+	}
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("UicahMain SetUiChaStat 경험치 안들어옴"))
+	}
 }
 
 void UUIChaMain::OnLoadMeInfo()
@@ -53,10 +65,25 @@ void UUIChaMain::OnLoadMeInfo()
 		return;
 	}
 	UiMain->LoginComp->HttpMePost();
+	
+	UE_LOG(LogTemp,Warning,TEXT("UUiChaMain에서 UiMain -> UUIChaMain 포인터 넘겨주기 실패 "))
+
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->AddToViewport();
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->AddToViewport();
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Visible);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Visible);
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	{
+		UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+	},1.5f,false);
 }
 
 void UUIChaMain::OnSelectMode()
 {
+	UiMain->LoginComp->TestPlayer->CaptureComp->DestroyComponent();
 	RemoveFromParent();
 }
 

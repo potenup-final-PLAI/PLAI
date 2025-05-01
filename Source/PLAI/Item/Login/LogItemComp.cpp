@@ -44,8 +44,8 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::L))//장비창 불러오기
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::L키 장비창 불러오기"));
-		// GetEquipInfo();
 		
+		GetEquipInfo();
 		GetInvenInfo();
 	}
 

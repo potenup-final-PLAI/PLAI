@@ -42,7 +42,7 @@ void ULoginComp::BeginPlay()
 	if (TestPlayer->IsLocallyControlled())
 	{
 		UiMain = CreateWidget<UUiMain>(GetWorld(),UiMainFactory);
-		UiMain->AddToViewport();
+		UiMain->AddToViewport(0);
 		UiMain->LoginComp = this;
 		UiMain->WbpUiSign->LoginComp = this;
 	}
@@ -139,7 +139,7 @@ void ULoginComp::HttpLoginPost()
 	
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 
-	httpRequest->SetURL(Ngrok.Ngrok + TEXT("/users/Login"));
+	httpRequest->SetURL(Ngrok.Ngrok + TEXT("/users/login"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	
@@ -208,13 +208,10 @@ void ULoginComp::HttpSignPost()
 
 void ULoginComp::HttpMePost()
 {
-	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
-	FNgrok Ngrok;
-	
-	FString url = FString::Printf(TEXT("%s/users/Me"),*Ngrok.Ngrok);
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest(); FNgrok Ngrok;
+	FString url = FString::Printf(TEXT("%s/me/"),*Ngrok.Ngrok);
+
 	httpRequest->SetURL(url);
-	
-	// httpRequest->SetURL(TEXT("http://192.168.10.96:8054/me/"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
@@ -258,6 +255,7 @@ void ULoginComp::HttpMePost()
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
 
 			UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
+			
 			LoadEquipItem();
 			LoadInvenItem();
 			
@@ -330,11 +328,8 @@ void ULoginComp::HttpCreatePost(FString CharacterName)
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 	FNgrok Ngrok;
 
-	FString Endpoint = FString::Printf(TEXT("%s/users/Create"), *Ngrok.Ngrok);
+	FString Endpoint = FString::Printf(TEXT("%s/characters/create"), *Ngrok.Ngrok);
 	httpRequest->SetURL(Endpoint);
-	
-	// httpRequest->SetURL(Ngrok.Ngrok + TEXT("/Create"));
-	// httpRequest->SetURL(TEXT("http://192.168.10.96:8054/characters/create"));
 	
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));

@@ -48,10 +48,11 @@ void UInvenComp::BeginPlay()
 	if (TestPlayer->IsLocallyControlled())
 	{
 		MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
-		MenuInven->AddToViewport();
-		MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
-		MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
-		MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+		MenuInven->AddToViewport(10);
+		MenuInven->SetVisibility(ESlateVisibility::Hidden);
+		// MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+		// MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+		// MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
