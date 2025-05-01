@@ -32,29 +32,30 @@ void AMonSpawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CurrentTime += DeltaTime;
-	if (CurrentTime > 1.0f)
-	{
-		float x = FMath::RandRange(-1000, 1000);
-		float y = FMath::RandRange(-1000, 1000);
-		float z = FMath::RandRange(0.0f, 50.0f);
-		RandLoc = FVector(x, y, z);
-		CurrentTime = 0;
-	}
-
-	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	FVector Start = GetActorLocation() + RandLoc + FVector(0,0,2000);
-	FVector End = Start + FVector(0,0,-10000);
-	
-	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_Visibility,Params);
-	if(bHit)
-	{
-		HitLoc = Hit.ImpactPoint;
-		DrawDebugLine(GetWorld(),Start,HitLoc,FColor::Blue,false,1.0f);
-		DrawDebugSphere(GetWorld(),HitLoc,30,10,FColor::Blue,false,1.0f);
-	}
+	SpawnMonster();
+	// CurrentTime += DeltaTime;
+	// if (CurrentTime > 1.0f)
+	// {
+	// 	float x = FMath::RandRange(-1000, 1000);
+	// 	float y = FMath::RandRange(-1000, 1000);
+	// 	float z = FMath::RandRange(0.0f, 50.0f);
+	// 	RandLoc = FVector(x, y, z);
+	// 	CurrentTime = 0;
+	// }
+	//
+	// FHitResult Hit;
+	// FCollisionQueryParams Params;
+	// Params.AddIgnoredActor(this);
+	// FVector Start = GetActorLocation() + RandLoc + FVector(0,0,2000);
+	// FVector End = Start + FVector(0,0,-10000);
+	//
+	// bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_Visibility,Params);
+	// if(bHit)
+	// {
+	// 	HitLoc = Hit.ImpactPoint;
+	// 	DrawDebugLine(GetWorld(),Start,HitLoc,FColor::Blue,false,1.0f);
+	// 	DrawDebugSphere(GetWorld(),HitLoc,30,10,FColor::Blue,false,1.0f);
+	// }
 
 	// CurrentTime += DeltaTime;
 	// if (CurrentTime > 2)
@@ -136,9 +137,33 @@ FVector AMonSpawn::RandLocation(float X, float Y, float Z)
 	float x = FMath::RandRange(-X, X);
 	float y = FMath::RandRange(-Y, Y);
 	float z = FMath::RandRange(0.0f, Z);
+	return FVector(x, y, z);
+}
 
-	FVector RandLoc = FVector(x, y, z);
+void AMonSpawn::SpawnMonster()
+{
+	MyTimer([this]()
+	{
+		FHitResult Hit;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+		FVector Start = GetActorLocation() + RandLocation() + FVector(0, 0, 1500);
+		FVector End = Start + FVector(0,0, -10000);
+	
+		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start,End,ECC_Visibility,Params);
 
-	return FVector(RandLoc);
+		if (bHit)
+		{
+			DrawDebugLine(GetWorld(),Start,Hit.ImpactPoint,FColor::Red,false,1.5f);
+			DrawDebugSphere(GetWorld(),Hit.ImpactPoint,20,10,FColor::Blue,false,1.5f);
+			
+			if (Monsters.Num() > 3) return;
+			
+			int32 index = FMath::RandRange(0, MonsterFactory.Num());
+			AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[index]);
+			Monster->SetActorLocation(Hit.ImpactPoint);
+			Monsters.Add(Monster);
+		}
+	},1.5);
 }
 
