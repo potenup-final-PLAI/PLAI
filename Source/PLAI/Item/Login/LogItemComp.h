@@ -62,7 +62,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString item_id = FString("");
 	UPROPERTY(EditAnywhere)
-	int32 Count = 0;
+	int32 Counts = 0;
 	UPROPERTY(EditAnywhere)
 	Foptions options;
 };

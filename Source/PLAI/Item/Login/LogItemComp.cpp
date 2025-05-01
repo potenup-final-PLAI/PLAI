@@ -45,7 +45,7 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::L키 장비창 불러오기"));
 		
-		GetEquipInfo();
+		// GetEquipInfo();
 		GetInvenInfo();
 	}
 
@@ -94,7 +94,7 @@ void ULogItemComp::HttpEquipPost(FString JsonString)
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 	
-	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/items/upsert/equipment"));
+	httpRequest->SetURL(TEXT("https://718f-221-148-189-129.ngrok-free.app/service1/items/upsert/equipment"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	httpRequest->SetContentAsString(JsonString);
@@ -116,9 +116,6 @@ void ULogItemComp::HttpEquipPost(FString JsonString)
 
 void ULogItemComp::GetInvenInfo()
 {
-	// FInventoryInfo InventoryInfo;
-	// FitemInfo ItemInfo;
-
 	FPostInvenId PostInvenId;
 	FInvenTory_Info InvenToryInfo;
 
@@ -129,12 +126,12 @@ void ULogItemComp::GetInvenInfo()
 			int index = TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildIndex(Slot);
 			if (Slot->ItemStructTable.ItemTop == -1)
 			{
-				UE_LOG(LogTemp,Warning,TEXT("LogItemComp, 여기 인벤슬롯 비었으니 넘어감 / %d"),index);
+				// UE_LOG(LogTemp,Warning,TEXT("LogItemComp, 여기 인벤슬롯 비었으니 넘어감 / %d"),index);
 				continue;
 			}
 			
 			InvenToryInfo.item_id = Slot->ItemStructTable.Item_Id;
-			InvenToryInfo.Count = Slot->ItemStructTable.ItemNum;
+			InvenToryInfo.Counts = Slot->ItemStructTable.ItemNum;
 
 			InvenToryInfo.options.attack = Slot->ItemStructTable.ItemStructStat.item_ATK;
 			InvenToryInfo.options.defense = Slot->ItemStructTable.ItemStructStat.item_DEF;
@@ -157,9 +154,10 @@ void ULogItemComp::GetInvenInfo()
 
 void ULogItemComp::HttpInvenPost(FString JsonString)
 {
+	UE_LOG(LogTemp,Warning,TEXT("LogItemComp, 아이템 정보 넘기기 "))
     FNgrok Ngrok;
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
-	httpRequest->SetURL(Ngrok.Ngrok + TEXT("/items/upsert/inventory"));
+	httpRequest->SetURL("https://718f-221-148-189-129.ngrok-free.app/service1/items/upsert/inventory");
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
@@ -171,7 +169,12 @@ void ULogItemComp::HttpInvenPost(FString JsonString)
 			FString JsonString = HttpResponse->GetContentAsString();
 			UE_LOG(LogTemp,Warning,TEXT("LogItemComp Response->GetAsString %s"),*JsonString)
 		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("LogItemComp 인벤토리 정보 넘기기 실패 "))
+		}
 	});
+	httpRequest->ProcessRequest();
 }
 
 
