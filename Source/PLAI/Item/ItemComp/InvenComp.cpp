@@ -48,8 +48,6 @@ void UInvenComp::BeginPlay()
 	if (TestPlayer->IsLocallyControlled())
 	{
 		MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
-		// MenuInven->AddToViewport(10);
-		// MenuInven->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -79,6 +77,27 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
 		Server_SpawnOneItem();
+	}
+	// 소환수 크리처 소환하기 임시
+	if (TestPlayer->HasAuthority() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Five))
+	{
+		TArray<FName> RawNames = ItemDataTable->GetRowNames();
+		if (RawNames.IsValidIndex(33))
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
+			FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
+			ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
+			ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
+
+			ItemMaster->ItemStructTable = *ItemStructTable;
+			ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+			ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
+			ItemMaster->SetActorScale3D(FVector(0.3,0.3,0.3));
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?"))
+		}
 	}
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))

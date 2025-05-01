@@ -12,13 +12,20 @@ AMonWolf::AMonWolf()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	MonFsm = CreateDefaultSubobject<UMonFsmWolf>("MonFsm");
+
+	SocketNames = {
+		TEXT("FootFrontRight")
+		TEXT("FootFrontLeft"),
+		TEXT("FootBackRight"),
+		TEXT("FootBackLeft"),
+	};
 }
 
 // Called when the game starts or when spawned
 void AMonWolf::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -31,5 +38,9 @@ void AMonWolf::Tick(float DeltaTime)
 void AMonWolf::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void AMonWolf::SetGravity()
+{
 }
 

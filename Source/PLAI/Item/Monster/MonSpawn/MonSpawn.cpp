@@ -31,31 +31,9 @@ void AMonSpawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// CurrentTime += DeltaTime;
+	CurrentTime += DeltaTime;
 	
-	if (CurrentTime > 2)
-	{
-		UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 실행중"));
-		float x = FMath::RandRange(-1000,1000);
-		float y = FMath::RandRange(-1000,1000);
-		float z = FMath::RandRange(0,100);
-		
-		int32 RandMonsterIndex = FMath::RandRange(0, MonsterFactory.Num() - 1);
-		AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[RandMonsterIndex]);
-		
-		Monster->SetActorLocation(GetActorLocation() + FVector(x,y,z));
-		DrawDebugSphere(GetWorld(),GetActorLocation() + FVector(x,y,z),20,20,FColor::Red);
-		
-		UE_LOG(LogTemp,Warning,TEXT("MonSpawn 어디서 떨어지냐 %f %f %f"),x,y,z);
-		UE_LOG(LogTemp,Warning,TEXT("MonSpawn 몬스터는 어디서 떨어지냐 %f %f %f"),Monster->GetActorLocation().X,
-			Monster->GetActorLocation().Y,Monster->GetActorLocation().Z);
-		
-		Monsters.Add(Monster);
-		CurrentTime = 0;
-	}
-
-	//몬스터 생성 타이머
-	// MyTimer([this]()
+	// if (CurrentTime > 2)
 	// {
 	// 	UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 실행중"));
 	// 	float x = FMath::RandRange(-1000,1000);
@@ -69,14 +47,38 @@ void AMonSpawn::Tick(float DeltaTime)
 	// 	DrawDebugSphere(GetWorld(),GetActorLocation() + FVector(x,y,z),20,20,FColor::Red);
 	// 	
 	// 	UE_LOG(LogTemp,Warning,TEXT("MonSpawn 어디서 떨어지냐 %f %f %f"),x,y,z);
+	// 	UE_LOG(LogTemp,Warning,TEXT("MonSpawn 몬스터는 어디서 떨어지냐 %f %f %f"),Monster->GetActorLocation().X,
+	// 		Monster->GetActorLocation().Y,Monster->GetActorLocation().Z);
 	// 	
 	// 	Monsters.Add(Monster);
-	// 	
-	// 	if (bTimer == true)
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("AMonSpawn:: 타이머 true"));
-	// 	}
-	// }, 2);
+	// 	CurrentTime = 0;
+	// }
+
+	// 몬스터 생성 타이머
+	 MyTimer([this]()
+	 {
+	 	if (Monsters.Num() > 8) return;
+	 	
+	 	UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 실행중"));
+	 	float x = FMath::RandRange(-1000,1000);
+	 	float y = FMath::RandRange(-1000,1000);
+	 	float z = FMath::RandRange(0,100);
+	 	
+	 	int32 RandMonsterIndex = FMath::RandRange(0, MonsterFactory.Num() - 1);
+	 	AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[RandMonsterIndex]);
+	 	
+	 	Monster->SetActorLocation(GetActorLocation() + FVector(x,y,z));
+	 	DrawDebugSphere(GetWorld(),GetActorLocation() + FVector(x,y,z),20,20,FColor::Red);
+	 	
+	 	// UE_LOG(LogTemp,Warning,TEXT("MonSpawn 어디서 떨어지냐 %f %f %f"),x,y,z);
+	 	
+	 	Monsters.Add(Monster);
+	 	
+	 	if (bTimer == true)
+	 	{
+	 		UE_LOG(LogTemp, Warning, TEXT("AMonSpawn:: 타이머 true"));
+	 	}
+	 }, 2);
 
 }
 

@@ -15,6 +15,10 @@
 #include "PLAI/Item/Login/LoginComp.h"
 #include "Components/TextBlock.h"
 #include "Interfaces/IHttpResponse.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 void UUiMain::NativeConstruct()
 {
@@ -106,6 +110,11 @@ void UUiMain::CreateCharacter()
 void UUiMain::OnButtonStart()
 {
 	UGameplayStatics::SetGamePaused(GetWorld(),false);
+	LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport();
+	LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+	LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+	LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+
 	RemoveFromParent();
 }
 

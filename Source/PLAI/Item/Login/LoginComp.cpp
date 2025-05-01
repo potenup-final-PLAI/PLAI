@@ -8,6 +8,7 @@
 #include "UserStruct.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/EditableTextBox.h"
+#include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -19,6 +20,7 @@
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Main/UIChaMain.h"
+#include "PLAI/Item/UI/Main/UiChaView.h"
 #include "PLAI/Item/UI/Main/UiSign.h"
 
 // Sets default values for this component's properties
@@ -258,6 +260,8 @@ void ULoginComp::HttpMePost()
 			
 			LoadEquipItem();
 			LoadInvenItem();
+			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->NameCha->SetText
+			(FText::FromString(UserFullInfo.character_info.character_name));
 			
 			character_id = UserFullInfo.character_info.character_id;
 			

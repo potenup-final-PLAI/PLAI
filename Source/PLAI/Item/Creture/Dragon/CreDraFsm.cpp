@@ -133,6 +133,12 @@ void UCreDraFsm::DraAround()
 
 void UCreDraFsm::DraAttack()
 {
+	if (PatrolPoints.Num() == 0 || PatrolIndex < 0 || PatrolIndex >= PatrolPoints.Num())
+	{
+		UE_LOG(LogTemp, Error, TEXT("DraAttack: PatrolPoints 크기=%d, PatrolIndex=%d"), PatrolPoints.Num(), PatrolIndex);
+		return;
+	}
+	
 	DrawDebugCircle(GetWorld(),PatrolPoints[PatrolIndex],50,10,FColor::Red,false,0.1);
 	DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),PatrolPoints[PatrolIndex],FColor::Red,false);
 	
@@ -158,10 +164,13 @@ void UCreDraFsm::DraAttack()
 	MyTimer(&UCreDraFsm::NextState,10);
 }
 
-
-
-void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), int32 time = 2.0f)
+void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), float time = 2.0f)
 {
+	if (!IsValid(Dragon)) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("DraAround: Dragon 포인터가 유효하지 않습니다."));
+		return;
+	}
 	bTimer = false;
 	if (Func)
 	{

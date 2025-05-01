@@ -38,7 +38,8 @@ public:
 	void DraIdle();
 	void DraAround();
 	void DraAttack();
-	void MyTimer(void(UCreDraFsm::*Func)(), int32 time);
+	
+	void MyTimer(void(UCreDraFsm::*Func)(), float time);
 
 	void NextState();
 

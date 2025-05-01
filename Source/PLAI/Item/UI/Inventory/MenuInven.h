@@ -29,4 +29,7 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class USlotCre* WBP_SlotCre;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UUiChaView* Wbp_ChaView;
 };
