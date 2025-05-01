@@ -12,7 +12,10 @@
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
+#include "PLAI/Item/UI/Inventory/QuickInven/QuickInven.h"
+#include "PLAI/Item/UI/Slot/SlotCre.h"
 
 void UUIChaMain::NativeConstruct()
 {
@@ -66,10 +69,12 @@ void UUIChaMain::OnLoadMeInfo()
 	}
 	UiMain->LoginComp->HttpMePost();
 	
-	UE_LOG(LogTemp,Warning,TEXT("UUiChaMain에서 UiMain -> UUIChaMain 포인터 넘겨주기 실패 "))
-
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->AddToViewport();
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->AddToViewport();
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport(1);
+	// 퀵슬롯 디테일창은 끄자
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_QuickInven->SetVisibility(ESlateVisibility::Hidden);
+    UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SetVisibility(ESlateVisibility::Hidden);
+	// 퀵슬롯 아이템 장비창 들어온느거 확인시켜주자
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Visible);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Visible);
 	
@@ -77,8 +82,8 @@ void UUIChaMain::OnLoadMeInfo()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 	{
 		UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
-	},1.5f,false);
+	    UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+	},3.0f,false);
 }
 
 void UUIChaMain::OnSelectMode()

@@ -7,6 +7,7 @@
 #include "JsonObjectConverter.h"
 #include "UIChaMain.h"
 #include "UiSign.h"
+#include "UiSUbMain.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/EditableTextBox.h"
@@ -22,6 +23,7 @@ void UUiMain::NativeConstruct()
 	// UGameplayStatics::SetGamePaused(GetWorld(),true);
 
     Wbp_UIChaMain->UiMain = this;
+	Wbp_UiSubMain->UiMain = this;
 	
 	if (APlayerController* pc = Cast<APlayerController>(GetOwningPlayer()))
 		

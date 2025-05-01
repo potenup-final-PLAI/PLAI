@@ -157,6 +157,21 @@ void ULogItemComp::GetInvenInfo()
 
 void ULogItemComp::HttpInvenPost(FString JsonString)
 {
+    FNgrok Ngrok;
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+	httpRequest->SetURL(Ngrok.Ngrok + TEXT("/items/upsert/inventory"));
+	httpRequest->SetVerb("POST");
+	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	httpRequest->SetContentAsString(JsonString);
+	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
+	{
+		if (bProcessedSuccessfully)
+		{
+			FString JsonString = HttpResponse->GetContentAsString();
+			UE_LOG(LogTemp,Warning,TEXT("LogItemComp Response->GetAsString %s"),*JsonString)
+		}
+	});
 }
 
 

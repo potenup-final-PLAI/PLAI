@@ -21,6 +21,9 @@ public:
 	UPROPERTY(meta = (BindWidget = "Widget1"))
 	class UButton* ButtonMulti;
 
+	UPROPERTY(EditAnywhere)
+	class UUiMain* UiMain;
+
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
