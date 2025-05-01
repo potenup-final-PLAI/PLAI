@@ -46,6 +46,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	FVector TargetLocation;
 
+	UPROPERTY(EditAnywhere)
+	float distLength;
+
 	void Idle();
 	void Around();
 	void Attack();
@@ -53,4 +56,12 @@ public:
 	bool bMoveArrive = false;
 
 	FVector RandLocation(float X = 1000.0f, float Y = 1000.0f, float Z = 50.0f);
+
+	void MoveDestination();
+	void LineDestination();
+
+	bool Timer = false;
+
+	void MyTimer(void(UMonFsm::*Func)(),float time = 2.0f);
+	void MyTimer(TFunction<void()> Func, float time = 2.0f);
 };
