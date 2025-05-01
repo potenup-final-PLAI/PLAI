@@ -38,13 +38,15 @@ public:
 	class AMonster* Monster;
 
     UPROPERTY(EditAnywhere)
-	float CurrentTime;
+	float CurrentTime = 0.0f;
 	
 	UPROPERTY(EditAnywhere)
 	EMonState MonState = EMonState::Idle;
 
 	UPROPERTY(EditAnywhere)
-	FVector TargetLocation;
+	FVector TargetLocation = FVector::ZeroVector;
+	UPROPERTY(EditAnywhere)
+	FVector RandLoc;
 
 	UPROPERTY(EditAnywhere)
 	float distLength;
@@ -60,8 +62,7 @@ public:
 	void MoveDestination();
 	void LineDestination();
 
-	bool Timer = false;
+	bool bTimer = false;
 
-	void MyTimer(void(UMonFsm::*Func)(),float time = 2.0f);
 	void MyTimer(TFunction<void()> Func, float time = 2.0f);
 };

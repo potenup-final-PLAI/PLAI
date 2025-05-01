@@ -4,6 +4,8 @@
 #include "MonFsm.h"
 
 #include "Monster.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 // Sets default values for this component's properties
@@ -22,16 +24,14 @@ void UMonFsm::BeginPlay()
 {
 	Super::BeginPlay();
 	Monster = Cast<AMonster>(GetOwner());
-	
 	LineDestination();
 }
-
 
 // Called every frame
 void UMonFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	switch (MonState)
 	{
 	case EMonState::Idle:
@@ -44,48 +44,16 @@ void UMonFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 		Attack();
 		break;
 	}
-
 	// ...
 }
 
 void UMonFsm::Idle()
 {
-	// MoveDestination();
-	
-	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(Monster);
-	FVector Start = Monster->GetActorLocation() + RandLocation() + FVector(0,0,2000);
-	FVector End = Start + FVector(0,0,10000);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_Visibility,Params);
-	if(bHit)
-	{
-		TargetLocation = Hit.ImpactPoint;
-		DrawDebugLine(GetWorld(),Start,TargetLocation,FColor::Blue,false,0.02f);
-		DrawDebugSphere(GetWorld(),TargetLocation,10,10,FColor::Blue,false,2.0f);
-	}
-	
-	// CurrentTime += GetWorld()->GetDeltaSeconds();
-	//
-	// FVector distVec = TargetLocation - Monster->GetActorLocation();
-	// distLength = distVec.Length();
-	// Monster->AddActorWorldOffset(distVec.GetSafeNormal() * 10);
-	//
-	// if (CurrentTime > 2)
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("2초 타이머 거리는 %f"), distLength);
-	// 	
-	// 	if (distLength < 100.f)
-	// 	{
-	// 		TargetLocation = RandLocation();
-	// 	}
-	// 	CurrentTime = 0.0f;
-	// }
+	MoveDestination();
 }
 
 void UMonFsm::Around()
 {
-	
 }
 
 void UMonFsm::Attack()
@@ -97,26 +65,33 @@ FVector UMonFsm::RandLocation(float X, float Y, float Z)
 	float x = FMath::RandRange(-X, X);
 	float y = FMath::RandRange(-Y, Y);
 	float z = FMath::RandRange(0.0f, Z);
-
-	FVector RandLoc = FVector(x, y, z);
-
-	return FVector(RandLoc);
+	return FVector(x,y,z);
 }
 
 void UMonFsm::MoveDestination()
 {
-	MyTimer([this]
+	DrawDebugLine(GetWorld(),Monster->GetActorLocation(),TargetLocation,FColor::Blue,false,0.02f);
+    DrawDebugSphere(GetWorld(),TargetLocation,20,30,FColor::Blue,false,0.02f);
+	
+	FVector Distance = TargetLocation - Monster->GetActorLocation();
+	Monster->AddActorWorldOffset(Distance.GetSafeNormal() * 10);
+	
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Monster);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Monster->GetActorLocation() + FVector(0,0,300),
+		Monster->GetActorLocation() + FVector(0,0,-300),ECC_Visibility,Params);
+	if(bHit)
 	{
-		DrawDebugLine(GetWorld(),Monster->GetActorLocation(),TargetLocation,FColor::Blue,false,0.02f);
-		FVector Distance = TargetLocation - Monster->GetActorLocation();
-		Monster->AddActorWorldOffset(Distance.GetSafeNormal() * 15);
-		
-		if (Timer == true && Distance.Length() < 100)
-		{
-			UE_LOG(LogTemp,Warning,TEXT("MonFsm 로케이션 타이머 어디까지왔니 %f"),Distance.Length())
-			LineDestination();
-		}
-	},2.0f);
+		FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
+		Monster->SetActorRotation(Rotator);
+	}
+
+
+    if (Distance.Length() < 75)
+    {
+    	LineDestination();
+    }
 }
 
 void UMonFsm::LineDestination()
@@ -126,44 +101,27 @@ void UMonFsm::LineDestination()
 	Params.AddIgnoredActor(Monster);
 
 	FVector Start = Monster->GetActorLocation() + RandLocation() + FVector(0,0,2000);
-	FVector End = Start + FVector(0,0,10000);
+	FVector End = Start + FVector(0,0, -10000);
 	
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_Visibility,Params);
 	if(bHit)
 	{
 		TargetLocation = Hit.ImpactPoint;
-		DrawDebugLine(GetWorld(),Start,TargetLocation,FColor::Blue,false,0.02f);
-		DrawDebugSphere(GetWorld(),TargetLocation,10,10,FColor::Blue,false,2.0f);
+		DrawDebugLine(GetWorld(),Start,TargetLocation,FColor::Red,false,2.0f);
+		DrawDebugSphere(GetWorld(),TargetLocation,10,10,FColor::Red,false,2.0f);
 	}
-}
-
-
-void UMonFsm::MyTimer(void(UMonFsm::* Func)(), float time)
-{
-	Timer = false;
-	
-	CurrentTime += GetWorld()->GetDeltaSeconds();
-	
-	if (CurrentTime > time)
-	{
-		(this->*Func)();
-		Timer = true;
-	}
-	CurrentTime = 0.0f;
 }
 
 void UMonFsm::MyTimer(TFunction<void()> Func, float time)
 {
-	Timer = false;
-	
+	bTimer = false;
 	CurrentTime += GetWorld()->GetDeltaSeconds();
-	
 	if (CurrentTime > time)
 	{
 		Func();
-		Timer = true;
+		bTimer = true;
+		CurrentTime = 0.0f;
 	}
-	CurrentTime = 0.0f;
 }
 
 
