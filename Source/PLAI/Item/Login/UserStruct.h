@@ -107,9 +107,9 @@ struct FcharInfo
     GENERATED_BODY()
 public:
     UPROPERTY(BlueprintReadWrite)
-    FString character_id;
+    FString character_id = FString("Init Character Id");
     UPROPERTY(BlueprintReadWrite)
-    FString character_name;
+    FString character_name = FString("Init Character Name");
     UPROPERTY(BlueprintReadWrite)
     FString job;
     UPROPERTY(BlueprintReadWrite)
@@ -156,7 +156,7 @@ public:
     UPROPERTY(BlueprintReadWrite)
     FString message;
     UPROPERTY(BlueprintReadWrite)
-    FString user_id;
+    FString user_id = FString("Init UserId");
     UPROPERTY(BlueprintReadWrite)
     FcharInfo character_info;
     UPROPERTY(BlueprintReadWrite)

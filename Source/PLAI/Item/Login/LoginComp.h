@@ -17,7 +17,7 @@ struct FNgrok
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere)
-	FString Ngrok = FString("https://ada5-221-148-189-129.ngrok-free.app/");
+	FString Ngrok = FString("https://718f-221-148-189-129.ngrok-free.app/service1/");
 };
 
 // 서버 가입 요청 토큰
@@ -177,6 +177,7 @@ public:
 	void HttpMePost();
 
 	void LoadEquipItem();
+	void LoadInvenItem();
 	//테스트 테이블 변환
 	// void TransDataTable();
 

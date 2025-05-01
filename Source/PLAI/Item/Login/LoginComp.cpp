@@ -139,9 +139,7 @@ void ULoginComp::HttpLoginPost()
 	
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 
-	// httpRequest->SetURL(Ngrok.Ngrok + TEXT("/Login"));
-	httpRequest->SetURL(TEXT("https://ada5-221-148-189-129.ngrok-free.app/users/login"));
-	
+	httpRequest->SetURL(Ngrok.Ngrok + TEXT("/users/Login"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	
@@ -179,9 +177,8 @@ void ULoginComp::HttpSignPost()
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 	FNgrok Ngrok;
-    FString url = FString::Printf(TEXT("%s/register"),*Ngrok.Ngrok);
+    FString url = FString::Printf(TEXT("%s/users/register"),*Ngrok.Ngrok);
 	httpRequest->SetURL(url);
-	// httpRequest->SetURL(TEXT("http://192.168.10.96:8054/users/register"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
@@ -214,7 +211,7 @@ void ULoginComp::HttpMePost()
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 	FNgrok Ngrok;
 	
-	FString url = FString::Printf(TEXT("%s/Me"),*Ngrok.Ngrok);
+	FString url = FString::Printf(TEXT("%s/users/Me"),*Ngrok.Ngrok);
 	httpRequest->SetURL(url);
 	
 	// httpRequest->SetURL(TEXT("http://192.168.10.96:8054/me/"));
@@ -262,6 +259,7 @@ void ULoginComp::HttpMePost()
 
 			UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
 			LoadEquipItem();
+			LoadInvenItem();
 			
 			character_id = UserFullInfo.character_info.character_id;
 			
@@ -295,14 +293,36 @@ void ULoginComp::LoadEquipItem()
 			}
 		}
 	}
-		
-	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+}
+
+void ULoginComp::LoadInvenItem()
+{
+	if (USlot* Slot = Cast<USlot>(TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildAt(0)))
 	{
-		if (USlotEquip* SlotEquip = Cast<USlotEquip>(Widget)) // 1번부터 5번까지 슬롯 돈다
+		TArray<FName>RawNames = Slot->ItemTable->GetRowNames();
+		for (int32 i = 0; i < UserFullInfo.inventory_info.item_list.Num(); i++)
 		{
-			
+			for (FName RawName : RawNames)
+			{
+				FItemStructTable* ItemStructTable = Slot->ItemTable->FindRow<FItemStructTable>(RawName,"LoginComp");
+				if (ItemStructTable->Item_Id == UserFullInfo.inventory_info.item_list[i].item_id)
+				{
+					USlot* SlotInvel = Cast<USlot>(TestPlayer->InvenComp->MenuInven->
+						WBP_ItemInven->WrapBox->GetChildAt(i));
+					SlotInvel->ItemStructTable = *ItemStructTable;
+					SlotInvel->SlotImageUpdate();
+				}
+			}
 		}
 	}
+	
+	// for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
+	// {
+	// 	if (USlot* SlOT = Cast<USlot>(Widget))
+	// 	{
+	// 		
+	// 	}
+	// }
 }
 
 void ULoginComp::HttpCreatePost(FString CharacterName)
@@ -310,7 +330,7 @@ void ULoginComp::HttpCreatePost(FString CharacterName)
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 	FNgrok Ngrok;
 
-	FString Endpoint = FString::Printf(TEXT("%s/Create"), *Ngrok.Ngrok);
+	FString Endpoint = FString::Printf(TEXT("%s/users/Create"), *Ngrok.Ngrok);
 	httpRequest->SetURL(Endpoint);
 	
 	// httpRequest->SetURL(Ngrok.Ngrok + TEXT("/Create"));

@@ -78,7 +78,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FInvenTory_Info>Inventory_info;
 	UPROPERTY(EditAnywhere)
-	int32 Gold;
+	int32 Gold = 0;
 };
 
 

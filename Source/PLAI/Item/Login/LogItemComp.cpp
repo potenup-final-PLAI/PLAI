@@ -44,7 +44,9 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::L))//장비창 불러오기
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::L키 장비창 불러오기"));
-		GetEquipInfo();
+		// GetEquipInfo();
+		
+		GetInvenInfo();
 	}
 
 	// ...
@@ -112,39 +114,45 @@ void ULogItemComp::HttpEquipPost(FString JsonString)
 }
 
 
-
-
 void ULogItemComp::GetInvenInfo()
 {
-	FInventoryInfo InventoryInfo;
-	FitemInfo ItemInfo;
+	// FInventoryInfo InventoryInfo;
+	// FitemInfo ItemInfo;
+
+	FPostInvenId PostInvenId;
+	FInvenTory_Info InvenToryInfo;
 
 	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
 	{
 		if (USlot* Slot = Cast<USlot>(Widget))
 		{
-			ItemInfo.item_id = Slot->ItemStructTable.Item_Id;
-			ItemInfo.item_category = Slot->ItemStructTable.ItemTop;
-			ItemInfo.item_type = Slot->ItemStructTable.ItemIndex;
-			ItemInfo.item_class = Slot->ItemStructTable.ItemIndexType;
-			ItemInfo.item_name = Slot->ItemStructTable.Name;
-			ItemInfo.category_name = Slot->ItemStructTable.NameType;
-			ItemInfo.description = Slot->ItemStructTable.NameDetail;
-			ItemInfo.level = Slot->ItemStructTable.ItemLevel;
-			ItemInfo.counts = Slot->ItemStructTable.ItemNum;
-			ItemInfo.price = Slot->ItemStructTable.ItemGold;
+			int index = TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildIndex(Slot);
+			if (Slot->ItemStructTable.ItemTop == -1)
+			{
+				UE_LOG(LogTemp,Warning,TEXT("LogItemComp, 여기 인벤슬롯 비었으니 넘어감 / %d"),index);
+				continue;
+			}
 			
-			ItemInfo.options.attack = Slot->ItemStructTable.ItemStructStat.item_ATK;
-			ItemInfo.options.defense = Slot->ItemStructTable.ItemStructStat.item_DEF;
-			ItemInfo.options.resistance = Slot->ItemStructTable.ItemStructStat.item_RES;
-			ItemInfo.options.critical_damage = Slot->ItemStructTable.ItemStructStat.item_CRITDMG;
-			ItemInfo.options.critical_rate = Slot->ItemStructTable.ItemStructStat.Item_CRIT;
-			ItemInfo.options.hp = Slot->ItemStructTable.ItemStructStat.item_SHI;
+			InvenToryInfo.item_id = Slot->ItemStructTable.Item_Id;
+			InvenToryInfo.Count = Slot->ItemStructTable.ItemNum;
 
-			InventoryInfo.item_list.Add(ItemInfo);
-			InventoryInfo.gold = TestPlayer->LoginComp->UserFullInfo.inventory_info.gold;
+			InvenToryInfo.options.attack = Slot->ItemStructTable.ItemStructStat.item_ATK;
+			InvenToryInfo.options.defense = Slot->ItemStructTable.ItemStructStat.item_DEF;
+			InvenToryInfo.options.resistance = Slot->ItemStructTable.ItemStructStat.item_RES;
+			InvenToryInfo.options.critical_damage = Slot->ItemStructTable.ItemStructStat.item_CRITDMG;
+			InvenToryInfo.options.critical_rate = Slot->ItemStructTable.ItemStructStat.Item_CRIT;
+			InvenToryInfo.options.hp = Slot->ItemStructTable.ItemStructStat.item_SHI;
+
+			PostInvenId.Inventory_info.Add(InvenToryInfo);
 		}
 	}
+	PostInvenId.character_id = TestPlayer->LoginComp->UserFullInfo.character_info.character_id;
+	PostInvenId.Gold = TestPlayer->LoginComp->UserFullInfo.inventory_info.gold;
+
+	FString jsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(PostInvenId,jsonString);
+	UE_LOG(LogTemp,Warning,TEXT("LogItemComp 인벤토리 정보 보내기 JsonString / %s"),*jsonString);
+	HttpInvenPost(jsonString);
 }
 
 void ULogItemComp::HttpInvenPost(FString JsonString)
