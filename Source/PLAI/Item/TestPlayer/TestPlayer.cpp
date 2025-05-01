@@ -36,6 +36,8 @@ void ATestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	StoreComp->StoreInven->AddToViewport();
+	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
+    
 	
 	// if (APlayerController* Pc = Cast<APlayerController>(GetController()))
 	// {

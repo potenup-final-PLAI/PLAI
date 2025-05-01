@@ -114,6 +114,7 @@ void ULogItemComp::HttpEquipPost(FString JsonString)
 
 void ULogItemComp::GetInvenInfo()
 {
+	FEquipmentInfo equipment_info;
 }
 
 

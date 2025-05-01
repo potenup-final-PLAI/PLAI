@@ -173,8 +173,10 @@ void ULoginComp::HttpLoginPost()
 void ULoginComp::HttpSignPost()
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
-	
-	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/users/register"));
+	FNgrok Ngrok;
+    FString url = FString::Printf(TEXT("%s/register"),*Ngrok.Ngrok);
+	httpRequest->SetURL(url);
+	// httpRequest->SetURL(TEXT("http://192.168.10.96:8054/users/register"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
@@ -205,8 +207,12 @@ void ULoginComp::HttpSignPost()
 void ULoginComp::HttpMePost()
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+	FNgrok Ngrok;
 	
-	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/me/"));
+	FString url = FString::Printf(TEXT("%s/Me"),*Ngrok.Ngrok);
+	httpRequest->SetURL(url);
+	
+	// httpRequest->SetURL(TEXT("http://192.168.10.96:8054/me/"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
@@ -297,8 +303,14 @@ void ULoginComp::LoadEquipItem()
 void ULoginComp::HttpCreatePost(FString CharacterName)
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+	FNgrok Ngrok;
+
+	FString Endpoint = FString::Printf(TEXT("%s/Create"), *Ngrok.Ngrok);
+	httpRequest->SetURL(Endpoint);
 	
-	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/characters/create"));
+	// httpRequest->SetURL(Ngrok.Ngrok + TEXT("/Create"));
+	// httpRequest->SetURL(TEXT("http://192.168.10.96:8054/characters/create"));
+	
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 

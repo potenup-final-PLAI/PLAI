@@ -84,6 +84,5 @@ public:
 	void HttpEquipPost(FString JsonString);
 	
 	void GetEquipInfo();
-
 	void GetInvenInfo();
 };
