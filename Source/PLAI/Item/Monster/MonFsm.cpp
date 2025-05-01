@@ -3,6 +3,7 @@
 
 #include "MonFsm.h"
 
+#include "MaterialHLSLTree.h"
 #include "Monster.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -75,6 +76,15 @@ void UMonFsm::MoveDestination()
 	
 	FVector Distance = TargetLocation - Monster->GetActorLocation();
 	Monster->AddActorWorldOffset(Distance.GetSafeNormal() * 10);
+	Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
+	// CurrentTime += GetWorld()->DeltaTimeSeconds;
+	// if (CurrentTime > 1.0f)
+	// {
+	// 	FRotator Smoothed = FMath::RInterpTo(Monster->GetActorRotation(), Distance.GetSafeNormal().Rotation(),
+	// 	CurrentTime, 1.0f);
+	// 	Monster->SetActorRotation(Smoothed);
+	// 	CurrentTime = 0.0f;
+	// }
 	
 	FHitResult Hit;
 	FCollisionQueryParams Params;
@@ -86,8 +96,7 @@ void UMonFsm::MoveDestination()
 		FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
 		Monster->SetActorRotation(Rotator);
 	}
-
-
+	
     if (Distance.Length() < 75)
     {
     	LineDestination();
