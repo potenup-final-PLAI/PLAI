@@ -20,8 +20,9 @@ void AMonSpawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// UIChaMain = CreateWidget<UUIChaMain>(GetWorld(),UUIChaMainFactory);
-	// UIChaMain->AddToViewport();
+	AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[1]);
+	 	
+	Monster->SetActorLocation(GetActorLocation() + FVector(100,100,0));
 	
 	UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 생성됨"));
 }
@@ -55,30 +56,29 @@ void AMonSpawn::Tick(float DeltaTime)
 	// }
 
 	// 몬스터 생성 타이머
-	 MyTimer([this]()
-	 {
-	 	if (Monsters.Num() > 8) return;
-	 	
-	 	UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 실행중"));
-	 	float x = FMath::RandRange(-1000,1000);
-	 	float y = FMath::RandRange(-1000,1000);
-	 	float z = FMath::RandRange(0,100);
-	 	
-	 	int32 RandMonsterIndex = FMath::RandRange(0, MonsterFactory.Num() - 1);
-	 	AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[RandMonsterIndex]);
-	 	
-	 	Monster->SetActorLocation(GetActorLocation() + FVector(x,y,z));
-	 	DrawDebugSphere(GetWorld(),GetActorLocation() + FVector(x,y,z),20,20,FColor::Red);
-	 	
-	 	// UE_LOG(LogTemp,Warning,TEXT("MonSpawn 어디서 떨어지냐 %f %f %f"),x,y,z);
-	 	
-	 	Monsters.Add(Monster);
-	 	
-	 	if (bTimer == true)
-	 	{
-	 		UE_LOG(LogTemp, Warning, TEXT("AMonSpawn:: 타이머 true"));
-	 	}
-	 }, 2);
+	 // MyTimer([this]()
+	 // {
+	 // 	if (! HasAuthority()) return;
+	 // 	if (Monsters.Num() > 2) return;
+	 // 	
+	 // 	UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 실행중"));
+	 // 	float x = FMath::RandRange(-1000,1000);
+	 // 	float y = FMath::RandRange(-1000,1000);
+	 // 	float z = FMath::RandRange(0,100);
+	 // 	
+	 // 	int32 RandMonsterIndex = FMath::RandRange(0, MonsterFactory.Num() - 1);
+	 // 	AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[RandMonsterIndex]);
+	 // 	
+	 // 	Monster->SetActorLocation(GetActorLocation() + FVector(x,y,z));
+	 // 	DrawDebugSphere(GetWorld(),GetActorLocation() + FVector(x,y,z),20,20,FColor::Red);
+	 // 	
+	 // 	Monsters.Add(Monster);
+	 // 	
+	 // 	if (bTimer == true)
+	 // 	{
+	 // 		UE_LOG(LogTemp, Warning, TEXT("AMonSpawn:: 타이머 몇마리 소환됨 ?? / %d"),Monsters.Num());
+	 // 	}
+	 // }, 2);
 
 }
 

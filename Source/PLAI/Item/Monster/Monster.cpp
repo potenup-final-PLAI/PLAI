@@ -3,6 +3,8 @@
 
 #include "Monster.h"
 
+#include "Components/CapsuleComponent.h"
+
 
 // Sets default values
 AMonster::AMonster()
@@ -15,7 +17,6 @@ AMonster::AMonster()
 void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
