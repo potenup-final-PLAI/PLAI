@@ -29,4 +29,7 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	class UMonFsm* MonFsm;
+	
+	UPROPERTY(EditAnywhere)
+	class USphereComponent* SphereComponent;
 };

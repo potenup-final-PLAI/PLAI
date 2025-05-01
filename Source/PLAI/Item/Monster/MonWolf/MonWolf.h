@@ -30,8 +30,5 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FName> SocketNames;
 
-	UPROPERTY(EditAnywhere)
-	FVector OffSet;
-
 	void SetGravity();
 };
