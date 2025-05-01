@@ -45,7 +45,7 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::L키 장비창 불러오기"));
 		
-		// GetEquipInfo();
+		GetEquipInfo();
 		GetInvenInfo();
 	}
 
@@ -124,9 +124,14 @@ void ULogItemComp::GetInvenInfo()
 		if (USlot* Slot = Cast<USlot>(Widget))
 		{
 			int index = TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildIndex(Slot);
-			if (Slot->ItemStructTable.ItemTop == -1)
+			if (Slot->ItemStructTable.ItemTop == -1 || Slot->ItemStructTable.ItemTop == 3)
 			{
 				// UE_LOG(LogTemp,Warning,TEXT("LogItemComp, 여기 인벤슬롯 비었으니 넘어감 / %d"),index);
+				continue;
+			}
+			if (Slot->ItemStructTable.ItemTop == 0 && Slot->ItemStructTable.ItemIndex == 0 &&
+				Slot->ItemStructTable.ItemIndexType == 1)
+			{
 				continue;
 			}
 			
