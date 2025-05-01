@@ -54,6 +54,33 @@ public:
 	TArray<Fequipment_info>equipment_info;
 };
 
+USTRUCT(BlueprintType)
+struct FInvenTory_Info
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	FString item_id = FString("");
+	UPROPERTY(EditAnywhere)
+	int32 Count = 0;
+	UPROPERTY(EditAnywhere)
+	Foptions options;
+};
+
+USTRUCT(BlueprintType)
+struct FPostInvenId
+{
+	GENERATED_BODY()
+public:
+
+	UPROPERTY(EditAnywhere)
+	FString character_id = FString("char");
+	UPROPERTY(EditAnywhere)
+	TArray<FInvenTory_Info>Inventory_info;
+	UPROPERTY(EditAnywhere)
+	int32 Gold;
+};
+
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API ULogItemComp : public UActorComponent
@@ -80,9 +107,12 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	FString Char_id = FString("char");
+
+	void GetEquipInfo();
 	
 	void HttpEquipPost(FString JsonString);
 	
-	void GetEquipInfo();
 	void GetInvenInfo();
+
+	void HttpInvenPost(FString JsonString);
 };

@@ -135,8 +135,13 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 void ULoginComp::HttpLoginPost()
 {
+    FNgrok Ngrok;
+	
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+
+	// httpRequest->SetURL(Ngrok.Ngrok + TEXT("/Login"));
 	httpRequest->SetURL(TEXT("https://ada5-221-148-189-129.ngrok-free.app/users/login"));
+	
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	

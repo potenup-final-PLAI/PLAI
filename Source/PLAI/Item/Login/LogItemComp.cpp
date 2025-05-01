@@ -6,11 +6,13 @@
 #include "JsonObjectConverter.h"
 #include "LoginComp.h"
 #include "Components/VerticalBox.h"
+#include "Components/WrapBox.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 
 // Sets default values for this component's properties
@@ -114,7 +116,39 @@ void ULogItemComp::HttpEquipPost(FString JsonString)
 
 void ULogItemComp::GetInvenInfo()
 {
-	FEquipmentInfo equipment_info;
+	FInventoryInfo InventoryInfo;
+	FitemInfo ItemInfo;
+
+	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
+	{
+		if (USlot* Slot = Cast<USlot>(Widget))
+		{
+			ItemInfo.item_id = Slot->ItemStructTable.Item_Id;
+			ItemInfo.item_category = Slot->ItemStructTable.ItemTop;
+			ItemInfo.item_type = Slot->ItemStructTable.ItemIndex;
+			ItemInfo.item_class = Slot->ItemStructTable.ItemIndexType;
+			ItemInfo.item_name = Slot->ItemStructTable.Name;
+			ItemInfo.category_name = Slot->ItemStructTable.NameType;
+			ItemInfo.description = Slot->ItemStructTable.NameDetail;
+			ItemInfo.level = Slot->ItemStructTable.ItemLevel;
+			ItemInfo.counts = Slot->ItemStructTable.ItemNum;
+			ItemInfo.price = Slot->ItemStructTable.ItemGold;
+			
+			ItemInfo.options.attack = Slot->ItemStructTable.ItemStructStat.item_ATK;
+			ItemInfo.options.defense = Slot->ItemStructTable.ItemStructStat.item_DEF;
+			ItemInfo.options.resistance = Slot->ItemStructTable.ItemStructStat.item_RES;
+			ItemInfo.options.critical_damage = Slot->ItemStructTable.ItemStructStat.item_CRITDMG;
+			ItemInfo.options.critical_rate = Slot->ItemStructTable.ItemStructStat.Item_CRIT;
+			ItemInfo.options.hp = Slot->ItemStructTable.ItemStructStat.item_SHI;
+
+			InventoryInfo.item_list.Add(ItemInfo);
+			InventoryInfo.gold = TestPlayer->LoginComp->UserFullInfo.inventory_info.gold;
+		}
+	}
+}
+
+void ULogItemComp::HttpInvenPost(FString JsonString)
+{
 }
 
 
