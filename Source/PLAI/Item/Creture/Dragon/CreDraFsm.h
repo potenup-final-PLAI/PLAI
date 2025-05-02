@@ -54,9 +54,8 @@ public:
 	
 	void DraAttackMultiPre(float time = 1.0f, float Radius = 2000.0f);
 	void DraAttackMulti(float time = 1.0f);
-	
 	UPROPERTY(EditAnywhere)
-	int32 MultiCount = 0;
+	float TimerMulti = 0.0f;
 	UPROPERTY(EditAnywhere)
 	int32 FinishCount = 0;
 	

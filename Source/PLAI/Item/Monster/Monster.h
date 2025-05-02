@@ -57,6 +57,5 @@ public:
 	TArray<FDataTableRowHandle> DataTableRows;
 
 	void SetMonsterUi();
-
 	void SetHpBar();
 };

@@ -86,21 +86,28 @@ void AMonSpawn::SpawnMonster()
 		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start,End,ECC_Visibility,Params);
 		if (bHit)
 		{
-			// DrawDebugLine(GetWorld(),Start,Hit.ImpactPoint,FColor::Red,false,1.5f);
-			// DrawDebugSphere(GetWorld(),Hit.ImpactPoint,20,10,FColor::Blue,false,1.5f);
+			TArray<FName>Raws = MonsterTable->GetRowNames();
+			for (FName Raw : Raws)
+			{
+				FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
+				// if (MonsterStruct && )
+			}
+			
 			if (Monsters.Num() > 6) return;
 			int32 index = FMath::RandRange(0, MonsterFactory.Num()-1);
 			if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[index]))
 			{
 				MonsterMaster->SetActorLocation(Hit.ImpactPoint);
 				Monsters.Add(MonsterMaster);
-				Monsters.Sort();
-			}
-			else
-			{
-				UE_LOG(LogTemp,Warning,TEXT("MonSpawn Monster가 없음"))
 			}
 		}
 	},1.5);
 }
 
+
+
+
+
+
+// DrawDebugLine(GetWorld(),Start,Hit.ImpactPoint,FColor::Red,false,1.5f);
+// DrawDebugSphere(GetWorld(),Hit.ImpactPoint,20,10,FColor::Blue,false,1.5f);

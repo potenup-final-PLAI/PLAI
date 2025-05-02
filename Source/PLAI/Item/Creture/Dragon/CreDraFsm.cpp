@@ -76,13 +76,14 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	// case EDraState::DraAround:
 	// 	DraAround();
 	// 	break;
+		
 	// case EDraState::DraPatrol:
 	// 	DraPatrol(10);
 	// 	break;
 	
-	// case EDraState::DraAttackSingleRange:
-	// 	DraAttackSingleRange();
-	// 	break;
+	case EDraState::DraAttackSingleRange:
+		DraAttackSingleRange();
+		break;
 	
 	case EDraState::DraAttackMultiPre:
 		DraAttackMultiPre();
@@ -173,8 +174,67 @@ void UCreDraFsm::DraPatrol(float time)
 	MyTimer(&UCreDraFsm::NextState,time);
 }
 
+
+void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
+{
+    CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime > 5)
+	{
+		Drastate = EDraState::DraAttackMultiPre;
+		CurrentTime = 0;
+	}
+	
+	AMonster* NearMonster = nullptr;
+
+	TimeFire += GetWorld()->GetDeltaSeconds();
+	if (TimeFire < time) return;
+	TimeFire = 0.0f;
+	
+	TArray<FOverlapResult>Results;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Dragon);
+	
+	bool bHit = GetWorld()->OverlapMultiByChannel(Results,Dragon->GetActorLocation(),
+		FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radios),Params);
+	if (bHit)
+	{
+		float Distance = 10000.0f;
+		for (FOverlapResult Result: Results)
+		{
+			AMonster* Monster = Cast<AMonster>(Result.GetActor());
+			if (Monster)
+			{
+				float CurDist = FVector::Distance(Dragon->GetActorLocation(),Result.GetActor()->GetActorLocation());
+				if (CurDist < Distance)
+				{
+					Distance = CurDist;
+					NearMonster = Monster;
+				}
+			}
+		}
+		if (NearMonster)
+		{
+			NearMonster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
+			NearMonster->SetHpBar();
+			FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
+			Dragon->SetActorRotation(dist.GetSafeNormal().Rotation());
+			DrawDebugLine(GetWorld(),NearMonster->GetActorLocation(),NearMonster->GetActorLocation()+FVector(0,0,1000),
+			FColor::Purple,false,1.5,0,1.5);
+			DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,
+			15,FColor::Purple,false,1.5,0,2);
+		}
+	}
+}
+
 void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 {
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime > 5)
+	{
+		Drastate = EDraState::DraAttackMultiPre;
+		CurrentTime = 0;
+	}
+	
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime > time)
 	{
@@ -205,6 +265,12 @@ void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 
 void UCreDraFsm::DraAttackMulti(float time)
 {
+	TimerMulti += GetWorld()->GetDeltaSeconds();
+	if (TimerMulti > 5)
+	{
+		TimerMulti = 0;
+		Drastate = EDraState::DraAttackSingleRange;
+	}
 	if (Monsters.Num() > 0)
 	{
 		if (FinishCount > 3)
@@ -276,51 +342,6 @@ void UCreDraFsm::MyTimer(TFunction<void()> func, float time)
 	}
 }
 
-void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
-{
-	AMonster* NearMonster = nullptr;
-
-	TimeFire += GetWorld()->GetDeltaSeconds();
-	if (TimeFire < time) return;
-	TimeFire = 0.0f;
-	
-	TArray<FOverlapResult>Results;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(Dragon);
-	FCollisionObjectQueryParams ObjectParams;
-	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
-
-	bool bHit = GetWorld()->OverlapMultiByObjectType(Results,Dragon->GetActorLocation(),
-		FQuat::Identity,ObjectParams,FCollisionShape::MakeSphere(Radios),Params);
-	if (bHit)
-	{
-		float Distance = 10000.0f;
-		for (FOverlapResult Result: Results)
-		{
-			AMonster* Monster = Cast<AMonster>(Result.GetActor());
-			if (Monster)
-			{
-				float CurDist = FVector::Distance(Dragon->GetActorLocation(),Result.GetActor()->GetActorLocation());
-				if (CurDist < Distance)
-				{
-					Distance = CurDist;
-					NearMonster = Monster;
-				}
-			}
-		}
-		if (NearMonster)
-		{
-			NearMonster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
-			NearMonster->SetHpBar();
-			FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
-			Dragon->SetActorRotation(dist.GetSafeNormal().Rotation());
-			DrawDebugLine(GetWorld(),NearMonster->GetActorLocation(),NearMonster->GetActorLocation()+FVector(0,0,1000),
-			FColor::Purple,false,1.5,0,1.5);
-			DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,
-			15,FColor::Purple,false,1.5,0,2);
-		}
-	}
-}
 
 void UCreDraFsm::NextState()
 {

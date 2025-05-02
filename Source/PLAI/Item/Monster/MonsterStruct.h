@@ -11,8 +11,12 @@ struct FMonsterStruct : public FTableRowBase
 {
 	GENERATED_BODY()
 public:
+    UPROPERTY(EditAnywhere)
+	int32 MonsterTop = 0;
+	
 	UPROPERTY(EditAnywhere)
 	FString Name = FString("Monster");
+	
 	UPROPERTY(EditAnywhere)
 	int32 Attack = 10;
 	
