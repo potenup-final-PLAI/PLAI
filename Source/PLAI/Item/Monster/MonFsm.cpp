@@ -76,15 +76,26 @@ void UMonFsm::MoveDestination()
 	
 	FVector Distance = TargetLocation - Monster->GetActorLocation();
 	Monster->AddActorWorldOffset(Distance.GetSafeNormal() * 10);
-	Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
-	// CurrentTime += GetWorld()->DeltaTimeSeconds;
-	// if (CurrentTime > 1.0f)
-	// {
-	// 	FRotator Smoothed = FMath::RInterpTo(Monster->GetActorRotation(), Distance.GetSafeNormal().Rotation(),
-	// 	CurrentTime, 1.0f);
-	// 	Monster->SetActorRotation(Smoothed);
-	// 	CurrentTime = 0.0f;
-	// }
+	// Monster->SetActorRotation(Distance.GetSafeNormal().Rotation());
+
+	if (Distance.Length() < 75)
+	{
+		LineDestination();
+		bRotator = true;
+	}
+	if (bRotator == true)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("MonFsm 초시계 %f"),CurrentTime)
+		CurrentTime += GetWorld()->DeltaTimeSeconds;
+		FRotator Rotator = UKismetMathLibrary::RLerp(Monster->GetActorRotation(), Distance.GetSafeNormal().Rotation(),
+		CurrentTime, false);
+		Monster->SetActorRotation(Rotator);
+		if (CurrentTime > 1)
+		{
+			CurrentTime = 0.0f;
+			bRotator = false;
+		}
+	}
 	
 	FHitResult Hit;
 	FCollisionQueryParams Params;
@@ -97,10 +108,7 @@ void UMonFsm::MoveDestination()
 		Monster->SetActorRotation(Rotator);
 	}
 	
-    if (Distance.Length() < 75)
-    {
-    	LineDestination();
-    }
+    
 }
 
 void UMonFsm::LineDestination()

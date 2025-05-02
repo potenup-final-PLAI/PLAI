@@ -44,6 +44,8 @@ public:
 	EMonState MonState = EMonState::Idle;
 
 	UPROPERTY(EditAnywhere)
+	FVector InitLocation;
+	UPROPERTY(EditAnywhere)
 	FVector TargetLocation = FVector::ZeroVector;
 	UPROPERTY(EditAnywhere)
 	FVector RandLoc;
@@ -63,6 +65,7 @@ public:
 	void LineDestination();
 
 	bool bTimer = false;
+	bool bRotator =false;
 
 	void MyTimer(TFunction<void()> Func, float time = 2.0f);
 };
