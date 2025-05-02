@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MonsterStruct.h"
 #include "GameFramework/Character.h"
 #include "Monster.generated.h"
 
@@ -32,4 +33,11 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphereComponent;
+
+	UPROPERTY(EditAnywhere)
+	FMonsterStruct MonsterStruct;
+
+	//임시 코드임 !!
+	UPROPERTY(EditAnywhere)
+	TArray<FDataTableRowHandle> DataTableRows;
 };

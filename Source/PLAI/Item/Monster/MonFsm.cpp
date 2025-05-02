@@ -26,6 +26,7 @@ void UMonFsm::BeginPlay()
 	Super::BeginPlay();
 	Monster = Cast<AMonster>(GetOwner());
 	LineDestination();
+	InitLocation = TargetLocation;
 }
 
 // Called every frame
@@ -81,6 +82,12 @@ void UMonFsm::MoveDestination()
 	if (Distance.Length() < 75)
 	{
 		LineDestination();
+		if (FVector::Distance(TargetLocation,InitLocation) > 3000)
+		{
+			FVector NewLoc = InitLocation - Monster->GetActorLocation();
+			NewLoc.Normalize();
+			TargetLocation = Monster->GetActorLocation() + NewLoc * 1500;
+		}
 		bRotator = true;
 	}
 	if (bRotator == true)
@@ -107,8 +114,6 @@ void UMonFsm::MoveDestination()
 		FRotator Rotator = UKismetMathLibrary::MakeRotFromYZ(Monster->GetActorRightVector(),Hit.ImpactNormal);
 		Monster->SetActorRotation(Rotator);
 	}
-	
-    
 }
 
 void UMonFsm::LineDestination()

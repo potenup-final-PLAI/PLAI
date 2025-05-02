@@ -76,7 +76,7 @@ void AMonSpawn::SpawnMonster()
 		{
 			// DrawDebugLine(GetWorld(),Start,Hit.ImpactPoint,FColor::Red,false,1.5f);
 			// DrawDebugSphere(GetWorld(),Hit.ImpactPoint,20,10,FColor::Blue,false,1.5f);
-			if (Monsters.Num() > 0) return;
+			if (Monsters.Num() > 6) return;
 			int32 index = FMath::RandRange(0, MonsterFactory.Num()-1);
 			AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[index]);
 			Monster->SetActorLocation(Hit.ImpactPoint);

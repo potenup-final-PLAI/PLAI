@@ -43,6 +43,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	FVector HitLoc;
 
+	UPROPERTY(EditAnywhere)
+	UDataTable* MonsterTable;
+
 	void MyTimer(void(AMonSpawn::*Func)(),float Second = 2.0f);
 	void MyTimer(TFunction<void()> Func, float Second = 2.0f);
 	
