@@ -5,7 +5,10 @@
 
 #include "CreDragon.h"
 #include "MovieSceneTracksComponentTypes.h"
+#include "Engine/OverlapResult.h"
 #include "PLAI/Item/Monster/MonFsm.h"
+#include "PLAI/Item/Monster/Monster.h"
+#include "PLAI/Item/Monster/MonsterMaster.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 
@@ -58,25 +61,27 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	RotateTime += GetWorld()->GetDeltaSeconds();
+
+	DraAttack();
 	
-	switch (Drastate)
-	{
-	case EDraState::DraIdle:
-		DraIdle();
-		break;
-
-	case EDraState::DraAround:
-		DraAround();
-		break;
-
-	case EDraState::DraPatrol:
-		DraPatrol();
-		break;
-
-	case EDraState::DraAttack:
-		DraAttack();
-		break;
-	}
+	// switch (Drastate)
+	// {
+	// case EDraState::DraIdle:
+	// 	DraIdle();
+	// 	break;
+	//
+	// case EDraState::DraAround:
+	// 	DraAround();
+	// 	break;
+	//
+	// case EDraState::DraPatrol:
+	// 	DraPatrol();
+	// 	break;
+	//
+	// case EDraState::DraAttack:
+	// 	DraAttack();
+	// 	break;
+	// }
 
 	// if (bTimer == true)
 	// {
@@ -153,8 +158,8 @@ void UCreDraFsm::DraPatrol()
 	
 	if (FVector::Dist(PatrolPoints[PatrolIndex] , Dragon->GetActorLocation()) < 50)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("CreDraFsm Patrol넘어감 %d 위치는 X 0.2%f 0.2%f Z 0.2Y%f"),PatrolIndex
-			,PatrolPoints[PatrolIndex].X,PatrolPoints[PatrolIndex].Y,PatrolPoints[PatrolIndex].Z);
+		// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm Patrol넘어감 %d 위치는 X 0.2%f 0.2%f Z 0.2Y%f"),PatrolIndex
+		// 	,PatrolPoints[PatrolIndex].X,PatrolPoints[PatrolIndex].Y,PatrolPoints[PatrolIndex].Z);
 		
 		PatrolIndex++;
 		FVector dir = PatrolPoints[PatrolIndex] - Dragon->GetActorLocation();
@@ -171,7 +176,48 @@ void UCreDraFsm::DraPatrol()
 
 void UCreDraFsm::DraAttack()
 {
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime < 2)
+	{
+		return;
+	}
+	CurrentTime = 0;
+
+	AMonsterMaster* NearMonster = nullptr;
+	TArray<FOverlapResult>Results;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Dragon);
+
+	FCollisionObjectQueryParams ObjectParams;
+	//추후에 수정 크리처 가능성 콜리전 채널
+	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
+	FCollisionShape ShapeParams = FCollisionShape::MakeSphere(2000);
 	
+	bool bHits = GetWorld()->OverlapMultiByObjectType(Results,Dragon->GetActorLocation()
+	,FQuat::Identity,ObjectParams,ShapeParams,Params);
+
+	float MonDist = 10000.0f;
+	if (bHits)
+	{
+		for (FOverlapResult Result : Results)
+		{
+			if (AMonsterMaster* Monster = Cast<AMonsterMaster>(Result.GetActor()))
+			{
+				float CurDist = FVector::Distance(Dragon->GetActorLocation(),Result.GetActor()->GetActorLocation());
+                if (CurDist < MonDist)
+                {
+                	MonDist = CurDist;
+                	NearMonster = Monster;
+                }
+			}
+		}
+		if (NearMonster)
+		{
+			DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,10,FColor::Blue,false,2);
+			NearMonster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
+			NearMonster->SetHpBar();
+		}
+	}
 }
 
 void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), float time = 2.0f)
@@ -197,6 +243,26 @@ void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), float time = 2.0f)
 	}
 }
 
+void UCreDraFsm::MyTimer(TFunction<void()> func, float time)
+{
+	if (!IsValid(Dragon)) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("DraAround: Dragon 포인터가 유효하지 않습니다."));
+		return;
+	}
+	bTimer = false;
+	if (func)
+	{
+		CurrentTime += GetWorld()->GetDeltaSeconds();
+		if (CurrentTime > time)
+		{
+			func(); 
+			CurrentTime = 0.0f;
+			bTimer = true;
+		}
+	}
+}
+
 void UCreDraFsm::NextState()
 {
 	if (Drastate != EDraState::DraAttack)
@@ -216,5 +282,9 @@ void UCreDraFsm::NextState()
 	// {
 	// 	Drastate = EDraState(0);
 	// }
+}
+
+void UCreDraFsm::OverlappedSphere()
+{
 }
 

@@ -42,6 +42,7 @@ public:
 	void DraAttack();
 	
 	void MyTimer(void(UCreDraFsm::*Func)(), float time);
+	void MyTimer(TFunction<void()> func, float time = 2.0f);
 
 	void NextState();
 
@@ -61,4 +62,6 @@ public:
 	int32 PatrolIndex = 0;
 
 	float CurrentTime = 0;
+
+	void OverlappedSphere();
 };
