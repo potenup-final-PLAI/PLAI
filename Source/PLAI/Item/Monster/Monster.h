@@ -45,6 +45,9 @@ public:
 	
     UPROPERTY(EditAnywhere)
 	TSubclassOf<class UMonUi> MonUiFactory;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AItemMaster> ItemMasterFactory;
 	
 	UPROPERTY(EditAnywhere)
 	class UMonUi* MonUi;
@@ -52,10 +55,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	FMonsterStruct MonsterStruct;
 
+	UPROPERTY(EditAnywhere)
+	UDataTable* MonsterTable;
+
 	//임시 코드임 !!
 	UPROPERTY(EditAnywhere)
 	TArray<FDataTableRowHandle> DataTableRows;
 
 	void SetMonsterUi();
 	void SetHpBar();
+	void Dead();
 };

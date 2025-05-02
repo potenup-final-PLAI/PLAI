@@ -82,7 +82,7 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	// 	break;
 	
 	case EDraState::DraAttackSingleRange:
-		DraAttackSingleRange();
+		DraAttackSingleRange(1000,0.5f);
 		break;
 	
 	case EDraState::DraAttackMultiPre:
@@ -157,7 +157,7 @@ void UCreDraFsm::DraPatrol(float time)
 	
 	FVector Dir = PatrolPoints[PatrolIndex] - Dragon->GetActorLocation();
 	Dir.Normalize();
-	Dragon->AddActorWorldOffset(Dir * 25);
+	Dragon->AddActorWorldOffset(Dir * 75);
 	
 	if (FVector::Dist(PatrolPoints[PatrolIndex] , Dragon->GetActorLocation()) < 50)
 	{
@@ -253,7 +253,7 @@ void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 					if (!Monsters.Contains(Monster))
 					{
 						Monsters.Add(Monster);
-						UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
+						// UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
 					}
 				}
 			}
@@ -282,7 +282,7 @@ void UCreDraFsm::DraAttackMulti(float time)
 		if (IsValid(Monster))
 		{
 			FVector Dir = Monster->GetActorLocation() - Dragon->GetActorLocation();
-			Dragon->AddActorWorldOffset(Dir.GetSafeNormal() * 25);
+			Dragon->AddActorWorldOffset(Dir.GetSafeNormal() * 100);
 			Dragon->SetActorRotation(Dir.Rotation());
 			if (FVector::Dist(Monster->GetActorLocation(),Dragon->GetActorLocation()) < 50.0f)
 			{

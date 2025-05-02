@@ -65,12 +65,12 @@ FVector AMonSpawn::RandLocation(float X, float Y, float Z)
 
 void AMonSpawn::SpawnMonster()
 {
-	UWorld* World = GetWorld();
-	if (!IsValid(World))
-	{ UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: GetWorld()가 유효하지 않습니다.")); return; }
-	int32 FactoryCount = MonsterFactory.Num();
-	if (FactoryCount <= 0)
-	{ UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: MonsterFactory가 비어 있습니다.")); return; }
+	// UWorld* World = GetWorld();
+	// if (!IsValid(World))
+	// { UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: GetWorld()가 유효하지 않습니다.")); return; }
+	// int32 FactoryCount = MonsterFactory.Num();
+	// if (FactoryCount <= 0)
+	// { UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: MonsterFactory가 비어 있습니다.")); return; }
 
 	
 	MyTimer([this]()
@@ -86,20 +86,32 @@ void AMonSpawn::SpawnMonster()
 		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start,End,ECC_Visibility,Params);
 		if (bHit)
 		{
+			if (Monsters.Num() > 6)return;
 			TArray<FName>Raws = MonsterTable->GetRowNames();
 			for (FName Raw : Raws)
 			{
 				FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
-				// if (MonsterStruct && )
+				if (MonsterStruct && MonsterStruct->MonsterTop == 0)
+				{
+					MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
+					int32 RandIndex = FMath::RandRange(0, Monsters.Num() - 1);
+					if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[RandIndex]))
+					{
+						MonsterMaster->SetActorLocation(Hit.Location);
+						MonsterMaster->MonsterStruct = *MonsterStruct;
+						MonsterMaster->SetMonsterUi();
+						Monsters.Add(MonsterMaster);
+					}
+				}
 			}
 			
-			if (Monsters.Num() > 6) return;
-			int32 index = FMath::RandRange(0, MonsterFactory.Num()-1);
-			if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[index]))
-			{
-				MonsterMaster->SetActorLocation(Hit.ImpactPoint);
-				Monsters.Add(MonsterMaster);
-			}
+			//
+			// int32 index = FMath::RandRange(0, MonsterFactory.Num()-1);
+			// if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[index]))
+			// {
+			// 	MonsterMaster->SetActorLocation(Hit.ImpactPoint);
+			// 	Monsters.Add(MonsterMaster);
+			// }
 		}
 	},1.5);
 }
