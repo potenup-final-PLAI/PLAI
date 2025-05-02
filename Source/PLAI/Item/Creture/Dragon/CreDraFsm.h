@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PLAI/Item/Creture/CreFsm.h"
 #include "CreDraFsm.generated.h"
+class AMonster;
 
 UENUM(BlueprintType)
 enum class EDraState : uint8
@@ -36,10 +37,18 @@ public:
 	UPROPERTY(EditAnywhere)
 	EDraState Drastate = EDraState::DraIdle;
 
+	UPROPERTY(EditAnywhere)
+	TArray<AMonster*>Monsters;
+	UPROPERTY(EditAnywhere)
+	int32 AttackCount = 0;
+	UPROPERTY(EditAnywhere)
+	int32 AttackCounted = 0;
+	
 	void DraIdle();
 	void DraAround();
 	void DraPatrol();
-	void DraAttack();
+	void DraAttack(float Radius = 1000.0f);
+	void DraAttackSingleRange(float Radios = 2000.0f, float time = 2.0f);
 	
 	void MyTimer(void(UCreDraFsm::*Func)(), float time);
 	void MyTimer(TFunction<void()> func, float time = 2.0f);
@@ -52,22 +61,29 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ATestPlayer* TestPlayer;
 
-	bool bTimer = true;
-	float RotateTime;
-
+	UPROPERTY(EditAnywhere)
+	float RotateTime = 0;
+    UPROPERTY(EditAnywhere)
+	float TimeAttack = 0;
 	UPROPERTY(EditAnywhere)
 	float TimeFire = 0;
+	
+	UPROPERTY(EditAnywhere)
+	bool bTimer = true;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FVector>PatrolPoints;
+	
+	UPROPERTY(EditAnywhere)
+	TArray<FVector>AttackPoints;
 	
 	UPROPERTY(EditAnywhere)
 	int32 PatrolIndex = 0;
 
 	float CurrentTime = 0;
 
+	FVector AttackVector;
 	FVector FireBallStart = FVector::ZeroVector;
 	FVector FireBallEnd = FVector::ZeroVector;
 
-	void OverlappedSphere(float Radios = 2000.0f, float time = 2.0f);
 };

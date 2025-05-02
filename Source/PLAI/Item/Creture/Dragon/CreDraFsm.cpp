@@ -60,8 +60,9 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// DraAttack();
-	OverlappedSphere(2000,2.0f);
+	DraAttack();
+	
+	// OverlappedSphere(2000,2.0f);
 	
 	// switch (Drastate)
 	// {
@@ -148,7 +149,6 @@ void UCreDraFsm::DraPatrol()
 		UE_LOG(LogTemp, Error, TEXT("DraAttack: PatrolPoints 크기=%d, PatrolIndex=%d"), PatrolPoints.Num(), PatrolIndex);
 		return;
 	}
-	
 	DrawDebugCircle(GetWorld(),PatrolPoints[PatrolIndex],50,10,FColor::Red,false,0.1);
 	DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),PatrolPoints[PatrolIndex],FColor::Red,false);
 	
@@ -171,9 +171,33 @@ void UCreDraFsm::DraPatrol()
 	MyTimer(&UCreDraFsm::NextState,10);
 }
 
-void UCreDraFsm::DraAttack()
+void UCreDraFsm::DraAttack(float Radius)
 {
-	
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime > 1.0f)
+	{
+		CurrentTime = 0.0f;
+		TArray<FOverlapResult>HitResults;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(Dragon);
+		bool bHit = GetWorld()->OverlapMultiByObjectType(HitResults,Dragon->GetActorLocation(),
+			FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radius),Params);
+		float distclose = 5000.0f;
+		if (bHit)
+		{
+			for (FOverlapResult Result : HitResults)
+			{
+				if (AMonster* Monster = Cast<AMonster>(Result.GetActor()))
+				{
+					if (distclose > FVector::Distance(Monster->GetActorLocation(),Dragon->GetActorLocation()))
+					{
+						distclose = FVector::Dist(Dragon->GetActorLocation(),Monster->GetActorLocation());
+						Monsters.Add(Monster);
+					}
+				}
+			}
+		}
+	}
 }
 
 void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), float time = 2.0f)
@@ -227,7 +251,7 @@ void UCreDraFsm::NextState()
 	{ Drastate = static_cast<EDraState>(0); }
 }
 
-void UCreDraFsm::OverlappedSphere(float Radios, float time)
+void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 {
 	AMonster* NearMonster = nullptr;
 

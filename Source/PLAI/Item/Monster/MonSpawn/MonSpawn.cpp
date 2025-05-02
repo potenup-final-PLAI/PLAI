@@ -75,6 +75,9 @@ void AMonSpawn::SpawnMonster()
 	
 	MyTimer([this]()
 	{
+		Monsters.RemoveAll([](AMonster* M){
+		  return !IsValid(M);});
+	   
 		FHitResult Hit;
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(this);
