@@ -2,7 +2,10 @@
 
 
 #include "Monster.h"
+
+#include "Components/ProgressBar.h"
 #include "Components/SphereComponent.h"
+#include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
 
 #include "MonUi/MonUi.h"
@@ -33,6 +36,9 @@ void AMonster::BeginPlay()
 	MonUiComp->SetVisibility(true);
 	MonUiComp->SetRelativeLocation(FVector(0,0,150));
 	MonUiComp->SetWidgetSpace(EWidgetSpace::Screen); // or World
+
+	SetMonsterUi();
+	SetHpBar();
 }
 
 // Called every frame
@@ -46,4 +52,23 @@ void AMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
+
+
+void AMonster::SetMonsterUi()
+{
+	MonUi->Name->SetText(FText::FromString(MonsterStruct.Name));
+	MonUi->CurrentHp->SetText(FText::AsNumber(MonsterStruct.CurrentHp));
+	MonUi->MaxHp->SetText(FText::AsNumber(MonsterStruct.MaxHp));
+}
+
+void AMonster::SetHpBar()
+{
+	MonUi->HpBar->SetPercent(static_cast<float>(MonsterStruct.CurrentHp) / MonsterStruct.MaxHp);
+	MonUi->CurrentHp->SetText(FText::AsNumber(MonsterStruct.CurrentHp));
+	if (MonsterStruct.CurrentHp < 1)
+	{
+		Destroy();
+	}
+}
+
 

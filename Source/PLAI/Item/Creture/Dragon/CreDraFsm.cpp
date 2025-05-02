@@ -183,7 +183,7 @@ void UCreDraFsm::DraAttack()
 	}
 	CurrentTime = 0;
 
-	AMonsterMaster* NearMonster = nullptr;
+	AMonster* NearMonster = nullptr;
 	TArray<FOverlapResult>Results;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Dragon);
@@ -201,7 +201,7 @@ void UCreDraFsm::DraAttack()
 	{
 		for (FOverlapResult Result : Results)
 		{
-			if (AMonsterMaster* Monster = Cast<AMonsterMaster>(Result.GetActor()))
+			if (AMonster* Monster = Cast<AMonster>(Result.GetActor()))
 			{
 				float CurDist = FVector::Distance(Dragon->GetActorLocation(),Result.GetActor()->GetActorLocation());
                 if (CurDist < MonDist)

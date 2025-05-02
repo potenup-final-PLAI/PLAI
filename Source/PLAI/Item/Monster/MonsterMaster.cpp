@@ -20,9 +20,12 @@ AMonsterMaster::AMonsterMaster()
 void AMonsterMaster::BeginPlay()
 {
 	Super::BeginPlay();
-	SetMonsterUi();
-	SetHpBar();
 	// 부모 DefaultObject에서 가져오기
+}
+
+void AMonsterMaster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 // Called every frame
@@ -32,20 +35,4 @@ void AMonsterMaster::Tick(float DeltaTime)
 }
 
 // Called to bind functionality to input
-void AMonsterMaster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
-
-void AMonsterMaster::SetMonsterUi()
-{
-	MonUi->Name->SetText(FText::FromString(MonsterStruct.Name));
-	MonUi->CurrentHp->SetText(FText::AsNumber(MonsterStruct.CurrentHp));
-	MonUi->MaxHp->SetText(FText::AsNumber(MonsterStruct.MaxHp));
-}
-
-void AMonsterMaster::SetHpBar()
-{
-	MonUi->HpBar->SetPercent(MonsterStruct.CurrentHp / MonsterStruct.MaxHp);
-}
 

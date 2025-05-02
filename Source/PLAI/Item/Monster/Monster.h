@@ -55,4 +55,8 @@ public:
 	//임시 코드임 !!
 	UPROPERTY(EditAnywhere)
 	TArray<FDataTableRowHandle> DataTableRows;
+
+	void SetMonsterUi();
+
+	void SetHpBar();
 };
