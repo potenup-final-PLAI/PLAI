@@ -88,7 +88,6 @@ void AMonSpawn::SpawnMonster()
 		{
 			// DrawDebugLine(GetWorld(),Start,Hit.ImpactPoint,FColor::Red,false,1.5f);
 			// DrawDebugSphere(GetWorld(),Hit.ImpactPoint,20,10,FColor::Blue,false,1.5f);
-			UE_LOG(LogTemp,Warning,TEXT("MonSpawn 몇말남음? %d"),Monsters.Num())
 			if (Monsters.Num() > 6) return;
 			int32 index = FMath::RandRange(0, MonsterFactory.Num()-1);
 			if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[index]))

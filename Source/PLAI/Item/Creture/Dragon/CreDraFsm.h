@@ -11,9 +11,14 @@ UENUM(BlueprintType)
 enum class EDraState : uint8
 {
 	DraIdle UMETA(DisplayName = "Idle"),
+	
 	DraAround UMETA(DisplayName = "Around"),
 	DraPatrol UMETA(DisplayName = "Attack"),
-	DraAttack UMETA(DisplayName = "Patrol"),
+	
+	DraAttackSingleRange UMETA(DisplayName = "DraAttackSingleRange"),
+	
+	DraAttackMultiPre UMETA(DisplayName = "DraAttackMultiPre"),
+	DraAttackMulti UMETA(DisplayName = "DraAttackMulti"),
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -35,20 +40,25 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 public:
 	UPROPERTY(EditAnywhere)
-	EDraState Drastate = EDraState::DraIdle;
+	EDraState Drastate = EDraState::DraAttackMultiPre;
 
 	UPROPERTY(EditAnywhere)
 	TArray<AMonster*>Monsters;
-	UPROPERTY(EditAnywhere)
-	int32 AttackCount = 0;
-	UPROPERTY(EditAnywhere)
-	int32 AttackCounted = 0;
 	
-	void DraIdle();
-	void DraAround();
-	void DraPatrol();
-	void DraAttack(float Radius = 1000.0f);
+	void DraIdle(float time = 1.0f);
+	
+	void DraAround(float time = 1.0f);
+	void DraPatrol(float time = 1.0f);
+
 	void DraAttackSingleRange(float Radios = 2000.0f, float time = 2.0f);
+	
+	void DraAttackMultiPre(float time = 1.0f, float Radius = 1000.0f);
+	void DraAttackMulti(float time = 1.0f);
+	
+	UPROPERTY(EditAnywhere)
+	int32 MultiCount = 0;
+	UPROPERTY(EditAnywhere)
+	int32 FinishCount = 0;
 	
 	void MyTimer(void(UCreDraFsm::*Func)(), float time);
 	void MyTimer(TFunction<void()> func, float time = 2.0f);

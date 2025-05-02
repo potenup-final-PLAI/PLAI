@@ -60,12 +60,15 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	DraAttack();
+	DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 150),
+	FString::Printf(TEXT("CreDreFsm DraState 현재[%s]"),*UEnum::GetValueAsString(EDraState(static_cast<int32>
+		(Drastate)))),nullptr,FColor::Red,0.f,false);
+	// *UEnum::GetValueAsString(EDraState(static_cast<int32>(Drastate))));
+	// DraAttackMultiPre();
+	// DraAttackSingleRange();
 	
-	// OverlappedSphere(2000,2.0f);
-	
-	// switch (Drastate)
-	// {
+	switch (Drastate)
+	{
 	// case EDraState::DraIdle:
 	// 	DraIdle();
 	// 	break;
@@ -73,34 +76,38 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	// case EDraState::DraAround:
 	// 	DraAround();
 	// 	break;
-	//
 	// case EDraState::DraPatrol:
-	// 	DraPatrol();
+	// 	DraPatrol(10);
 	// 	break;
-	//
-	// case EDraState::DraAttack:
-	// 	DraAttack();
+	
+	// case EDraState::DraAttackSingleRange:
+	// 	DraAttackSingleRange();
 	// 	break;
-	// }
+	
+	case EDraState::DraAttackMultiPre:
+		DraAttackMultiPre();
+		break;
+	case EDraState::DraAttackMulti:
+		DraAttackMulti();
+		break;
+	}
 
 	// if (bTimer == true)
 	// {
 	// 	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm bool값은? %s"),bTimer ? TEXT("참") : TEXT("거짓"));
 	// }
-
-	// ...
 }
 
-void UCreDraFsm::DraIdle()
+void UCreDraFsm::DraIdle(float time)
 {
 	// Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
 	
-	MyTimer(&UCreDraFsm::NextState,1);
+	MyTimer(&UCreDraFsm::NextState,time);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
 }
 
-void UCreDraFsm::DraAround()
+void UCreDraFsm::DraAround(float time)
 {
 	RotateTime += GetWorld()->GetDeltaSeconds();
 	Dragon->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
@@ -139,10 +146,10 @@ void UCreDraFsm::DraAround()
 
 		DrawDebugCircle(GetWorld(),PatrolPoints[0] * 100,50,10,FColor::Blue,false,3);
 	}
-	MyTimer(&UCreDraFsm::NextState,2);
+	MyTimer(&UCreDraFsm::NextState,time);
 }
 
-void UCreDraFsm::DraPatrol()
+void UCreDraFsm::DraPatrol(float time)
 {
 	if (PatrolPoints.Num() == 0 || PatrolIndex < 0 || PatrolIndex >= PatrolPoints.Num())
 	{
@@ -168,34 +175,69 @@ void UCreDraFsm::DraPatrol()
 			PatrolIndex = 0;
 		}
 	}
-	MyTimer(&UCreDraFsm::NextState,10);
+	MyTimer(&UCreDraFsm::NextState,time);
 }
 
-void UCreDraFsm::DraAttack(float Radius)
+void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 {
 	CurrentTime += GetWorld()->GetDeltaSeconds();
-	if (CurrentTime > 1.0f)
+	if (CurrentTime > time)
 	{
-		CurrentTime = 0.0f;
+		MultiCount = 0;
+		Monsters.Empty();
 		TArray<FOverlapResult>HitResults;
 		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(Dragon);
-		bool bHit = GetWorld()->OverlapMultiByObjectType(HitResults,Dragon->GetActorLocation(),
+		Params.AddIgnoredActor(Dragon); 
+		bool bHit = GetWorld()->OverlapMultiByChannel(HitResults,Dragon->GetActorLocation(),
 			FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radius),Params);
-		float distclose = 5000.0f;
 		if (bHit)
 		{
 			for (FOverlapResult Result : HitResults)
 			{
 				if (AMonster* Monster = Cast<AMonster>(Result.GetActor()))
 				{
-					if (distclose > FVector::Distance(Monster->GetActorLocation(),Dragon->GetActorLocation()))
-					{
-						distclose = FVector::Dist(Dragon->GetActorLocation(),Monster->GetActorLocation());
-						Monsters.Add(Monster);
-					}
+					UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 잡은애 몇말? 몬스터스 갯수 %d"
+								 "엑터이름 %s"),Monsters.Num(),*Monster->GetName());
+					Monsters.Add(Monster);
 				}
 			}
+		}
+		Drastate = EDraState::DraAttackMulti;
+		Dragon->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		CurrentTime = 0.0f;
+	}
+}
+
+void UCreDraFsm::DraAttackMulti(float time)
+{
+	if (!Monsters.IsValidIndex(MultiCount))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Invalid MultiCount: %d / Num:%d"), MultiCount, Monsters.Num());
+		Drastate = EDraState::DraAttackMultiPre;
+		return;
+	}
+	FVector dist = Monsters[MultiCount]->GetActorLocation() - Dragon->GetActorLocation();
+	Dragon->AddActorWorldOffset(dist.GetSafeNormal() * 30);
+	if (dist.Length() < 50)
+	{
+		MultiCount++;
+		FinishCount++;
+		if (MultiCount >= PatrolPoints.Num()) return;
+		UE_LOG(LogTemp, Error, TEXT("Invalid 50보다 거리작지만 없음 MultiCount: %d / Num:%d"), MultiCount, Monsters.Num());
+		FVector dir = PatrolPoints[PatrolIndex] - Dragon->GetActorLocation();
+		
+		dir.Normalize();
+		Dragon->SetActorRotation(dir.Rotation());
+		
+		if (MultiCount >= Monsters.Num())
+		{
+			Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
+			Drastate = EDraState::DraAttackMultiPre;
+		}
+		if (FinishCount % 3 == 0)
+		{
+			FinishCount = 0;
+			UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 필살기 시전"));
 		}
 	}
 }
@@ -243,14 +285,6 @@ void UCreDraFsm::MyTimer(TFunction<void()> func, float time)
 	}
 }
 
-void UCreDraFsm::NextState()
-{
-	if (Drastate != EDraState::DraAttack)
-	{ Drastate = static_cast<EDraState>(static_cast<int32>(Drastate) + 1); }
-	else
-	{ Drastate = static_cast<EDraState>(0); }
-}
-
 void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 {
 	AMonster* NearMonster = nullptr;
@@ -295,6 +329,14 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			15,FColor::Purple,false,1.5,0,2);
 		}
 	}
+}
+
+void UCreDraFsm::NextState()
+{
+	if (Drastate != EDraState::DraAttackMulti)
+	{ Drastate = static_cast<EDraState>(static_cast<int32>(Drastate) + 1); }
+	else
+	{ Drastate = static_cast<EDraState>(0); }
 }
 
 
