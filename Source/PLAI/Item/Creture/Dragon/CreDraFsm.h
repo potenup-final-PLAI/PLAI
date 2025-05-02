@@ -56,6 +56,9 @@ public:
 	float RotateTime;
 
 	UPROPERTY(EditAnywhere)
+	float TimeFire = 0;
+
+	UPROPERTY(EditAnywhere)
 	TArray<FVector>PatrolPoints;
 	
 	UPROPERTY(EditAnywhere)
@@ -63,5 +66,8 @@ public:
 
 	float CurrentTime = 0;
 
-	void OverlappedSphere();
+	FVector FireBallStart = FVector::ZeroVector;
+	FVector FireBallEnd = FVector::ZeroVector;
+
+	void OverlappedSphere(float Radios = 2000.0f, float time = 2.0f);
 };
