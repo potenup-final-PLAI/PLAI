@@ -61,7 +61,6 @@ bool USlotCre::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& I
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTable.CreatureFactory,SpawnParams);
 		Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
-			
 		TestPlayer->CreComp->EquipCreature(Creature);
 	}
 	else

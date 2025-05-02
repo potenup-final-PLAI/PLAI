@@ -3,6 +3,7 @@
 
 #include "InvenComp.h"
 
+#include "CreComp.h"
 #include "JsonObjectConverter.h"
 #include "StoreComp.h"
 #include "Components/BoxComponent.h"
@@ -93,6 +94,15 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
 			ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
 			ItemMaster->SetActorScale3D(FVector(0.3,0.3,0.3));
+
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.bNoFail = true; // 실패하지 않게 설정
+			SpawnParams.bDeferConstruction = true;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTable->CreatureFactory,SpawnParams);
+			Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
+			TestPlayer->CreComp->EquipCreature(Creature);
+			Creature->ItemStructTable = *ItemStructTable;
 		}
 		else
 		{

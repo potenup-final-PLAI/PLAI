@@ -3,6 +3,8 @@
 
 #include "MonsterMaster.h"
 
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
 #include "MonUi/MonUi.h"
 
@@ -18,7 +20,8 @@ AMonsterMaster::AMonsterMaster()
 void AMonsterMaster::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SetMonsterUi();
+	SetHpBar();
 	// 부모 DefaultObject에서 가져오기
 }
 
@@ -32,5 +35,17 @@ void AMonsterMaster::Tick(float DeltaTime)
 void AMonsterMaster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void AMonsterMaster::SetMonsterUi()
+{
+	MonUi->Name->SetText(FText::FromString(MonsterStruct.Name));
+	MonUi->CurrentHp->SetText(FText::AsNumber(MonsterStruct.CurrentHp));
+	MonUi->MaxHp->SetText(FText::AsNumber(MonsterStruct.MaxHp));
+}
+
+void AMonsterMaster::SetHpBar()
+{
+	MonUi->HpBar->SetPercent(MonsterStruct.CurrentHp / MonsterStruct.MaxHp);
 }
 

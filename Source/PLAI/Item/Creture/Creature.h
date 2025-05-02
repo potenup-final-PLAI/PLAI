@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PLAI/Item/Item/ItemStruct.h"
 #include "Creature.generated.h"
 
 UCLASS()
@@ -29,4 +30,6 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	class UCreFsm* CreFsm;
+	UPROPERTY(EditAnywhere)
+	FItemStructTable ItemStructTable;
 };

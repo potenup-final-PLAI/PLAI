@@ -11,7 +11,8 @@ enum class EDraState : uint8
 {
 	DraIdle UMETA(DisplayName = "Idle"),
 	DraAround UMETA(DisplayName = "Around"),
-	DraAttack UMETA(DisplayName = "Attack"),
+	DraPatrol UMETA(DisplayName = "Attack"),
+	DraAttack UMETA(DisplayName = "Patrol"),
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -37,6 +38,7 @@ public:
 
 	void DraIdle();
 	void DraAround();
+	void DraPatrol();
 	void DraAttack();
 	
 	void MyTimer(void(UCreDraFsm::*Func)(), float time);

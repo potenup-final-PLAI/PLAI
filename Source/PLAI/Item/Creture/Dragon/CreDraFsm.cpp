@@ -5,6 +5,7 @@
 
 #include "CreDragon.h"
 #include "MovieSceneTracksComponentTypes.h"
+#include "PLAI/Item/Monster/MonFsm.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 
@@ -66,6 +67,10 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 	case EDraState::DraAround:
 		DraAround();
+		break;
+
+	case EDraState::DraPatrol:
+		DraPatrol();
 		break;
 
 	case EDraState::DraAttack:
@@ -131,7 +136,7 @@ void UCreDraFsm::DraAround()
 	MyTimer(&UCreDraFsm::NextState,2);
 }
 
-void UCreDraFsm::DraAttack()
+void UCreDraFsm::DraPatrol()
 {
 	if (PatrolPoints.Num() == 0 || PatrolIndex < 0 || PatrolIndex >= PatrolPoints.Num())
 	{
@@ -162,6 +167,11 @@ void UCreDraFsm::DraAttack()
 		}
 	}
 	MyTimer(&UCreDraFsm::NextState,10);
+}
+
+void UCreDraFsm::DraAttack()
+{
+	
 }
 
 void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), float time = 2.0f)
