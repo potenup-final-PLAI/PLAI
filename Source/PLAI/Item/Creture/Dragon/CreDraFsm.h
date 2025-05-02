@@ -52,7 +52,7 @@ public:
 
 	void DraAttackSingleRange(float Radios = 2000.0f, float time = 2.0f);
 	
-	void DraAttackMultiPre(float time = 1.0f, float Radius = 1000.0f);
+	void DraAttackMultiPre(float time = 1.0f, float Radius = 2000.0f);
 	void DraAttackMulti(float time = 1.0f);
 	
 	UPROPERTY(EditAnywhere)

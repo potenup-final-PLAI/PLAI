@@ -91,11 +91,6 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		DraAttackMulti();
 		break;
 	}
-
-	// if (bTimer == true)
-	// {
-	// 	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm bool값은? %s"),bTimer ? TEXT("참") : TEXT("거짓"));
-	// }
 }
 
 void UCreDraFsm::DraIdle(float time)
@@ -183,62 +178,58 @@ void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime > time)
 	{
-		MultiCount = 0;
-		Monsters.Empty();
+		CurrentTime = 0.0f;
 		TArray<FOverlapResult>HitResults;
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(Dragon); 
 		bool bHit = GetWorld()->OverlapMultiByChannel(HitResults,Dragon->GetActorLocation(),
-			FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radius),Params);
+			FQuat::Identity,ECC_Pawn,FCollisionShape::MakeCapsule(Radius,1000),Params);
 		if (bHit)
 		{
 			for (FOverlapResult Result : HitResults)
 			{
 				if (AMonster* Monster = Cast<AMonster>(Result.GetActor()))
 				{
-					UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 잡은애 몇말? 몬스터스 갯수 %d"
-								 "엑터이름 %s"),Monsters.Num(),*Monster->GetName());
-					Monsters.Add(Monster);
+					if (!Monsters.Contains(Monster))
+					{
+						Monsters.Add(Monster);
+						UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
+					}
 				}
 			}
 		}
+		Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		Drastate = EDraState::DraAttackMulti;
-		Dragon->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-		CurrentTime = 0.0f;
 	}
 }
 
 void UCreDraFsm::DraAttackMulti(float time)
 {
-	if (!Monsters.IsValidIndex(MultiCount))
+	if (Monsters.Num() > 0)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Invalid MultiCount: %d / Num:%d"), MultiCount, Monsters.Num());
-		Drastate = EDraState::DraAttackMultiPre;
-		return;
-	}
-	FVector dist = Monsters[MultiCount]->GetActorLocation() - Dragon->GetActorLocation();
-	Dragon->AddActorWorldOffset(dist.GetSafeNormal() * 30);
-	if (dist.Length() < 50)
-	{
-		MultiCount++;
-		FinishCount++;
-		if (MultiCount >= PatrolPoints.Num()) return;
-		UE_LOG(LogTemp, Error, TEXT("Invalid 50보다 거리작지만 없음 MultiCount: %d / Num:%d"), MultiCount, Monsters.Num());
-		FVector dir = PatrolPoints[PatrolIndex] - Dragon->GetActorLocation();
-		
-		dir.Normalize();
-		Dragon->SetActorRotation(dir.Rotation());
-		
-		if (MultiCount >= Monsters.Num())
-		{
-			Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
-			Drastate = EDraState::DraAttackMultiPre;
-		}
-		if (FinishCount % 3 == 0)
+		if (FinishCount > 3)
 		{
 			FinishCount = 0;
-			UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 필살기 시전"));
+			UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 필살기 시전"))
 		}
+		AMonster* Monster = Monsters[0];
+		if (IsValid(Monster))
+		{
+			FVector Dir = Monster->GetActorLocation() - Dragon->GetActorLocation();
+			Dragon->AddActorWorldOffset(Dir.GetSafeNormal() * 25);
+			Dragon->SetActorRotation(Dir.Rotation());
+			if (FVector::Dist(Monster->GetActorLocation(),Dragon->GetActorLocation()) < 50.0f)
+			{
+				FinishCount++;
+				Monster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
+				Monster->SetHpBar();
+				Monsters.RemoveAt(0);
+			}
+		}
+	}
+	else
+	{
+		Drastate = EDraState::DraAttackMultiPre;
 	}
 }
 
@@ -343,6 +334,61 @@ void UCreDraFsm::NextState()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+//
+// if (!Monsters.IsValidIndex(MultiCount))
+// {
+// 	UE_LOG(LogTemp, Error, TEXT("Invalid MultiCount: %d / Num:%d"), MultiCount, Monsters.Num());
+// 	Drastate = EDraState::DraAttackMultiPre;
+// 	return;
+// }
+// UE_LOG(LogTemp, Error, TEXT("Invalid MultiCount: 실행되는거맞나? %d / Num:%d"), MultiCount, Monsters.Num());
+// FVector dist = Monsters[MultiCount]->GetActorLocation() - Dragon->GetActorLocation();
+// Dragon->AddActorWorldOffset(dist.GetSafeNormal() * 20);
+// Dragon->SetActorRotation(dist.GetSafeNormal().Rotation());
+// 	
+// if (dist.Length() < 50)
+// {   DrawDebugSphere(GetWorld(),Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 50,
+// 150,10,FColor::Red,false,1);
+// 	
+// 	FHitResult HitResult;
+// 	FCollisionQueryParams Params;
+// 	Params.AddIgnoredActor(Dragon);
+// 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult,Dragon->GetActorLocation(),
+// 		Dragon->GetActorLocation() + Dragon->GetActorForwardVector() * 50,ECC_Visibility,Params);
+// 	if (bHit)
+// 	{
+// 		UE_LOG(LogTemp,Warning,TEXT("CreDraFSm 누구랑 부딛힘? %s"),*HitResult.GetActor()->GetName())
+// 		if (AMonster* Monster = Cast<AMonster>(HitResult.GetActor()))
+// 		{
+// 			UE_LOG(LogTemp,Warning,TEXT("CreDraFSm Monster 체력 깎음 %s"),*Monster->GetName())
+// 			Monster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
+// 			Monster->SetHpBar();
+// 		}
+// 	}
+// 	MultiCount++;
+// 	FinishCount++;
+// 	if (MultiCount >= Monsters.Num())
+// 	{
+// 		Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
+// 		Drastate = EDraState::DraAttackMultiPre;
+// 	}
+// 	if (FinishCount % 3 == 0)
+// 	{
+// 		FinishCount = 0;
+// 		UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 필살기 시전"));
+// 	}
+// }
 
 
 // CurrentTime += GetWorld()->GetDeltaSeconds();
