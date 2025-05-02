@@ -92,7 +92,7 @@ void UMonFsm::MoveDestination()
 	}
 	if (bRotator == true)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("MonFsm 초시계 %f"),CurrentTime)
+		// UE_LOG(LogTemp,Warning,TEXT("MonFsm 초시계 %f"),CurrentTime)
 		CurrentTime += GetWorld()->DeltaTimeSeconds;
 		FRotator Rotator = UKismetMathLibrary::RLerp(Monster->GetActorRotation(), Distance.GetSafeNormal().Rotation(),
 		CurrentTime, false);

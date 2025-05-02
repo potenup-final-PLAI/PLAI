@@ -34,6 +34,20 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphereComponent;
 
+    UPROPERTY(EditAnywhere)
+	class UWidgetComponent* MonUiComp;
+
+    UPROPERTY(EditAnywhere)
+	TSubclassOf<class AMonster> MonsterMasterFactory;
+	UPROPERTY(EditAnywhere)
+	AMonster* MonsterMaster;
+	
+    UPROPERTY(EditAnywhere)
+	TSubclassOf<class UMonUi> MonUiFactory;
+	
+	UPROPERTY(EditAnywhere)
+	class UMonUi* MonUi;
+	
 	UPROPERTY(EditAnywhere)
 	FMonsterStruct MonsterStruct;
 

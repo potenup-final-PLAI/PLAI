@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "MonUI.generated.h"
+#include "MonUi.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PLAI_API UMonUI : public UUserWidget
+class PLAI_API UMonUi : public UUserWidget
 {
 	GENERATED_BODY()
 };

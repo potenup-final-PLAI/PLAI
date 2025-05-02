@@ -340,6 +340,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("spine_02Socket"));
 		ItemArmor->ItemStructTable = ItemStructTable;
 		ItemArmor->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
+		ItemArmor->SetActorLocation(ItemArmor->GetActorLocation() + FVector(0,0,60));
 		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 	}
 	else if (SlotType == EquipSlotType::Helmet)

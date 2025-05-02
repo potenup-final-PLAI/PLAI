@@ -17,7 +17,6 @@ struct FMonDropTable
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Drop")
 	FDataTableRowHandle ItemRowHandle;
-
 	// ② 드롭 확률 (0.0 ~ 1.0)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Drop")
 	float DropChance = 1.0f;

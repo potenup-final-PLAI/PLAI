@@ -3,6 +3,9 @@
 
 #include "Monster.h"
 #include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
+
+#include "MonUi/MonUi.h"
 
 
 // Sets default values
@@ -13,12 +16,17 @@ AMonster::AMonster()
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	SphereComponent->SetupAttachment(RootComponent);
+	
+	MonUiComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("MonUiComponent"));
+	MonUiComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
 void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
 }
 
 // Called every frame
