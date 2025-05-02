@@ -25,8 +25,6 @@ void UMonFsm::BeginPlay()
 {
 	Super::BeginPlay();
 	Monster = Cast<AMonster>(GetOwner());
-	LineDestination();
-	InitLocation = TargetLocation;
 }
 
 // Called every frame
@@ -51,11 +49,21 @@ void UMonFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 
 void UMonFsm::Idle()
 {
-	MoveDestination();
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime > 1)
+	{
+		MonState = EMonState::Around;
+		LineDestination();
+		InitLocation = TargetLocation;
+		FVector Vec = TargetLocation = Monster->GetActorLocation();
+		Monster->SetActorRotation(Vec.GetSafeNormal().Rotation());
+		CurrentTime = 0;
+	}
 }
 
 void UMonFsm::Around()
 {
+	MoveDestination();
 }
 
 void UMonFsm::Attack()

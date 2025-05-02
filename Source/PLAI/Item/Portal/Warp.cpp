@@ -59,7 +59,7 @@ void AWarp::OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* O
 			if (TestPlayer->HasAuthority() && TestPlayer->IsLocallyControlled())
 			{
 				UiPortal = CreateWidget<UUiPortal>(GetWorld(),UiPortalFactory);
-				UiPortal->AddToViewport();
+				UiPortal->AddToViewport(5);
 				UiPortal->TestPlayer = TestPlayer;
 				UiPortal->Warp = this;
 				UiPortal->WorldMap->SetVisibility(ESlateVisibility::Hidden);

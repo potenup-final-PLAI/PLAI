@@ -65,6 +65,14 @@ FVector AMonSpawn::RandLocation(float X, float Y, float Z)
 
 void AMonSpawn::SpawnMonster()
 {
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+	{ UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: GetWorld()가 유효하지 않습니다.")); return; }
+	int32 FactoryCount = MonsterFactory.Num();
+	if (FactoryCount <= 0)
+	{ UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: MonsterFactory가 비어 있습니다.")); return; }
+
+	
 	MyTimer([this]()
 	{
 		FHitResult Hit;
@@ -79,9 +87,15 @@ void AMonSpawn::SpawnMonster()
 			// DrawDebugSphere(GetWorld(),Hit.ImpactPoint,20,10,FColor::Blue,false,1.5f);
 			if (Monsters.Num() > 6) return;
 			int32 index = FMath::RandRange(0, MonsterFactory.Num()-1);
-			AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[index]);
-			MonsterMaster->SetActorLocation(Hit.ImpactPoint);
-			Monsters.Add(MonsterMaster);
+			if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[index]))
+			{
+				MonsterMaster->SetActorLocation(Hit.ImpactPoint);
+				Monsters.Add(MonsterMaster);
+			}
+			else
+			{
+				UE_LOG(LogTemp,Warning,TEXT("MonSpawn Monster가 없음"))
+			}
 		}
 	},1.5);
 }
