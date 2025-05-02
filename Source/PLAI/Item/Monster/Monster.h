@@ -37,10 +37,11 @@ public:
     UPROPERTY(EditAnywhere)
 	class UWidgetComponent* MonUiComp;
 
-    UPROPERTY(EditAnywhere)
-	TSubclassOf<class AMonster> MonsterMasterFactory;
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<class AMonster> MonsterFactory;
+	
 	UPROPERTY(EditAnywhere)
-	AMonster* MonsterMaster;
+	class AMonster* MonsterParent;
 	
     UPROPERTY(EditAnywhere)
 	TSubclassOf<class UMonUi> MonUiFactory;

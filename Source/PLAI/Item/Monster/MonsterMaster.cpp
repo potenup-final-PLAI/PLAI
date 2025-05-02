@@ -18,30 +18,8 @@ AMonsterMaster::AMonsterMaster()
 void AMonsterMaster::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	MonsterMaster = MonsterMasterFactory->GetDefaultObject<AMonster>();
-	if (MonsterMaster)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Monster Master Created [%s]"),*MonsterMaster->GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Monster Master 없음 Created"));
-	}
-	if (MonsterMaster->MonUiFactory)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Monster Master Factory Created [%s]"),*MonsterMaster->MonUi->GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Monster Master Factory 없음"));
-	}
-	MonUi = CreateWidget<UMonUi>(GetWorld(),MonsterMaster->MonUiFactory);
-	MonUiComp->SetWidget(MonUi);
-	MonUiComp->SetDrawSize(FVector2D(300.f, 45.f));
-	MonUiComp->SetVisibility(true);
-	MonUiComp->SetRelativeLocation(FVector(0,0,150));
-	MonUiComp->SetWidgetSpace(EWidgetSpace::Screen); // or World
+
+	// 부모 DefaultObject에서 가져오기
 }
 
 // Called every frame

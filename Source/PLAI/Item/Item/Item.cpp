@@ -28,7 +28,8 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 	ItemParent = ItemFactory->GetDefaultObject<AItem>();
-	// BoxComp->SetWorldScale3D(FVector(1.5));
+
+		// BoxComp->SetWorldScale3D(FVector(1.5));
 	BoxComp->OnComponentBeginOverlap.AddDynamic(this,&AItem::OnMyBeginOverlapped);
 	
 	FTimerHandle TimerHandle;

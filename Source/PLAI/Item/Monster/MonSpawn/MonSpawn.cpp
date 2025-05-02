@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "PLAI/Item/Monster/Monster.h"
+#include "PLAI/Item/Monster/MonsterMaster.h"
 #include "Templates/Function.h"
 
 // Sets default values
@@ -78,9 +79,9 @@ void AMonSpawn::SpawnMonster()
 			// DrawDebugSphere(GetWorld(),Hit.ImpactPoint,20,10,FColor::Blue,false,1.5f);
 			if (Monsters.Num() > 6) return;
 			int32 index = FMath::RandRange(0, MonsterFactory.Num()-1);
-			AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[index]);
-			Monster->SetActorLocation(Hit.ImpactPoint);
-			Monsters.Add(Monster);
+			AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[index]);
+			MonsterMaster->SetActorLocation(Hit.ImpactPoint);
+			Monsters.Add(MonsterMaster);
 		}
 	},1.5);
 }
