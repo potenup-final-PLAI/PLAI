@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Creature.h"
 #include "CreBullet.h"
 #include "Components/ActorComponent.h"
 #include "CreFsm.generated.h"
@@ -28,4 +29,9 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ACreBullet>CreBulletFactory;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FCreStruct CreStruct;
+
+	void SetCreStat();
 };

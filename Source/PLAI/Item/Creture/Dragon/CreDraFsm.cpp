@@ -73,17 +73,16 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	
 	switch (Drastate)
 	{
-	case EDraState::DraIdle:
-		DraIdle(1);
-		break;
-	
-	case EDraState::DraAround:
-		DraAround(2);
-		break;
-		
-	case EDraState::DraPatrol:
-		DraPatrol(3);
-		break;
+	// case EDraState::DraIdle:
+	// 	DraIdle(1);
+	// 	break;
+	//
+	// case EDraState::DraAround:
+	// 	DraAround(2);
+	// 	break;
+	// case EDraState::DraPatrol:
+	// 	DraPatrol(3);
+	// 	break;
 	
 	case EDraState::DraAttackSingleRange:
 		DraAttackSingleRange(1000,3.0f);
@@ -113,7 +112,6 @@ void UCreDraFsm::DraAround(float time)
 	if (!TestPlayer) return;
 	FRotator Rot = FRotator(0,RotateTime * 90,0);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation() + Rot.Vector() * 500
-		
 		+FVector(0,0,200 + sin(RotateTime * 10) * 100));
 	
 	if (bTimer)
@@ -137,10 +135,9 @@ void UCreDraFsm::DraAround(float time)
 		dir.Normalize();
 		Dragon->SetActorRotation(dir.Rotation());
 		
-		DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),
-			PatrolPoints[0] ,FColor::Blue,false,3);
-
-		DrawDebugCircle(GetWorld(),PatrolPoints[0] * 100,50,10,FColor::Blue,false,3);
+		// DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),
+		// 	PatrolPoints[0] ,FColor::Blue,false,3);
+		// DrawDebugCircle(GetWorld(),PatrolPoints[0] * 100,50,10,FColor::Blue,false,3);
 	}
 	MyTimer(&UCreDraFsm::NextState,time);
 }
@@ -228,6 +225,13 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			NearMonster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
 			NearMonster->SetHpBar();
 			
+			if (NearMonster->MonsterStruct.CurrentHp <= 0)
+			{
+				CreStruct.CurrentExp += NearMonster->MonsterStruct.Exp;
+				NearMonster->Dead();
+				SetCreStat();
+			}
+			
 			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
 	        NiagaraSkills[1],NearMonster->GetActorLocation(),FRotator::ZeroRotator,FVector(1.f),true, // AutoActivate                        
 	        true,// AutoDestroy
@@ -240,10 +244,10 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			// DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,
 			// 15,FColor::Purple,false,1.5,0,2);
 		}
-		else // Hit 없으면 순찰하기
-		{
-			Drastate = EDraState::DraAround;
-		}
+		// else // Hit 없으면 순찰하기
+		// {
+		// 	Drastate = EDraState::DraAround;
+		// }
 	}
 }
 
@@ -253,7 +257,9 @@ void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime < time)return;
 	CurrentTime = 0; // 밑에거 한번만 실행됨
-	
+
+	Monsters.Empty();
+	//Remove 해줘야할듯
 	TArray<FOverlapResult>HitResults;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Dragon); 
@@ -268,7 +274,7 @@ void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 				if (!Monsters.Contains(Monster))
 				{
 					Monsters.Add(Monster);
-					// UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
+					UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
 				}
 			}
 		}
@@ -305,6 +311,13 @@ void UCreDraFsm::DraAttackMulti(float time)
 				FinishCount++;
 				Monster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
 				Monster->SetHpBar();
+
+				if (Monster->MonsterStruct.CurrentHp <= 0)
+				{
+					CreStruct.CurrentExp += Monster->MonsterStruct.Exp;
+					Monster->Dead();
+					SetCreStat();
+				}
 				Monsters.RemoveAt(0);
 				int32 index = 0;
 				FinishCount == 2 ? index = 2 : index = 1;  

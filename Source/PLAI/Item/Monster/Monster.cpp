@@ -69,10 +69,6 @@ void AMonster::SetHpBar()
 {
 	MonUi->HpBar->SetPercent(static_cast<float>(MonsterStruct.CurrentHp) / MonsterStruct.MaxHp);
 	MonUi->CurrentHp->SetText(FText::AsNumber(MonsterStruct.CurrentHp));
-	if (MonsterStruct.CurrentHp < 1)
-	{
-		Dead();
-	}
 }
 
 void AMonster::Dead()
@@ -86,8 +82,6 @@ void AMonster::Dead()
 		ItemMaster->ItemStructTable = *ItemStructTable;
 		ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
 		ItemMaster->SetActorLocation(GetActorLocation());
-		// ItemMaster->StaticMesh->SetSimulatePhysics(true);
-		// ItemMaster->BoxComp->SetSimulatePhysics(true);
 	}
 	else
 	{

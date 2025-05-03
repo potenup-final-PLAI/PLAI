@@ -35,4 +35,6 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UUiCre* Wbp_UiCre;
+
+	virtual void NativeConstruct() override;
 };

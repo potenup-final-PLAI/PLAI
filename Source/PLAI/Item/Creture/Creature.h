@@ -7,6 +7,23 @@
 #include "PLAI/Item/Item/ItemStruct.h"
 #include "Creature.generated.h"
 
+USTRUCT(BlueprintType,BlueprintType)
+struct FCreStruct
+{
+	GENERATED_BODY()
+public:
+	FString Name = FString("CreName");
+	int32 CurrentHp = 100;
+	int32 MaxHp = 100;
+
+	int32 CurrentExp = 0;
+	int32 MaxExp = 1000;
+
+	int32 Level = 1;
+	int32 Atk = 10;
+	int32 Def = 10;
+};
+
 UCLASS()
 class PLAI_API ACreature : public ACharacter
 {

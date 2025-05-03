@@ -5,10 +5,12 @@
 
 #include "Blueprint/DragDropOperation.h"
 #include "PLAI/Item/Creture/Creature.h"
+#include "PLAI/Item/Creture/CreFsm.h"
 #include "PLAI/Item/Item/ItemObject.h"
 #include "PLAI/Item/ItemComp/CreComp.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/UiCre/UiCre.h"
 
 FReply USlotCre::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
@@ -89,6 +91,18 @@ void USlotCre::SpawnCreature(FItemStructTable ItemStructTab)
 		Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
 		TestPlayer->CreComp->EquipCreature(Creature);
 		Creature->ItemStructTable = ItemStructTable;
+		
+		Creature->CreFsm->CreStruct.Name = ItemStructTable.Name;
+		Creature->CreFsm->CreStruct.Atk = ItemStructTable.ItemStructStat.item_ATK;
+		
+		Creature->CreFsm->CreStruct.MaxHp = ItemStructTable.ItemStructStat.item_SHI;
+		Creature->CreFsm->CreStruct.CurrentHp = ItemStructTable.ItemStructStat.item_SHI;
+
+		Creature->CreFsm->CreStruct.Def = ItemStructTable.ItemStructStat.item_DEF;
+		// 왜 경험치 1000 초기화 안됨?
+		// Creature->CreFsm->CreStruct.MaxExp = 1000;
+		
+		MenuInven->Wbp_UiCre->SetUiCre(&Creature->CreFsm->CreStruct);
 	}
 	else
 	{
