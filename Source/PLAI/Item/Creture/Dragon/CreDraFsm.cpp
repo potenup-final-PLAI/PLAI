@@ -5,7 +5,10 @@
 
 #include "CreDragon.h"
 #include "MovieSceneTracksComponentTypes.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 #include "Engine/OverlapResult.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "PLAI/Item/Monster/MonFsm.h"
 #include "PLAI/Item/Monster/Monster.h"
 #include "PLAI/Item/Monster/MonsterMaster.h"
@@ -19,6 +22,7 @@ UCreDraFsm::UCreDraFsm()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	// ...
+	TimerMultiPre.SetNum(3);
 }
 
 
@@ -177,15 +181,14 @@ void UCreDraFsm::DraPatrol(float time)
 
 void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 {
+	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 원거리공격 초시계%f"),CurrentTime)
     CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime > 5)
 	{
 		Drastate = EDraState::DraAttackMultiPre;
 		CurrentTime = 0;
 	}
-	
 	AMonster* NearMonster = nullptr;
-
 	TimeFire += GetWorld()->GetDeltaSeconds();
 	if (TimeFire < time) return;
 	TimeFire = 0.0f;
@@ -214,8 +217,23 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 		}
 		if (NearMonster)
 		{
+			if (ACreBullet* Bullet = GetWorld()->SpawnActor<ACreBullet>(CreBulletFactory))
+			{
+				Bullet->SetActorLocation(Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 75);
+				Bullet->ProjectileComp->SetActive(true);
+			}
+			else
+			{
+				UE_LOG(LogTemp,Warning,TEXT("CreDraFsm Bullet 없음"))
+			}
 			NearMonster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
 			NearMonster->SetHpBar();
+			
+			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
+	        NiagaraSkills[1],NearMonster->GetActorLocation(),FRotator::ZeroRotator,FVector(1.f),true, // AutoActivate                        
+	        true,// AutoDestroy
+	        ENCPoolMethod::AutoRelease); NiagaraComp->SetActive(true);
+			
 			FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
 			Dragon->SetActorRotation(dist.GetSafeNormal().Rotation());
 			DrawDebugLine(GetWorld(),NearMonster->GetActorLocation(),NearMonster->GetActorLocation()+FVector(0,0,1000),
@@ -228,14 +246,16 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 
 void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 {
-	CurrentTime += GetWorld()->GetDeltaSeconds();
-	if (CurrentTime > 5)
+	TimerMulti += GetWorld()->GetDeltaSeconds();
+	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 ->원거리공격 초시계%f"),TimerMulti)
+	if (TimerMulti > 3)
 	{
-		Drastate = EDraState::DraAttackMultiPre;
-		CurrentTime = 0;
+		TimerMulti = 0;
+		Drastate = EDraState::DraAttackSingleRange;
 	}
 	
 	CurrentTime += GetWorld()->GetDeltaSeconds();
+	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 초시계%f"),CurrentTime)
 	if (CurrentTime > time)
 	{
 		CurrentTime = 0.0f;
@@ -265,12 +285,6 @@ void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 
 void UCreDraFsm::DraAttackMulti(float time)
 {
-	TimerMulti += GetWorld()->GetDeltaSeconds();
-	if (TimerMulti > 5)
-	{
-		TimerMulti = 0;
-		Drastate = EDraState::DraAttackSingleRange;
-	}
 	if (Monsters.Num() > 0)
 	{
 		if (FinishCount > 3)
@@ -290,6 +304,11 @@ void UCreDraFsm::DraAttackMulti(float time)
 				Monster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
 				Monster->SetHpBar();
 				Monsters.RemoveAt(0);
+
+				UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
+				NiagaraSkills[1],Monster->GetActorLocation(),FRotator::ZeroRotator,FVector(1.f),true, // AutoActivate                        
+				true,// AutoDestroy
+				ENCPoolMethod::AutoRelease); NiagaraComp->SetActive(true);
 			}
 		}
 	}

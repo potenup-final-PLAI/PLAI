@@ -39,7 +39,7 @@ public:
 
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSubclassOf<class AMonster> MonsterFactory;
-	
+	// 이건 부모에서는 절대 쓰지말아야할 함수임 !!
 	UPROPERTY(EditAnywhere)
 	class AMonster* MonsterParent;
 	

@@ -77,41 +77,12 @@ void AMonster::SetHpBar()
 
 void AMonster::Dead()
 {
-	if (MonsterStruct.MaxHp < 150)
-	{
-		UE_LOG(LogTemp, Display, TEXT("Monster 몬스터 스트럭트가 없네 HP [%d"),MonsterStruct.CurrentHp);
-		return;
-	}
-
-	// 2) MonDropTableFactory[0] 인덱스
-	if (!MonsterStruct.MonDropTableFactory.IsValidIndex(0))
-	{
-		UE_LOG(LogTemp, Error, TEXT("DropItem: MonDropTableFactory[0]이 없습니다."));
-		return;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("DropItem:  MonDropTableFactory Num값 %d"),
-			MonsterStruct.MonDropTableFactory.Num());
-	}
-
-	// 3) RowName이 비어있지 않은지
-	// if (!MonsterParent->MonsterStruct.MonDropTableFactory.IsValidIndex(0))
-	// {
-	// 	UE_LOG(LogTemp, Error, TEXT("DropItem: MonDropTableFactory 배열이 비어있음!"));
-	// 	return;
-	// }
-	// FName RowName = MonsterParent->MonsterStruct.MonDropTableFactory[0].ItemRowHandle.RowName;
-	// if (RowName.IsNone())
-	// {
-	// 	UE_LOG(LogTemp, Error, TEXT("DropItem: RowHandle.RowName이 NAME_None입니다."));
-	// 	return;
-	// }
+	
 	FItemStructTable* ItemStructTable = MonsterStruct.MonDropTableFactory[0].
 	ItemRowHandle.DataTable->FindRow<FItemStructTable>(MonsterStruct.MonDropTableFactory[0].
 	ItemRowHandle.RowName,TEXT("Monster"));
 	
-	if (AItemMaster* ItemMaster = GetWorld()->SpawnActor<AItemMaster>(MonsterParent->ItemMasterFactory))
+	if (AItem* ItemMaster = GetWorld()->SpawnActor<AItem>(MonsterParent->ItemMasterFactory))
 	{
 		ItemMaster->ItemStructTable = *ItemStructTable;
 		ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
@@ -122,12 +93,15 @@ void AMonster::Dead()
 	{
 		UE_LOG(LogTemp, Error, TEXT("DropItem: MonDropTableFactory 아이템 마스터가 없나?"));
 	}
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	{
-		Destroy();
-	},1.0f,false);
+	Destroy();
+	// FTimerHandle TimerHandle;
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	// {
+	// 	Destroy();
+	// },1.0f,false);
 }
+
+
 
 // FItemStructTable* ItemStructTable = MonsterParent->ItemTable->FindRow<FItemStructTable>(MonsterStruct.
 // 		MonDropTableFactory[0].ItemRowHandle.RowName,TEXT("Monster"));
@@ -144,3 +118,25 @@ void AMonster::Dead()
 // },1.0f,false);
 
 
+// if (!MonsterStruct.MonDropTableFactory.IsValidIndex(0))
+// {
+// 	UE_LOG(LogTemp, Error, TEXT("DropItem: MonDropTableFactory[0]이 없습니다."));
+// 	return;
+// }
+// else
+// {
+// 	UE_LOG(LogTemp, Error, TEXT("DropItem:  MonDropTableFactory Num값 %d"),
+// 		MonsterStruct.MonDropTableFactory.Num());
+// }
+// 3) RowName이 비어있지 않은지
+// if (!MonsterParent->MonsterStruct.MonDropTableFactory.IsValidIndex(0))
+// {
+// 	UE_LOG(LogTemp, Error, TEXT("DropItem: MonDropTableFactory 배열이 비어있음!"));
+// 	return;
+// }
+// FName RowName = MonsterParent->MonsterStruct.MonDropTableFactory[0].ItemRowHandle.RowName;
+// if (RowName.IsNone())
+// {
+// 	UE_LOG(LogTemp, Error, TEXT("DropItem: RowHandle.RowName이 NAME_None입니다."));
+// 	return;
+// }

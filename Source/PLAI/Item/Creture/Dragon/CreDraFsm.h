@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NiagaraComponent.h"
 #include "PLAI/Item/Creture/CreFsm.h"
+#include "PLAI/Item/Creture/CreBullet.h"
 #include "CreDraFsm.generated.h"
 class AMonster;
 
@@ -41,7 +43,13 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	EDraState Drastate = EDraState::DraAttackMultiPre;
+	
+    UPROPERTY(EditAnywhere)
+	TArray<UNiagaraSystem*>NiagaraSkills;
 
+	UPROPERTY(EditAnywhere)
+	TArray<UParticleSystem*>ParticlesSkills;
+	
 	UPROPERTY(EditAnywhere)
 	TArray<AMonster*>Monsters;
 	
@@ -53,6 +61,10 @@ public:
 	void DraAttackSingleRange(float Radios = 2000.0f, float time = 2.0f);
 	
 	void DraAttackMultiPre(float time = 1.0f, float Radius = 2000.0f);
+	
+    UPROPERTY(EditAnywhere)
+	TArray<float>TimerMultiPre;
+	
 	void DraAttackMulti(float time = 1.0f);
 	UPROPERTY(EditAnywhere)
 	float TimerMulti = 0.0f;
