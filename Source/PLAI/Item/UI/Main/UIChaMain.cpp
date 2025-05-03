@@ -83,7 +83,7 @@ void UUIChaMain::OnLoadMeInfo()
 	{
 		UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 	    UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
-	},2.0f,false);
+	},1.7f,false);
 }
 
 void UUIChaMain::OnSelectMode()

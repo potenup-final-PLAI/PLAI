@@ -24,6 +24,7 @@
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
+#include "PLAI/Item/UI/Slot/SlotCre.h"
 
 
 // Sets default values for this component's properties
@@ -87,22 +88,25 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		{
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
 			FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
-			ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
-			ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
+            TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable);
 
-			ItemMaster->ItemStructTable = *ItemStructTable;
-			ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
-			ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
-			ItemMaster->SetActorScale3D(FVector(0.3,0.3,0.3));
-
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.bNoFail = true; // 실패하지 않게 설정
-			SpawnParams.bDeferConstruction = true;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTable->CreatureFactory,SpawnParams);
-			Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
-			TestPlayer->CreComp->EquipCreature(Creature);
-			Creature->ItemStructTable = *ItemStructTable;
+			// ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
+			// ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
+			//
+			// ItemMaster->ItemStructTable = *ItemStructTable;
+			// ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+			// ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
+			// ItemMaster->SetActorScale3D(FVector(0.3,0.3,0.3));
+			//
+			// FActorSpawnParameters SpawnParams;
+			// SpawnParams.bNoFail = true; // 실패하지 않게 설정
+			// SpawnParams.bDeferConstruction = true;
+			// SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			// ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTable->CreatureFactory,
+			// 	FVector(0,0,3000),FRotator(0,0,0),SpawnParams);
+			// Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
+			// TestPlayer->CreComp->EquipCreature(Creature);
+			// Creature->ItemStructTable = *ItemStructTable;
 		}
 		else
 		{

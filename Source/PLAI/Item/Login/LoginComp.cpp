@@ -56,9 +56,10 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 100),
-	FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
-					  "나의 CharacterId [%s]"),*User_id, *UserFullInfo.character_info.character_id),nullptr,FColor::Red,0.f,false);
+	// DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 100),
+	// FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
+	// 				  "나의 CharacterId [%s]"),*User_id, *UserFullInfo.character_info.character_id),
+	// 				  nullptr,FColor::Red,0.f,false);
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::One)) // 1 캐릭터 생성 요청

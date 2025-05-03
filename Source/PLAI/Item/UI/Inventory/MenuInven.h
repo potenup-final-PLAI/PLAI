@@ -32,4 +32,7 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UUiChaView* Wbp_ChaView;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UUiCre* Wbp_UiCre;
 };

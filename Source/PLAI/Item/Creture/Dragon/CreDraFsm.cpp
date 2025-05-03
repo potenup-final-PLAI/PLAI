@@ -100,7 +100,6 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 void UCreDraFsm::DraIdle(float time)
 {
-	// Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
 	MyTimer(&UCreDraFsm::NextState,time);
@@ -131,8 +130,8 @@ void UCreDraFsm::DraAround(float time)
 			{ DrawDebugSphere(GetWorld(),PatrolPoints[i],75,20,FColor::Black,false,10); }
 			else
 			{ DrawDebugCircle(GetWorld(),PatrolPoints[i],50,10,FColor::Red,false,10); }
-			UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 위치는 %0.2f,%0.2f,%0.2f"),
-				PatrolPoints[i].X,PatrolPoints[i].Y,PatrolPoints[i].Z);
+			// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 위치는 %0.2f,%0.2f,%0.2f"),
+			// 	PatrolPoints[i].X,PatrolPoints[i].Y,PatrolPoints[i].Z);
 		}
 		FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
 		dir.Normalize();
@@ -153,8 +152,8 @@ void UCreDraFsm::DraPatrol(float time)
 		UE_LOG(LogTemp, Error, TEXT("DraAttack: PatrolPoints 크기=%d, PatrolIndex=%d"), PatrolPoints.Num(), PatrolIndex);
 		return;
 	}
-	DrawDebugCircle(GetWorld(),PatrolPoints[PatrolIndex],50,10,FColor::Red,false,0.1);
-	DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),PatrolPoints[PatrolIndex],FColor::Red,false);
+	// DrawDebugCircle(GetWorld(),PatrolPoints[PatrolIndex],50,10,FColor::Red,false,0.1);
+	// DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),PatrolPoints[PatrolIndex],FColor::Red,false);
 	
 	FVector Dir = PatrolPoints[PatrolIndex] - Dragon->GetActorLocation();
 	Dir.Normalize();
@@ -236,10 +235,10 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			
 			FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
 			Dragon->SetActorRotation(dist.GetSafeNormal().Rotation());
-			DrawDebugLine(GetWorld(),NearMonster->GetActorLocation(),NearMonster->GetActorLocation()+FVector(0,0,1000),
-			FColor::Purple,false,1.5,0,1.5);
-			DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,
-			15,FColor::Purple,false,1.5,0,2);
+			// DrawDebugLine(GetWorld(),NearMonster->GetActorLocation(),NearMonster->GetActorLocation()+FVector(0,0,1000),
+			// FColor::Purple,false,1.5,0,1.5);
+			// DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,
+			// 15,FColor::Purple,false,1.5,0,2);
 		}
 		else // Hit 없으면 순찰하기
 		{
