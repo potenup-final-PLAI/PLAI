@@ -42,7 +42,7 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 public:
 	UPROPERTY(EditAnywhere)
-	EDraState Drastate = EDraState::DraAttackMultiPre;
+	EDraState Drastate = EDraState::DraAttackSingleRange;
 	
     UPROPERTY(EditAnywhere)
 	TArray<UNiagaraSystem*>NiagaraSkills;

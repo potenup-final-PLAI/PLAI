@@ -23,6 +23,7 @@ ACreBullet::ACreBullet()
 	ProjectileComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
 	ProjectileComp->InitialSpeed = 2000.0f;
 	ProjectileComp->MaxSpeed = 4000.0f;
+	
 	ProjectileComp->bRotationFollowsVelocity = true;
 	ProjectileComp->bShouldBounce = false;
 }
@@ -31,8 +32,6 @@ ACreBullet::ACreBullet()
 void ACreBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	// NiagaraComp->Activate(true);
 }
 
 // Called every frame

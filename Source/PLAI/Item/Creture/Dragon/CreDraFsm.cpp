@@ -181,11 +181,13 @@ void UCreDraFsm::DraPatrol(float time)
 
 void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 {
+	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	
 	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 원거리공격 초시계%f"),CurrentTime)
     CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime > 5)
 	{
-		Drastate = EDraState::DraAttackMultiPre;
+		// Drastate = EDraState::DraAttackMultiPre;
 		CurrentTime = 0;
 	}
 	AMonster* NearMonster = nullptr;
@@ -220,7 +222,8 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			if (ACreBullet* Bullet = GetWorld()->SpawnActor<ACreBullet>(CreBulletFactory))
 			{
 				Bullet->SetActorLocation(Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 75);
-				Bullet->ProjectileComp->SetActive(true);
+				Bullet->SetActorRotation(Dragon->GetActorRotation());
+				Bullet->ProjectileComp->Velocity = Dragon->GetActorForwardVector() * 2000;
 			}
 			else
 			{
@@ -255,7 +258,7 @@ void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 	}
 	
 	CurrentTime += GetWorld()->GetDeltaSeconds();
-	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 초시계%f"),CurrentTime)
+	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 초시계%f"),CurrentTime)
 	if (CurrentTime > time)
 	{
 		CurrentTime = 0.0f;
