@@ -27,6 +27,8 @@ AWarp::AWarp()
 	
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("BoxComponent");
 	NiagaraComp->SetupAttachment(GetRootComponent());
+
+	
 }
 
 // Called when the game starts or when spawned
@@ -85,7 +87,6 @@ void AWarp::OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* Othe
 		}
 	}
 }
-
 
 void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 {

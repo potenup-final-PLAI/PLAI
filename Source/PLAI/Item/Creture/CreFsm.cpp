@@ -4,6 +4,7 @@
 #include "CreFsm.h"
 
 #include "Components/TextBlock.h"
+#include "Engine/OverlapResult.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/Monster/Monster.h"
@@ -27,6 +28,8 @@ UCreFsm::UCreFsm()
 void UCreFsm::BeginPlay()
 {
 	Super::BeginPlay();
+	TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	Creature = Cast<ACreature>(GetOwner());
 	// ...
 }
 
@@ -41,28 +44,47 @@ void UCreFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 
 void UCreFsm::SetCreStat()
 {
-	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	if (CreStruct.CurrentExp > CreStruct.MaxExp)
 	{
-		if (CreStruct.CurrentExp > CreStruct.MaxExp)
-		{
-			CreStruct.MaxExp = CreStruct.MaxExp * 1.2;
-			CreStruct.CurrentExp = 0;
-			CreStruct.Level++;
-		}
-		TestPlayer->InvenComp->MenuInven->Wbp_UiCre->SetUiCre(&CreStruct);
+		CreStruct.MaxExp = CreStruct.MaxExp * 1.2;
+		CreStruct.CurrentExp = 0;
+		CreStruct.Level++;
 	}
+	TestPlayer->InvenComp->MenuInven->Wbp_UiCre->SetUiCre(&CreStruct);
 }
 
 void UCreFsm::GetMonGold(AMonster* Monster)
 {
-	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	int32 GetGold = TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += Monster->MonsterStruct.gold;
+	TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(GetGold));
+	TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(GetGold));
+}
+
+float UCreFsm::PlayerDistance()
+{
+	return FVector::Distance(TestPlayer->GetActorLocation(),Creature->GetActorLocation());
+}
+
+FMonsters UCreFsm::GetMonsterBySphere(AActor* Actor,float Radios)
+{
+	FMonsters Monsters;
+	TArray<FOverlapResult>Hits;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Creature);
+	Params.AddIgnoredActor(TestPlayer);
+
+	bool bHit = GetWorld()->OverlapMultiByChannel(Hits,Actor->GetActorLocation(),FQuat::Identity,
+		ECC_Visibility,FCollisionShape::MakeSphere(Radios),Params);
+
+	if(bHit)
 	{
-		int32 GetGold = TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += Monster->MonsterStruct.gold;
-		TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(GetGold));
-		TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(GetGold));
+		for (FOverlapResult Hit : Hits)
+		{
+			if (AMonster* Monster = Cast<AMonster>(Hit.GetActor()))
+			{
+				Monsters.Monsters.Add(Monster);
+			}
+		}
 	}
-	else
-	{
-		UE_LOG(LogTemp,Warning,TEXT("CreFsm TestPlayer 캐스팅 실패"))
-	}
+	return Monsters;
 }

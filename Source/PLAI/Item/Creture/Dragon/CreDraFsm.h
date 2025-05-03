@@ -7,7 +7,6 @@
 #include "PLAI/Item/Creture/CreFsm.h"
 #include "PLAI/Item/Creture/CreBullet.h"
 #include "CreDraFsm.generated.h"
-class AMonster;
 
 UENUM(BlueprintType)
 enum class EDraState : uint8
@@ -82,8 +81,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ACreDragon* Dragon;
 	
-	UPROPERTY(EditAnywhere)
-	class ATestPlayer* TestPlayer;
+	// UPROPERTY(EditAnywhere)
+	// class ATestPlayer* TestPlayer;
 
 	UPROPERTY(EditAnywhere)
 	float RotateTime = 0;

@@ -30,32 +30,37 @@ UCreDraFsm::UCreDraFsm()
 void UCreDraFsm::BeginPlay()
 {
 	Super::BeginPlay();
-	TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (TestPlayer)
-	{
-		UE_LOG(LogTemp,Warning,TEXT("UCreDraFsm::BeginPlay PC->캐릭터 캐스팅 성공"));
-	}
-	else
-	{
-		UE_LOG(LogTemp,Warning,TEXT("UCreDraFsm::BeginPlay PC->캐릭터 캐스팅 실패"));
-	}
-	if (ACreDragon* Dra = Cast<ACreDragon>(GetOwner()))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay 드래곤있음"))
-		Dragon = Dra;
-		if (ACreature* Creature = Cast<ACreature>(Dragon->CreFsm->GetOwner()))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature있음"))
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature없음"))
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay 드래곤없음"))
-	}
+
+	Dragon = Cast<ACreDragon>(Creature);
+	if (Dragon) { UE_LOG(LogTemp, Warning, TEXT("CreDraFsm = Created Dragon")); }
+	else { UE_LOG(LogTemp, Warning, TEXT("CreDraFsm = Created Dragon")); }
+	
+	// if (ACreDragon* Dra = Cast<ACreDragon>(GetOwner()))
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay 드래곤있음"))
+	// 	Dragon = Dra;
+	// 	if (ACreature* Creature = Cast<ACreature>(Dragon->CreFsm->GetOwner()))
+	// 	{
+	// 		UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature있음"))
+	// 	}
+	// 	else
+	// 	{
+	// 		UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature없음"))
+	// 	}
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay 드래곤없음"))
+	// }
+	// TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	// if (TestPlayer)
+	// {
+	// 	UE_LOG(LogTemp,Warning,TEXT("UCreDraFsm::BeginPlay PC->캐릭터 캐스팅 성공"));
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp,Warning,TEXT("UCreDraFsm::BeginPlay PC->캐릭터 캐스팅 실패"));
+	// }
 }
 
 
@@ -73,16 +78,16 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	
 	switch (Drastate)
 	{
-	// case EDraState::DraIdle:
-	// 	DraIdle(1);
-	// 	break;
-	//
-	// case EDraState::DraAround:
-	// 	DraAround(2);
-	// 	break;
-	// case EDraState::DraPatrol:
-	// 	DraPatrol(3);
-	// 	break;
+	case EDraState::DraIdle:
+		DraIdle(1);
+		break;
+		
+	case EDraState::DraAround:
+		DraAround(3);
+		break;
+	case EDraState::DraPatrol:
+		DraPatrol(3);
+		break;
 	
 	case EDraState::DraAttackSingleRange:
 		DraAttackSingleRange(1000,3.0f);
@@ -113,6 +118,12 @@ void UCreDraFsm::DraAround(float time)
 	FRotator Rot = FRotator(0,RotateTime * 90,0);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation() + Rot.Vector() * 500
 		+FVector(0,0,200 + sin(RotateTime * 10) * 100));
+
+	if (GetMonsterBySphere(Creature).Monsters.Num() > 0)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("CreDreFsm 순찰중 사냥모드 진입"))
+		Drastate = EDraState::DraAttackSingleRange;
+	}
 	
 	if (bTimer)
 	{
@@ -144,6 +155,12 @@ void UCreDraFsm::DraAround(float time)
 
 void UCreDraFsm::DraPatrol(float time)
 {
+	if (GetMonsterBySphere(Creature).Monsters.Num() > 0)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("CreDreFsm 순찰중 사냥모드 진입"))
+		Drastate = EDraState::DraAttackSingleRange;
+	}
+	
 	if (PatrolPoints.Num() == 0 || PatrolIndex < 0 || PatrolIndex >= PatrolPoints.Num())
 	{
 		UE_LOG(LogTemp, Error, TEXT("DraAttack: PatrolPoints 크기=%d, PatrolIndex=%d"), PatrolPoints.Num(), PatrolIndex);
@@ -174,8 +191,10 @@ void UCreDraFsm::DraPatrol(float time)
 
 void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 {
-	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	if (PlayerDistance() > 5000)
+	{ Drastate = EDraState::DraIdle; }
 	
+	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 원거리공격 초시계%f"),CurrentTime)
     CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime > time)
@@ -254,6 +273,9 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 
 void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 {
+	if (PlayerDistance() > 5000)
+	{ Drastate = EDraState::DraIdle; }
+	
 	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 초시계%f"),CurrentTime)
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime < time)return;

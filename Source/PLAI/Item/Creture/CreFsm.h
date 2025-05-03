@@ -5,11 +5,22 @@
 #include "CoreMinimal.h"
 
 class AMonster;
+class ATestPlayer;
+class ACreature;
 
 #include "Creature.h"
 #include "CreBullet.h"
 #include "Components/ActorComponent.h"
 #include "CreFsm.generated.h"
+
+USTRUCT(BlueprintType)
+struct FMonsters
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<AMonster*>Monsters;
+};
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 
@@ -36,6 +47,15 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FCreStruct CreStruct;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class ATestPlayer* TestPlayer;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class ACreature* Creature;
+
 	void SetCreStat();
 	void GetMonGold(AMonster* Monster);
+	float PlayerDistance();
+	
+	FMonsters GetMonsterBySphere(AActor* Actor, float Radios = 3000.0f);
 };
