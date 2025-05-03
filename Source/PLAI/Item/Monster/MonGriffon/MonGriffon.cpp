@@ -3,12 +3,16 @@
 
 #include "MonGriffon.h"
 
+#include "PLAI/Item/Monster/MonFsm.h"
+
 
 // Sets default values
 AMonGriffon::AMonGriffon()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	MonFsm = CreateDefaultSubobject<UMonFsm>("MonFsm");
 }
 
 // Called when the game starts or when spawned
