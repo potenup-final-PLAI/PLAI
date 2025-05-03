@@ -77,16 +77,15 @@ void AMonster::SetHpBar()
 
 void AMonster::Dead()
 {
-	
 	FItemStructTable* ItemStructTable = MonsterStruct.MonDropTableFactory[0].
 	ItemRowHandle.DataTable->FindRow<FItemStructTable>(MonsterStruct.MonDropTableFactory[0].
 	ItemRowHandle.RowName,TEXT("Monster"));
 	
 	if (AItem* ItemMaster = GetWorld()->SpawnActor<AItem>(MonsterParent->ItemMasterFactory))
 	{
-		ItemMaster->SetActorLocation(MonsterParent->GetActorLocation());
 		ItemMaster->ItemStructTable = *ItemStructTable;
 		ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+		ItemMaster->SetActorLocation(GetActorLocation());
 		// ItemMaster->StaticMesh->SetSimulatePhysics(true);
 		// ItemMaster->BoxComp->SetSimulatePhysics(true);
 	}
@@ -95,11 +94,6 @@ void AMonster::Dead()
 		UE_LOG(LogTemp, Error, TEXT("DropItem: MonDropTableFactory 아이템 마스터가 없나?"));
 	}
 	Destroy();
-	// FTimerHandle TimerHandle;
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	// {
-	// 	Destroy();
-	// },1.0f,false);
 }
 
 

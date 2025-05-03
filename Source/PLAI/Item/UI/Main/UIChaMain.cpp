@@ -68,8 +68,8 @@ void UUIChaMain::OnLoadMeInfo()
 		return;
 	}
 	UiMain->LoginComp->HttpMePost();
-	
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport(1);
+	
 	// 퀵슬롯 디테일창은 끄자
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_QuickInven->SetVisibility(ESlateVisibility::Hidden);
     UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
@@ -83,7 +83,7 @@ void UUIChaMain::OnLoadMeInfo()
 	{
 		UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 	    UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
-	},3.0f,false);
+	},2.0f,false);
 }
 
 void UUIChaMain::OnSelectMode()

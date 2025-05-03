@@ -95,9 +95,15 @@ void AMonSpawn::SpawnMonster()
 				{
 					MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
 					int32 RandIndex = FMath::RandRange(0, Monsters.Num() - 1);
-					if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[RandIndex]))
+
+					FActorSpawnParameters SpawnParams;
+					SpawnParams.Owner = this;
+					SpawnParams.Instigator = GetInstigator();
+					SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+					
+					if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[RandIndex],
+						Hit.Location,FRotator(0,0,0),SpawnParams))
 					{
-						MonsterMaster->SetActorLocation(Hit.Location);
 						MonsterMaster->MonsterStruct = *MonsterStruct;
 						MonsterMaster->SetMonsterUi();
 						Monsters.Add(MonsterMaster);
