@@ -36,5 +36,8 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UUiCre* Wbp_UiCre;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UItemGold* Wbp_ItemGold;
+
 	virtual void NativeConstruct() override;
 };

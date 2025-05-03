@@ -32,7 +32,7 @@ AMonster::AMonster()
 void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	MonsterParent = MonsterFactory->GetDefaultObject<AMonster>();
 	MonUi = CreateWidget<UMonUi>(GetWorld(),MonsterParent->MonUiFactory);
 	MonUiComp->SetWidget(MonUi);
@@ -43,6 +43,11 @@ void AMonster::BeginPlay()
 
 	SetMonsterUi();
 	SetHpBar();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	{
+		MonsterStruct.gold = FMath::FRandRange(0.85,1.15) * MonsterStruct.gold;
+	},0.1,false);
 }
 
 // Called every frame
@@ -73,8 +78,9 @@ void AMonster::SetHpBar()
 
 void AMonster::Dead()
 {
-	FItemStructTable* ItemStructTable = MonsterStruct.MonDropTableFactory[0].
-	ItemRowHandle.DataTable->FindRow<FItemStructTable>(MonsterStruct.MonDropTableFactory[0].
+	int32 Randindex = FMath::RandRange(0,MonsterStruct.MonDropTableFactory.Num()-1);
+	FItemStructTable* ItemStructTable = MonsterStruct.MonDropTableFactory[Randindex].
+	ItemRowHandle.DataTable->FindRow<FItemStructTable>(MonsterStruct.MonDropTableFactory[Randindex].
 	ItemRowHandle.RowName,TEXT("Monster"));
 	
 	if (AItem* ItemMaster = GetWorld()->SpawnActor<AItem>(MonsterParent->ItemMasterFactory))
@@ -82,6 +88,7 @@ void AMonster::Dead()
 		ItemMaster->ItemStructTable = *ItemStructTable;
 		ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
 		ItemMaster->SetActorLocation(GetActorLocation());
+		ItemMaster->SetActorScale3D(FVector(2,2,2));
 	}
 	else
 	{

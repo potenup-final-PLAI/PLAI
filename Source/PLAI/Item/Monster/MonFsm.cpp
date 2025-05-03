@@ -80,8 +80,8 @@ FVector UMonFsm::RandLocation(float X, float Y, float Z)
 
 void UMonFsm::MoveDestination()
 {
-	DrawDebugLine(GetWorld(),Monster->GetActorLocation(),TargetLocation,FColor::Blue,false,0.02f);
-    DrawDebugSphere(GetWorld(),TargetLocation,20,30,FColor::Blue,false,0.02f);
+	// DrawDebugLine(GetWorld(),Monster->GetActorLocation(),TargetLocation,FColor::Blue,false,0.02f);
+ //    DrawDebugSphere(GetWorld(),TargetLocation,20,30,FColor::Blue,false,0.02f);
 	
 	FVector Distance = TargetLocation - Monster->GetActorLocation();
 	Monster->AddActorWorldOffset(Distance.GetSafeNormal() * 10);

@@ -3,13 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+class AMonster;
+
 #include "Creature.h"
 #include "CreBullet.h"
 #include "Components/ActorComponent.h"
 #include "CreFsm.generated.h"
 
-
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+
 class PLAI_API UCreFsm : public UActorComponent
 {
 	GENERATED_BODY()
@@ -34,4 +37,5 @@ public:
 	FCreStruct CreStruct;
 
 	void SetCreStat();
+	void GetMonGold(AMonster* Monster);
 };

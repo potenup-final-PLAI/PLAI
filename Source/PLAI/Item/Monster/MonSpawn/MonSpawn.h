@@ -6,6 +6,13 @@
 #include "GameFramework/Actor.h"
 #include "MonSpawn.generated.h"
 
+UENUM(BlueprintType)
+enum class EMonSpawnType : uint8
+{
+	Desert UMETA(DisplayName = "Desert"),
+	Mountain UMETA(DisplayName = "Mountain"),
+};
+
 UCLASS()
 class PLAI_API AMonSpawn : public AActor
 {
@@ -32,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComp;
 
+    UPROPERTY(EditAnywhere)
+	EMonSpawnType MonSpawnType;
+	
 	UPROPERTY(EditAnywhere)
 	bool bTimer = false;
 	

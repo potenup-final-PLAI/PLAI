@@ -230,6 +230,7 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 				CreStruct.CurrentExp += NearMonster->MonsterStruct.Exp;
 				NearMonster->Dead();
 				SetCreStat();
+				GetMonGold(NearMonster);
 			}
 			
 			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
@@ -274,7 +275,7 @@ void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 				if (!Monsters.Contains(Monster))
 				{
 					Monsters.Add(Monster);
-					UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
+					// UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
 				}
 			}
 		}
@@ -317,6 +318,7 @@ void UCreDraFsm::DraAttackMulti(float time)
 					CreStruct.CurrentExp += Monster->MonsterStruct.Exp;
 					Monster->Dead();
 					SetCreStat();
+					GetMonGold(Monster);
 				}
 				Monsters.RemoveAt(0);
 				int32 index = 0;

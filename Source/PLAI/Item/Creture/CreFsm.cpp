@@ -3,8 +3,12 @@
 
 #include "CreFsm.h"
 
+#include "Components/TextBlock.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/Login/LoginComp.h"
+#include "PLAI/Item/Monster/Monster.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/UiCre/UiCre.h"
 
 
@@ -23,9 +27,7 @@ UCreFsm::UCreFsm()
 void UCreFsm::BeginPlay()
 {
 	Super::BeginPlay();
-
 	// ...
-	
 }
 
 
@@ -51,3 +53,16 @@ void UCreFsm::SetCreStat()
 	}
 }
 
+void UCreFsm::GetMonGold(AMonster* Monster)
+{
+	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	{
+		int32 GetGold = TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += Monster->MonsterStruct.gold;
+		TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(GetGold));
+		TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(GetGold));
+	}
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("CreFsm TestPlayer 캐스팅 실패"))
+	}
+}
