@@ -84,10 +84,11 @@ void AMonster::Dead()
 	
 	if (AItem* ItemMaster = GetWorld()->SpawnActor<AItem>(MonsterParent->ItemMasterFactory))
 	{
+		ItemMaster->SetActorLocation(MonsterParent->GetActorLocation());
 		ItemMaster->ItemStructTable = *ItemStructTable;
 		ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
-		ItemMaster->StaticMesh->SetSimulatePhysics(true);
-		ItemMaster->BoxComp->SetSimulatePhysics(true);
+		// ItemMaster->StaticMesh->SetSimulatePhysics(true);
+		// ItemMaster->BoxComp->SetSimulatePhysics(true);
 	}
 	else
 	{

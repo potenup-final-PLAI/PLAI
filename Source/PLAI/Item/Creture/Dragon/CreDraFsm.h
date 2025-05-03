@@ -42,6 +42,9 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 public:
 	UPROPERTY(EditAnywhere)
+	float DistTarget = 0.0f;
+	
+	UPROPERTY(EditAnywhere)
 	EDraState Drastate = EDraState::DraAttackSingleRange;
 	
     UPROPERTY(EditAnywhere)

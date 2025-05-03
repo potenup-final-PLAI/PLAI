@@ -73,27 +73,27 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	
 	switch (Drastate)
 	{
-	// case EDraState::DraIdle:
-	// 	DraIdle();
-	// 	break;
-	//
-	// case EDraState::DraAround:
-	// 	DraAround();
-	// 	break;
+	case EDraState::DraIdle:
+		DraIdle(1);
+		break;
+	
+	case EDraState::DraAround:
+		DraAround(2);
+		break;
 		
-	// case EDraState::DraPatrol:
-	// 	DraPatrol(10);
-	// 	break;
+	case EDraState::DraPatrol:
+		DraPatrol(3);
+		break;
 	
 	case EDraState::DraAttackSingleRange:
-		DraAttackSingleRange(1000,0.5f);
+		DraAttackSingleRange(1000,3.0f);
 		break;
 	
 	case EDraState::DraAttackMultiPre:
-		DraAttackMultiPre();
+		DraAttackMultiPre(0.5);
 		break;
 	case EDraState::DraAttackMulti:
-		DraAttackMulti();
+		DraAttackMulti(3);
 		break;
 	}
 }
@@ -102,9 +102,8 @@ void UCreDraFsm::DraIdle(float time)
 {
 	// Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
-	
-	MyTimer(&UCreDraFsm::NextState,time);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
+	MyTimer(&UCreDraFsm::NextState,time);
 }
 
 void UCreDraFsm::DraAround(float time)
@@ -113,9 +112,7 @@ void UCreDraFsm::DraAround(float time)
 	Dragon->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
 	
 	if (!TestPlayer) return;
-	
 	FRotator Rot = FRotator(0,RotateTime * 90,0);
-	
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation() + Rot.Vector() * 500
 		
 		+FVector(0,0,200 + sin(RotateTime * 10) * 100));
@@ -183,16 +180,16 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 {
 	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	
-	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 원거리공격 초시계%f"),CurrentTime)
+	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 원거리공격 초시계%f"),CurrentTime)
     CurrentTime += GetWorld()->GetDeltaSeconds();
-	if (CurrentTime > 5)
+	if (CurrentTime > time)
 	{
-		// Drastate = EDraState::DraAttackMultiPre;
+		Drastate = EDraState::DraAttackMultiPre;
 		CurrentTime = 0;
 	}
 	AMonster* NearMonster = nullptr;
 	TimeFire += GetWorld()->GetDeltaSeconds();
-	if (TimeFire < time) return;
+	if (TimeFire < 1) return;
 	TimeFire = 0.0f;
 	
 	TArray<FOverlapResult>Results;
@@ -222,8 +219,8 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			if (ACreBullet* Bullet = GetWorld()->SpawnActor<ACreBullet>(CreBulletFactory))
 			{
 				Bullet->SetActorLocation(Dragon->GetActorLocation()+Dragon->GetActorForwardVector() * 75);
-				Bullet->SetActorRotation(Dragon->GetActorRotation());
-				Bullet->ProjectileComp->Velocity = Dragon->GetActorForwardVector() * 2000;
+				FVector dist = Dragon->GetActorLocation() - NearMonster->GetActorLocation();
+				Bullet->ProjectileComp->Velocity = dist.GetSafeNormal() * -2000;
 			}
 			else
 			{
@@ -244,50 +241,53 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,
 			15,FColor::Purple,false,1.5,0,2);
 		}
+		else // Hit 없으면 순찰하기
+		{
+			Drastate = EDraState::DraAround;
+		}
 	}
 }
 
 void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 {
+	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 초시계%f"),CurrentTime)
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime < time)return;
+	CurrentTime = 0; // 밑에거 한번만 실행됨
+	
+	TArray<FOverlapResult>HitResults;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Dragon); 
+	bool bHit = GetWorld()->OverlapMultiByChannel(HitResults,Dragon->GetActorLocation(),
+		FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Radius),Params);
+	if (bHit)
+	{
+		for (FOverlapResult Result : HitResults)
+		{
+			if (AMonster* Monster = Cast<AMonster>(Result.GetActor()))
+			{
+				if (!Monsters.Contains(Monster))
+				{
+					Monsters.Add(Monster);
+					// UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
+				}
+			}
+		}
+	}
+	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	Drastate = EDraState::DraAttackMulti;
+}
+
+void UCreDraFsm::DraAttackMulti(float time)
+{
+	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 ->원거리공격 초시계%f"),TimerMulti)
 	TimerMulti += GetWorld()->GetDeltaSeconds();
-	UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 ->원거리공격 초시계%f"),TimerMulti)
-	if (TimerMulti > 3)
+	if (TimerMulti > time)
 	{
 		TimerMulti = 0;
 		Drastate = EDraState::DraAttackSingleRange;
 	}
 	
-	CurrentTime += GetWorld()->GetDeltaSeconds();
-	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 초시계%f"),CurrentTime)
-	if (CurrentTime > time)
-	{
-		CurrentTime = 0.0f;
-		TArray<FOverlapResult>HitResults;
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(Dragon); 
-		bool bHit = GetWorld()->OverlapMultiByChannel(HitResults,Dragon->GetActorLocation(),
-			FQuat::Identity,ECC_Pawn,FCollisionShape::MakeCapsule(Radius,1000),Params);
-		if (bHit)
-		{
-			for (FOverlapResult Result : HitResults)
-			{
-				if (AMonster* Monster = Cast<AMonster>(Result.GetActor()))
-				{
-					if (!Monsters.Contains(Monster))
-					{
-						Monsters.Add(Monster);
-						// UE_LOG(LogTemp,Warning,TEXT("CraDraFsm 몬스터 몇마리씩 담기노 %d 네임 %s"),Monsters.Num(),*Monster->GetName())
-					}
-				}
-			}
-		}
-		Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		Drastate = EDraState::DraAttackMulti;
-	}
-}
-
-void UCreDraFsm::DraAttackMulti(float time)
-{
 	if (Monsters.Num() > 0)
 	{
 		if (FinishCount > 3)
@@ -307,11 +307,14 @@ void UCreDraFsm::DraAttackMulti(float time)
 				Monster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
 				Monster->SetHpBar();
 				Monsters.RemoveAt(0);
-
-				UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
-				NiagaraSkills[1],Monster->GetActorLocation(),FRotator::ZeroRotator,FVector(1.f),true, // AutoActivate                        
-				true,// AutoDestroy
-				ENCPoolMethod::AutoRelease); NiagaraComp->SetActive(true);
+				int32 index = 0;
+				FinishCount == 2 ? index = 2 : index = 1;  
+				{
+					UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
+				    NiagaraSkills[index],Monster->GetActorLocation(),FRotator::ZeroRotator,FVector(index),true, // AutoActivate                        
+				    true,// AutoDestroy
+				    ENCPoolMethod::AutoRelease); NiagaraComp->SetActive(true);
+				}
 			}
 		}
 	}
