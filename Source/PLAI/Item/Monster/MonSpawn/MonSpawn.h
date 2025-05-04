@@ -9,8 +9,8 @@
 UENUM(BlueprintType)
 enum class EMonSpawnType : uint8
 {
-	Desert UMETA(DisplayName = "Desert"),
 	Mountain UMETA(DisplayName = "Mountain"),
+	Desert UMETA(DisplayName = "Desert"),
 };
 
 UCLASS()

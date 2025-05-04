@@ -89,6 +89,7 @@ void AMonster::Dead()
 		ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
 		ItemMaster->SetActorLocation(GetActorLocation());
 		ItemMaster->SetActorScale3D(FVector(2,2,2));
+		ItemMaster->BoxComp->SetSimulatePhysics(true);
 	}
 	else
 	{

@@ -91,11 +91,12 @@ void AMonSpawn::SpawnMonster()
 			for (FName Raw : Raws)
 			{
 				FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
-				if (MonsterStruct && MonsterStruct->MonsterTop == 0)
+				int32 index = static_cast<int32>(MonSpawnType);
+				if (MonsterStruct && MonsterStruct->MonsterTop == static_cast<int32>(MonSpawnType))
 				{
 					MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
 					int32 RandIndex = FMath::RandRange(0, Monsters.Num() - 1);
-
+				
 					FActorSpawnParameters SpawnParams;
 					SpawnParams.Owner = this;
 					SpawnParams.Instigator = GetInstigator();
@@ -109,15 +110,28 @@ void AMonSpawn::SpawnMonster()
 						Monsters.Add(MonsterMaster);
 					}
 				}
+
+				
+				// FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
+				// if (MonsterStruct && MonsterStruct->MonsterTop == 0)
+				// {
+				// 	MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
+				// 	int32 RandIndex = FMath::RandRange(0, Monsters.Num() - 1);
+				//
+				// 	FActorSpawnParameters SpawnParams;
+				// 	SpawnParams.Owner = this;
+				// 	SpawnParams.Instigator = GetInstigator();
+				// 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				// 	
+				// 	if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[RandIndex],
+				// 		Hit.Location,FRotator(0,0,0),SpawnParams))
+				// 	{
+				// 		MonsterMaster->MonsterStruct = *MonsterStruct;
+				// 		MonsterMaster->SetMonsterUi();
+				// 		Monsters.Add(MonsterMaster);
+				// 	}
+				// }
 			}
-			
-			//
-			// int32 index = FMath::RandRange(0, MonsterFactory.Num()-1);
-			// if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[index]))
-			// {
-			// 	MonsterMaster->SetActorLocation(Hit.ImpactPoint);
-			// 	Monsters.Add(MonsterMaster);
-			// }
 		}
 	},1.5);
 }
