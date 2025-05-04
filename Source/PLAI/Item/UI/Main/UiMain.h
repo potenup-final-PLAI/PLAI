@@ -75,6 +75,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UUiSUbMain* Wbp_UiSubMain;
 
+	UPROPERTY(meta = (BindWidget))
+	class UUIinitMain* Wbp_UiInitMain;
+	
 	// Init 클래스
     UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* CanvasInit;

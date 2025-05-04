@@ -55,7 +55,8 @@ void UCreFsm::SetCreStat()
 
 void UCreFsm::GetMonGold(AMonster* Monster)
 {
-	int32 GetGold = TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += Monster->MonsterStruct.gold;
+	TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += Monster->MonsterStruct.gold;
+	int32 GetGold = TestPlayer->LoginComp->UserFullInfo.inventory_info.gold;
 	TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(GetGold));
 	TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(GetGold));
 }

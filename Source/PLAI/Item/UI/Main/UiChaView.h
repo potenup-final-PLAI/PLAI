@@ -13,7 +13,7 @@ UCLASS()
 class PLAI_API UUiChaView : public UUserWidget
 {
 	GENERATED_BODY()
-
+// 이것은 왼쪽 위에있는 캐릭터 셋팅창임
 public:
 	UPROPERTY(EditAnywhere)
 	class UTextBlock* NameCha;

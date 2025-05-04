@@ -26,6 +26,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Traits;
 
+	UPROPERTY(meta = (BindWidget))
+	class UWrapBox* TraitsBox;
+
 	// 오른쪽 위 캐릭터
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Level;

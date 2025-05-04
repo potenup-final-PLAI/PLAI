@@ -23,6 +23,7 @@
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Main/UIChaMain.h"
 #include "PLAI/Item/UI/Main/UiChaView.h"
+#include "PLAI/Item/UI/Main/UIinitMain.h"
 #include "PLAI/Item/UI/Main/UiSign.h"
 
 // Sets default values for this component's properties
@@ -40,7 +41,7 @@ ULoginComp::ULoginComp()
 void ULoginComp::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
     if (FModuleManager::Get().IsModuleLoaded("WebSocket"))
     {
     	FModuleManager::Get().LoadModule("WebSocket");
@@ -99,7 +100,7 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::B)) // B 웹소켓연걸
 	{
-		ConnectWebSocket(UserFullInfo.user_id);
+		ConnectWebSocket();
 		UE_LOG(LogTemp,Display,TEXT("Input B 웹소켓 연결 Key JustPressed"));
 	}
 	}
@@ -382,11 +383,8 @@ void ULoginComp::HttpCreatePost(FString CharacterName)
 }
 
 
-void ULoginComp::ConnectWebSocket(const FString& user_id)
+void ULoginComp::ConnectWebSocket()
 {
-	// const FString URL = FString::Printf(TEXT(
-	// 	"ws://718f-221-148-189-129.ngrok-free.app/service1/ws/characters/create/%s"),*UserFullInfo.user_id);
-
 	const FString URL = FString::Printf(TEXT(
 		"wss://718f-221-148-189-129.ngrok-free.app/service1/ws/characters/create/%s"),*UserFullInfo.user_id);
 	
@@ -415,7 +413,7 @@ void ULoginComp::OnWebSocketConnected()
 void ULoginComp::OnWebSocketMessage(const FString& Msg)
 {
 	UE_LOG(LogTemp, Warning, TEXT("LoginComp 웹소켓 메시지 [%s]"), *Msg);
-	UiMain->InitResponse->SetText(FText::FromString(Msg));
+	UiMain->Wbp_UiInitMain->InitResponse->SetText(FText::FromString(Msg));
 }
 
 void ULoginComp::OnWebSocketConnectionError(const FString& Error)

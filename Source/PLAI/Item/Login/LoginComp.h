@@ -183,7 +183,7 @@ public:
 	void LoadInvenItem();
 
 	/** 런타임에 받은 토큰을 넣어서 WS 연결 */
-	void ConnectWebSocket(const FString& user_id);
+	void ConnectWebSocket();
 
 	/** WS 인스턴스 보관 */
 	TSharedPtr<IWebSocket> WebSocket;
