@@ -65,7 +65,7 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 	DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 100),
 	FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
-					  "나의 CharacterId [%s]"),*UserFullInfo.user_id, *UserFullInfo.character_info.character_id),
+					              "LoginComp 나의 CharacterId [%s]"),*UserFullInfo.user_id, *UserFullInfo.character_info.character_id),
 					  nullptr,FColor::Red,0.f,false);
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))

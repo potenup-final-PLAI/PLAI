@@ -129,6 +129,7 @@ void ULogItemComp::GetInvenInfo()
 				// UE_LOG(LogTemp,Warning,TEXT("LogItemComp, 여기 인벤슬롯 비었으니 넘어감 / %d"),index);
 				continue;
 			}
+			// 아직 서버 아이템 테이블에 안들어가있음
 			if (Slot->ItemStructTable.ItemTop == 0 && Slot->ItemStructTable.ItemIndex == 0 &&
 				Slot->ItemStructTable.ItemIndexType == 1)
 			{
