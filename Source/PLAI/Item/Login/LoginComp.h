@@ -193,11 +193,11 @@ public:
 	void OnWebSocketConnected();
 	void OnWebSocketMessage(const FString& Msg);
 	void OnWebSocketConnectionError(const FString& Error);
+	void SendInitStringWebSocket(const FString& Message);
 	void OnWebSocketClosed(int32 StatusCode, const FString& Reason, bool bWasClean);
 	
 	//테스트 테이블 변환
 	// void TransDataTable();
 
 	bool bQuest = true;
-	
 };

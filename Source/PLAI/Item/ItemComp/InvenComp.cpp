@@ -191,6 +191,7 @@ void UInvenComp::SetGold(int32 Getgold)
 {
 	Gold += Getgold;
 	MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(Gold));
+	MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(Gold));
 }
 
 void UInvenComp::Server_SpawnOneItem_Implementation()

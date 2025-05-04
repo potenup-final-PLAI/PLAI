@@ -63,10 +63,10 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 100),
-	FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
-					              "LoginComp 나의 CharacterId [%s]"),*UserFullInfo.user_id, *UserFullInfo.character_info.character_id),
-					  nullptr,FColor::Red,0.f,false);
+	// DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 100),
+	// FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
+	// 				              "LoginComp 나의 CharacterId [%s]"),*UserFullInfo.user_id, *UserFullInfo.character_info.character_id),
+	// 				  nullptr,FColor::Red,0.f,false);
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::One)) // 1 캐릭터 생성 요청
@@ -310,6 +310,7 @@ void ULoginComp::LoadEquipItem()
 
 void ULoginComp::LoadInvenItem()
 {
+	TestPlayer->InvenComp->SetGold(UserFullInfo.inventory_info.gold);
 	if (USlot* Slot = Cast<USlot>(TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildAt(0)))
 	{
 		TArray<FName>RawNames = Slot->ItemTable->GetRowNames();
@@ -338,52 +339,6 @@ void ULoginComp::LoadInvenItem()
 	// }
 }
 
-void ULoginComp::ConnectWebSocket(const FString& user_id)
-{
-	const FString URL = FString::Printf(TEXT(
-		"ws://718f-221-148-189-129.ngrok-free.app/service1/ws/characters/create/%s"),*UserFullInfo.user_id);
-
-	UE_LOG(LogTemp,Warning,TEXT("LoginComp WebSocket 연결된 주소%s"),*URL)
-	
-	const FString Protocol = TEXT("");
-	
-	WebSocket = FWebSocketsModule::Get().CreateWebSocket(URL, Protocol);
-
-	// 연결 성공
-	WebSocket->OnConnected().AddUObject(this, &ULoginComp::OnWebSocketConnected);
-
-	// 메시지 수신
-	WebSocket->OnMessage().AddUObject(this, &ULoginComp::OnWebSocketMessage);
-
-	// 에러 처리
-	WebSocket->OnConnectionError().AddUObject(this, &ULoginComp::OnWebSocketConnectionError);
-
-	// 종료 처리
-	WebSocket->OnClosed().AddUObject(this, &ULoginComp::OnWebSocketClosed);
-
-	// 실제 연결 시도
-	WebSocket->Connect();
-}
-
-void ULoginComp::OnWebSocketConnected()
-{
-	UE_LOG(LogTemp, Log, TEXT("✅ LoginComp WebSocket Connected!"));
-}
-
-void ULoginComp::OnWebSocketMessage(const FString& Msg)
-{
-	UE_LOG(LogTemp, Warning, TEXT("LoginComp 웹소켓 메시지 [%s]"), *Msg);
-}
-
-void ULoginComp::OnWebSocketConnectionError(const FString& Error)
-{
-	UE_LOG(LogTemp, Warning, TEXT("LoginComp 웹소켓 에러 [%s]"), *Error);
-}
-
-void ULoginComp::OnWebSocketClosed(int32 StatusCode, const FString& Reason, bool bWasClean)
-{
-	UE_LOG(LogTemp,Warning,TEXT("🔒LoginCOmp 웹소켓 Closed: Code=%d Reason=%s Clean=%d"), StatusCode, *Reason, bWasClean);
-}
 
 
 void ULoginComp::HttpCreatePost(FString CharacterName)
@@ -424,4 +379,64 @@ void ULoginComp::HttpCreatePost(FString CharacterName)
 		}
 	});
 	httpRequest->ProcessRequest();
+}
+
+
+void ULoginComp::ConnectWebSocket(const FString& user_id)
+{
+	// const FString URL = FString::Printf(TEXT(
+	// 	"ws://718f-221-148-189-129.ngrok-free.app/service1/ws/characters/create/%s"),*UserFullInfo.user_id);
+
+	const FString URL = FString::Printf(TEXT(
+		"wss://718f-221-148-189-129.ngrok-free.app/service1/ws/characters/create/%s"),*UserFullInfo.user_id);
+	
+	UE_LOG(LogTemp,Warning,TEXT("LoginComp WebSocket 연결된 주소[%s]"),*URL)
+	const FString Protocol = TEXT("");
+	
+	WebSocket = FWebSocketsModule::Get().CreateWebSocket(URL, Protocol);
+	
+	// 연결 성공
+	WebSocket->OnConnected().AddUObject(this, &ULoginComp::OnWebSocketConnected);
+	// 메시지 수신
+	WebSocket->OnMessage().AddUObject(this, &ULoginComp::OnWebSocketMessage);
+	// 에러 처리
+	WebSocket->OnConnectionError().AddUObject(this, &ULoginComp::OnWebSocketConnectionError);
+	// 종료 처리
+	WebSocket->OnClosed().AddUObject(this, &ULoginComp::OnWebSocketClosed);
+	// 실제 연결 시도
+	WebSocket->Connect();
+}
+
+void ULoginComp::OnWebSocketConnected()
+{
+	UE_LOG(LogTemp, Log, TEXT("✅ LoginComp WebSocket Connected!"));
+}
+
+void ULoginComp::OnWebSocketMessage(const FString& Msg)
+{
+	UE_LOG(LogTemp, Warning, TEXT("LoginComp 웹소켓 메시지 [%s]"), *Msg);
+	UiMain->InitResponse->SetText(FText::FromString(Msg));
+}
+
+void ULoginComp::OnWebSocketConnectionError(const FString& Error)
+{
+	UE_LOG(LogTemp, Warning, TEXT("LoginComp 웹소켓 에러 [%s]"), *Error);
+}
+
+void ULoginComp::SendInitStringWebSocket(const FString& Message)
+{
+	if (WebSocket.IsValid() && WebSocket->IsConnected())
+	{
+		WebSocket->Send(Message);
+		UE_LOG(LogTemp, Log, TEXT("▶ Sent via WS: %s"), *Message);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WebSocket not connected!"));
+	}
+}
+
+void ULoginComp::OnWebSocketClosed(int32 StatusCode, const FString& Reason, bool bWasClean)
+{
+	UE_LOG(LogTemp,Warning,TEXT("🔒LoginCOmp 웹소켓 Closed: Code=%d Reason=%s Clean=%d"), StatusCode, *Reason, bWasClean);
 }
