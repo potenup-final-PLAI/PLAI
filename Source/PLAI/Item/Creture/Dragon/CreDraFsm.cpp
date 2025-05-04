@@ -9,6 +9,7 @@
 #include "NiagaraSystem.h"
 #include "Engine/OverlapResult.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/Monster/MonFsm.h"
 #include "PLAI/Item/Monster/Monster.h"
 #include "PLAI/Item/Monster/MonsterMaster.h"
@@ -105,12 +106,12 @@ void UCreDraFsm::DraAttackRangePre(float time)
 	{
 		float x = FMath::RandRange(-750,750);
 		float y = FMath::RandRange(-750,750);   
-		float z = FMath::RandRange(200,500);
+		float z = FMath::RandRange(0,500);
 		PatrolPoints.Add(Loc + FVector(x,y,z));
-		if (i == 0)
-		{ DrawDebugSphere(GetWorld(),PatrolPoints[i],75,20,FColor::Black,false,10); }
-		else
-		{ DrawDebugSphere(GetWorld(),PatrolPoints[i],50,10,FColor::Red,false,10); }
+		// if (i == 0)
+		// { DrawDebugSphere(GetWorld(),PatrolPoints[i],75,20,FColor::Black,false,10); }
+		// else
+		// { DrawDebugSphere(GetWorld(),PatrolPoints[i],50,10,FColor::Red,false,10); }
 	}
 	FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
 	dir.Normalize();
@@ -120,8 +121,6 @@ void UCreDraFsm::DraAttackRangePre(float time)
 
 void UCreDraFsm::DraAttackRange(float time)
 {
-	// DrawDebugCircle(GetWorld(),PatrolPoints[PatrolIndex],50,10,FColor::Red,false,0.1);
-	// DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),PatrolPoints[PatrolIndex],FColor::Red,false);
 	int32 PatrolIndex = 0;
 	FVector Dir = PatrolPoints[0] - Dragon->GetActorLocation();
 	Dir.Normalize();
@@ -129,6 +128,23 @@ void UCreDraFsm::DraAttackRange(float time)
 	
 	if (FVector::Dist(PatrolPoints[0] , Dragon->GetActorLocation()) < 50)
 	{
+		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
+		NiagaraSkills[3],LineTraceZ(Creature,Dragon->GetActorLocation()),
+		FRotator::ZeroRotator,FVector(1.f),true,true,ENCPoolMethod::AutoRelease);
+		NiagaraComp->SetActive(true);
+
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ParticlesSkills[0],
+		   LineTraceZ(Creature,Dragon->GetActorLocation()),
+		   FRotator(0,0,0),/*Scale=*/ FVector(1.f),/*bAutoDestroy=*/ true);
+		
+		for (AMonster* Monster : GetMonsterBySphere(Creature,300).Monsters)
+		{
+			// UE_LOG(LogTemp,Warning,TEXT())
+			AttackMonster(Monster);
+			DrawDebugSphere(GetWorld(),Monster->GetActorLocation(),500,
+				100,FColor::Black,false,.15); 
+		}
+		
 		PatrolPoints.RemoveAt(0);
 		if (PatrolPoints.Num() == 0)
 		{ Drastate = EDraState::DraAttackSingleRange; return;}

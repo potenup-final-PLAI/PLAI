@@ -53,9 +53,11 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class ACreature* Creature;
 
+	void AttackMonster(AMonster* Monster);
 	void SetCreStat();
 	void GetMonGold(AMonster* Monster);
 	float PlayerDistance();
 	
 	FMonsters GetMonsterBySphere(AActor* Actor, float Radios = 2500.0f);
+	FVector LineTraceZ(AActor* Actor,FVector Vector);
 };

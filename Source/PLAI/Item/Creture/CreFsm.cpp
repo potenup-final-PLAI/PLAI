@@ -42,6 +42,18 @@ void UCreFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	// ...
 }
 
+void UCreFsm::AttackMonster(AMonster* Monster)
+{
+	Monster->MonsterStruct.CurrentHp -= Creature->CreFsm->CreStruct.Atk;
+	Monster->SetHpBar();
+	if (Monster->MonsterStruct.CurrentHp <= 0)
+	{
+		Monster->Dead();
+		GetMonGold(Monster);
+		SetCreStat();
+	}
+}
+
 void UCreFsm::SetCreStat()
 {
 	if (CreStruct.CurrentExp > CreStruct.MaxExp)
@@ -83,9 +95,28 @@ FMonsters UCreFsm::GetMonsterBySphere(AActor* Actor,float Radios)
 		{
 			if (AMonster* Monster = Cast<AMonster>(Hit.GetActor()))
 			{
-				Monsters.Monsters.Add(Monster);
+				if (!Monsters.Monsters.Contains(Monster))
+				{
+					Monsters.Monsters.Add(Monster);
+				}
 			}
 		}
 	}
 	return Monsters;
 }
+
+FVector UCreFsm::LineTraceZ(AActor* Actor,FVector Vector)
+{
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Actor);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Vector,Vector+FVector(0,0,-10000),
+	ECC_Visibility, Params);
+	if(bHit)
+	{
+		return Hit.Location;
+	}
+	return FVector::ZeroVector;
+}
+
