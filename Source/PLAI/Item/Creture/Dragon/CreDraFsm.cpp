@@ -44,17 +44,15 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	case EDraState::DraIdle:
 		DraIdle(1);
 		break;
-		
 	case EDraState::DraAround:
 		DraAround(3);
 		break;
-
-		
+	
 	case EDraState::DraAttackRangePre:
 		DraAttackRangePre(1);
 		break;
-	case EDraState::DraPatrol:
-		DraPatrol(3);
+	case EDraState::DraAttackRange:
+		DraAttackRange(3);
 		break;
 	
 	case EDraState::DraAttackSingleRange:
@@ -72,98 +70,83 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 void UCreDraFsm::DraIdle(float time)
 {
+	// if (CurrentTime - GetWorld()->GetDeltaSeconds() <= 0.f){} 최초한번 실행됨
 	Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
-	MyTimer(&UCreDraFsm::NextState,time);
+	
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime < time) return;
+	CurrentTime = 0;
+	
+	Dragon->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+	Drastate = EDraState::DraAround;
 }
 
 void UCreDraFsm::DraAround(float time)
 {
-	RotateTime += GetWorld()->GetDeltaSeconds();
-	Dragon->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-	
 	if (!TestPlayer) return;
+	
 	FRotator Rot = FRotator(0,RotateTime * 90,0);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation() + Rot.Vector() * 500
 		+FVector(0,0,200 + sin(RotateTime * 10) * 100));
 
-	if (GetMonsterBySphere(Creature).Monsters.Num() > 0)
+	if (GetMonsterBySphere(Creature,2500).Monsters.Num() > 0)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("CreDreFsm 순찰중 사냥모드 진입"))
-		Drastate = EDraState::DraAttackSingleRange;
+		Drastate = EDraState::DraAttackRangePre;
 	}
-	
-	if (bTimer)
-	{
-		PatrolPoints.Empty();
-		FVector Loc = TestPlayer->GetActorLocation();
-		for (int32 i = 0; i < 10; i++)
-		{
-			float x = FMath::RandRange(-750,750);
-			float y = FMath::RandRange(-750,750);   
-			float z = FMath::RandRange(200,500);
-			PatrolPoints.Add(Loc + FVector(x,y,z));
-			if (i == 0)
-			{ DrawDebugSphere(GetWorld(),PatrolPoints[i],75,20,FColor::Black,false,10); }
-			else
-			{ DrawDebugCircle(GetWorld(),PatrolPoints[i],50,10,FColor::Red,false,10); }
-			// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 위치는 %0.2f,%0.2f,%0.2f"),
-			// 	PatrolPoints[i].X,PatrolPoints[i].Y,PatrolPoints[i].Z);
-		}
-		FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
-		dir.Normalize();
-		Dragon->SetActorRotation(dir.Rotation());
-		
-		// DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),
-		// 	PatrolPoints[0] ,FColor::Blue,false,3);
-		// DrawDebugCircle(GetWorld(),PatrolPoints[0] * 100,50,10,FColor::Blue,false,3);
-	}
-	MyTimer(&UCreDraFsm::NextState,time);
 }
 
 void UCreDraFsm::DraAttackRangePre(float time)
 {
+	PatrolPoints.Empty();
+	FVector Loc = TestPlayer->GetActorLocation();
+	for (int32 i = 0; i < 10; i++)
+	{
+		float x = FMath::RandRange(-750,750);
+		float y = FMath::RandRange(-750,750);   
+		float z = FMath::RandRange(200,500);
+		PatrolPoints.Add(Loc + FVector(x,y,z));
+		if (i == 0)
+		{ DrawDebugSphere(GetWorld(),PatrolPoints[i],75,20,FColor::Black,false,10); }
+		else
+		{ DrawDebugSphere(GetWorld(),PatrolPoints[i],50,10,FColor::Red,false,10); }
+	}
+	FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
+	dir.Normalize();
+	Dragon->SetActorRotation(dir.Rotation());
+	Drastate = EDraState::DraAttackRange;
 }
 
-void UCreDraFsm::DraPatrol(float time)
+void UCreDraFsm::DraAttackRange(float time)
 {
-	if (GetMonsterBySphere(Creature).Monsters.Num() > 0)
-	{
-		UE_LOG(LogTemp,Warning,TEXT("CreDreFsm 순찰중 사냥모드 진입"))
-		Drastate = EDraState::DraAttackSingleRange;
-	}
-	
-	if (PatrolPoints.Num() == 0 || PatrolIndex < 0 || PatrolIndex >= PatrolPoints.Num())
-	{
-		UE_LOG(LogTemp, Error, TEXT("DraAttack: PatrolPoints 크기=%d, PatrolIndex=%d"), PatrolPoints.Num(), PatrolIndex);
-		return;
-	}
 	// DrawDebugCircle(GetWorld(),PatrolPoints[PatrolIndex],50,10,FColor::Red,false,0.1);
 	// DrawDebugLine(GetWorld(),Dragon->GetActorLocation(),PatrolPoints[PatrolIndex],FColor::Red,false);
-	
-	FVector Dir = PatrolPoints[PatrolIndex] - Dragon->GetActorLocation();
+	int32 PatrolIndex = 0;
+	FVector Dir = PatrolPoints[0] - Dragon->GetActorLocation();
 	Dir.Normalize();
-	Dragon->AddActorWorldOffset(Dir * 75);
+	Dragon->AddActorWorldOffset(Dir * 100);
 	
-	if (FVector::Dist(PatrolPoints[PatrolIndex] , Dragon->GetActorLocation()) < 50)
+	if (FVector::Dist(PatrolPoints[0] , Dragon->GetActorLocation()) < 50)
 	{
-		PatrolIndex++;
-		FVector dir = PatrolPoints[PatrolIndex] - Dragon->GetActorLocation();
+		PatrolPoints.RemoveAt(0);
+		if (PatrolPoints.Num() == 0)
+		{ Drastate = EDraState::DraAttackSingleRange; return;}
+		
+		FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
 		dir.Normalize();
 		Dragon->SetActorRotation(dir.Rotation());
-		
-		if (PatrolIndex > PatrolPoints.Num()-2 || bTimer == true)
-		{
-			PatrolIndex = 0;
-		}
 	}
-	MyTimer(&UCreDraFsm::NextState,time);
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime < time) return;
+	if (GetMonsterBySphere(Creature,2000).Monsters.Num() == 0) { Drastate = EDraState::DraIdle;}
+	CurrentTime = 0;
 }
 
 
 void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 {
-	if (PlayerDistance() > 5000)
+	if (PlayerDistance() > 2000 || GetMonsterBySphere(Creature,2000).Monsters.Num() == 0)
 	{ Drastate = EDraState::DraIdle; }
 	
 	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -175,6 +158,7 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 		CurrentTime = 0;
 	}
 	AMonster* NearMonster = nullptr;
+	
 	TimeFire += GetWorld()->GetDeltaSeconds();
 	if (TimeFire < 1) return;
 	TimeFire = 0.0f;
@@ -213,7 +197,7 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			{
 				UE_LOG(LogTemp,Warning,TEXT("CreDraFsm Bullet 없음"))
 			}
-			NearMonster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
+			NearMonster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
 			NearMonster->SetHpBar();
 			
 			if (NearMonster->MonsterStruct.CurrentHp <= 0)
@@ -223,7 +207,6 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 				SetCreStat();
 				GetMonGold(NearMonster);
 			}
-			
 			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
 	        NiagaraSkills[1],NearMonster->GetActorLocation(),FRotator::ZeroRotator,FVector(1.f),true, // AutoActivate                        
 	        true,// AutoDestroy
@@ -231,21 +214,13 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			
 			FVector dist = NearMonster->GetActorLocation() - Dragon->GetActorLocation();
 			Dragon->SetActorRotation(dist.GetSafeNormal().Rotation());
-			// DrawDebugLine(GetWorld(),NearMonster->GetActorLocation(),NearMonster->GetActorLocation()+FVector(0,0,1000),
-			// FColor::Purple,false,1.5,0,1.5);
-			// DrawDebugSphere(GetWorld(),NearMonster->GetActorLocation(),50,
-			// 15,FColor::Purple,false,1.5,0,2);
 		}
-		// else // Hit 없으면 순찰하기
-		// {
-		// 	Drastate = EDraState::DraAround;
-		// }
 	}
 }
 
 void UCreDraFsm::DraAttackMultiPre(float time, float Radius)
 {
-	if (PlayerDistance() > 5000)
+	if (PlayerDistance() > 2500 || GetMonsterBySphere(Creature,2500).Monsters.Num() == 0)
 	{ Drastate = EDraState::DraIdle; }
 	
 	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 멀티공격준비 초시계%f"),CurrentTime)
@@ -285,7 +260,7 @@ void UCreDraFsm::DraAttackMulti(float time)
 	if (TimerMulti > time)
 	{
 		TimerMulti = 0;
-		Drastate = EDraState::DraAttackSingleRange;
+		Drastate = EDraState::DraAttackRangePre;
 	}
 	
 	if (Monsters.Num() > 0)
@@ -299,12 +274,13 @@ void UCreDraFsm::DraAttackMulti(float time)
 		if (IsValid(Monster))
 		{
 			FVector Dir = Monster->GetActorLocation() - Dragon->GetActorLocation();
-			Dragon->AddActorWorldOffset(Dir.GetSafeNormal() * 100);
+			Dragon->AddActorWorldOffset(Dir.GetSafeNormal() * 70);
 			Dragon->SetActorRotation(Dir.Rotation());
 			if (FVector::Dist(Monster->GetActorLocation(),Dragon->GetActorLocation()) < 50.0f)
 			{
 				FinishCount++;
-				Monster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
+				// Monster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
+				Monster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
 				Monster->SetHpBar();
 
 				if (Monster->MonsterStruct.CurrentHp <= 0)
@@ -332,28 +308,8 @@ void UCreDraFsm::DraAttackMulti(float time)
 	}
 }
 
-void UCreDraFsm::MyTimer(void(UCreDraFsm::*Func)(), float time = 2.0f)
-{
-	if (!IsValid(Dragon)) 
-	{
-		UE_LOG(LogTemp, Error, TEXT("DraAround: Dragon 포인터가 유효하지 않습니다."));
-		return;
-	}
-	bTimer = false;
-	if (Func)
-	{
-		CurrentTime += GetWorld()->GetDeltaSeconds();
-		if (CurrentTime > time)
-		{
-			(this->*Func)(); 
-			UE_LOG(LogTemp, Display, TEXT("CreDraFsm 현 DraState는 %s"),
-				*UEnum::GetValueAsString(EDraState(static_cast<int32>(Drastate))));
-			
-			CurrentTime = 0.0f;
-			bTimer = true;
-		}
-	}
-}
+
+
 
 void UCreDraFsm::MyTimer(TFunction<void()> func, float time)
 {

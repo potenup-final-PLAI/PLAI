@@ -16,7 +16,7 @@ enum class EDraState : uint8
 	DraAround UMETA(DisplayName = "Around"),
 
 	DraAttackRangePre UMETA(DisplayName = "DraAttackRangePre"),
-	DraPatrol UMETA(DisplayName = "Attack"),
+	DraAttackRange UMETA(DisplayName = "DraAttackRange"),
 	
 	DraAttackSingleRange UMETA(DisplayName = "DraAttackSingleRange"),
 	
@@ -46,7 +46,7 @@ public:
 	float DistTarget = 0.0f;
 	
 	UPROPERTY(EditAnywhere)
-	EDraState Drastate = EDraState::DraAttackSingleRange;
+	EDraState Drastate = EDraState::DraIdle;
 	
     UPROPERTY(EditAnywhere)
 	TArray<UNiagaraSystem*>NiagaraSkills;
@@ -62,7 +62,7 @@ public:
 	void DraAround(float time = 1.0f);
 
 	void DraAttackRangePre(float time = 1.0f);
-	void DraPatrol(float time = 1.0f);
+	void DraAttackRange(float time = 1.0f);
 
 	void DraAttackSingleRange(float Radios = 2000.0f, float time = 2.0f);
 	
@@ -77,7 +77,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	int32 FinishCount = 0;
 	
-	void MyTimer(void(UCreDraFsm::*Func)(), float time);
 	void MyTimer(TFunction<void()> func, float time = 2.0f);
 
 	void NextState();
@@ -100,9 +99,6 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TArray<FVector>AttackPoints;
-	
-	UPROPERTY(EditAnywhere)
-	int32 PatrolIndex = 0;
 
 	float CurrentTime = 0;
 

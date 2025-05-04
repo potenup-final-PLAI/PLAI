@@ -57,5 +57,5 @@ public:
 	void GetMonGold(AMonster* Monster);
 	float PlayerDistance();
 	
-	FMonsters GetMonsterBySphere(AActor* Actor, float Radios = 3000.0f);
+	FMonsters GetMonsterBySphere(AActor* Actor, float Radios = 2500.0f);
 };
