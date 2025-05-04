@@ -78,6 +78,7 @@ void AMonster::SetHpBar()
 
 void AMonster::Dead()
 {
+	if (MonsterStruct.MonDropTableFactory.Num() == 0) return;
 	int32 Randindex = FMath::RandRange(0,MonsterStruct.MonDropTableFactory.Num()-1);
 	FItemStructTable* ItemStructTable = MonsterStruct.MonDropTableFactory[Randindex].
 	ItemRowHandle.DataTable->FindRow<FItemStructTable>(MonsterStruct.MonDropTableFactory[Randindex].
