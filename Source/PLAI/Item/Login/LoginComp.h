@@ -8,6 +8,9 @@ DECLARE_DELEGATE_OneParam(FOnSing, bool bSign)
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
+#include "IWebSocket.h"  
+
 #include "PLAI/Item/UI/Main/UiMain.h" 
 #include "LoginComp.generated.h"
 
@@ -178,6 +181,20 @@ public:
 
 	void LoadEquipItem();
 	void LoadInvenItem();
+
+	/** 런타임에 받은 토큰을 넣어서 WS 연결 */
+	void ConnectWebSocket(const FString& user_id);
+
+	/** WS 인스턴스 보관 */
+	TSharedPtr<IWebSocket> WebSocket;
+	
+	/** 콜백들 */
+	
+	void OnWebSocketConnected();
+	void OnWebSocketMessage(const FString& Msg);
+	void OnWebSocketConnectionError(const FString& Error);
+	void OnWebSocketClosed(int32 StatusCode, const FString& Reason, bool bWasClean);
+	
 	//테스트 테이블 변환
 	// void TransDataTable();
 
