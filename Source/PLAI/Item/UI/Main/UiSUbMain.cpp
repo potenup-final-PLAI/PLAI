@@ -3,6 +3,7 @@
 
 #include "UiSUbMain.h"
 
+#include "UiChaView.h"
 #include "UiMain.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
@@ -11,6 +12,7 @@
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/QuickInven/QuickInven.h"
+#include "PLAI/Item/UI/Inventory/UiCre/UiCre.h"
 #include "PLAI/Item/UI/Slot/SlotCre.h"
 
 void UUiSUbMain::NativeConstruct()
@@ -26,5 +28,9 @@ void UUiSUbMain::OnButtonSingle()
 	// UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport();
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_QuickInven->SetVisibility(ESlateVisibility::Visible);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SetVisibility(ESlateVisibility::Visible);
+	
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiCre->SetVisibility(ESlateVisibility::Visible);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetVisibility(ESlateVisibility::Visible);
+	
 	RemoveFromParent();
 }

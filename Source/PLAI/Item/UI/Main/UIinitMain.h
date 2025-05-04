@@ -17,6 +17,8 @@ class PLAI_API UUIinitMain : public UUserWidget
 public:
     UPROPERTY(EditAnywhere)
 	class UUiMain* UiMain;
+
+	// 캐릭터 소켓 생성 캐릭터 UI
 	
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* CanvasInit;
@@ -29,6 +31,8 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* InitResponse;
+
+	// 캐릭터 초기 생성 캐릭터 UI
 
 	// UPROPERTY(meta = (BindWidget))
 	// class UButton* ButtonCreate;

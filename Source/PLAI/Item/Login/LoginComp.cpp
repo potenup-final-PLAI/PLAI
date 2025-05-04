@@ -171,13 +171,14 @@ void ULoginComp::HttpLoginPost()
 	httpRequest->SetContentAsString(JsonString);
 	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
 	{
+		FLoginStructGet LoginStructGetInit;
 		FLoginStructGet LoginStructGet;
 		if (bProcessedSuccessfully)
 		{ FString JsonString = HttpResponse->GetContentAsString();
 			UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인%s"), *JsonString);
 
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &LoginStructGet);
-			if (LoginStructGet.user_id != TEXT("string"))
+			if (LoginStructGetInit.user_id != LoginStructGet.user_id)
 			{ OnLogin.ExecuteIfBound(true);
 				UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인%s"),*LoginStructGet.user_id);
 				UserFullInfo.user_id = LoginStructGet.user_id;

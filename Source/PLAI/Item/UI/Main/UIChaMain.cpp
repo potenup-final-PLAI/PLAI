@@ -3,6 +3,7 @@
 
 #include "UIChaMain.h"
 
+#include "UiChaView.h"
 #include "UiMain.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Button.h"
@@ -17,6 +18,7 @@
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/QuickInven/QuickInven.h"
+#include "PLAI/Item/UI/Inventory/UiCre/UiCre.h"
 #include "PLAI/Item/UI/Slot/SlotCre.h"
 
 void UUIChaMain::NativeConstruct()
@@ -91,6 +93,9 @@ void UUIChaMain::OnLoadMeInfo()
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_QuickInven->SetVisibility(ESlateVisibility::Hidden);
     UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiCre->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetVisibility(ESlateVisibility::Hidden);
+	
 	// 퀵슬롯 아이템 장비창 들어온느거 확인시켜주자
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Visible);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Visible);

@@ -23,8 +23,8 @@ public:
 	class UTextBlock* Job;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Gen;
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Traits;
+	// UPROPERTY(meta = (BindWidget))
+	// class UTextBlock* Traits;
 
 	UPROPERTY(meta = (BindWidget))
 	class UWrapBox* TraitsBox;
