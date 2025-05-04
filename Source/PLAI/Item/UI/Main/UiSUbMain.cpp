@@ -31,6 +31,7 @@ void UUiSUbMain::OnButtonSingle()
 	
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiCre->SetVisibility(ESlateVisibility::Visible);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetVisibility(ESlateVisibility::Visible);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->SetVisibility(ESlateVisibility::Visible);
 	
 	RemoveFromParent();
 }

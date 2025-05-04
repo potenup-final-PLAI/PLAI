@@ -137,8 +137,8 @@ void UMonFsm::LineDestination()
 	if(bHit)
 	{
 		TargetLocation = Hit.ImpactPoint;
-		DrawDebugLine(GetWorld(),Start,TargetLocation,FColor::Red,false,2.0f);
-		DrawDebugSphere(GetWorld(),TargetLocation,10,10,FColor::Red,false,2.0f);
+		// DrawDebugLine(GetWorld(),Start,TargetLocation,FColor::Red,false,2.0f);
+		// DrawDebugSphere(GetWorld(),TargetLocation,10,10,FColor::Red,false,2.0f);
 	}
 }
 

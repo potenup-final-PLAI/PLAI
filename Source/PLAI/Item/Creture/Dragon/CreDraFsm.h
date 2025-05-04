@@ -14,6 +14,8 @@ enum class EDraState : uint8
 	DraIdle UMETA(DisplayName = "Idle"),
 	
 	DraAround UMETA(DisplayName = "Around"),
+
+	DraAttackRangePre UMETA(DisplayName = "DraAttackRangePre"),
 	DraPatrol UMETA(DisplayName = "Attack"),
 	
 	DraAttackSingleRange UMETA(DisplayName = "DraAttackSingleRange"),
@@ -58,16 +60,18 @@ public:
 	void DraIdle(float time = 1.0f);
 	
 	void DraAround(float time = 1.0f);
+
+	void DraAttackRangePre(float time = 1.0f);
 	void DraPatrol(float time = 1.0f);
 
 	void DraAttackSingleRange(float Radios = 2000.0f, float time = 2.0f);
 	
 	void DraAttackMultiPre(float time = 1.0f, float Radius = 2000.0f);
+	void DraAttackMulti(float time = 1.0f);
 	
     UPROPERTY(EditAnywhere)
 	TArray<float>TimerMultiPre;
 	
-	void DraAttackMulti(float time = 1.0f);
 	UPROPERTY(EditAnywhere)
 	float TimerMulti = 0.0f;
 	UPROPERTY(EditAnywhere)
@@ -80,9 +84,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ACreDragon* Dragon;
-	
-	// UPROPERTY(EditAnywhere)
-	// class ATestPlayer* TestPlayer;
 
 	UPROPERTY(EditAnywhere)
 	float RotateTime = 0;

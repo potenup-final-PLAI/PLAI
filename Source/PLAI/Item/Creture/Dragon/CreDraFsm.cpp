@@ -18,15 +18,10 @@
 // Sets default values for this component's properties
 UCreDraFsm::UCreDraFsm()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	// ...
 	TimerMultiPre.SetNum(3);
 }
 
-
-// Called when the game starts
 void UCreDraFsm::BeginPlay()
 {
 	Super::BeginPlay();
@@ -34,47 +29,15 @@ void UCreDraFsm::BeginPlay()
 	Dragon = Cast<ACreDragon>(Creature);
 	if (Dragon) { UE_LOG(LogTemp, Warning, TEXT("CreDraFsm = Created Dragon")); }
 	else { UE_LOG(LogTemp, Warning, TEXT("CreDraFsm = Created Dragon")); }
-	
-	// if (ACreDragon* Dra = Cast<ACreDragon>(GetOwner()))
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay 드래곤있음"))
-	// 	Dragon = Dra;
-	// 	if (ACreature* Creature = Cast<ACreature>(Dragon->CreFsm->GetOwner()))
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature있음"))
-	// 	}
-	// 	else
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature없음"))
-	// 	}
-	// }
-	// else
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay 드래곤없음"))
-	// }
-	// TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	// if (TestPlayer)
-	// {
-	// 	UE_LOG(LogTemp,Warning,TEXT("UCreDraFsm::BeginPlay PC->캐릭터 캐스팅 성공"));
-	// }
-	// else
-	// {
-	// 	UE_LOG(LogTemp,Warning,TEXT("UCreDraFsm::BeginPlay PC->캐릭터 캐스팅 실패"));
-	// }
 }
 
-
-// Called every frame
 void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 150),
-	FString::Printf(TEXT("CreDreFsm DraState 현재[%s]"),*UEnum::GetValueAsString(EDraState(static_cast<int32>
-		(Drastate)))),nullptr,FColor::Red,0.f,false);
-	// *UEnum::GetValueAsString(EDraState(static_cast<int32>(Drastate))));
-	// DraAttackMultiPre();
-	// DraAttackSingleRange();
+	// DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 150),
+	// FString::Printf(TEXT("CreDreFsm DraState 현재[%s]"),*UEnum::GetValueAsString(EDraState(static_cast<int32>
+	// 	(Drastate)))),nullptr,FColor::Red,0.f,false);
 	
 	switch (Drastate)
 	{
@@ -85,6 +48,11 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	case EDraState::DraAround:
 		DraAround(3);
 		break;
+
+		
+	case EDraState::DraAttackRangePre:
+		DraAttackRangePre(1);
+		break;
 	case EDraState::DraPatrol:
 		DraPatrol(3);
 		break;
@@ -94,7 +62,7 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		break;
 	
 	case EDraState::DraAttackMultiPre:
-		DraAttackMultiPre(0.5);
+		DraAttackMultiPre(1);
 		break;
 	case EDraState::DraAttackMulti:
 		DraAttackMulti(3);
@@ -151,6 +119,10 @@ void UCreDraFsm::DraAround(float time)
 		// DrawDebugCircle(GetWorld(),PatrolPoints[0] * 100,50,10,FColor::Blue,false,3);
 	}
 	MyTimer(&UCreDraFsm::NextState,time);
+}
+
+void UCreDraFsm::DraAttackRangePre(float time)
+{
 }
 
 void UCreDraFsm::DraPatrol(float time)
@@ -514,4 +486,32 @@ void UCreDraFsm::NextState()
 // 		NearMonster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
 // 		NearMonster->SetHpBar();
 // 	}
+// }
+
+
+// if (ACreDragon* Dra = Cast<ACreDragon>(GetOwner()))
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay 드래곤있음"))
+// 	Dragon = Dra;
+// 	if (ACreature* Creature = Cast<ACreature>(Dragon->CreFsm->GetOwner()))
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature있음"))
+// 	}
+// 	else
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay Creature없음"))
+// 	}
+// }
+// else
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("UCreDraFsm::BeginPlay 드래곤없음"))
+// }
+// TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+// if (TestPlayer)
+// {
+// 	UE_LOG(LogTemp,Warning,TEXT("UCreDraFsm::BeginPlay PC->캐릭터 캐스팅 성공"));
+// }
+// else
+// {
+// 	UE_LOG(LogTemp,Warning,TEXT("UCreDraFsm::BeginPlay PC->캐릭터 캐스팅 실패"));
 // }

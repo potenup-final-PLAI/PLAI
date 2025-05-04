@@ -95,6 +95,7 @@ void UUIChaMain::OnLoadMeInfo()
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SetVisibility(ESlateVisibility::Hidden);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiCre->SetVisibility(ESlateVisibility::Hidden);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->SetVisibility(ESlateVisibility::Hidden);
 	
 	// 퀵슬롯 아이템 장비창 들어온느거 확인시켜주자
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Visible);

@@ -58,7 +58,7 @@ void AMonWolf::SetGravity()
 		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_Visibility,Params);
 		if (bHit)
 		{
-			DrawDebugLine(GetWorld(), Start,Hit.ImpactPoint, FColor::Blue, false, 0.02f);
+			// DrawDebugLine(GetWorld(), Start,Hit.ImpactPoint, FColor::Blue, false, 0.02f);
 			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 15, 10, FColor::Green, false,0.02f);
 
 			FVector Distance = Hit.ImpactPoint - GetMesh()->GetSocketLocation(SocketName);
