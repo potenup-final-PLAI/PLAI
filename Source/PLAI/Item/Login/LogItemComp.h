@@ -104,9 +104,6 @@ public:
 	ATestPlayer* TestPlayer;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APlayerController* PC;
-	
-	UPROPERTY(EditAnywhere)
-	FString Char_id = FString("char");
 
 	void GetEquipInfo();
 	

@@ -277,10 +277,6 @@ void ULoginComp::HttpMePost()
 			LoadInvenItem();
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->NameCha->SetText
 			(FText::FromString(UserFullInfo.character_info.character_name));
-			
-			character_id = UserFullInfo.character_info.character_id;
-			
-			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 Logitem Comp CharId%s"),*TestPlayer->LogItemComp->Char_id)
 		}
 	});
 	httpRequest->ProcessRequest();
