@@ -6,8 +6,22 @@
 #include "LogItemComp.h"
 #include "UObject/Object.h"
 #include "UserStruct.generated.h"
-
 class ULogItemComp;
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FMaterialBase : public FTableRowBase
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere)
+    class UMaterialInstanceDynamic* MaterialInstance;
+
+    UPROPERTY(EditAnywhere)
+    int32 Index = 0;
+
+    UPROPERTY(EditAnywhere)
+    class UStaticMesh* StaticMesh;
+};
 
 USTRUCT(BlueprintType)
 struct FPosition

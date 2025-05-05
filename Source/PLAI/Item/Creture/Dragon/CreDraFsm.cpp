@@ -57,7 +57,7 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		break;
 	
 	case EDraState::DraAttackSingleRange:
-		DraAttackSingleRange(1000,3.0f);
+		DraAttackSingleRange(2000,5.0f);
 		break;
 	
 	case EDraState::DraAttackMultiPre:
@@ -295,7 +295,6 @@ void UCreDraFsm::DraAttackMulti(float time)
 			if (FVector::Dist(Monster->GetActorLocation(),Dragon->GetActorLocation()) < 50.0f)
 			{
 				FinishCount++;
-				// Monster->MonsterStruct.CurrentHp -= Dragon->ItemStructTable.ItemStructStat.item_ATK;
 				Monster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
 				Monster->SetHpBar();
 
