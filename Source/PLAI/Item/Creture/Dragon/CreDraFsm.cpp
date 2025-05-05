@@ -37,9 +37,9 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 150),
-	// FString::Printf(TEXT("CreDreFsm DraState 현재[%s]"),*UEnum::GetValueAsString(EDraState(static_cast<int32>
-	// 	(Drastate)))),nullptr,FColor::Red,0.f,false);
+	DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 150),
+	FString::Printf(TEXT("CreDreFsm DraState 현재[%s]"),*UEnum::GetValueAsString(EDraState(static_cast<int32>
+		(Drastate)))),nullptr,FColor::Red,0.f,false);
 	
 	switch (Drastate)
 	{
@@ -61,7 +61,7 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		break;
 	
 	case EDraState::DraAttackSingleRange:
-		DraAttackSingleRange(2000,5.0f);
+		DraAttackSingleRange(3000,5.0f);
 		break;
 	
 	case EDraState::DraAttackMultiPre:
@@ -174,17 +174,18 @@ void UCreDraFsm::DraAttackRangeFinish(float time)
 	Dragon->AddActorWorldRotation(FRotator(0,CurrentTime * 360,0));
 	if (FVector::Distance(Dragon->GetActorLocation(),LineTraceZ(Creature,Dragon->GetActorLocation())) < 50)
 	{
+		Drastate = EDraState::DraAttackSingleRange;
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ParticlesSkills[1],
 		   LineTraceZ(Creature,Dragon->GetActorLocation()),
 		   FRotator(0,0,0),/*Scale=*/ FVector(3.f),/*bAutoDestroy=*/ true);
-		
-		CurrentTime = 0; Drastate = EDraState::DraAttackSingleRange;
+		for (AMonster* Monster : GetMonsterBySphere(Creature,800).Monsters)
+		{ AttackMonster(Monster); }
 	}
 }
 
 void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 {
-	if (PlayerDistance() > 2000 || GetMonsterBySphere(Creature,2000).Monsters.Num() == 0)
+	if (PlayerDistance() > 2800 || GetMonsterBySphere(Creature,2800).Monsters.Num() == 0)
 	{ Drastate = EDraState::DraIdle; }
 	
 	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);

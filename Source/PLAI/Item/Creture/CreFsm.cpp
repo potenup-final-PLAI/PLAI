@@ -117,6 +117,6 @@ FVector UCreFsm::LineTraceZ(AActor* Actor,FVector Vector)
 	{
 		return Hit.Location;
 	}
-	return FVector::ZeroVector;
+	return Vector;
 }
 
