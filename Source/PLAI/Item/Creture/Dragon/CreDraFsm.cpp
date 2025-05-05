@@ -7,6 +7,7 @@
 #include "MovieSceneTracksComponentTypes.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
+#include "RewindData.h"
 #include "Engine/OverlapResult.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -55,6 +56,9 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	case EDraState::DraAttackRange:
 		DraAttackRange(3);
 		break;
+	case EDraState::DraAttackRangeFinish:
+		DraAttackRangeFinish();
+		break;
 	
 	case EDraState::DraAttackSingleRange:
 		DraAttackSingleRange(2000,5.0f);
@@ -86,10 +90,10 @@ void UCreDraFsm::DraIdle(float time)
 void UCreDraFsm::DraAround(float time)
 {
 	if (!TestPlayer) return;
-	
+	RotateTime += GetWorld()->GetDeltaSeconds();
 	FRotator Rot = FRotator(0,RotateTime * 90,0);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation() + Rot.Vector() * 500
-		+FVector(0,0,200 + sin(RotateTime * 10) * 100));
+		+FVector(0,cos(RotateTime * 3) * 200,200 + sin(RotateTime * 10) * 100));
 
 	if (GetMonsterBySphere(Creature,2500).Monsters.Num() > 0)
 	{
@@ -144,14 +148,17 @@ void UCreDraFsm::DraAttackRange(float time)
 			DrawDebugSphere(GetWorld(),Monster->GetActorLocation(),500,
 				100,FColor::Black,false,.15); 
 		}
-		
-		PatrolPoints.RemoveAt(0);
-		if (PatrolPoints.Num() == 0)
-		{ Drastate = EDraState::DraAttackSingleRange; return;}
-		
 		FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
 		dir.Normalize();
 		Dragon->SetActorRotation(dir.Rotation());
+		PatrolPoints.RemoveAt(0);
+		if (PatrolPoints.Num() == 0)
+		{
+			Dragon->SetActorLocation(Dragon->GetActorLocation() + FVector(0,0,3000));
+			Drastate = EDraState::DraAttackRangeFinish;
+			return;
+		}
+		// { Drastate = EDraState::DraAttackSingleRange; return;}
 	}
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime < time) return;
@@ -159,6 +166,21 @@ void UCreDraFsm::DraAttackRange(float time)
 	CurrentTime = 0;
 }
 
+void UCreDraFsm::DraAttackRangeFinish(float time)
+{
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	Dragon->AddActorWorldOffset(FVector(0,0,-50));
+	Dragon->SetActorRotation(FVector(0,0,-1).Rotation());
+	Dragon->AddActorWorldRotation(FRotator(0,CurrentTime * 360,0));
+	if (FVector::Distance(Dragon->GetActorLocation(),LineTraceZ(Creature,Dragon->GetActorLocation())) < 50)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ParticlesSkills[1],
+		   LineTraceZ(Creature,Dragon->GetActorLocation()),
+		   FRotator(0,0,0),/*Scale=*/ FVector(3.f),/*bAutoDestroy=*/ true);
+		
+		CurrentTime = 0; Drastate = EDraState::DraAttackSingleRange;
+	}
+}
 
 void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 {

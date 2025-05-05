@@ -17,6 +17,7 @@ enum class EDraState : uint8
 
 	DraAttackRangePre UMETA(DisplayName = "DraAttackRangePre"),
 	DraAttackRange UMETA(DisplayName = "DraAttackRange"),
+	DraAttackRangeFinish UMETA(DisplayName = "DraAttackRangeFinish"),
 	
 	DraAttackSingleRange UMETA(DisplayName = "DraAttackSingleRange"),
 	
@@ -63,6 +64,7 @@ public:
 
 	void DraAttackRangePre(float time = 1.0f);
 	void DraAttackRange(float time = 1.0f);
+	void DraAttackRangeFinish(float time = 1.0f);
 
 	void DraAttackSingleRange(float Radios = 2000.0f, float time = 2.0f);
 	
