@@ -224,6 +224,15 @@ void ULoginComp::HttpSignPost()
 	httpRequest->ProcessRequest();
 }
 
+void ULoginComp::Server_HttpMePost_Implementation()
+{
+	Client_HttpMePost();
+}
+
+void ULoginComp::Client_HttpMePost_Implementation()
+{
+	HttpMePost();
+}
 
 void ULoginComp::HttpMePost()
 {
@@ -274,7 +283,7 @@ void ULoginComp::HttpMePost()
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
 
 			UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
-			
+
 			LoadEquipItem();
 			LoadInvenItem();
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->NameCha->SetText
@@ -299,7 +308,7 @@ void ULoginComp::LoadEquipItem()
 			    	if (UserFullInfo.equipment_info.item_list[i].item_id == RawName &&
 			    		static_cast<int32>(SlotEquip->SlotType) == ItemStructTable->ItemIndex)
 			    	{
-			    		TestPlayer->InvenComp->EquipItem(*ItemStructTable,SlotEquip->SlotType);
+			    		TestPlayer->InvenComp->Server_EquipItem(*ItemStructTable,SlotEquip->SlotType);
 			    		SlotEquip->ItemStructTable = *ItemStructTable;
 			    		SlotEquip->SlotImageUpdate();
 			    		break;
@@ -312,6 +321,8 @@ void ULoginComp::LoadEquipItem()
 
 void ULoginComp::LoadInvenItem()
 {
+	if (!TestPlayer -> IsLocallyControlled()){return;}
+	
 	TestPlayer->InvenComp->SetGold(UserFullInfo.inventory_info.gold);
 	if (USlot* Slot = Cast<USlot>(TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildAt(0)))
 	{
@@ -382,12 +393,6 @@ void ULoginComp::HttpCreatePost(FString CharacterName)
 	});
 	httpRequest->ProcessRequest();
 }
-
-void ULoginComp::Server_HttpMePost_Implementation()
-{
-	
-}
-
 
 void ULoginComp::ConnectWebSocket()
 {

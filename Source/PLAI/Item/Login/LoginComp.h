@@ -179,8 +179,8 @@ public:
 
 	UFUNCTION(Server, Reliable)
     void Server_HttpMePost();
-
-
+	UFUNCTION(Client, Reliable)
+	void Client_HttpMePost();
 	void HttpMePost();
 
 	void LoadEquipItem();

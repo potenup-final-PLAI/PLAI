@@ -80,18 +80,12 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 
 void UUIChaMain::OnLoadMeInfo()
 {
-	UE_LOG(LogTemp,Warning,TEXT("UiChaMain::OnLoadMeInfo 버튼 누름 "));
-	if (!UiMain)
-	{
-		UE_LOG(LogTemp,Warning,TEXT("UUiChaMain에서 UiMain -> UUIChaMain 포인터 넘겨주기 실패 "))
-		return;
-	}
 	UiMain->LoginComp->HttpMePost();
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport(1);
 	
 	// 퀵슬롯 디테일창은 끄자
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_QuickInven->SetVisibility(ESlateVisibility::Hidden);
-    UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SetVisibility(ESlateVisibility::Hidden);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiCre->SetVisibility(ESlateVisibility::Hidden);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetVisibility(ESlateVisibility::Hidden);
@@ -105,7 +99,7 @@ void UUIChaMain::OnLoadMeInfo()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 	{
 		UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
-	    UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+		UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 	},1.7f,false);
 }
 

@@ -189,9 +189,12 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 void UInvenComp::SetGold(int32 Getgold)
 {
-	Gold += Getgold;
-	MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(Gold));
-	MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(Gold));
+	if (TestPlayer->IsLocallyControlled())
+	{
+		Gold += Getgold;
+		MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(Gold));
+		MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(Gold));
+	}
 }
 
 void UInvenComp::Server_SpawnOneItem_Implementation()
@@ -298,7 +301,7 @@ void UInvenComp::GetItem(const FItemStructTable& ItemStructTable)
 	for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
 	{
 		USlot* Slot = Cast<USlot>(Widget);
-		if (Slot && Slot->ItemStructTable.ItemTop == ItemStructTable.ItemTop &&Slot->ItemStructTable.ItemIndex == ItemStructTable.ItemIndex
+		if (Slot && Slot->ItemStructTable.ItemTop != 1 && Slot->ItemStructTable.ItemTop == ItemStructTable.ItemTop &&Slot->ItemStructTable.ItemIndex == ItemStructTable.ItemIndex
 			&&Slot->ItemStructTable.ItemIndexType == ItemStructTable.ItemIndexType 
 			&&Slot->ItemStructTable.ItemIndexDetail == ItemStructTable.ItemIndexDetail)
 		{
@@ -443,9 +446,7 @@ void UInvenComp::CatchItem()
 	TArray<FHitResult> Hits;
 	FCollisionQueryParams Params;
 	FVector Loc = TestPlayer->GetActorLocation();
-		
 	DrawDebugBox(GetWorld(),Loc+TestPlayer->GetActorForwardVector()*250,FVector(100,100,100),FColor::Red,false, 1.0f);
-
 	bool hitinfo = GetWorld()->SweepMultiByChannel(Hits,Loc + TestPlayer->GetActorForwardVector() * 250,Loc + TestPlayer->GetActorForwardVector() * 250,
 		FQuat::Identity,ECC_Visibility,FCollisionShape::MakeBox(FVector(100,100,100)),Params);
 	if (hitinfo)
@@ -491,14 +492,7 @@ void UInvenComp::LoadItemInventory()
 	{
 		USlot* Slot = Cast<USlot>(MenuInven->WBP_ItemInven->WrapBox->GetChildAt(i));
 		Slot->ItemStructTable = ItemStructTables.ItemStructTables[i];
-		if (Slot->ItemStructTable.ItemTop == -1)
-		{
-			// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 슬롯 itemtop -1 리턴"));
-		}
-		else
-		{
-			Slot->SlotImageUpdate();
-		}
+		Slot->SlotImageUpdate();
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 로드"))
 }
