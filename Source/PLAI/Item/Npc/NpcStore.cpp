@@ -15,6 +15,8 @@ ANpcStore::ANpcStore()
 void ANpcStore::BeginPlay()
 {
 	Super::BeginPlay();
+
+	NpcNameString = TEXT("토리 (Store)");
 	
 	Item = ItemFactory->GetDefaultObject<AItem>();
 }

@@ -35,7 +35,7 @@ public:
 	class UUiNpc* UiNpc;
 
 	UPROPERTY(EditAnywhere)
-	FString NpcNameString = FString("초기 NPC");
+	FString NpcNameString = TEXT("초기 NPC");
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UWidgetComponent* WidgetComp;

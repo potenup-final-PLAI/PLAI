@@ -15,6 +15,8 @@ ANpcStart::ANpcStart()
 void ANpcStart::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	NpcNameString = TEXT("말론 (StartEquip)");
 }
 
 // Called every frame
