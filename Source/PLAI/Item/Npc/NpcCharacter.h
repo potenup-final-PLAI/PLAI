@@ -34,6 +34,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UUiNpc* UiNpc;
 
+	UPROPERTY(EditAnywhere)
+	FText NpcName = FText::FromString(FString("Initial NpcName"));
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UWidgetComponent* WidgetComp;
 };

@@ -3,6 +3,7 @@
 
 #include "NpcCharacter.h"
 
+#include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
 
 
@@ -13,7 +14,14 @@ ANpcCharacter::ANpcCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	WidgetComp = CreateDefaultSubobject<UWidgetComponent>("Widget");
 	WidgetComp->SetupAttachment(RootComponent);
-	WidgetComp->SetMobility(EComponentMobility::Movable);
+	// WidgetComp->SetMobility(EComponentMobility::Movable);
+
+
+
+	
+
+	
+	
 }
 
 // Called when the game starts or when spawned
@@ -21,9 +29,15 @@ void ANpcCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	UiNpc = CreateWidget<UUiNpc>(GetWorld(),UiNpcFactory);
-	// UiNpc->AddToViewport();
-	// WidgetComp->SetWidget(UiNpc);
-	// WidgetComp->SetVisibility(true);
+    WidgetComp->SetWidget(UiNpc);
+	WidgetComp->SetDrawSize(FVector2D(300.0f,45.0f));
+	WidgetComp->SetVisibility(true);
+	WidgetComp->SetRelativeLocation(FVector(0,0,150));
+	WidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	{ UiNpc->NpcName->SetText(NpcName);},0.5,false);
 }
 
 // Called every frame

@@ -15,6 +15,8 @@ ANpcStart::ANpcStart()
 void ANpcStart::BeginPlay()
 {
 	Super::BeginPlay();
+	NpcName = NpcName = FText::FromString(FString("게임 스타터"));
+
 }
 
 // Called every frame

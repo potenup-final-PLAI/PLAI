@@ -45,9 +45,7 @@ void AMonster::BeginPlay()
 	SetHpBar();
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	{
-		MonsterStruct.gold = FMath::FRandRange(0.85,1.15) * MonsterStruct.gold;
-	},0.1,false);
+	{ MonsterStruct.gold = FMath::FRandRange(0.85,1.15) * MonsterStruct.gold; },0.1,false);
 }
 
 // Called every frame

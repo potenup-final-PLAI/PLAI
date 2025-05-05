@@ -13,4 +13,7 @@ UCLASS()
 class PLAI_API UUiNpc : public UUserWidget
 {
 	GENERATED_BODY()
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* NpcName;
 };
