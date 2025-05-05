@@ -31,6 +31,12 @@ void AItem::BeginPlay()
 
 		// BoxComp->SetWorldScale3D(FVector(1.5));
 	BoxComp->OnComponentBeginOverlap.AddDynamic(this,&AItem::OnMyBeginOverlapped);
+
+	// ItemStructTable에 머티리얼이 있으면 아이템 머티리얼을 적용시켜라
+	if (ItemStructTable.Material)
+	{
+		StaticMesh->SetMaterial(0, ItemStructTable.Material);
+	}
 	
 	// FTimerHandle TimerHandle;
 	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AItem::SetMesh,0.5f,false);

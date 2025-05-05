@@ -88,17 +88,11 @@ void AMonster::Dead()
 	{
 		ItemMaster->ItemStructTable = *ItemStructTable;
 		ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
-		if (ItemStructTable->Item_Id == FString("bow_001"))
-		{
-			ItemMaster->StaticMesh->SetMaterial(0,ItemStructTable->Material);
-		}
-		ItemMaster->SetActorLocation(GetActorLocation());
+		if (ItemStructTable->Material)
+		{ ItemMaster->StaticMesh->SetMaterial(0,ItemStructTable->Material);}
+		ItemMaster->SetActorLocation(GetActorLocation()+FVector(0,0,75));
 		ItemMaster->SetActorScale3D(FVector(2,2,2));
 		ItemMaster->BoxComp->SetSimulatePhysics(true);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("DropItem: MonDropTableFactory 아이템 마스터가 없나?"));
 	}
 	Destroy();
 }

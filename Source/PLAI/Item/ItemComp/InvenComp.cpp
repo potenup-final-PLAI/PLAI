@@ -347,6 +347,9 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemWeapon->ItemStructTable = ItemStructTable;
 		ItemWeapon->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+
+		if (ItemStructTable.Material)
+		{ ItemWeapon->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 	else if (SlotType == EquipSlotType::Armor)
 	{
@@ -357,6 +360,9 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemArmor->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemArmor->SetActorLocation(ItemArmor->GetActorLocation() + FVector(0,0,60));
 		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+		
+		if (ItemStructTable.Material)
+		{ ItemArmor->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 	else if (SlotType == EquipSlotType::Helmet)
 	{
@@ -365,8 +371,9 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemHelmet->ItemStructTable = ItemStructTable;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemHelmet->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
- 
-		// ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
+
+		if (ItemStructTable.Material)
+		{ ItemHelmet->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 	else if (SlotType == EquipSlotType::Gloves)
 	{
@@ -377,6 +384,9 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		// ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
 		ItemGlove->SetActorRelativeRotation(FRotator(-90,0,0));
 		ItemGlove->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
+		
+		if (ItemStructTable.Material)
+		{ ItemGlove->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 	else if (SlotType == EquipSlotType::Boots)
 	{
@@ -389,6 +399,9 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
 		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
 		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
+		
+		if (ItemStructTable.Material)
+		{ Itemboots->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 }
 
