@@ -383,6 +383,11 @@ void ULoginComp::HttpCreatePost(FString CharacterName)
 	httpRequest->ProcessRequest();
 }
 
+void ULoginComp::Server_HttpMePost_Implementation()
+{
+	
+}
+
 
 void ULoginComp::ConnectWebSocket()
 {

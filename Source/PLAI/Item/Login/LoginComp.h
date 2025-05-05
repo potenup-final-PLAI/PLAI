@@ -176,7 +176,11 @@ public:
 	void HttpLoginPost();
 	
 	void HttpCreatePost(FString CharacterName);
-	
+
+	UFUNCTION(Server, Reliable)
+    void Server_HttpMePost();
+
+
 	void HttpMePost();
 
 	void LoadEquipItem();
