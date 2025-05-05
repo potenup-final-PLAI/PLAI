@@ -12,6 +12,21 @@ enum class EItemIndex : uint8
 	Other UMETA(DisplayName = "Other Item"),
 };
 
+USTRUCT(BlueprintType,BlueprintType)
+struct FItemMaterialTable : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	class UMaterialInterface* MaterialBeginner;
+
+	UPROPERTY(EditAnywhere)
+	class UMaterialInterface* MaterialStandard;
+
+	UPROPERTY(EditAnywhere)
+	class UMaterialInterface* MaterialExpert;
+};
+
 USTRUCT(BlueprintType,Blueprintable)
 struct FItemStructStat
 {
