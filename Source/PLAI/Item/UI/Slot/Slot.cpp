@@ -136,15 +136,41 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
 	UDragDropOperation* InOperation)
 {
-	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
-	Swap(ItemStructTable, ItemObject->ItemStructTable);
+	// Swap 추가 나중에 네트워크 동기화는 확인안해봐서 확인해볼것
+	if (ItemStructTable.ItemTop != -1)
+	{
+		UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
+        if (USlot* SlotPre = Cast<USlot>(ItemObject->SlotUi))
+        {
+	        SlotPre->ItemStructTable = ItemStructTable;
+        	ItemStructTable = ItemObject->ItemStructTable;
+        	SlotPre->SlotImageUpdate();
+        	SlotImageUpdate();
+        } 
+		
+		// Swap(ItemObject->SlotUi->ItemStructTable, ItemStructTable);
+		// SlotImageUpdate();
+		// ItemObject->SlotUi->SlotImageUpdate();
+		// SlotCountUpdate(ItemStructTable.ItemNum);
+		// ItemObject->SlotUi->ItemStructTable = ItemStructTable;
+		// ItemObject->SlotUi->SlotImageUpdate();
+		// UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
+		
+		return true;
+	}
+	// 밑에거는 동기화까지는 끝내는거 확인했던 함수임!!
+	else
+	{
+		UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
+		Swap(ItemStructTable, ItemObject->ItemStructTable);
 
-	SlotImageUpdate();
-	SlotCountUpdate(ItemStructTable.ItemNum);
+		SlotImageUpdate();
+		SlotCountUpdate(ItemStructTable.ItemNum);
 	
-	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
-	return true;
-	// return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+		UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
+		return true;
+		// return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+	}
 }
 
 void USlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
