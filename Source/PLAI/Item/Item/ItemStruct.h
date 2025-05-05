@@ -81,6 +81,8 @@ public:
 	FItemStructStatName ItemStructStatName;
 };
 
+
+
 USTRUCT(BlueprintType,Blueprintable)
 struct FItemMeshStruct
 {
@@ -153,6 +155,8 @@ public:
 	UStaticMesh* StaticMesh;
 	UPROPERTY(EditAnywhere)
 	UTexture2D* Texture;
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* Material;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACreature>CreatureFactory;

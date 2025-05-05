@@ -88,6 +88,10 @@ void AMonster::Dead()
 	{
 		ItemMaster->ItemStructTable = *ItemStructTable;
 		ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+		if (ItemStructTable->Item_Id == FString("bow_001"))
+		{
+			ItemMaster->StaticMesh->SetMaterial(0,ItemStructTable->Material);
+		}
 		ItemMaster->SetActorLocation(GetActorLocation());
 		ItemMaster->SetActorScale3D(FVector(2,2,2));
 		ItemMaster->BoxComp->SetSimulatePhysics(true);

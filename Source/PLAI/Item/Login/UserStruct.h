@@ -14,7 +14,7 @@ struct FMaterialBase : public FTableRowBase
     GENERATED_BODY()
 public:
     UPROPERTY(EditAnywhere)
-    class UMaterialInstanceDynamic* MaterialInstance;
+    class UMaterialInterface* Material;
 
     UPROPERTY(EditAnywhere)
     int32 Index = 0;
