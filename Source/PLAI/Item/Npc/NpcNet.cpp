@@ -22,8 +22,6 @@ ANpcNet::ANpcNet()
 void ANpcNet::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	NpcName = NpcName = FText::FromString(FString("게임 가이더"));
 }
 
 // Called every frame

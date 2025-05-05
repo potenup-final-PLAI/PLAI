@@ -37,7 +37,7 @@ void ANpcCharacter::BeginPlay()
 	
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	{ UiNpc->NpcName->SetText(NpcName);},0.5,false);
+	{ UiNpc->NpcName->SetText(FText::FromString(NpcNameString));},0.5,false);
 }
 
 // Called every frame

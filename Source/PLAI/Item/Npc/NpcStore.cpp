@@ -15,7 +15,7 @@ ANpcStore::ANpcStore()
 void ANpcStore::BeginPlay()
 {
 	Super::BeginPlay();
-	NpcName = NpcName = FText::FromString(FString("게임 스토어"));
+	
 	Item = ItemFactory->GetDefaultObject<AItem>();
 }
 
