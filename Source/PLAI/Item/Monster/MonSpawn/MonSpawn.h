@@ -11,6 +11,7 @@ enum class EMonSpawnType : uint8
 {
 	Mountain UMETA(DisplayName = "Mountain"),
 	Desert UMETA(DisplayName = "Desert"),
+	Dungeon UMETA(DisplayName = "Dungeon"),
 };
 
 UCLASS()
