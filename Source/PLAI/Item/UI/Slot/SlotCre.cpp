@@ -94,6 +94,8 @@ void USlotCre::SpawnCreature(FItemStructTable ItemStructTab)
 		
 		Creature->CreFsm->CreStruct.Name = ItemStructTable.Name;
 		Creature->CreFsm->CreStruct.Atk = ItemStructTable.ItemStructStat.item_ATK;
+		Creature->CreFsm->CreStruct.Crit = ItemStructTable.ItemStructStat.Item_CRIT;
+		Creature->CreFsm->CreStruct.CritDmg = ItemStructTable.ItemStructStat.item_CRITDMG;
 		
 		Creature->CreFsm->CreStruct.MaxHp = ItemStructTable.ItemStructStat.item_SHI;
 		Creature->CreFsm->CreStruct.CurrentHp = ItemStructTable.ItemStructStat.item_SHI;

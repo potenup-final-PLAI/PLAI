@@ -60,4 +60,5 @@ public:
 	
 	FMonsters GetMonsterBySphere(AActor* Actor, float Radios = 2500.0f);
 	FVector LineTraceZ(AActor* Actor,FVector Vector);
+	// float CreatureDamage();
 };

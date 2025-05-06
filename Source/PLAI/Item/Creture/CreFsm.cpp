@@ -48,6 +48,7 @@ void UCreFsm::AttackMonster(AMonster* Monster)
 	Monster->SetHpBar();
 	if (Monster->MonsterStruct.CurrentHp <= 0)
 	{
+		Monster->DamageUi(Creature->CreFsm->CreStruct.Atk);
 		Monster->Dead();
 		GetMonGold(Monster);
 		SetCreStat();
@@ -119,4 +120,9 @@ FVector UCreFsm::LineTraceZ(AActor* Actor,FVector Vector)
 	}
 	return Vector;
 }
+
+// float UCreFsm::CreatureDamage()
+// {
+// 	
+// }
 

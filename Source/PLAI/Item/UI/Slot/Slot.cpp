@@ -90,13 +90,6 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 			bItemDetail = !bItemDetail;
 			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(bItemDetail ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetItemDetail(*ItemTableFind());
-			
-			// FGeometry Geometry = GetCachedGeometry();
-			// FVector2D Position = Geometry.GetAbsolutePosition();
-			// float Scale = UWidgetLayoutLibrary::GetViewportScale(this);
-			// FVector2D ScalePosition = Position / Scale;
-			// TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->
-			// SetRenderTranslation(ScalePosition);
 		}
 	}
 	return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);

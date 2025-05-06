@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
+#include "MonUi/MonDamage.h"
 
 #include "MonUi/MonUi.h"
 #include "PLAI/Item/Item/Item.h"
@@ -95,7 +96,33 @@ void AMonster::Dead()
 	Destroy();
 }
 
+void AMonster::DamageUi(float Damage)
+{
+	MonDamage = CreateWidget<UMonDamage>(GetWorld(),MonDamageFactory);
+	UWidgetComponent* MonDamageComp = NewObject<UWidgetComponent>(this);
+	MonDamageComp->SetupAttachment(GetRootComponent());
+	// MonDamageComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+	MonDamageComp->RegisterComponent();
+	MonDamageComp->SetWidget(MonDamage);
+	MonDamageComp->SetRelativeLocation(FVector(0,0,25));
+	MonDamageComp->SetDrawSize(FVector2D(500.f,80.f));
+	MonDamageComp->SetWidgetSpace(EWidgetSpace::Screen);
+	
+	DamageUiDestroy(MonDamageComp);
+	// FTimerDelegate TimerHandle;
+	// TimerHandle.BindUFunction(this,FName("DestroyDamageComp"), MonDamageComp);
+	// GetWorld()->GetTimerManager().SetTimer(DamageUiTimerHandle,TimerHandle,
+	// 	1.0f,false);
+}
 
+void AMonster::DamageUiDestroy(UWidgetComponent* DamageComp)
+{
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,DamageComp]()
+	{
+		DamageComp->DestroyComponent();
+	},2.0f,false);
+}
 
 // FItemStructTable* ItemStructTable = MonsterParent->ItemTable->FindRow<FItemStructTable>(MonsterStruct.
 // 		MonDropTableFactory[0].ItemRowHandle.RowName,TEXT("Monster"));

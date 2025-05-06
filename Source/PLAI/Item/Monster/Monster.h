@@ -47,10 +47,18 @@ public:
 	TSubclassOf<class UMonUi> MonUiFactory;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AItemMaster> ItemMasterFactory;
+	class UMonUi* MonUi;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UMonDamage> MonDamageFactory;
+
+    UPROPERTY(EditAnywhere)
+	class UMonDamage* MonDamage;
 	
 	UPROPERTY(EditAnywhere)
-	class UMonUi* MonUi;
+	TSubclassOf<class AItemMaster> ItemMasterFactory;
+	
+
 	
 	UPROPERTY(EditAnywhere)
 	FMonsterStruct MonsterStruct;
@@ -65,4 +73,12 @@ public:
 	void SetMonsterUi();
 	void SetHpBar();
 	void Dead();
+
+	UPROPERTY(EditAnywhere)
+	FTimerHandle DamageUiTimerHandle;
+	
+	UFUNCTION()
+	void DamageUi(float Damage);
+
+	void DamageUiDestroy(UWidgetComponent* DamageComp);
 };
