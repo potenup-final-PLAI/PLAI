@@ -238,7 +238,7 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			}
 			NearMonster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
 			NearMonster->SetHpBar();
-			NearMonster->DamageUi(Creature->CreFsm->CreStruct.Atk);
+			NearMonster->DamageUi(CreatureDamage());
 
 			if (NearMonster->MonsterStruct.CurrentHp <= 0)
 			{
@@ -321,7 +321,7 @@ void UCreDraFsm::DraAttackMulti(float time)
 				FinishCount++;
 				Monster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
 				Monster->SetHpBar();
-				Monster->DamageUi(Creature->CreFsm->CreStruct.Atk);
+				Monster->DamageUi(CreatureDamage());
 
 				if (Monster->MonsterStruct.CurrentHp <= 0)
 				{

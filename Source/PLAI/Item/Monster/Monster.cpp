@@ -99,6 +99,8 @@ void AMonster::Dead()
 void AMonster::DamageUi(float Damage)
 {
 	MonDamage = CreateWidget<UMonDamage>(GetWorld(),MonDamageFactory);
+	MonDamage->Damage->SetText(FText::AsNumber(Damage));
+	
 	UWidgetComponent* MonDamageComp = NewObject<UWidgetComponent>(this);
 	MonDamageComp->SetupAttachment(GetRootComponent());
 	// MonDamageComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
