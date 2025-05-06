@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "PLAI/Item/Item/ItemStruct.h"
+#include "PLAI/Item/Monster/MonUi/MonDamage.h"
 #include "Creature.generated.h"
 
 USTRUCT(BlueprintType,BlueprintType)
@@ -74,6 +75,18 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	class UCreFsm* CreFsm;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UMonDamage>MonDamageFactory;
+
+    UPROPERTY(EditAnywhere)
+	TSubclassOf<ACreature>CreatureFactory;
+	UPROPERTY(EditAnywhere)
+	class ACreature* CreatureParent;
+	
+	UPROPERTY(EditAnywhere)
+	class UMonDamage* MonDamage;
+	
 	UPROPERTY(EditAnywhere)
 	FItemStructTable ItemStructTable;
 };

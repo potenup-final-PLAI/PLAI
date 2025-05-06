@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "PLAI/Item/Monster/MonUi/MonDamage.h"
 
 class AMonster;
@@ -45,9 +46,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ACreBullet>CreBulletFactory;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UMonDamage>MonDamageFactory;
-
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FCreStruct CreStruct;
 
@@ -58,6 +56,9 @@ public:
 	class ACreature* Creature;
 
 	void AttackMonster(AMonster* Monster);
+	
+	void DamageUiDestroy(UWidgetComponent* DamageComp);
+	
 	void SetCreStat();
 	void GetMonGold(AMonster* Monster);
 	float PlayerDistance();

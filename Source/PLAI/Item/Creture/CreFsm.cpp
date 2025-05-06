@@ -4,6 +4,7 @@
 #include "CreFsm.h"
 
 #include "Components/TextBlock.h"
+#include "Components/WidgetComponent.h"
 #include "Engine/OverlapResult.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
@@ -54,12 +55,26 @@ void UCreFsm::AttackMonster(AMonster* Monster)
 	
 	Monster->MonsterStruct.CurrentHp -= Damage;
 	Monster->SetHpBar();
-	Monster->DamageUi(Damage);
+
+	// 몬스터 데미지주기 과연될까?
+	Creature->MonDamage = CreateWidget<UMonDamage>(GetWorld(),Creature->CreatureParent->MonDamageFactory);
+	Creature->MonDamage->Damage->SetText(FText::AsNumber(Damage));
+	UWidgetComponent* MonDamageComp = NewObject<UWidgetComponent>(this);
+	MonDamageComp->SetupAttachment(Monster->GetRootComponent());
+	MonDamageComp->RegisterComponent();
+	MonDamageComp->SetWidget(Creature->MonDamage);
+	float DamageLoc = FMath::FRandRange(-50.0f,50.0f);
+	MonDamageComp->SetRelativeLocation(FVector(DamageLoc,DamageLoc,DamageLoc));
+	MonDamageComp->SetDrawSize(FVector2D(150.f,30.f));
+	MonDamageComp->SetWidgetSpace(EWidgetSpace::Screen);
+	DamageUiDestroy(MonDamageComp);
+	
+	// Monster->DamageUi(Damage);
 	if (Critical)
 	{
-		Monster->MonDamage->SetRenderScale(FVector2D(1.3,1.3));
-		Monster->MonDamage->Damage->SetColorAndOpacity(FSlateColor(FLinearColor::Yellow));
-		Monster->MonDamage->Damage->SetShadowColorAndOpacity(FLinearColor::Black);
+		Creature->MonDamage->SetRenderScale(FVector2D(1.3,1.3));
+		Creature->MonDamage->Damage->SetColorAndOpacity(FSlateColor(FLinearColor::Yellow));
+		Creature->MonDamage->Damage->SetShadowColorAndOpacity(FLinearColor::Black);
 	}
 	
 	if (Monster->MonsterStruct.CurrentHp <= 0)
@@ -69,6 +84,15 @@ void UCreFsm::AttackMonster(AMonster* Monster)
 		GetMonGold(Monster);
 		SetCreStat();
 	}
+}
+
+void UCreFsm::DamageUiDestroy(UWidgetComponent* DamageComp)
+{
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,DamageComp]()
+	{
+		DamageComp->DestroyComponent();
+	},1.0f,false);
 }
 
 void UCreFsm::SetCreStat()

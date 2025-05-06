@@ -35,7 +35,6 @@ void AMonster::BeginPlay()
 	Super::BeginPlay();
 
 	MonsterParent = MonsterFactory->GetDefaultObject<AMonster>();
-	
 	MonUi = CreateWidget<UMonUi>(GetWorld(),MonsterParent->MonUiFactory);
 	
 	MonUiComp->SetWidget(MonUi);

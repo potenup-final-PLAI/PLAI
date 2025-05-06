@@ -58,8 +58,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AItemMaster> ItemMasterFactory;
 	
-
-	
 	UPROPERTY(EditAnywhere)
 	FMonsterStruct MonsterStruct;
 
