@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "PLAI/Item/Monster/Monster.h"
+#include "PLAI/Item/Monster/MonsterMaster.h"
 #include "MonTrog.generated.h"
 
 UCLASS()
-class PLAI_API AMonTrog : public AMonster
+class PLAI_API AMonTrog : public AMonsterMaster
 {
 	GENERATED_BODY()
 
