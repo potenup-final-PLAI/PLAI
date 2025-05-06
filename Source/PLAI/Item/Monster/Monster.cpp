@@ -35,6 +35,7 @@ void AMonster::BeginPlay()
 	Super::BeginPlay();
 
 	MonsterParent = MonsterFactory->GetDefaultObject<AMonster>();
+	
 	MonUi = CreateWidget<UMonUi>(GetWorld(),MonsterParent->MonUiFactory);
 	MonUiComp->SetWidget(MonUi);
 	MonUiComp->SetDrawSize(FVector2D(300.f, 45.f));
@@ -98,7 +99,7 @@ void AMonster::Dead()
 
 void AMonster::DamageUi(float Damage)
 {
-	MonDamage = CreateWidget<UMonDamage>(GetWorld(),MonDamageFactory);
+	MonDamage = CreateWidget<UMonDamage>(GetWorld(),MonsterParent->MonDamageFactory);
 	MonDamage->Damage->SetText(FText::AsNumber(Damage));
 	
 	UWidgetComponent* MonDamageComp = NewObject<UWidgetComponent>(this);
@@ -124,7 +125,7 @@ void AMonster::DamageUiDestroy(UWidgetComponent* DamageComp)
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,DamageComp]()
 	{
 		DamageComp->DestroyComponent();
-	},2.0f,false);
+	},1.0f,false);
 }
 
 // FItemStructTable* ItemStructTable = MonsterParent->ItemTable->FindRow<FItemStructTable>(MonsterStruct.

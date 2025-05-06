@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PLAI/Item/Monster/MonUi/MonDamage.h"
 
 class AMonster;
 class ATestPlayer;
@@ -43,6 +44,9 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ACreBullet>CreBulletFactory;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UMonDamage>MonDamageFactory;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FCreStruct CreStruct;
