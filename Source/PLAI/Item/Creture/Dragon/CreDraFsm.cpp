@@ -174,7 +174,7 @@ void UCreDraFsm::DraAttackRangeFinish(float time)
 	Dragon->AddActorWorldRotation(FRotator(0,CurrentTime * 360,0));
 	if (FVector::Distance(Dragon->GetActorLocation(),LineTraceZ(Creature,Dragon->GetActorLocation())) < 50)
 	{
-		Drastate = EDraState::DraAttackSingleRange;
+		Drastate = EDraState::DraAttackSingleRange;	CurrentTime = 0;
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ParticlesSkills[1],
 		   LineTraceZ(Creature,Dragon->GetActorLocation()),
 		   FRotator(0,0,0),/*Scale=*/ FVector(3.f),/*bAutoDestroy=*/ true);
@@ -189,7 +189,6 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 	{ Drastate = EDraState::DraIdle; }
 	
 	Dragon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	// UE_LOG(LogTemp,Warning,TEXT("CreDraFsm 원거리공격 초시계%f"),CurrentTime)
     CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime > time)
 	{
