@@ -37,6 +37,7 @@ void AMonster::BeginPlay()
 	MonsterParent = MonsterFactory->GetDefaultObject<AMonster>();
 	
 	MonUi = CreateWidget<UMonUi>(GetWorld(),MonsterParent->MonUiFactory);
+	
 	MonUiComp->SetWidget(MonUi);
 	MonUiComp->SetDrawSize(FVector2D(300.f, 45.f));
 	MonUiComp->SetVisibility(true);
