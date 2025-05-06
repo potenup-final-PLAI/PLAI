@@ -17,4 +17,9 @@ class PLAI_API UMonDamage : public UUserWidget
 public:
 	UPROPERTY(meta = (BindWidget = "Widget"))
 	class UTextBlock* Damage;
+
+    UPROPERTY(meta =(BindWidgetAnim), Transient)
+	UWidgetAnimation* DamageUiAnimation;
+	
+	virtual void NativeConstruct() override;
 };

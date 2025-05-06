@@ -145,7 +145,7 @@ void UCreDraFsm::DraAttackRange(float time)
 		{
 			// UE_LOG(LogTemp,Warning,TEXT())
 			AttackMonster(Monster);
-			DrawDebugSphere(GetWorld(),Monster->GetActorLocation(),500,
+			DrawDebugSphere(GetWorld(),Monster->GetActorLocation(),300,
 				100,FColor::Black,false,.15); 
 		}
 		FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
@@ -236,17 +236,17 @@ void UCreDraFsm::DraAttackSingleRange(float Radios, float time)
 			{
 				UE_LOG(LogTemp,Warning,TEXT("CreDraFsm Bullet 없음"))
 			}
-			NearMonster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
-			NearMonster->SetHpBar();
-			NearMonster->DamageUi(CreatureDamage());
-
-			if (NearMonster->MonsterStruct.CurrentHp <= 0)
-			{
-				CreStruct.CurrentExp += NearMonster->MonsterStruct.Exp;
-				NearMonster->Dead();
-				SetCreStat();
-				GetMonGold(NearMonster);
-			}
+			AttackMonster(NearMonster);
+			// NearMonster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
+			// NearMonster->SetHpBar();
+			// NearMonster->DamageUi(CreatureDamage());
+			// if (NearMonster->MonsterStruct.CurrentHp <= 0)
+			// {
+			// 	CreStruct.CurrentExp += NearMonster->MonsterStruct.Exp;
+			// 	NearMonster->Dead();
+			// 	SetCreStat();
+			// 	GetMonGold(NearMonster);
+			// }
 			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
 	        NiagaraSkills[1],NearMonster->GetActorLocation(),FRotator::ZeroRotator,FVector(1.f),true, // AutoActivate                        
 	        true,// AutoDestroy
@@ -319,17 +319,20 @@ void UCreDraFsm::DraAttackMulti(float time)
 			if (FVector::Dist(Monster->GetActorLocation(),Dragon->GetActorLocation()) < 50.0f)
 			{
 				FinishCount++;
-				Monster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
-				Monster->SetHpBar();
-				Monster->DamageUi(CreatureDamage());
-
-				if (Monster->MonsterStruct.CurrentHp <= 0)
-				{
-					CreStruct.CurrentExp += Monster->MonsterStruct.Exp;
-					Monster->Dead();
-					SetCreStat();
-					GetMonGold(Monster);
-				}
+				AttackMonster(Monster);
+				
+				// Monster->MonsterStruct.CurrentHp -= Dragon->CreFsm->CreStruct.Atk;
+				// Monster->SetHpBar();
+				// Monster->DamageUi(CreatureDamage());
+				//
+				// if (Monster->MonsterStruct.CurrentHp <= 0)
+				// {
+				// 	CreStruct.CurrentExp += Monster->MonsterStruct.Exp;
+				// 	Monster->Dead();
+				// 	SetCreStat();
+				// 	GetMonGold(Monster);
+				// }
+				
 				Monsters.RemoveAt(0);
 				int32 index = 0;
 				FinishCount == 2 ? index = 2 : index = 1;  

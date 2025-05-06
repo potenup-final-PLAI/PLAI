@@ -103,11 +103,12 @@ void AMonster::DamageUi(float Damage)
 	
 	UWidgetComponent* MonDamageComp = NewObject<UWidgetComponent>(this);
 	MonDamageComp->SetupAttachment(GetRootComponent());
-	// MonDamageComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+	
 	MonDamageComp->RegisterComponent();
 	MonDamageComp->SetWidget(MonDamage);
-	MonDamageComp->SetRelativeLocation(FVector(0,0,25));
-	MonDamageComp->SetDrawSize(FVector2D(500.f,80.f));
+	float DamageLoc = FMath::FRandRange(-50.0f,50.0f);
+	MonDamageComp->SetRelativeLocation(FVector(DamageLoc,DamageLoc,DamageLoc));
+	MonDamageComp->SetDrawSize(FVector2D(150.f,30.f));
 	MonDamageComp->SetWidgetSpace(EWidgetSpace::Screen);
 	
 	DamageUiDestroy(MonDamageComp);

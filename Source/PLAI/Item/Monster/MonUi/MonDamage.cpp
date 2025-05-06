@@ -2,3 +2,9 @@
 
 
 #include "MonDamage.h"
+
+void UMonDamage::NativeConstruct()
+{
+	Super::NativeConstruct();
+	PlayAnimation(DamageUiAnimation,0,2);
+}

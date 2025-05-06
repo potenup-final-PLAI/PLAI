@@ -8,6 +8,7 @@
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/Monster/Monster.h"
+#include "PLAI/Item/Monster/MonUi/MonDamage.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/UiCre/UiCre.h"
@@ -44,11 +45,26 @@ void UCreFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 
 void UCreFsm::AttackMonster(AMonster* Monster)
 {
-	Monster->MonsterStruct.CurrentHp -= Creature->CreFsm->CreStruct.Atk;
+	bool Critical = false;
+	int Damage = 0;
+	if (CreStruct.Crit > FMath::FRandRange(0.0f,100.0f))
+	{ Damage = CreStruct.Atk + CreStruct.Atk*CreStruct.CritDmg/100; Critical = true; }
+	else { Damage = CreStruct.Atk; }
+    Damage = FMath::FRandRange(Damage * 0.9,Damage * 1.1);
+	
+	Monster->MonsterStruct.CurrentHp -= Damage;
 	Monster->SetHpBar();
+	Monster->DamageUi(Damage);
+	if (Critical)
+	{
+		Monster->MonDamage->SetRenderScale(FVector2D(1.3,1.3));
+		Monster->MonDamage->Damage->SetColorAndOpacity(FSlateColor(FLinearColor::Yellow));
+		Monster->MonDamage->Damage->SetShadowColorAndOpacity(FLinearColor::Black);
+	}
+	
 	if (Monster->MonsterStruct.CurrentHp <= 0)
 	{
-		Monster->DamageUi(CreatureDamage());
+		CreStruct.CurrentExp += Monster->MonsterStruct.Exp;
 		Monster->Dead();
 		GetMonGold(Monster);
 		SetCreStat();
