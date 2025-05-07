@@ -9,6 +9,9 @@ struct FTraitStructTable : public FTableRowBase
 public:
 	UPROPERTY(EditAnywhere)
 	FName Trait = FName(TEXT("Trait"));
+
+	UPROPERTY(EditAnywhere)
+	FString TraitStat = FString("TraitStat");
 	
 	UPROPERTY(EditAnywhere)
 	int32 Hp = 0;

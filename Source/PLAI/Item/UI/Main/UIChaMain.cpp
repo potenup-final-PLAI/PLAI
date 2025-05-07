@@ -48,9 +48,9 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 			if (TraitStruct->Trait == UserFullInfo->character_info.traits[index])
 			{
 				UTextBlock* TraitStatName = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("UiChaMain"));
-
-				TraitStatName->SetText(FText::FromName(TraitStruct->Trait));
-				TraitsStatValue->AddChild(TraitStatName);
+				TraitStatName->SetFont(FSlateFontInfo(TraitStatName->GetFont().FontObject, 18));
+				TraitStatName->SetText(FText::FromString(TraitStruct->TraitStat));
+				TraitsStatNameBox->AddChild(TraitStatName);
 			}
 		}
 		
@@ -91,25 +91,6 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("UicahMain SetUiChaStat 경험치 안들어옴"))
 	}
-}
-
-void UUIChaMain::SetUiChaTrait(FUserFullInfo* UserFullInfo)
-{
-	int32 index = 0;
-	for (FString trait : UserFullInfo->character_info.traits)
-	{
-		TArray<FName>Traits = UiMain->LoginComp->TraitStructTable->GetRowNames();
-		for (FName Trait : Traits)
-		{
-			FTraitStructTable* TraitStruct = UiMain->LoginComp->TraitStructTable->FindRow<FTraitStructTable>(Trait,TEXT("UiChaMain"));
-			if (TraitStruct->Trait == UserFullInfo->character_info.traits[index])
-			{
-				UTextBlock* TraitStatName = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("UiChaMain"));
-
-				TraitStatName->SetText(FText::FromName(TraitStruct->Trait));
-				TraitsStatValue->AddChild(TraitStatName);
-			}
-		}
 }
 
 void UUIChaMain::OnLoadMeInfo()

@@ -30,10 +30,10 @@ public:
 	class UVerticalBox* TraitsName;
 	
 	UPROPERTY(meta = (BindWidget))
-	class UVerticalBox* TraitsStatName;
+	class UVerticalBox* TraitsStatNameBox;
 
-	UPROPERTY(meta = (BindWidget))
-	class UVerticalBox* TraitsStatValue;
+	// UPROPERTY(meta = (BindWidget))
+	// class UVerticalBox* TraitsStatValueBox;
 
 	// 오른쪽 위 캐릭터
 	UPROPERTY(meta = (BindWidget))
@@ -75,7 +75,6 @@ public:
 	class UUiMain* UiMain;
 
 	void SetUiChaStat(FUserFullInfo* UserFullInfo);
-	void SetUiChaTrait(FUserFullInfo* UserFullInfo);
 
 	UFUNCTION()
 	void OnLoadMeInfo();
