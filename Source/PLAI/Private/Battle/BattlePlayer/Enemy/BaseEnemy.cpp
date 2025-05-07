@@ -6,7 +6,6 @@
 #include "BasePlayerState.h"
 #include "GridTile.h"
 #include "GridTileManager.h"
-#include "Battle/TurnSystem/PhaseManager.h"
 #include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
@@ -24,7 +23,7 @@ void ABaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABaseBattlePawn::TryInitStatus, 0.1f, true);
+	// GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABaseBattlePawn::TryInitStatus, 0.1f, true);
 }
 
 // Called every frame
@@ -121,7 +120,7 @@ void ABaseEnemy::FindAndAttackPlayer()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Detected Player"));
 			// 플레이어가 있다면 공격
-			this->BaseAttack(detectedPlayer);
+			this->ApplyAttack(detectedPlayer, EActionMode::Poison);
 			break;
 		}
 	}
@@ -133,9 +132,9 @@ void ABaseEnemy::FindAndAttackPlayer()
 void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 {
 	// 본인이 서버에서 지시된 캐릭터인지 확인
-	if (actionRequest.current_character_id != GetName())
+	if (actionRequest.current_character_id != this->GetName())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("actionRequest not for this enemy: %s"), *GetName());
+		UE_LOG(LogTemp, Warning, TEXT("actionRequest not for this enemy: %s"), *this->GetName());
 		return;
 	}
 
@@ -172,7 +171,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		ABaseBattlePawn* Target = FindUnitById(Action.target_character_id);
 		if (Target)
 		{
-			BaseAttack(Target); // 공격 실행
+			ApplyAttack(Target, EActionMode::BaseAttack); // 공격 실행
 		}
 	}
 

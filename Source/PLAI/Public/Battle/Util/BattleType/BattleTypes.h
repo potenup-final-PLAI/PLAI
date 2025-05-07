@@ -43,7 +43,7 @@ struct FEnvironmentState
 	FString weather = "";
 };
 
-//-------Action API 캐릭터 상태 정보-------
+//-------Action API 보낼 데이터 구조체-------
 USTRUCT(BlueprintType)
 struct FCharacterStatus
 {
@@ -67,7 +67,25 @@ struct FCharacterStatus
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> status_effects = {};
 };
-//-------Action API 전체 게임 상태 데이터-------
+USTRUCT(BlueprintType)
+struct FBattleTurnState
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 cycle = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 turn = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString current_character_id = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FCharacterStatus> characters = {};
+};
+
+//-------Action API Response 받은 데이터--------
 USTRUCT(BlueprintType)
 struct FBattleAction
 {
@@ -91,7 +109,6 @@ struct FBattleAction
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 remaining_mov = 0;
 };
-
 USTRUCT(BlueprintType)
 struct FActionRequest
 {
@@ -102,24 +119,6 @@ struct FActionRequest
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FBattleAction> actions = {};
-};
-
-USTRUCT(BlueprintType)
-struct FBattleTurnState
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 cycle = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 turn = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString current_character_id = "";
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FCharacterStatus> characters = {};
 };
 
 // 캐릭터 스텟
@@ -146,12 +145,42 @@ struct FBaseStatus
 	int32 speed = 0;
 	UPROPERTY()
 	int32 points = 0;
+	UPROPERTY()
+	TArray<FString> traits = {};
+	UPROPERTY()
+	TArray<FString> skills = {};
 };
 UENUM(BlueprintType)
 enum class ELifeState : uint8
 {
 	Alive UMETA(DisplayName = "Alive"),
 	Dead UMETA(DisplayName = "Dead"),
+};
+
+UENUM(BlueprintType)
+enum class EActionMode : uint8
+{
+	None UMETA(DisplayName = "None"),
+	TurnEnd UMETA(DisplayName = "TurnEnd"),
+	Move UMETA(DisplayName = "Move"),
+	BaseAttack UMETA(DisplayName = "BaseAttack"),
+	Paralysis UMETA(DisplayName = "Paralysis"),
+	Poison UMETA(DisplayName = "Poison"),
+	Vulnerable UMETA(DisplayName = "Vulnerable"),
+	Weakening UMETA(DisplayName = "Weakening"),
+	Fatal UMETA(DisplayName = "Fatal"),
+	Rupture UMETA(DisplayName = "Rupture"),
+	Roar UMETA(DisplayName = "Roar"),
+	BattleCry UMETA(DisplayName = "BattleCry")
+};
+UENUM(BlueprintType)
+enum class EStatusEffect : uint8
+{
+	Poison UMETA(DisplayName = "Poison"),
+	Vulnerable UMETA(DisplayName = "Vulnerable"),
+	Weakening UMETA(DisplayName = "Weakening"),
+	Angry UMETA(DisplayName = "Angry"),
+	Bleeding UMETA(DisplayName = "Bleeding")
 };
 /**
  * 

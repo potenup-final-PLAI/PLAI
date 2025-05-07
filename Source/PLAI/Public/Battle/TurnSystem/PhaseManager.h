@@ -89,15 +89,12 @@ public:
 
 	//--------------Test ------------------
 	bool bAPITest = true;
-	FTimerHandle timerAPIHandle;
-	FTimerHandle timerSetStateHandle;
+	FTimerHandle timerBattleStartHandle;
 
-	bool bAllUnitsReady = false;
+	void SetBeforeBattle();
 	
 	void TrySendInitialState();
 	FEnvironmentState SetStartBattleAPI();
-
-	void CheckAllUnitsReady();
 	
 	// HttpActor 탐색용
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Phase")
@@ -106,4 +103,23 @@ public:
 	FBattleTurnState SetBattleProcessingAPI();
 	void TrySendbattleState(ABaseBattlePawn* unit);
 	bool AreAllUnitsInitialized() const;
+
+	//GridTileManager
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	class AGridTileManager* gridTileManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Phase")
+	TSubclassOf<class AGridTileManager> girdTileManagerFactory;
+
+	//-------------Set Status-----------------------
+	bool bIsInitialized = false;
+	
+	UFUNCTION()
+	void TryInitStatus(ABaseBattlePawn* unit);
+	void SetStatus(ABaseBattlePawn* unit);
+
+	//------------Status 이름 변경--------------------
+	FString GetStatusEffectsString(EStatusEffect effect);
+	
+	
 };

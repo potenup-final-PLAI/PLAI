@@ -27,10 +27,6 @@ public:
 	class UInputAction* IA_Move;
 
 	//--------------Player Status--------------------
-
-
-	
-	
 	
 };
 

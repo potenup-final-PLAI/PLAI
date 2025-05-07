@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BasePlayerState.h"
 #include "InputActionValue.h"
+#include "Enemy/EnemyBattleState.h"
 #include "GameFramework/Pawn.h"
+#include "Player/BattlePlayerState.h"
 #include "BaseBattlePawn.generated.h"
 
 UCLASS()
@@ -35,7 +36,46 @@ public:
 	void OnTurnEnd();
 
 	//------------Skill System-----------------
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
+	EActionMode currentActionMode = EActionMode::None;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	bool bBaseAttack = true;
+	
+	// 플레이어 스킬들
+	void PlayerMove(FHitResult& hitInfo);
+	void PlayerBaseAttack(FHitResult& hitInfo);
+	void PlayerParalysis(FHitResult& hitInfo);
+	void PlayerPoison(FHitResult& hitInfo);
+	void PlayerVulnerable(FHitResult& hitInfo);
+	void PlayerWeaking(FHitResult& hitInfo);
+	void PlayerFatal(FHitResult& hitInfo);
+	void PlayerRupture(FHitResult& hitInfo);
+	void PlayerRoar(FHitResult& hitInfo);
+	void PlayerBattleCry(FHitResult& hitInfo);
+	
+	// 대미지 전달 함수
+	void ApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
+	
+	// 상태이상과 지속 턴 
+	TMap<EStatusEffect, int32> activeStatusEffects;
+	
+	// 상태이상 관리 함수
+	void AddStatusEffect(EStatusEffect newEffect, int32 duration);
+	void ApplyStatusEffect();
+	void HandleStateusEffect(EStatusEffect effect);
+	
+	// 약화 상태이상 처리 함수
+	// player 상태 처리
+	void WeakeningProcess(ABattlePlayerState* playerState);
+	void VulnerableProcess(ABattlePlayerState* playerState);
+	void AngryProcess(ABattlePlayerState* playerState);
+	void BleedingProcess(ABattlePlayerState* playerState);
+	// enemy 상태 처리
+	void WeakeningEnemyProcess(UEnemyBattleState* enemyState);
+	void VulnerableEnemyProcess(UEnemyBattleState* enemyState);
+	void AngryEnemyProcess(UEnemyBattleState* enemyState);
+	void BleedingEnemyProcess(UEnemyBattleState* enemyState);
+	
 	//---------------TEST-------------------
 	// Player 움직임
 	// UI 눌렀을 때 그쪽으로 이동하도록
@@ -44,25 +84,65 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
 	TSubclassOf<class AGridTileManager> TileManagerFactory;
 
+	// PlayerState 부분
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
-	class ABasePlayerState* state;
+	class ABattlePlayerState* battlePlayerState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
+	TArray<FString> playerSkills = {
+		TEXT("타격"),
+	    TEXT("마비의 일격"),
+	    TEXT("맹동 공격"),
+	    TEXT("취약 타격"),
+	    TEXT("약화의 일격"),
+	    TEXT("치명 일격"),
+	    TEXT("파열 참격"),
+		TEXT("포효"),
+		TEXT("전투의 외침")
+	};
 	
-	void TestClick();
+	// Enemy State 부분
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
+	class UEnemyBattleState* enemybattleState;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
+	TArray<FString> enemySkills = {
+		TEXT("타격"),
+	    TEXT("마비의 일격"),
+	    TEXT("몸통 박치기"),
+	    TEXT("맹동 공격"),
+	    TEXT("취약 타격"),
+	    TEXT("약화의 일격"),
+	    TEXT("치명 일격"),
+	    TEXT("파열 참격"),
+		TEXT("대지 가르기"),
+		TEXT("독침 찌르기"),
+		TEXT("이빨 물기"),
+		TEXT("날카로운 발톱"),
+		TEXT("단단한 갑각"),
+		TEXT("생존 본능"),
+		TEXT("유연한 자세"),
+		TEXT("전투 준비"),
+		TEXT("방어 지휘"),
+		TEXT("포효"),
+		TEXT("광란 유도"),
+		TEXT("전투의 외침")
+	};
+	// Enemy State Set
+	void InitEnemyState();
+	
+	// 마우스 클릭 했을 때 처리 하는 부분
+	void OnMouseLeftClick();
 	void AddOpenByOffset(FIntPoint offset);
 
-	bool bIsInitialized = false;
-	FTimerHandle timerHandle;
-	UFUNCTION()
-	virtual void TryInitStatus();
-
+	// httpActor 담을 변수 선언
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
 	TSubclassOf<class ABattleHttpActor> httpActorFactory;
-	//-------------Set Status-----------------------
-	void SetStatus();
+
+	
 	//-------------Get Damage-----------------------
 	void GetDamage(ABaseBattlePawn* unit, int32 damage);
-	//-------------Base Attack-----------------------
-	void BaseAttack(ABaseBattlePawn* targetUnit);
+
 	//------------Move System-----------------
 	// 이 변수에 들어있는 Block 들을 기준으로 상, 하, 좌, 우 검색 후 Cost 구해야 한다.
 	UPROPERTY(EditAnywhere)
@@ -106,7 +186,7 @@ public:
 
 	// 이동력 테스트 코드
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 moveRange = 7;
+	int32 moveRange = 0;
 	
 	// 골 위치를 클릭 했을 때 그쪽으로 이동
 	void UnitMove();

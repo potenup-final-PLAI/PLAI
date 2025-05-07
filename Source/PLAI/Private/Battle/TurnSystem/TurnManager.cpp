@@ -59,6 +59,7 @@ void ATurnManager::StartPlayerTurn()
 {
 	if (curTurnState == ETurnState::TurnEnd && curTurnState == ETurnState::PlayerTurn && curTurnState == ETurnState::EnemyTurn) return;
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Player Turn"));
+	// Player 턴 시작
 	SetTurnState(ETurnState::PlayerTurn);
 	
 	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
