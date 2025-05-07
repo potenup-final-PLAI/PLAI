@@ -374,6 +374,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemHelmet->ItemStructTable = ItemStructTable;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemHelmet->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
+		ItemHelmet->StaticMesh->SetRelativeRotation(FRotator(0,90,-90));
 
 		if (ItemStructTable.Material)
 		{ ItemHelmet->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
