@@ -75,6 +75,7 @@ public:
 	class UUiMain* UiMain;
 
 	void SetUiChaStat(FUserFullInfo* UserFullInfo);
+	void SetUiChaTrait(FUserFullInfo* UserFullInfo);
 
 	UFUNCTION()
 	void OnLoadMeInfo();
