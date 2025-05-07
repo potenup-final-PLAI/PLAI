@@ -386,6 +386,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemGlove->ItemStructTable = ItemStructTable;
 		// ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
 		ItemGlove->SetActorRelativeRotation(FRotator(-90,0,0));
+		ItemGlove->AddActorLocalOffset(FVector(0,0,-150));
 		ItemGlove->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		
 		if (ItemStructTable.Material)

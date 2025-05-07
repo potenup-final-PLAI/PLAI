@@ -94,7 +94,7 @@ void ULogItemComp::HttpEquipPost(FString JsonString)
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 	
-	httpRequest->SetURL(TEXT("https://718f-221-148-189-129.ngrok-free.app/service1/items/upsert/equipment"));
+	httpRequest->SetURL(TEXT("https://919e-221-148-189-129.ngrok-free.app/service1/items/upsert/equipment"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	httpRequest->SetContentAsString(JsonString);
@@ -163,7 +163,7 @@ void ULogItemComp::HttpInvenPost(FString JsonString)
 	UE_LOG(LogTemp,Warning,TEXT("LogItemComp, 아이템 정보 넘기기 "))
     FNgrok Ngrok;
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
-	httpRequest->SetURL("https://718f-221-148-189-129.ngrok-free.app/service1/items/upsert/inventory");
+	httpRequest->SetURL("https://919e-221-148-189-129.ngrok-free.app/service1/items/upsert/inventory");
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 

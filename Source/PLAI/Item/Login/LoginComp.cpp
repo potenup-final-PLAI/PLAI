@@ -397,7 +397,7 @@ void ULoginComp::HttpCreatePost(FString CharacterName)
 void ULoginComp::ConnectWebSocket()
 {
 	const FString URL = FString::Printf(TEXT(
-		"wss://718f-221-148-189-129.ngrok-free.app/service1/ws/characters/create/%s"),*UserFullInfo.user_id);
+		"wss://919e-221-148-189-129.ngrok-free.app/service1/ws/characters/create/%s"),*UserFullInfo.user_id);
 	
 	UE_LOG(LogTemp,Warning,TEXT("LoginComp WebSocket 연결된 주소[%s]"),*URL)
 	const FString Protocol = TEXT("");

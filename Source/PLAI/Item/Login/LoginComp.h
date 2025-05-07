@@ -20,7 +20,7 @@ struct FNgrok
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere)
-	FString Ngrok = FString("https://718f-221-148-189-129.ngrok-free.app/service1");
+	FString Ngrok = FString("https://919e-221-148-189-129.ngrok-free.app/service1");
 };
 
 // 서버 가입 요청 토큰
