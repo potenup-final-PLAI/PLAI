@@ -32,6 +32,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* TraitsStatName;
 
+	UPROPERTY(meta = (BindWidget))
+	class UVerticalBox* TraitsStatValue;
+
 	// 오른쪽 위 캐릭터
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Level;

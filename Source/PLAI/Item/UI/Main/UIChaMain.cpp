@@ -16,6 +16,7 @@
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/TestPlayer/TraitStructTable/TraitStructTable.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
@@ -40,6 +41,16 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 	int32 index = 0;
 	for (FString trait : UserFullInfo->character_info.traits)
 	{
+        TArray<FName>Traits = UiMain->LoginComp->TraitStructTable->GetRowNames();
+		for (FName Trait : Traits)
+		{
+			FTraitStructTable* TraitStruct = UiMain->LoginComp->TraitStructTable->FindRow<FTraitStructTable>(Trait,TEXT("UiChaMain"));
+			if (TraitStruct->Trait == UserFullInfo->character_info.traits[index])
+			{
+				
+			}
+		}
+		
 		UTextBlock* NewTB = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 		NewTB->SetText(FText::FromString(UserFullInfo->character_info.traits[index]));
 
