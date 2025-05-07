@@ -141,6 +141,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FUserFullInfo UserFullInfo;
+
+	UPROPERTY(EditAnywhere)
+	UDataTable* TraitStructTable;
 	
     UPROPERTY(EditAnywhere)
 	FString User_id = FString("user_id");
@@ -183,6 +186,8 @@ public:
 	void Client_HttpMePost();
 	void HttpMePost();
 
+    void SetTrait();
+	
 	void LoadEquipItem();
 	void LoadInvenItem();
 

@@ -27,7 +27,10 @@ public:
 	// class UTextBlock* Traits;
 
 	UPROPERTY(meta = (BindWidget))
-	class UWrapBox* TraitsBox;
+	class UVerticalBox* TraitsName;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UVerticalBox* TraitsStatName;
 
 	// 오른쪽 위 캐릭터
 	UPROPERTY(meta = (BindWidget))

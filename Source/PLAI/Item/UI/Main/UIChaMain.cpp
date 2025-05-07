@@ -7,9 +7,11 @@
 #include "UiMain.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Button.h"
+#include "Components/HorizontalBox.h"
 #include "Components/ProgressBar.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
@@ -30,7 +32,7 @@ void UUIChaMain::NativeConstruct()
 
 void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 {
-	if (!UserFullInfo || TraitsBox->GetAllChildren().Num() > 1)
+	if (!UserFullInfo || TraitsName->GetAllChildren().Num() > 1)
     {
     	UE_LOG(LogTemp,Warning,TEXT("UiChaMain UserFUllinfo 아직 안들어옴여 || 이미 있음"))
 	    return;
@@ -38,7 +40,6 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 	int32 index = 0;
 	for (FString trait : UserFullInfo->character_info.traits)
 	{
-		
 		UTextBlock* NewTB = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 		NewTB->SetText(FText::FromString(UserFullInfo->character_info.traits[index]));
 
@@ -47,7 +48,7 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 		// NewTB->SetFont(FontInfo);
 		
 		NewTB->SetFont(FSlateFontInfo(NewTB->GetFont().FontObject, 18));
-		TraitsBox->AddChild(NewTB);
+		TraitsName->AddChild(NewTB);
 		index++;
 	}
 	

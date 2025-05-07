@@ -19,6 +19,7 @@
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Npc/NpcNet.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/TestPlayer/TraitStructTable/TraitStructTable.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Main/UIChaMain.h"
@@ -291,6 +292,11 @@ void ULoginComp::HttpMePost()
 		}
 	});
 	httpRequest->ProcessRequest();
+}
+
+void ULoginComp::SetTrait()
+{
+	
 }
 
 void ULoginComp::LoadEquipItem()
