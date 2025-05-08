@@ -47,14 +47,15 @@ void UInvenComp::BeginPlay()
 	{
 		MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
 	}
-	// if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-	// {
-	// 	if (WorldGi->bBattleReward == true)
-	// 	{
-	// 		TurnReward();
-	// 		WorldGi->bBattleReward = false;
-	// 	}
-	// }
+	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+	{
+		if (WorldGi->bBattleReward == true)
+		{
+			MenuInven->AddToViewport();
+			TurnReward();
+			WorldGi->bBattleReward = false;
+		}
+	}
 }
 
 // Called every frame
@@ -540,7 +541,7 @@ void UInvenComp::TurnReward()
 	UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
 	UiTurnReward->AddToViewport();
 	
-    UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UUiTurnRewardFactory);
+    UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UiTurnReward->UiTurnRewardImageFactory);
 	if (UiTurnReward->UiTurnRewardImage)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 이미지 생성"))
@@ -550,10 +551,10 @@ void UInvenComp::TurnReward()
 		UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 이미지 생성실패"))
 	}
 	
-	// FSlateBrush Brush;
-	// Brush.SetResourceObject(ItemStructTable->Texture);
-	// UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
-	// UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
+	FSlateBrush Brush;
+	Brush.SetResourceObject(ItemStructTable->Texture);
+	UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
+	UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
 	
 	Server_GetItem(*ItemStructTable);
 
