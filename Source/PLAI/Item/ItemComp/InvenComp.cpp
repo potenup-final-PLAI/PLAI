@@ -3,6 +3,7 @@
 
 #include "InvenComp.h"
 
+#include "CreComp.h"
 #include "JsonObjectConverter.h"
 #include "StoreComp.h"
 #include "Components/BoxComponent.h"
@@ -23,6 +24,7 @@
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
+#include "PLAI/Item/UI/Slot/SlotCre.h"
 
 
 // Sets default values for this component's properties
@@ -48,10 +50,6 @@ void UInvenComp::BeginPlay()
 	if (TestPlayer->IsLocallyControlled())
 	{
 		MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
-		MenuInven->AddToViewport();
-		MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
-		MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
-		MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -60,7 +58,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     // 데이터테이블 템 먹기
-	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
+	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::T)){ CatchItem();}
 
     //임시함수임
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::P)){ SetGold(500);}
@@ -81,6 +79,39 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
 		Server_SpawnOneItem();
+	}
+	// 소환수 크리처 소환하기 임시
+	if (TestPlayer->HasAuthority() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Five))
+	{
+		TArray<FName> RawNames = ItemDataTable->GetRowNames();
+		if (RawNames.IsValidIndex(33))
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
+			FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
+            TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable);
+
+			// ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
+			// ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
+			//
+			// ItemMaster->ItemStructTable = *ItemStructTable;
+			// ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+			// ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
+			// ItemMaster->SetActorScale3D(FVector(0.3,0.3,0.3));
+			//
+			// FActorSpawnParameters SpawnParams;
+			// SpawnParams.bNoFail = true; // 실패하지 않게 설정
+			// SpawnParams.bDeferConstruction = true;
+			// SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			// ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTable->CreatureFactory,
+			// 	FVector(0,0,3000),FRotator(0,0,0),SpawnParams);
+			// Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
+			// TestPlayer->CreComp->EquipCreature(Creature);
+			// Creature->ItemStructTable = *ItemStructTable;
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?"))
+		}
 	}
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
@@ -158,8 +189,12 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 void UInvenComp::SetGold(int32 Getgold)
 {
-	Gold += Getgold;
-	MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(Gold));
+	if (TestPlayer->IsLocallyControlled())
+	{
+		Gold += Getgold;
+		MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(Gold));
+		MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(Gold));
+	}
 }
 
 void UInvenComp::Server_SpawnOneItem_Implementation()
@@ -266,7 +301,7 @@ void UInvenComp::GetItem(const FItemStructTable& ItemStructTable)
 	for (UWidget* Widget : MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
 	{
 		USlot* Slot = Cast<USlot>(Widget);
-		if (Slot && Slot->ItemStructTable.ItemTop == ItemStructTable.ItemTop &&Slot->ItemStructTable.ItemIndex == ItemStructTable.ItemIndex
+		if (Slot && Slot->ItemStructTable.ItemTop != 1 && Slot->ItemStructTable.ItemTop == ItemStructTable.ItemTop &&Slot->ItemStructTable.ItemIndex == ItemStructTable.ItemIndex
 			&&Slot->ItemStructTable.ItemIndexType == ItemStructTable.ItemIndexType 
 			&&Slot->ItemStructTable.ItemIndexDetail == ItemStructTable.ItemIndexDetail)
 		{
@@ -315,6 +350,9 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemWeapon->ItemStructTable = ItemStructTable;
 		ItemWeapon->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+
+		if (ItemStructTable.Material)
+		{ ItemWeapon->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 	else if (SlotType == EquipSlotType::Armor)
 	{
@@ -323,7 +361,11 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("spine_02Socket"));
 		ItemArmor->ItemStructTable = ItemStructTable;
 		ItemArmor->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
+		ItemArmor->SetActorLocation(ItemArmor->GetActorLocation() + FVector(0,0,35));
 		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+		
+		if (ItemStructTable.Material)
+		{ ItemArmor->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 	else if (SlotType == EquipSlotType::Helmet)
 	{
@@ -332,8 +374,10 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemHelmet->ItemStructTable = ItemStructTable;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemHelmet->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
- 
-		// ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
+		ItemHelmet->StaticMesh->SetRelativeRotation(FRotator(0,90,-90));
+
+		if (ItemStructTable.Material)
+		{ ItemHelmet->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 	else if (SlotType == EquipSlotType::Gloves)
 	{
@@ -343,7 +387,11 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemGlove->ItemStructTable = ItemStructTable;
 		// ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
 		ItemGlove->SetActorRelativeRotation(FRotator(-90,0,0));
+		ItemGlove->AddActorLocalOffset(FVector(0,0,-150));
 		ItemGlove->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
+		
+		if (ItemStructTable.Material)
+		{ ItemGlove->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 	else if (SlotType == EquipSlotType::Boots)
 	{
@@ -356,6 +404,9 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
 		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
 		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
+		
+		if (ItemStructTable.Material)
+		{ Itemboots->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 }
 
@@ -397,9 +448,7 @@ void UInvenComp::CatchItem()
 	TArray<FHitResult> Hits;
 	FCollisionQueryParams Params;
 	FVector Loc = TestPlayer->GetActorLocation();
-		
 	DrawDebugBox(GetWorld(),Loc+TestPlayer->GetActorForwardVector()*250,FVector(100,100,100),FColor::Red,false, 1.0f);
-
 	bool hitinfo = GetWorld()->SweepMultiByChannel(Hits,Loc + TestPlayer->GetActorForwardVector() * 250,Loc + TestPlayer->GetActorForwardVector() * 250,
 		FQuat::Identity,ECC_Visibility,FCollisionShape::MakeBox(FVector(100,100,100)),Params);
 	if (hitinfo)
@@ -445,14 +494,7 @@ void UInvenComp::LoadItemInventory()
 	{
 		USlot* Slot = Cast<USlot>(MenuInven->WBP_ItemInven->WrapBox->GetChildAt(i));
 		Slot->ItemStructTable = ItemStructTables.ItemStructTables[i];
-		if (Slot->ItemStructTable.ItemTop == -1)
-		{
-			// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 슬롯 itemtop -1 리턴"));
-		}
-		else
-		{
-			Slot->SlotImageUpdate();
-		}
+		Slot->SlotImageUpdate();
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 로드"))
 }

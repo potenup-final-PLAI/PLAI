@@ -6,11 +6,13 @@
 #include "JsonObjectConverter.h"
 #include "LoginComp.h"
 #include "Components/VerticalBox.h"
+#include "Components/WrapBox.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 
 // Sets default values for this component's properties
@@ -42,7 +44,9 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::L))//장비창 불러오기
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::L키 장비창 불러오기"));
+		
 		GetEquipInfo();
+		GetInvenInfo();
 	}
 
 	// ...
@@ -90,7 +94,7 @@ void ULogItemComp::HttpEquipPost(FString JsonString)
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
 	
-	httpRequest->SetURL(TEXT("http://192.168.10.96:8054/items/upsert/equipment"));
+	httpRequest->SetURL(TEXT("https://919e-221-148-189-129.ngrok-free.app/service1/items/upsert/equipment"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	httpRequest->SetContentAsString(JsonString);
@@ -110,10 +114,73 @@ void ULogItemComp::HttpEquipPost(FString JsonString)
 }
 
 
-
-
 void ULogItemComp::GetInvenInfo()
 {
+	FPostInvenId PostInvenId;
+	FInvenTory_Info InvenToryInfo;
+
+	for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
+	{
+		if (USlot* Slot = Cast<USlot>(Widget))
+		{
+			int index = TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildIndex(Slot);
+			if (Slot->ItemStructTable.ItemTop == -1 || Slot->ItemStructTable.ItemTop == 3)
+			{
+				// UE_LOG(LogTemp,Warning,TEXT("LogItemComp, 여기 인벤슬롯 비었으니 넘어감 / %d"),index);
+				continue;
+			}
+			// 아직 서버 아이템 테이블에 안들어가있음
+			if (Slot->ItemStructTable.ItemTop == 0 && Slot->ItemStructTable.ItemIndex == 0 &&
+				Slot->ItemStructTable.ItemIndexType == 1)
+			{
+				continue;
+			}
+			
+			InvenToryInfo.item_id = Slot->ItemStructTable.Item_Id;
+			InvenToryInfo.Counts = Slot->ItemStructTable.ItemNum;
+
+			InvenToryInfo.options.attack = Slot->ItemStructTable.ItemStructStat.item_ATK;
+			InvenToryInfo.options.defense = Slot->ItemStructTable.ItemStructStat.item_DEF;
+			InvenToryInfo.options.resistance = Slot->ItemStructTable.ItemStructStat.item_RES;
+			InvenToryInfo.options.critical_damage = Slot->ItemStructTable.ItemStructStat.item_CRITDMG;
+			InvenToryInfo.options.critical_rate = Slot->ItemStructTable.ItemStructStat.Item_CRIT;
+			InvenToryInfo.options.hp = Slot->ItemStructTable.ItemStructStat.item_SHI;
+
+			PostInvenId.Inventory_info.Add(InvenToryInfo);
+		}
+	}
+	PostInvenId.character_id = TestPlayer->LoginComp->UserFullInfo.character_info.character_id;
+	PostInvenId.Gold = TestPlayer->LoginComp->UserFullInfo.inventory_info.gold;
+
+	FString jsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(PostInvenId,jsonString);
+	UE_LOG(LogTemp,Warning,TEXT("LogItemComp 인벤토리 정보 보내기 JsonString / %s"),*jsonString);
+	HttpInvenPost(jsonString);
+}
+
+void ULogItemComp::HttpInvenPost(FString JsonString)
+{
+	UE_LOG(LogTemp,Warning,TEXT("LogItemComp, 아이템 정보 넘기기 "))
+    FNgrok Ngrok;
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+	httpRequest->SetURL("https://919e-221-148-189-129.ngrok-free.app/service1/items/upsert/inventory");
+	httpRequest->SetVerb("POST");
+	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	httpRequest->SetContentAsString(JsonString);
+	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
+	{
+		if (bProcessedSuccessfully)
+		{
+			FString JsonString = HttpResponse->GetContentAsString();
+			UE_LOG(LogTemp,Warning,TEXT("LogItemComp Response->GetAsString %s"),*JsonString)
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("LogItemComp 인벤토리 정보 넘기기 실패 "))
+		}
+	});
+	httpRequest->ProcessRequest();
 }
 
 

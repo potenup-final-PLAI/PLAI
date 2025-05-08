@@ -35,7 +35,7 @@ class PLAI_API UUiMain : public UUserWidget
 	GENERATED_BODY()
 
 public:
-
+	//Ui Main
 	UPROPERTY(EditAnywhere)
 	class ULoginComp* LoginComp;
 
@@ -72,11 +72,25 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UUIChaMain* Wbp_UIChaMain;
 
+	UPROPERTY(meta = (BindWidget))
+	class UUiSUbMain* Wbp_UiSubMain;
+
+	UPROPERTY(meta = (BindWidget))
+	class UUIinitMain* Wbp_UiInitMain;
+	
 	// Init 클래스
     UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* CanvasInit;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ButtonInitEnd;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* ButtonCreate;
+
+    UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* CreatePost;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* InitPost;
 	
@@ -96,6 +110,9 @@ public:
 
 	UFUNCTION()
 	void Login();
+
+	UFUNCTION()
+	void CreateCharacter();
 	
 	
 	virtual void NativeConstruct() override;

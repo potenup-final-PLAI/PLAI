@@ -63,5 +63,8 @@ public:
 	void OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	// UFUNCTION()
+	// void HandleOldLevelLoaded();
+
 	void WarpLevel(class ATestPlayer* TestPlayer, int32 index);
 };

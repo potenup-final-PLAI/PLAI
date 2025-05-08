@@ -17,6 +17,8 @@ ACreature::ACreature()
 void ACreature::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CreatureParent = CreatureFactory->GetDefaultObject<ACreature>();
 }
 
 // Called every frame

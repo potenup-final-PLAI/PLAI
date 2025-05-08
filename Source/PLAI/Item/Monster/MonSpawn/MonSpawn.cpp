@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "PLAI/Item/Monster/Monster.h"
+#include "PLAI/Item/Monster/MonsterMaster.h"
 #include "Templates/Function.h"
 
 // Sets default values
@@ -19,66 +20,15 @@ AMonSpawn::AMonSpawn()
 void AMonSpawn::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// UIChaMain = CreateWidget<UUIChaMain>(GetWorld(),UUIChaMainFactory);
-	// UIChaMain->AddToViewport();
-	
-	UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 생성됨"));
 }
 
 // Called every frame
 void AMonSpawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// CurrentTime += DeltaTime;
-	
-	if (CurrentTime > 2)
-	{
-		UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 실행중"));
-		float x = FMath::RandRange(-1000,1000);
-		float y = FMath::RandRange(-1000,1000);
-		float z = FMath::RandRange(0,100);
-		
-		int32 RandMonsterIndex = FMath::RandRange(0, MonsterFactory.Num() - 1);
-		AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[RandMonsterIndex]);
-		
-		Monster->SetActorLocation(GetActorLocation() + FVector(x,y,z));
-		DrawDebugSphere(GetWorld(),GetActorLocation() + FVector(x,y,z),20,20,FColor::Red);
-		
-		UE_LOG(LogTemp,Warning,TEXT("MonSpawn 어디서 떨어지냐 %f %f %f"),x,y,z);
-		UE_LOG(LogTemp,Warning,TEXT("MonSpawn 몬스터는 어디서 떨어지냐 %f %f %f"),Monster->GetActorLocation().X,
-			Monster->GetActorLocation().Y,Monster->GetActorLocation().Z);
-		
-		Monsters.Add(Monster);
-		CurrentTime = 0;
-	}
-
-	//몬스터 생성 타이머
-	// MyTimer([this]()
-	// {
-	// 	UE_LOG(LogTemp,Warning,TEXT("MonsterSpwan 실행중"));
-	// 	float x = FMath::RandRange(-1000,1000);
-	// 	float y = FMath::RandRange(-1000,1000);
-	// 	float z = FMath::RandRange(0,100);
-	// 	
-	// 	int32 RandMonsterIndex = FMath::RandRange(0, MonsterFactory.Num() - 1);
-	// 	AMonster* Monster = GetWorld()->SpawnActor<AMonster>(MonsterFactory[RandMonsterIndex]);
-	// 	
-	// 	Monster->SetActorLocation(GetActorLocation() + FVector(x,y,z));
-	// 	DrawDebugSphere(GetWorld(),GetActorLocation() + FVector(x,y,z),20,20,FColor::Red);
-	// 	
-	// 	UE_LOG(LogTemp,Warning,TEXT("MonSpawn 어디서 떨어지냐 %f %f %f"),x,y,z);
-	// 	
-	// 	Monsters.Add(Monster);
-	// 	
-	// 	if (bTimer == true)
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("AMonSpawn:: 타이머 true"));
-	// 	}
-	// }, 2);
-
+	SpawnMonster();
 }
+
 
 void AMonSpawn::MyTimer(void(AMonSpawn::* Func)(), float Second)
 {
@@ -105,3 +55,91 @@ void AMonSpawn::MyTimer(TFunction<void()> Func, float Second)
 	}
 }
 
+FVector AMonSpawn::RandLocation(float X, float Y, float Z)
+{
+	float x = FMath::RandRange(-X, X);
+	float y = FMath::RandRange(-Y, Y);
+	float z = FMath::RandRange(0.0f, Z);
+	return FVector(x, y, z);
+}
+
+void AMonSpawn::SpawnMonster()
+{
+	// UWorld* World = GetWorld();
+	// if (!IsValid(World))
+	// { UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: GetWorld()가 유효하지 않습니다.")); return; }
+	// int32 FactoryCount = MonsterFactory.Num();
+	// if (FactoryCount <= 0)
+	// { UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: MonsterFactory가 비어 있습니다.")); return; }
+
+	
+	MyTimer([this]()
+	{
+		Monsters.RemoveAll([](AMonster* M){
+		  return !IsValid(M);});
+	   
+		FHitResult Hit;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+		FVector Start = GetActorLocation() + RandLocation(500,500) + FVector(0, 0, 1500);
+		FVector End = Start + FVector(0,0, -10000);
+		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start,End,ECC_Visibility,Params);
+		if (bHit)
+		{
+			if (Monsters.Num() > 6)return;
+			TArray<FName>Raws = MonsterTable->GetRowNames();
+			for (FName Raw : Raws)
+			{
+				FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
+				int32 index = static_cast<int32>(MonSpawnType);
+				if (MonsterStruct && MonsterStruct->MonsterTop == static_cast<int32>(MonSpawnType))
+				{
+					MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
+					int32 RandIndex = FMath::RandRange(0, Monsters.Num() - 1);
+				
+					FActorSpawnParameters SpawnParams;
+					SpawnParams.Owner = this;
+					SpawnParams.Instigator = GetInstigator();
+					SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+					
+					if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[RandIndex],
+						Hit.Location,FRotator(0,0,0),SpawnParams))
+					{
+						MonsterMaster->MonsterStruct = *MonsterStruct;
+						MonsterMaster->SetMonsterUi();
+						Monsters.Add(MonsterMaster);
+					}
+				}
+
+				
+				// FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
+				// if (MonsterStruct && MonsterStruct->MonsterTop == 0)
+				// {
+				// 	MonsterFactory.Add(MonsterStruct->MonsterFactory[0]);
+				// 	int32 RandIndex = FMath::RandRange(0, Monsters.Num() - 1);
+				//
+				// 	FActorSpawnParameters SpawnParams;
+				// 	SpawnParams.Owner = this;
+				// 	SpawnParams.Instigator = GetInstigator();
+				// 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				// 	
+				// 	if (AMonsterMaster* MonsterMaster = GetWorld()->SpawnActor<AMonsterMaster>(MonsterFactory[RandIndex],
+				// 		Hit.Location,FRotator(0,0,0),SpawnParams))
+				// 	{
+				// 		MonsterMaster->MonsterStruct = *MonsterStruct;
+				// 		MonsterMaster->SetMonsterUi();
+				// 		Monsters.Add(MonsterMaster);
+				// 	}
+				// }
+			}
+		}
+	},1.5);
+}
+
+
+
+
+
+
+// DrawDebugLine(GetWorld(),Start,Hit.ImpactPoint,FColor::Red,false,1.5f);
+// DrawDebugSphere(GetWorld(),Hit.ImpactPoint,20,10,FColor::Blue,false,1.5f);

@@ -6,6 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "MonSpawn.generated.h"
 
+UENUM(BlueprintType)
+enum class EMonSpawnType : uint8
+{
+	Mountain UMETA(DisplayName = "Mountain"),
+	Desert UMETA(DisplayName = "Desert"),
+	Dungeon UMETA(DisplayName = "Dungeon"),
+};
+
 UCLASS()
 class PLAI_API AMonSpawn : public AActor
 {
@@ -32,14 +40,28 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComp;
 
+    UPROPERTY(EditAnywhere)
+	EMonSpawnType MonSpawnType;
+	
 	UPROPERTY(EditAnywhere)
 	bool bTimer = false;
 	
 	UPROPERTY(EditAnywhere)
 	float CurrentTime = 0;
 
+	UPROPERTY(EditAnywhere)
+	FVector RandLoc;
+	UPROPERTY(EditAnywhere)
+	FVector HitLoc;
+
+	UPROPERTY(EditAnywhere)
+	UDataTable* MonsterTable;
+
 	void MyTimer(void(AMonSpawn::*Func)(),float Second = 2.0f);
 	void MyTimer(TFunction<void()> Func, float Second = 2.0f);
+	
+	FVector RandLocation(float X = 1000.0f, float Y = 1000.0f, float Z = 50.0f);
+	void SpawnMonster();
 
 	// UPROPERTY(EditAnywhere)
 	// TSubclassOf<UUIChaMain>UUIChaMainFactory;

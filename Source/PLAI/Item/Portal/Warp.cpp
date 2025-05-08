@@ -27,6 +27,8 @@ AWarp::AWarp()
 	
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("BoxComponent");
 	NiagaraComp->SetupAttachment(GetRootComponent());
+
+	
 }
 
 // Called when the game starts or when spawned
@@ -59,7 +61,7 @@ void AWarp::OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* O
 			if (TestPlayer->HasAuthority() && TestPlayer->IsLocallyControlled())
 			{
 				UiPortal = CreateWidget<UUiPortal>(GetWorld(),UiPortalFactory);
-				UiPortal->AddToViewport();
+				UiPortal->AddToViewport(5);
 				UiPortal->TestPlayer = TestPlayer;
 				UiPortal->Warp = this;
 				UiPortal->WorldMap->SetVisibility(ESlateVisibility::Hidden);
@@ -85,7 +87,6 @@ void AWarp::OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* Othe
 		}
 	}
 }
-
 
 void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 {

@@ -6,19 +6,33 @@
 #include "LogItemComp.h"
 #include "UObject/Object.h"
 #include "UserStruct.generated.h"
-
 class ULogItemComp;
+
+USTRUCT(BlueprintType,Blueprintable)
+struct FMaterialBase : public FTableRowBase
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere)
+    class UMaterialInterface* Material;
+
+    UPROPERTY(EditAnywhere)
+    int32 Index = 0;
+
+    UPROPERTY(EditAnywhere)
+    class UStaticMesh* StaticMesh;
+};
 
 USTRUCT(BlueprintType)
 struct FPosition
 {
     GENERATED_BODY()
 public:
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     float x = 0.0f;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     float y= 0.0f;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     float z= 0.0f;
 };
 
@@ -27,23 +41,23 @@ struct Fstats
 {
     GENERATED_BODY()
 public:
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 hp;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 attack;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 defense;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 resistance;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     float critical_rate;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     float critical_damage;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 move_range;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 speed;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 points;
 };
 
@@ -75,29 +89,29 @@ struct FitemInfo
 {
     GENERATED_BODY()
 public:
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FString item_id;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 item_category;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 item_type;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 item_class;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FString item_name;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FString category_name;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FString description;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 level;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 price;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     Foptions options;
 
     // inventory_info에만 존재
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 counts = 0; // 기본값 0
 };
 
@@ -106,25 +120,25 @@ struct FcharInfo
 {
     GENERATED_BODY()
 public:
-    UPROPERTY(BlueprintReadWrite)
-    FString character_id;
-    UPROPERTY(BlueprintReadWrite)
-    FString character_name;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    FString character_id = FString("Init Character Id");
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    FString character_name = FString("Init Character Name");
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FString job;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FString gender;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     TArray<FString> traits;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 level;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 current_exp;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 max_exp;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FPosition position;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     Fstats stats;
 };
 
@@ -133,7 +147,7 @@ struct FEquipmentInfo
 {
     GENERATED_BODY()
 public:
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     TArray<FitemInfo> item_list;
 };
 
@@ -142,9 +156,9 @@ struct FInventoryInfo
 {
     GENERATED_BODY()
 public:
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     TArray<FitemInfo> item_list;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 gold;
 };
 
@@ -153,15 +167,15 @@ struct FUserFullInfo
 {
     GENERATED_BODY()
 public:
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FString message;
-    UPROPERTY(BlueprintReadWrite)
-    FString user_id;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    FString user_id = FString("Init UserId");
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FcharInfo character_info;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FEquipmentInfo equipment_info;
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     FInventoryInfo inventory_info;
 };
 

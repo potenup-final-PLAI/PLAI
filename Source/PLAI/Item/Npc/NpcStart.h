@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NpcCharacter.h"
 #include "GameFramework/Character.h"
 #include "PLAI/Item/Item/ItemStruct.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
@@ -11,7 +12,7 @@
 DECLARE_DELEGATE_OneParam(FOnNpcStart, const FItemStructTables)
 
 UCLASS()
-class PLAI_API ANpcStart : public ACharacter
+class PLAI_API ANpcStart : public ANpcCharacter
 {
 	GENERATED_BODY()
 

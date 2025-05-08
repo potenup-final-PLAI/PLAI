@@ -36,9 +36,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemStructTop ItemStructTop;
 
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AItem> ItemFactory;
-
+	
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AItem* ItemParent;
 	

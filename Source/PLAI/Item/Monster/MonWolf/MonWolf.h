@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "PLAI/Item/Monster/Monster.h"
+#include "PLAI/Item/Monster/MonsterMaster.h"
 #include "MonWolf.generated.h"
 
 UCLASS()
-class PLAI_API AMonWolf : public AMonster
+class PLAI_API AMonWolf : public AMonsterMaster
 {
 	GENERATED_BODY()
 
@@ -25,4 +26,10 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<FName> SocketNames;
+
+	void SetGravity();
 };

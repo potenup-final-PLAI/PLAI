@@ -53,7 +53,7 @@ public:
 
     void SetGold(int32 Getgold);
 	UPROPERTY(EditAnywhere)
-	int32 Gold = 10000;
+	int32 Gold = 0;
 	
 	EquipSlotType StartSlotType;
 	

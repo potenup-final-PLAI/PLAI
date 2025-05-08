@@ -26,4 +26,18 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UQuickInven* WBP_QuickInven;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class USlotCre* WBP_SlotCre;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UUiChaView* Wbp_ChaView;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UUiCre* Wbp_UiCre;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UItemGold* Wbp_ItemGold;
+
+	virtual void NativeConstruct() override;
 };

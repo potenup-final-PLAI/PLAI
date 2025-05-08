@@ -8,7 +8,6 @@
 void UUiPost::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
 	TextPost->OnTextCommitted.AddDynamic(this, &UUiPost::UiPostEnter);
 }
 

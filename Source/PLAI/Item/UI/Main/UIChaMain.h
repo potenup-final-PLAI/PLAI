@@ -23,8 +23,17 @@ public:
 	class UTextBlock* Job;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Gen;
+	// UPROPERTY(meta = (BindWidget))
+	// class UTextBlock* Traits;
+
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Traits;
+	class UVerticalBox* TraitsName;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UVerticalBox* TraitsStatNameBox;
+
+	// UPROPERTY(meta = (BindWidget))
+	// class UVerticalBox* TraitsStatValueBox;
 
 	// 오른쪽 위 캐릭터
 	UPROPERTY(meta = (BindWidget))
