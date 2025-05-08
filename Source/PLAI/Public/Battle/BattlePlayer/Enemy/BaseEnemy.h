@@ -27,11 +27,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
-	
-	
+
+
 	//--------------Test---------------------
-	void MoveToPlayer(class ABattlePlayer* player, class AGridTileManager* tileManager);
-	class ABattlePlayer* FindClosestPlayer(TArray<class ABattlePlayer*>& allPlayers);
+	void MoveToPlayer(class AGridTile* player,
+	                  class AGridTileManager* tileManager);
+	class ABattlePlayer* FindClosestPlayer(
+		TArray<class ABattlePlayer*>& allPlayers);
 
 	void FindAndAttackPlayer();
 

@@ -13,16 +13,15 @@
 // Sets default values
 ABaseEnemy::ABaseEnemy()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
 void ABaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	// GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABaseBattlePawn::TryInitStatus, 0.1f, true);
 }
 
@@ -30,39 +29,46 @@ void ABaseEnemy::BeginPlay()
 void ABaseEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
-void ABaseEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ABaseEnemy::SetupPlayerInputComponent(
+	UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
-void ABaseEnemy::MoveToPlayer(ABattlePlayer* player, AGridTileManager* tileManager)
+void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
 {
 	if (!tileManager)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - tileManager is nullptr"));
+		UE_LOG(LogTemp, Warning,
+		       TEXT("BaseEnemy : MoveToPlayer - tileManager is nullptr"));
 		return;
 	}
 	if (!player && !goalTile)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - player/goalTile is nullptr"));
+		UE_LOG(LogTemp, Warning,
+		       TEXT("BaseEnemy : MoveToPlayer - player/goalTile is nullptr"));
 		return;
 	}
-	
+
 	InitValues();
 
 	if (player)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Target Not Nullptr"));
 		goalTile = tileManager->FindCurrentTile(player->GetActorLocation());
 	}
+	UE_LOG(LogTemp, Warning, TEXT("Target is Valid "));
 	startTile = tileManager->FindCurrentTile(GetActorLocation());
 
-	if (!IsValid(startTile) || !IsValid(goalTile)) return;
-
+	if (!IsValid(startTile) || !IsValid(goalTile))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Is Not Valid startTile or goalTile"));
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Is Valid startTile, goalTile"));
 	startTile->sCostValue = 0;
 	openArray.Add(startTile);
 
@@ -76,14 +82,15 @@ ABattlePlayer* ABaseEnemy::FindClosestPlayer(TArray<ABattlePlayer*>& allPlayers)
 
 	for (ABattlePlayer* player : allPlayers)
 	{
-		float dist = FVector::DistSquared(player->GetActorLocation(), GetActorLocation());
+		float dist = FVector::DistSquared(player->GetActorLocation(),
+		                                  GetActorLocation());
 		if (dist < minDist)
 		{
 			minDist = dist;
 			closet = player;
 		}
 	}
-	
+
 	return closet;
 }
 
@@ -100,7 +107,7 @@ void ABaseEnemy::FindAndAttackPlayer()
 		FColor::Red,
 		false,
 		0.1f
-		);
+	);
 	TArray<FOverlapResult> overlaps;
 	FCollisionQueryParams queryParams;
 	queryParams.AddIgnoredActor(this);
@@ -112,11 +119,12 @@ void ABaseEnemy::FindAndAttackPlayer()
 		ECC_Pawn,
 		FCollisionShape::MakeSphere(detectRadius),
 		queryParams
-		);
+	);
 	for (auto& overlap : overlaps)
 	{
 		// 탐색 했을 때 그 객체가 Player라면
-		if (ABattlePlayer* detectedPlayer = Cast<ABattlePlayer>(overlap.GetActor()))
+		if (ABattlePlayer* detectedPlayer = Cast<ABattlePlayer>(
+			overlap.GetActor()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Detected Player"));
 			// 플레이어가 있다면 공격
@@ -124,7 +132,7 @@ void ABaseEnemy::FindAndAttackPlayer()
 			break;
 		}
 	}
-	
+
 	// 끝났으면 턴 종료 처리
 	OnTurnEnd();
 }
@@ -134,17 +142,31 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	// 본인이 서버에서 지시된 캐릭터인지 확인
 	if (actionRequest.current_character_id != this->GetName())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("actionRequest not for this enemy: %s"), *this->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("actionRequest not for this enemy: %s"),
+		       *this->GetName());
 		return;
 	}
 
-	if (actionRequest.actions.Num() == 0)
+	// 배열이 비어 있다면 return
+	if (actionRequest.actions.IsEmpty())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No actions provided"));
+		UE_LOG(LogTemp, Error, TEXT("ProcessAction: actions array is empty"));
+		OnTurnEnd();
 		return;
 	}
 
 	const FBattleAction& Action = actionRequest.actions[0];
+	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"),
+	       *actionRequest.current_character_id);
+
+	if (actionRequest.actions.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No actions provided"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("actions"));
+	}
 
 	// 1. 이동 처리
 	if (Action.move_to.Num() == 2)
@@ -152,7 +174,33 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		int32 targetX = Action.move_to[0];
 		int32 targetY = Action.move_to[1];
 
-		// 예시: GridTileManager 통해 목표 타일 찾기
+		// 자동 탐색 전 가까운 적을 찾는 로직
+		// AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
+		//
+		// TArray<AActor*> playerActors;
+		// UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABattlePlayer::StaticClass(), playerActors);
+		//
+		// TArray<ABattlePlayer*> players;
+		// for (AActor* actor : playerActors)
+		// {
+		// 	if (ABattlePlayer* p = Cast<ABattlePlayer>(actor))
+		// 	{
+		// 		players.Add(p);
+		// 	}
+		// }
+		//
+		// if (ABattlePlayer* target = this->FindClosestPlayer(players))
+		// {
+		// 	this->MoveToPlayer(target, tileManger);
+		// }
+		//
+		// FTimerHandle timerHandle;
+		// GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([this]()
+		// {
+		// 	OnTurnEnd();
+		// }), 5.0f, false);
+
+		// GridTileManager 통해 목표 타일 찾기
 		if (AGridTileManager* tileManager = Cast<AGridTileManager>(
 			UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory)))
 		{
@@ -160,7 +208,16 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 			if (goal)
 			{
 				goalTile = goal; // ✅ 기존 goalTile 변수에 대입
-				MoveToPlayer(nullptr, tileManager); // ✅ 타겟 null로 넘기고 이동만 실행
+				if (goalTile)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("goalTile : %s"),
+					       *goal->GetName());
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("goalTile is nullptr"));
+				}
+				MoveToPlayer(goalTile, tileManager); // ✅ 타겟 null로 넘기고 이동만 실행
 			}
 		}
 	}
@@ -181,10 +238,13 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		OnTurnEnd();
 	}
 }
+
 ABaseBattlePawn* ABaseEnemy::FindUnitById(const FString& Id)
 {
 	TArray<AActor*> FoundUnits;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseBattlePawn::StaticClass(), FoundUnits);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),
+	                                      ABaseBattlePawn::StaticClass(),
+	                                      FoundUnits);
 
 	for (AActor* Actor : FoundUnits)
 	{
