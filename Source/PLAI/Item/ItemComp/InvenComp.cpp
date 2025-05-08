@@ -11,10 +11,14 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
+#include "Engine/OverlapResult.h"
 #include "EnvironmentQuery/EnvQueryDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/Creture/Creature.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/Item/ItemMaster.h"
+#include "PLAI/Item/Monster/MonWorld/MonWorld.h"
 #include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/Npc/NpcStore.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -64,17 +68,40 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::P)){ SetGold(500);}
 	
 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
-	{   UE_LOG(LogTemp, Warning, TEXT("인벤컴프 Q키 !"));
-		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
-		TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
+	{   UE_LOG(LogTemp, Warning, TEXT("몬스터 트리거 Q키 !"));
+
+		TArray<FOverlapResult> Hits;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(TestPlayer);
+
+		DrawDebugSphere(GetWorld(),TestPlayer->GetActorLocation()+TestPlayer->GetActorForwardVector() * 50,100,
+			20,FColor::Red,false,2)
+;		bool bHit = GetWorld()->OverlapMultiByChannel(Hits,TestPlayer->GetActorLocation()+TestPlayer->GetActorForwardVector() * 50,
+	FQuat::Identity, ECC_Visibility,FCollisionShape::MakeSphere(100),Params);
 		
-		int32 randIndex = FMath::RandRange(0,1);
-		ItemMaster->ItemStruct.ItemTop = 0;
-		ItemMaster->ItemStruct.ItemIndex = randIndex;
-		
-		int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStruct.ItemTop].
-		ItemMeshIndexes[ItemMaster->ItemStruct.ItemIndex].ItemMeshTypes[ItemMaster->ItemStruct.ItemIndexType].StaticMeshes.Num()-1);
-		ItemMaster->ItemStruct.ItemIndexDetail = randDetail;
+		if (bHit)
+		{
+			for (FOverlapResult Hit: Hits)
+			{
+				if (AMonWorld* MonWorld = Cast<AMonWorld>(Hit.GetActor()))
+				{
+					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 맞노"))
+					if (UWorldGi* Gi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+					{
+						Gi->bWorldSpawnTime = 10;
+						UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
+					};
+				}
+				else
+				{
+					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 아니야"))
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp Q키 안맞음"))
+		}
 	}
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{

@@ -17,6 +17,7 @@ AMonWorld::AMonWorld()
 void AMonWorld::BeginPlay()
 {
 	Super::BeginPlay();
+	InitLoc = GetActorLocation() + RandLocation();
 }
 
 // Called every frame
@@ -45,26 +46,27 @@ FVector AMonWorld::RandLocation()
 	
 	bool bHit = GetWorld()->LineTraceSingleByChannel(hit,FVector(x,y,z) + FVector(0,0,2000),
 		FVector(x,y,z) + FVector(0,0,-2000), ECC_WorldStatic, params);
-	DrawDebugSphere(GetWorld(),hit.Location,30,30,FColor::Red);
+	DrawDebugLine(GetWorld(),GetActorLocation() + hit.Location + FVector(0,0,3000),hit.Location,FColor::Blue,
+		false,2);
+	DrawDebugSphere(GetWorld(),GetActorLocation() + hit.Location,30,30,FColor::Red,false,2);
 	return FVector(hit.Location);
 }
 
 void AMonWorld::MoveToLocation()
 {
 	CurrentTime += GetWorld()->GetDeltaSeconds();
-	if (CurrentTime <=  GetWorld()->GetTimeSeconds())
-	{
-		InitLoc = GetActorLocation() + RandLocation();
-	}
+	
 	if (FVector::Distance(GetActorLocation(),InitLoc) > 25)
 	{
 		FVector Dist = InitLoc - GetActorLocation(); 
 		AddActorWorldOffset(Dist.GetSafeNormal() * 5);
-		SetActorRotation(Dist.Rotation());
 	}
 	else
 	{
+		UE_LOG(LogTemp,Error,TEXT("AMonWorld::MoveToLocation"));
 		InitLoc = GetActorLocation() + RandLocation();
+		FVector Dist = InitLoc - GetActorLocation(); 
+		SetActorRotation(Dist.Rotation());
 		CurrentTime = 0;
 	}
 }
