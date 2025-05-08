@@ -76,13 +76,20 @@ void ATurnManager::StartPlayerTurn()
 			FTimerHandle possessHandle;
 			GetWorld()->GetTimerManager().ClearTimer(possessHandle);
 			// 이후에 값이 변경 및 삭제 될 수 있기 때문에 값 복사로 가져와서 람다 내에서 사용
-			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=]()
+			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
 			{
 				if (pc && playerPawn)
 				{
-					pc->Possess(playerPawn);
-					playerPawn->OnTurnStart();
-					UE_LOG(LogTemp, Warning, TEXT("possess unit %s"), *playerPawn->GetActorNameOrLabel());
+					pc->Possess(curUnit);
+					if (curUnit->IsValidLowLevelFast())
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Safe to call OnTurnStart on %s"), *curUnit->GetName());
+						curUnit->OnTurnStart();
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("curUnit is invalid when calling OnTurnStart"));
+					}
 				}
 			}), 1.0f, false);
 		}
