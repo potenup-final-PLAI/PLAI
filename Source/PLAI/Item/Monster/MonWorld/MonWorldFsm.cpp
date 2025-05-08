@@ -11,6 +11,9 @@ UMonWorldFsm::UMonWorldFsm()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	// RandLocationFloat = 300.0f;
+	// InitLocationFloat = 600.0f;
+
 	// ...
 }
 
@@ -19,9 +22,6 @@ UMonWorldFsm::UMonWorldFsm()
 void UMonWorldFsm::BeginPlay()
 {
 	Super::BeginPlay();
-
-	RandLocationFloat = 300.0f;
-	InitLocationFloat = 600.0f;
 
 	// ...
 	

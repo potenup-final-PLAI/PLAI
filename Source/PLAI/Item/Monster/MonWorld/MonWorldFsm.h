@@ -8,7 +8,7 @@
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class PLAI_API UMonWorldFsm : public UMonFsm
+class PLAI_API UMonWorldFsm : public UActorComponent
 {
 	GENERATED_BODY()
 

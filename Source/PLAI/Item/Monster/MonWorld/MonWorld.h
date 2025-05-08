@@ -7,7 +7,7 @@
 #include "MonWorld.generated.h"
 
 UCLASS()
-class PLAI_API AMonWorld : public AMonsterMaster
+class PLAI_API AMonWorld : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -25,4 +25,14 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+    UPROPERTY()
+	float CurrentTime = 0;
+	UPROPERTY()
+	
+	FVector InitLoc = FVector::ZeroVector;
+	
+	FVector RandLocation();
+	
+	void MoveToLocation();
 };
