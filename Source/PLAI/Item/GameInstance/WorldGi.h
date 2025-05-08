@@ -20,5 +20,5 @@ public:
 	TArray<int32>bWorldSpawnInt;
 	
 	UPROPERTY(EditAnywhere)
-	int32 bWorldSpawnTime = 0;
+	bool bGameStart = false;
 };

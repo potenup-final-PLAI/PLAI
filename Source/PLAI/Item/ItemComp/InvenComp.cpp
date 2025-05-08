@@ -88,7 +88,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 맞노"))
 					if (UWorldGi* Gi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 					{
-						Gi->bWorldSpawnTime = 10;
 						UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
 					};
 				}

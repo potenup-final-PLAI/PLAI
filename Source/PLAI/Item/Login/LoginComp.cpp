@@ -16,6 +16,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Npc/NpcNet.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -52,10 +53,16 @@ void ULoginComp::BeginPlay()
 	
 	if (TestPlayer->IsLocallyControlled())
 	{
-		UiMain = CreateWidget<UUiMain>(GetWorld(),UiMainFactory);
-		UiMain->AddToViewport(0);
-		UiMain->LoginComp = this;
-		UiMain->WbpUiSign->LoginComp = this;
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+		{
+			if (WorldGi->bGameStart == false)
+			{
+				UiMain = CreateWidget<UUiMain>(GetWorld(),UiMainFactory);
+				UiMain->AddToViewport(0);
+				UiMain->LoginComp = this;
+				UiMain->WbpUiSign->LoginComp = this;
+			}
+		}
 	}
 }
 

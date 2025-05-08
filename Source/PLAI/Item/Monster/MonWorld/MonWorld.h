@@ -42,6 +42,9 @@ public:
 	FVector FirstInitLoc;
 	UPROPERTY(EditAnywhere)
 	FVector InitLoc = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere)
+	bool bBattle = false;
 	
 	FVector RandLocation();
 	

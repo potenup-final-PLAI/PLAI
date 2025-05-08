@@ -28,7 +28,10 @@ void AMonWorld::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	MoveToLocation();
+	if (bBattle == false)
+	{
+		MoveToLocation();
+	}
 }
 
 // Called to bind functionality to input
@@ -100,6 +103,9 @@ void AMonWorld::CastPlayer()
 				UE_LOG(LogTemp,Error,TEXT("AMonWorld::CastPlayer"));
 				UIMonWorld = CreateWidget<UUiMonWorld>(GetWorld(),UIMonWorldFactory);
 				UIMonWorld->AddToViewport();
+				UIMonWorld->MonWorld = this;
+				UIMonWorld->TestPlayer = TestPlayer;
+				bBattle = true;
 			}
 		}
 	}

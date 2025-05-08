@@ -2,3 +2,32 @@
 
 
 #include "UiMonWorld.h"
+
+#include "MonWorld.h"
+#include "Components/Button.h"
+#include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
+
+void UUiMonWorld::NativeConstruct()
+{
+	Super::NativeConstruct();
+	Button_No->OnClicked.AddDynamic(this,&UUiMonWorld::OnButtonNo);
+	Button_Yes->OnClicked.AddDynamic(this,&UUiMonWorld::OnButtonYes);
+}
+
+void UUiMonWorld::OnButtonYes()
+{
+	if (TestPlayer)
+	{
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+		{
+			WorldGi->bGameStart = true;
+		}
+		UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
+	}
+}
+
+void UUiMonWorld::OnButtonNo()
+{
+}

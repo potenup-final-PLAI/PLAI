@@ -13,4 +13,22 @@ UCLASS()
 class PLAI_API UUiMonWorld : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Button_Yes;
+    UFUNCTION()
+	void OnButtonYes();
+	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Button_No;
+	UFUNCTION()
+	void OnButtonNo();
+
+	UPROPERTY()
+	class ATestPlayer* TestPlayer;
+	UPROPERTY()
+	class AMonWorld* MonWorld;
+
+	virtual void NativeConstruct() override;
 };
