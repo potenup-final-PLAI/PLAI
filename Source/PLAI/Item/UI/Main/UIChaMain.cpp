@@ -13,6 +13,7 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
+#include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -95,27 +96,14 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 
 void UUIChaMain::OnLoadMeInfo()
 {
+	UGameplayStatics::SetGamePaused(GetWorld(),false);
+	
 	UiMain->LoginComp->HttpMePost();
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport(1);
-	
-	// 퀵슬롯 디테일창은 끄자
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_QuickInven->SetVisibility(ESlateVisibility::Hidden);
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SetVisibility(ESlateVisibility::Hidden);
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiCre->SetVisibility(ESlateVisibility::Hidden);
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetVisibility(ESlateVisibility::Hidden);
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->SetVisibility(ESlateVisibility::Hidden);
-	
-	// 퀵슬롯 아이템 장비창 들어온느거 확인시켜주자
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Visible);
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Visible);
-	
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 	{
-		UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
-		UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
-	},1.7f,false);
+		UGameplayStatics::SetGamePaused(GetWorld(),true);
+	},1.0f,false);
 }
 
 void UUIChaMain::OnSelectMode()
@@ -124,3 +112,36 @@ void UUIChaMain::OnSelectMode()
 	RemoveFromParent();
 }
 
+
+// void UUIChaMain::OnLoadMeInfo()
+// {
+// 	UGameplayStatics::SetGamePaused(GetWorld(),false);
+// 	UiMain->LoginComp->HttpMePost();
+// 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport(1);
+// 	
+// 	// 퀵슬롯 디테일창은 끄자
+// 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_QuickInven->SetVisibility(ESlateVisibility::Hidden);
+// 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+// 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SetVisibility(ESlateVisibility::Hidden);
+// 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiCre->SetVisibility(ESlateVisibility::Hidden);
+// 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetVisibility(ESlateVisibility::Hidden);
+// 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->SetVisibility(ESlateVisibility::Hidden);
+// 	
+// 	// 퀵슬롯 아이템 장비창 들어온느거 확인시켜주자
+// 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Visible);
+// 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Visible);
+// 	
+// 	FTimerHandle TimerHandle;
+// 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+// 	{
+// 		UGameplayStatics::SetGamePaused(GetWorld(),true);
+// 		UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+// 		UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+// 	},1.0f,false);
+// }
+//
+// void UUIChaMain::OnSelectMode()
+// {
+// 	UiMain->LoginComp->TestPlayer->CaptureComp->DestroyComponent();
+// 	RemoveFromParent();
+// }

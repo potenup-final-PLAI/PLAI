@@ -12,6 +12,7 @@
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/EditableTextBox.h"
+#include "Components/SizeBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "Components/TextBlock.h"
@@ -25,7 +26,7 @@ void UUiMain::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// UGameplayStatics::SetGamePaused(GetWorld(),true);
+	UGameplayStatics::SetGamePaused(GetWorld(),true);
 
     Wbp_UIChaMain->UiMain = this;
 	Wbp_UiSubMain->UiMain = this;
@@ -50,6 +51,7 @@ void UUiMain::SetUiSign()
 {
 	if (bUiSign == false)
 	{ WbpUiSign->SetVisibility(ESlateVisibility::Visible);
+		WbpUiSign->SignCompleteBox->SetVisibility(ESlateVisibility::Hidden);
 		bUiSign = true; }
 	else
 	{ WbpUiSign->SetVisibility(ESlateVisibility::Hidden);
@@ -70,7 +72,6 @@ void UUiMain::Login()
 		}
 	});
 	LoginComp->HttpLoginPost();
-	
 }
 
 void UUiMain::CreateCharacter()

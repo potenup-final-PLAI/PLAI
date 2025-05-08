@@ -52,6 +52,15 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ButtonSign;
 
+	UPROPERTY(meta = (BindWidget))
+	class USizeBox* SignCompleteBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* bSingComplete;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* bSingCompleteDetail;
+
 	UPROPERTY(EditAnywhere)
 	class ULoginComp* LoginComp;
 

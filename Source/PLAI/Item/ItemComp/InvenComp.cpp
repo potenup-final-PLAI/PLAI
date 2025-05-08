@@ -21,6 +21,7 @@
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
@@ -52,6 +53,9 @@ void UInvenComp::BeginPlay()
 		if (WorldGi->bBattleReward == true)
 		{
 			MenuInven->AddToViewport();
+			MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+			MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+			MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 			TurnReward();
 			WorldGi->bBattleReward = false;
 		}
@@ -533,31 +537,25 @@ void UInvenComp::LoadEquipInventory()
 
 void UInvenComp::TurnReward()
 {
-	TArray<FName>Raws = ItemDataTable->GetRowNames();
-	int32 index = FMath::RandRange(0,Raws.Num()-1);
-	FName ItemName = Raws[index];
-	FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(ItemName,TEXT("InvecComp548"));
-
 	UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
 	UiTurnReward->AddToViewport();
 	
-    UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UiTurnReward->UiTurnRewardImageFactory);
-	if (UiTurnReward->UiTurnRewardImage)
+	int32 RandomReward = FMath::RandRange(2,4);
+	for (int32 i = 0; i < RandomReward; i++)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 이미지 생성"))
-	}
-	else
-	{
-		UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 이미지 생성실패"))
-	}
+		TArray<FName>Raws = ItemDataTable->GetRowNames();
+		int32 index = FMath::RandRange(0,Raws.Num()-1);
+		FName ItemName = Raws[index];
+		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(ItemName,TEXT("InvecComp548"));
 	
-	FSlateBrush Brush;
-	Brush.SetResourceObject(ItemStructTable->Texture);
-	UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
-	UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
+		UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UiTurnReward->UiTurnRewardImageFactory);
+		FSlateBrush Brush;
+		Brush.SetResourceObject(ItemStructTable->Texture);
+		UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
+		UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
 	
-	Server_GetItem(*ItemStructTable);
-
+		Server_GetItem(*ItemStructTable);
+	}
 	FTimerHandle TurnRewardTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this]()
 	{
@@ -566,7 +564,7 @@ void UInvenComp::TurnReward()
 			UiTurnReward->RemoveFromParent();
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
 		}
-	},1.5f,false);
+	},2.5f,false);
 	
 }
 
