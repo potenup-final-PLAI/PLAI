@@ -40,6 +40,7 @@ void ABaseBattlePawn::BeginPlay()
 	{
 		ps->SetAP();
 	}
+	
 }
 
 // Called every frame
