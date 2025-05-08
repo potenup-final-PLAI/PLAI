@@ -76,7 +76,7 @@ void AMonWorld::MoveToLocation()
 	}
 	else
 	{
-		UE_LOG(LogTemp,Error,TEXT("AMonWorld::MoveToLocation"));
+		// UE_LOG(LogTemp,Error,TEXT("AMonWorld::MoveToLocation"));
 		FVector Candidate;
 		do
 		{ Candidate = GetActorLocation() + RandLocation(); }
@@ -94,7 +94,7 @@ void AMonWorld::CastPlayer()
 	{ UIMonWorld->RemoveFromParent(); }
 	bBattle = false;
 
-	UE_LOG(LogTemp,Error,TEXT("AMonWorld::CastPlayer 캐스팅 플레이어중"));
+	// UE_LOG(LogTemp,Error,TEXT("AMonWorld::CastPlayer 캐스팅 플레이어중"));
 	TArray<FOverlapResult> Hits;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);

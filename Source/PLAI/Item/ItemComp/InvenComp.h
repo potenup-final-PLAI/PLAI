@@ -10,6 +10,7 @@
 #include "PLAI/Item/Item/Equip//ItemEquip.h"
 #include "PLAI/Item/UI/Inventory/MenuInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
+#include "PLAI/Item/UI/TurnReward/UiTurnReward.h"
 #include "InvenComp.generated.h"
 
 class APlayerController;
@@ -129,6 +130,14 @@ public:
 
 	void SaveEquipInventory();
 	void LoadEquipInventory();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUiTurnReward> UUiTurnRewardFactory;
+	
+	UPROPERTY(EditAnywhere)
+	class UUiTurnReward* UiTurnReward;
+	
+	void TurnReward();
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 public:

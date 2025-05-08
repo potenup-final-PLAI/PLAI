@@ -131,7 +131,7 @@ void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 			TargetPlayer->SetActorLocation(TargetLocation);
 			FVector Forward = TargetPlayer->CameraBoom->GetForwardVector(); // 전방 방향
 		}
-	}, 2.0f, false);
+	}, 3.5f, false);
 }
 
 

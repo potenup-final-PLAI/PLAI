@@ -21,4 +21,7 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	bool bGameStart = false;
+
+	UPROPERTY(EditAnywhere)
+	bool bBattleReward = false;
 };

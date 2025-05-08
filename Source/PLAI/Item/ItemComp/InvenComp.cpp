@@ -2,8 +2,6 @@
 
 
 #include "InvenComp.h"
-
-#include "CreComp.h"
 #include "JsonObjectConverter.h"
 #include "StoreComp.h"
 #include "Components/BoxComponent.h"
@@ -12,7 +10,6 @@
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
 #include "Engine/OverlapResult.h"
-#include "EnvironmentQuery/EnvQueryDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/Creture/Creature.h"
@@ -24,7 +21,6 @@
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
-#include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
@@ -45,16 +41,20 @@ UInvenComp::UInvenComp()
 void UInvenComp::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// UE_LOG(LogTemp, Warning, TEXT("UInvenComp::BeginPlay%s"),*TestPlayer->GetName());
-	
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
-
 	if (TestPlayer->IsLocallyControlled())
 	{
 		MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
 	}
+	// if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+	// {
+	// 	if (WorldGi->bBattleReward == true)
+	// 	{
+	// 		TurnReward();
+	// 		WorldGi->bBattleReward = false;
+	// 	}
+	// }
 }
 
 // Called every frame
@@ -62,7 +62,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     // 데이터테이블 템 먹기
-	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::T)){ CatchItem();}
+	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
 
     //임시함수임
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::P)){ SetGold(500);}
@@ -115,24 +115,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
 			FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
             TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable);
-
-			// ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
-			// ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
-			//
-			// ItemMaster->ItemStructTable = *ItemStructTable;
-			// ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
-			// ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
-			// ItemMaster->SetActorScale3D(FVector(0.3,0.3,0.3));
-			//
-			// FActorSpawnParameters SpawnParams;
-			// SpawnParams.bNoFail = true; // 실패하지 않게 설정
-			// SpawnParams.bDeferConstruction = true;
-			// SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			// ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTable->CreatureFactory,
-			// 	FVector(0,0,3000),FRotator(0,0,0),SpawnParams);
-			// Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
-			// TestPlayer->CreComp->EquipCreature(Creature);
-			// Creature->ItemStructTable = *ItemStructTable;
 		}
 		else
 		{
@@ -226,34 +208,20 @@ void UInvenComp::SetGold(int32 Getgold)
 void UInvenComp::Server_SpawnOneItem_Implementation()
 {
     if (TestPlayer->IsLocallyControlled() && ItemDataTable)
-    		{
-    			TArray<FName> RawNames = ItemDataTable->GetRowNames();
-    			int32 Rand = FMath::RandRange(0,RawNames.Num()-1);
-    			if (RawNames.IsValidIndex(Rand))
-    			{
-    				FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[Rand],TEXT("InvenComp100"));
-    				ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
-    				ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
-
-    				ItemMaster->ItemStructTable = *ItemStructTable;
-    				ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
-    				ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
-    			}
-    		}
+    {
+    	TArray<FName> RawNames = ItemDataTable->GetRowNames();
+    	int32 Rand = FMath::RandRange(0,RawNames.Num()-1);
+    	if (RawNames.IsValidIndex(Rand))
+    	{
+    		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[Rand],TEXT("InvenComp100"));
+    		ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
+    		ItemMaster->SetActorLocation(TestPlayer->GetActorLocation() + TestPlayer->GetActorForwardVector() *75);
+    		ItemMaster->ItemStructTable = *ItemStructTable;
+    		ItemMaster->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+    		ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
+    	}
+    }
 	
-	// if (TestPlayer->IsLocallyControlled())
-	// {
-	// 	ItemMaster = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() +
-	// 		TestPlayer->GetActorForwardVector() * 50,FRotator(0,0,0));
-	// 	int32 randIndex = FMath::RandRange(0,4);
-	// 	if (!ItemMaster) {UE_LOG(LogTemp, Warning, TEXT("인벤컴프 One키 ItemMaster없음 !"));return;}
-	// 	ItemMaster->ItemStruct.ItemTop = 1;
-	// 	ItemMaster->ItemStruct.ItemIndex = randIndex;
-	// 	
-	// 	int32 randDetail = FMath::RandRange(0,ItemMaster->ItemParent->ItemStructTop.ItemMeshTops[ItemMaster->ItemStructTable.ItemTop].
-	// 	ItemMeshIndexes[ItemMaster->ItemStructTable.ItemIndex].ItemMeshTypes[ItemMaster->ItemStructTable.ItemIndexType].StaticMeshes.Num()-1);
-	// 	ItemMaster->ItemStructTable.ItemIndexDetail = randDetail;
-	// }
 }
 
 void UInvenComp::Server_UnEquip_Implementation(EquipSlotType SlotType)
@@ -560,6 +528,45 @@ void UInvenComp::LoadEquipInventory()
 		Server_EquipItem(ItemStructTables.ItemStructTables[index],SlotEquip->SlotType);
 	}
 	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 로드"))
+}
+
+void UInvenComp::TurnReward()
+{
+	TArray<FName>Raws = ItemDataTable->GetRowNames();
+	int32 index = FMath::RandRange(0,Raws.Num()-1);
+	FName ItemName = Raws[index];
+	FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(ItemName,TEXT("InvecComp548"));
+
+	UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
+	UiTurnReward->AddToViewport();
+	
+    UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UUiTurnRewardFactory);
+	if (UiTurnReward->UiTurnRewardImage)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 이미지 생성"))
+	}
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 이미지 생성실패"))
+	}
+	
+	// FSlateBrush Brush;
+	// Brush.SetResourceObject(ItemStructTable->Texture);
+	// UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
+	// UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
+	
+	Server_GetItem(*ItemStructTable);
+
+	FTimerHandle TurnRewardTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this]()
+	{
+		if (UiTurnReward)
+		{
+			UiTurnReward->RemoveFromParent();
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
+		}
+	},1.5f,false);
+	
 }
 
 void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

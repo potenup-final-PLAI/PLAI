@@ -23,6 +23,7 @@ void UUiMonWorld::OnButtonYes()
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
 			WorldGi->bGameStart = true;
+			WorldGi->bBattleReward = true;
 		}
 		UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
 	}
