@@ -30,28 +30,31 @@ ABaseBattlePawn::ABaseBattlePawn()
 void ABaseBattlePawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 
-	turnManager = Cast<ATurnManager>(UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
+	turnManager = Cast<ATurnManager>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
 
 	if (ABasePlayerState* ps = Cast<ABasePlayerState>(GetPlayerState()))
 	{
 		ps->SetAP();
 	}
-
+	
 }
 
 // Called every frame
 void ABaseBattlePawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
 	{
-		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() + FVector(0, 0, 10);
+		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() +
+			FVector(0, 0, 10);
 		FVector currentLoc = GetActorLocation();
-		FVector nextLoc = FMath::VInterpConstantTo(currentLoc, targetLoc, DeltaTime, 500.f);
+		FVector nextLoc = FMath::VInterpConstantTo(
+			currentLoc, targetLoc, DeltaTime, 500.f);
 		SetActorLocation(nextLoc);
 
 		if (FVector::DistSquared(currentLoc, targetLoc) < FMath::Square(5.f))
@@ -82,7 +85,7 @@ void ABaseBattlePawn::OnTurnStart()
 {
 	// 기본 공격 초기화
 	bBaseAttack = true;
-	
+
 	// 턴이 시작됐으면 턴 카운트 1 증가
 	if (turnManager)
 	{
@@ -96,8 +99,9 @@ void ABaseBattlePawn::OnTurnStart()
 			{
 				if (hud->mainUI && hud->mainUI->WBP_CycleAndTurn)
 				{
-					
-					FString s = Cast<ABattlePlayer>(turnManager->curUnit) ? TEXT("Player") : TEXT("Enemy");
+					FString s = Cast<ABattlePlayer>(turnManager->curUnit)
+						            ? TEXT("Player")
+						            : TEXT("Enemy");
 					hud->mainUI->WBP_CycleAndTurn->SetTurnText(s);
 				}
 			}
@@ -124,61 +128,56 @@ void ABaseBattlePawn::OnTurnStart()
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
 		// 턴 시작 시 AP 증가
-		enemybattleState->curAP += enemybattleState->GetAP(enemybattleState->curAP);
-		UE_LOG(LogTemp, Warning, TEXT("Current AP: %d"), enemybattleState->curAP);
-		
+		enemybattleState->curAP += enemybattleState->GetAP(
+			enemybattleState->curAP);
+		UE_LOG(LogTemp, Warning, TEXT("Current AP: %d"),
+		       enemybattleState->curAP);
+
 		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnTurnStart"));
 		ABaseBattlePawn* CapturedUnit = this;
-		
+
 		FTimerHandle battleAPIHandle;
-		GetWorld()->GetTimerManager().SetTimer(battleAPIHandle, FTimerDelegate::CreateLambda([this, CapturedUnit]()
-		{
-			UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::In Lambda"));
-			if (turnManager && turnManager->phaseManager)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::turnManager, phaseManager is Set"));
-				turnManager->phaseManager->TrySendbattleState(CapturedUnit);
-			}
-		}), 4.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(battleAPIHandle,
+		                                       FTimerDelegate::CreateLambda(
+			                                       [this, CapturedUnit]()
+			                                       {
+				                                       UE_LOG(LogTemp, Warning,
+					                                       TEXT(
+						                                       "BaseBattlePawn::In Lambda"
+					                                       ));
+				                                       if (turnManager &&
+					                                       turnManager->
+					                                       phaseManager)
+				                                       {
+					                                       UE_LOG(LogTemp,
+						                                       Warning,
+						                                       TEXT(
+							                                       "BaseBattlePawn::turnManager, phaseManager is Set"
+						                                       ));
+					                                       turnManager->
+						                                       phaseManager->
+						                                       TrySendbattleState(
+							                                       CapturedUnit);
+				                                       }
+			                                       }), 4.0f, false);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
 }
-// 자동 탐색 전 가까운 적을 찾는 로직
-// AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
-//
-// TArray<AActor*> playerActors;
-// UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABattlePlayer::StaticClass(), playerActors);
-//
-// TArray<ABattlePlayer*> players;
-// for (AActor* actor : playerActors)
-// {
-// 	if (ABattlePlayer* p = Cast<ABattlePlayer>(actor))
-// 	{
-// 		players.Add(p);
-// 	}
-// }
-//
-// if (ABattlePlayer* target = enemy->FindClosestPlayer(players))
-// {
-// 	enemy->MoveToPlayer(target, tileManger);
-// }
-		
-// FTimerHandle timerHandle;
-// GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([this]()
-// {
-// 	OnTurnEnd();
-// }), 5.0f, false);
+
 void ABaseBattlePawn::OnTurnEnd()
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *GetName());
 	// 입력 막고 FSM 종료
-	
+
 	// Casting을 통해 현재 유닛이 player 또는 enemy라면 그쪽 함수 실행
 	if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 	{
 		// 턴 종료 상태라면 return
-		if (phaseManager->turnManager->curTurnState == ETurnState::TurnEnd) return;
-		
+		if (phaseManager->turnManager->curTurnState == ETurnState::TurnEnd)
+		{
+			return;
+		}
+
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
 			// PlayerPhaseEnd
@@ -199,14 +198,17 @@ void ABaseBattlePawn::OnMouseLeftClick()
 	FHitResult hitInfo;
 	FCollisionQueryParams params;
 
-	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(start, dir);
+	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(
+		start, dir);
 	end = start + dir * 10000;
 
-	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, params))
+	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,
+	                                         ECC_Visibility, params))
 	{
 		// 상대와 거리 측정
-		float dist = FVector::Dist(GetActorLocation(), hitInfo.GetActor()->GetActorLocation());
-		
+		float dist = FVector::Dist(GetActorLocation(),
+		                           hitInfo.GetActor()->GetActorLocation());
+
 		// 자신의 moveRange * 100 보다 작거나 같을 때
 		if (dist > (this->battlePlayerState->playerStatus.move_Range * 100))
 		{
@@ -215,48 +217,50 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		}
 
 		EActionMode curSkillState = currentActionMode;
-		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"), *UEnum::GetValueAsString(curSkillState));
+		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),
+		       *UEnum::GetValueAsString(curSkillState));
 		switch (curSkillState)
 		{
-			case EActionMode::None:
-				break;
-			case EActionMode::TurnEnd:
-				OnTurnEnd();
-				break;
-			case EActionMode::Move:
-				PlayerMove(hitInfo);
-				break;
-			case EActionMode::BaseAttack:
-				PlayerBaseAttack(hitInfo);
-				break;
-			case EActionMode::Paralysis:
-				UE_LOG(LogTemp, Warning, TEXT("OnMouseLeftClick Paralysis"));
-				PlayerParalysis(hitInfo);
-				break;
-			case EActionMode::Poison:
-				PlayerPoison(hitInfo);
-				break;
-			case EActionMode::Vulnerable:
-				PlayerVulnerable(hitInfo);
-				break;
-			case EActionMode::Weakening:
-				PlayerWeaking(hitInfo);
-				break;
-			case EActionMode::Fatal:
-				PlayerFatal(hitInfo);
-				break;
-			case EActionMode::Rupture:
-				PlayerRupture(hitInfo);
-				break;
-			case EActionMode::Roar:
-				PlayerRoar(hitInfo);
-				break;
-			case EActionMode::BattleCry:
-				PlayerBattleCry(hitInfo);
-				break;
+		case EActionMode::None:
+			break;
+		case EActionMode::TurnEnd:
+			OnTurnEnd();
+			break;
+		case EActionMode::Move:
+			PlayerMove(hitInfo);
+			break;
+		case EActionMode::BaseAttack:
+			PlayerBaseAttack(hitInfo);
+			break;
+		case EActionMode::Paralysis:
+			UE_LOG(LogTemp, Warning, TEXT("OnMouseLeftClick Paralysis"));
+			PlayerParalysis(hitInfo);
+			break;
+		case EActionMode::Poison:
+			PlayerPoison(hitInfo);
+			break;
+		case EActionMode::Vulnerable:
+			PlayerVulnerable(hitInfo);
+			break;
+		case EActionMode::Weakening:
+			PlayerWeaking(hitInfo);
+			break;
+		case EActionMode::Fatal:
+			PlayerFatal(hitInfo);
+			break;
+		case EActionMode::Rupture:
+			PlayerRupture(hitInfo);
+			break;
+		case EActionMode::Roar:
+			PlayerRoar(hitInfo);
+			break;
+		case EActionMode::BattleCry:
+			PlayerBattleCry(hitInfo);
+			break;
 		}
 	}
 }
+
 void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 {
 	// 이동을 위한 타일이라면
@@ -420,15 +424,20 @@ void ABaseBattlePawn::InitEnemyState()
 		enemybattleState->critical_Rate = 0.04f;
 		enemybattleState->critical_Damage = 1.5f;
 		enemybattleState->speed = 4;
-		
+
+		// enemy에 moveRange 세팅 작업
+		enemy->moveRange = enemy->enemybattleState->move_Range;
+
 		// 전송용 구조체에 값 세팅
 		enemybattleState->enemyStatus.hp = enemybattleState->hp;
 		enemybattleState->enemyStatus.attack = enemybattleState->attack;
 		enemybattleState->enemyStatus.defense = enemybattleState->defense;
 		enemybattleState->enemyStatus.resistance = enemybattleState->resistance;
 		enemybattleState->enemyStatus.move_Range = enemybattleState->move_Range;
-		enemybattleState->enemyStatus.critical_Rate = enemybattleState->critical_Rate;
-		enemybattleState->enemyStatus.critical_Damage = enemybattleState->critical_Damage;
+		enemybattleState->enemyStatus.critical_Rate = enemybattleState->
+			critical_Rate;
+		enemybattleState->enemyStatus.critical_Damage = enemybattleState->
+			critical_Damage;
 		enemybattleState->enemyStatus.speed = enemybattleState->speed;
 	}
 }
@@ -441,27 +450,35 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("state && state->playerStatus.hp > 0"));
 		// 피를 깎는다.
-		player->battlePlayerState->playerStatus.hp = FMath::Max(0, player->battlePlayerState->playerStatus.hp - damage);
-		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage, player->battlePlayerState->playerStatus.hp);
+		player->battlePlayerState->playerStatus.hp = FMath::Max(
+			0, player->battlePlayerState->playerStatus.hp - damage);
+		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage,
+		       player->battlePlayerState->playerStatus.hp);
 
 		// hp가 0보다 작으면 사망
 		if (player->battlePlayerState->playerStatus.hp <= 0)
 		{
 			player->battlePlayerState->playerLifeState = ELifeState::Dead;
-			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(player->battlePlayerState->playerLifeState));	
+			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),
+			       *UEnum::GetValueAsString(player->battlePlayerState->
+				       playerLifeState));
 		}
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 	{
 		// 피를 깎는다.
-		enemy->enemybattleState->enemyStatus.hp = FMath::Max(0, enemy->enemybattleState->enemyStatus.hp - damage);
-		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage, enemy->enemybattleState->enemyStatus.hp);
+		enemy->enemybattleState->enemyStatus.hp = FMath::Max(
+			0, enemy->enemybattleState->enemyStatus.hp - damage);
+		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage,
+		       enemy->enemybattleState->enemyStatus.hp);
 
 		// hp가 0보다 작으면 사망
 		if (enemy->enemybattleState->hp <= 0)
 		{
 			enemy->enemybattleState->enemyLifeState = ELifeState::Dead;
-			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(enemy->enemybattleState->enemyLifeState)); 
+			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),
+			       *UEnum::GetValueAsString(enemy->enemybattleState->
+				       enemyLifeState));
 		}
 	}
 
@@ -469,10 +486,13 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	currentActionMode = EActionMode::None;
 }
 
-void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType)
+void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
+                                  EActionMode attackType)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[ApplyAttack] Called by %s with attackType %d"), *GetName(), (int32)attackType);
-	
+	UE_LOG(LogTemp, Warning,
+	       TEXT("[ApplyAttack] Called by %s with attackType %d"), *GetName(),
+	       (int32)attackType);
+
 	// (기본스탯 + 장비) * 스킬 계수 * (1 + (성격 + 상태효과))
 	if (auto* player = Cast<ABattlePlayer>(targetUnit))
 	{
@@ -480,7 +500,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attac
 		if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("In Cast Enemy"));
-			
+
 			int32 atk = enemybattleState->enemyStatus.attack;
 			int32 weapon = 2;
 			float critical = enemybattleState->enemyStatus.critical_Rate;
@@ -490,105 +510,112 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attac
 
 			// 스킬 계수 및 추가 효과
 			float skillMultiplier = 1.0f;
-			
+
 			switch (attackType)
 			{
-				case EActionMode::Paralysis:
-					// 현재 Ap가 cost보다 크다면 실행
-					UE_LOG(LogTemp, Warning, TEXT("In Paralysis"));
-					if (!enemy->enemybattleState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					skillMultiplier = 0.8f;
-					// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
-					player->AddStatusEffect(EStatusEffect::Weakening, 2);
-					break;
-				case EActionMode::Poison:
-					if (!enemy->enemybattleState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					player->AddStatusEffect(EStatusEffect::Poison, 3);
-					break;
-				case EActionMode::Vulnerable:
-					if (!enemy->enemybattleState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					player->AddStatusEffect(EStatusEffect::Vulnerable, 2);
-					break;
-				case EActionMode::Weakening:
-					if (!enemy->enemybattleState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					player->AddStatusEffect(EStatusEffect::Weakening, 2);
-					break;
-				case EActionMode::Fatal:
-					if (!enemy->enemybattleState->CanConsumeAP(2))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					skillMultiplier = 1.5f;
-					player->AddStatusEffect(EStatusEffect::Bleeding, 2);
-					break;
-				case EActionMode::Rupture:
-					if (!enemy->enemybattleState->CanConsumeAP(2))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					skillMultiplier = 1.5f;
-					player->AddStatusEffect(EStatusEffect::Vulnerable, 1);
-					break;
-				case EActionMode::Roar:
-					if (!enemy->enemybattleState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					player->AddStatusEffect(EStatusEffect::Weakening, 2);
-					break;
-				case EActionMode::BattleCry:
-					if (!enemy->enemybattleState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					// 자신과 동료들에게 버프 부여
-					// 주위 동료들에게 피해 증가 버프 부여
-					// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
-					enemy->AddStatusEffect(EStatusEffect::Angry, 1);
-					break;
-				default:
-					// 기본 타격 스킬 배율
-					skillMultiplier = 1.0f;
-					break;
+			case EActionMode::Paralysis:
+				// 현재 Ap가 cost보다 크다면 실행
+				UE_LOG(LogTemp, Warning, TEXT("In Paralysis"));
+				if (!enemy->enemybattleState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				skillMultiplier = 0.8f;
+			// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
+				player->AddStatusEffect(EStatusEffect::Weakening, 2);
+				break;
+			case EActionMode::Poison:
+				if (!enemy->enemybattleState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				player->AddStatusEffect(EStatusEffect::Poison, 3);
+				break;
+			case EActionMode::Vulnerable:
+				if (!enemy->enemybattleState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				player->AddStatusEffect(EStatusEffect::Vulnerable, 2);
+				break;
+			case EActionMode::Weakening:
+				if (!enemy->enemybattleState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				player->AddStatusEffect(EStatusEffect::Weakening, 2);
+				break;
+			case EActionMode::Fatal:
+				if (!enemy->enemybattleState->CanConsumeAP(2))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				skillMultiplier = 1.5f;
+				player->AddStatusEffect(EStatusEffect::Bleeding, 2);
+				break;
+			case EActionMode::Rupture:
+				if (!enemy->enemybattleState->CanConsumeAP(2))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				skillMultiplier = 1.5f;
+				player->AddStatusEffect(EStatusEffect::Vulnerable, 1);
+				break;
+			case EActionMode::Roar:
+				if (!enemy->enemybattleState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				player->AddStatusEffect(EStatusEffect::Weakening, 2);
+				break;
+			case EActionMode::BattleCry:
+				if (!enemy->enemybattleState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+			// 자신과 동료들에게 버프 부여
+			// 주위 동료들에게 피해 증가 버프 부여
+			// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
+				enemy->AddStatusEffect(EStatusEffect::Angry, 1);
+				break;
+			default:
+				// 기본 타격 스킬 배율
+				skillMultiplier = 1.0f;
+				break;
 			}
 
 			// Rour와 BattleCry는 비공격스킬 및 버프스킬이므로 return 시키면 될듯?
-			if (attackType == EActionMode::Roar || attackType == EActionMode::BattleCry) return;
-			
+			if (attackType == EActionMode::Roar || attackType ==
+				EActionMode::BattleCry)
+			{
+				return;
+			}
+
 			// 반올림 처리
 			int32 chance = FMath::RoundToInt(critical * 100.0f);
 			int32 roll = FMath::RandRange(1, 100);
 
-			
+
 			if (bool bIsCrit = roll <= chance)
 			{
-				int32 critical_Damage = enemybattleState->enemyStatus.critical_Damage;
-				damage = ((atk + weapon) * skillMultiplier * (1 + (personality + status_effect))) * critical_Damage;
+				int32 critical_Damage = enemybattleState->enemyStatus.
+					critical_Damage;
+				damage = ((atk + weapon) * skillMultiplier * (1 + (personality +
+					status_effect))) * critical_Damage;
 				UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
 			}
 			else
 			{
-				damage = (atk + weapon) * skillMultiplier * (1 + (personality + status_effect));
+				damage = (atk + weapon) * skillMultiplier * (1 + (personality +
+					status_effect));
 				UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
 			}
 			GetDamage(player, damage);
@@ -600,7 +627,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attac
 		if (auto* baseAttackPlayer = Cast<ABattlePlayer>(this))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("In Cast baseAttackPlayer"));
-			
+
 			int32 atk = battlePlayerState->playerStatus.attack;
 			int32 weapon = 2;
 			float critical = battlePlayerState->playerStatus.critical_Rate;
@@ -608,113 +635,120 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attac
 			int32 status_effect = 4;
 			int32 damage = 0;
 
-			
+
 			// 스킬 계수 및 추가 효과
 			float skillMultiplier = 1.0f;
-			
+
 			switch (attackType)
 			{
-				case EActionMode::Paralysis:
-					// 현재 Ap가 cost보다 크다면 실행
-					if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					skillMultiplier = 0.8f;
-					// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
-					enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
-					break;
-				case EActionMode::Poison:
-					// 현재 Ap가 cost보다 크다면 실행
-					if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					enemy->AddStatusEffect(EStatusEffect::Poison, 3);
-					break;
-				case EActionMode::Vulnerable:
-					// 현재 Ap가 cost보다 크다면 실행
-					if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					enemy->AddStatusEffect(EStatusEffect::Vulnerable, 2);
-					break;
-				case EActionMode::Weakening:
-					// 현재 Ap가 cost보다 크다면 실행
-					if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
-					break;
-				case EActionMode::Fatal:
-					// 현재 Ap가 cost보다 크다면 실행
-					if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(2))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					skillMultiplier = 1.5f;
-					enemy->AddStatusEffect(EStatusEffect::Bleeding, 2);
-					break;
-				case EActionMode::Rupture:
-					// 현재 Ap가 cost보다 크다면 실행
-					if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(2))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					skillMultiplier = 1.5f;
-					enemy->AddStatusEffect(EStatusEffect::Vulnerable, 1);
-					break;
-				case EActionMode::Roar:
-					// 현재 Ap가 cost보다 크다면 실행
-					if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
-					break;
-				case EActionMode::BattleCry:
-					// 현재 Ap가 cost보다 크다면 실행
-					if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(2))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-						return;
-					}
-					// 자신 및 주위 동료들에게 피해 증가 버프 부여
-					// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
-					baseAttackPlayer->AddStatusEffect(EStatusEffect::Angry, 1);
-					break;
-				default:
-					// 기본 타격 스킬 배율 
-					skillMultiplier = 1.0f;
-					break;
+			case EActionMode::Paralysis:
+				// 현재 Ap가 cost보다 크다면 실행
+				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				skillMultiplier = 0.8f;
+			// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
+				enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
+				break;
+			case EActionMode::Poison:
+				// 현재 Ap가 cost보다 크다면 실행
+				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				enemy->AddStatusEffect(EStatusEffect::Poison, 3);
+				break;
+			case EActionMode::Vulnerable:
+				// 현재 Ap가 cost보다 크다면 실행
+				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				enemy->AddStatusEffect(EStatusEffect::Vulnerable, 2);
+				break;
+			case EActionMode::Weakening:
+				// 현재 Ap가 cost보다 크다면 실행
+				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
+				break;
+			case EActionMode::Fatal:
+				// 현재 Ap가 cost보다 크다면 실행
+				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(2))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				skillMultiplier = 1.5f;
+				enemy->AddStatusEffect(EStatusEffect::Bleeding, 2);
+				break;
+			case EActionMode::Rupture:
+				// 현재 Ap가 cost보다 크다면 실행
+				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(2))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				skillMultiplier = 1.5f;
+				enemy->AddStatusEffect(EStatusEffect::Vulnerable, 1);
+				break;
+			case EActionMode::Roar:
+				// 현재 Ap가 cost보다 크다면 실행
+				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+				enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
+				break;
+			case EActionMode::BattleCry:
+				// 현재 Ap가 cost보다 크다면 실행
+				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(2))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+					return;
+				}
+			// 자신 및 주위 동료들에게 피해 증가 버프 부여
+			// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
+				baseAttackPlayer->AddStatusEffect(EStatusEffect::Angry, 1);
+				break;
+			default:
+				// 기본 타격 스킬 배율 
+				skillMultiplier = 1.0f;
+				break;
 			}
 
 			// Rour와 BattleCry는 비공격스킬 및 버프스킬이므로 return 시키면 될듯?
-			if (attackType == EActionMode::Roar || attackType == EActionMode::BattleCry) return;
-			
+			if (attackType == EActionMode::Roar || attackType ==
+				EActionMode::BattleCry)
+			{
+				return;
+			}
+
 			// 반올림 처리
 			int32 chance = FMath::RoundToInt(critical * 100.0f);
 			int32 roll = FMath::RandRange(1, 100);
 
-			
+
 			if (bool bIsCrit = roll <= chance)
 			{
-				int32 critical_Damage = battlePlayerState->playerStatus.critical_Damage;
-				damage = ((atk + weapon) * skillMultiplier * (1 + (personality + status_effect))) * critical_Damage;
+				int32 critical_Damage = battlePlayerState->playerStatus.
+					critical_Damage;
+				damage = ((atk + weapon) * skillMultiplier * (1 + (personality +
+					status_effect))) * critical_Damage;
 				UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
 			}
 			else
 			{
-				damage = (atk + weapon) * skillMultiplier * (1 + (personality + status_effect));
+				damage = (atk + weapon) * skillMultiplier * (1 + (personality +
+					status_effect));
 				UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
 			}
 			GetDamage(enemy, damage);
@@ -723,20 +757,22 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attac
 }
 
 
-
 void ABaseBattlePawn::AddStatusEffect(EStatusEffect newEffect, int32 duration)
 {
 	if (activeStatusEffects.Contains(newEffect))
 	{
 		// 이미 있으면 지속시간 갱신 or 덧붙이기
-		activeStatusEffects[newEffect] = FMath::Max(activeStatusEffects[newEffect], duration);
+		activeStatusEffects[newEffect] = FMath::Max(
+			activeStatusEffects[newEffect], duration);
 		// UEnum로그를 찍기 위해 enum 메타데이터를 얻어서 Log찍는 과정 
 		UEnum* enumPtr = StaticEnum<EStatusEffect>();
 		if (enumPtr)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("In AddStatusEffect : %s, Duration : %d"),
-				*enumPtr->GetNameStringByValue(static_cast<int64>(newEffect)),
-				activeStatusEffects[newEffect]);
+			UE_LOG(LogTemp, Warning,
+			       TEXT("In AddStatusEffect : %s, Duration : %d"),
+			       *enumPtr->GetNameStringByValue(static_cast<int64>(newEffect)
+			       ),
+			       activeStatusEffects[newEffect]);
 		}
 	}
 	else
@@ -753,9 +789,9 @@ void ABaseBattlePawn::ApplyStatusEffect()
 		UE_LOG(LogTemp, Warning, TEXT("No Status Effect"));
 		return;
 	}
-	
+
 	TArray<EStatusEffect> expiredEffects;
-	
+
 	for (auto& elem : activeStatusEffects)
 	{
 		// Key로 된 Enum값 주소 저장
@@ -765,7 +801,7 @@ void ABaseBattlePawn::ApplyStatusEffect()
 
 		// switch문 처리용 함수
 		HandleStateusEffect(effect);
-		
+
 		// 턴 감소 처리
 		TurnsLeft--;
 		if (TurnsLeft <= 0)
@@ -856,7 +892,6 @@ void ABaseBattlePawn::WeakeningProcess(ABattlePlayerState* playerState)
 	def = FMath::Max(0, def - decreaseDefAmount);
 	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
 	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), def);
-	
 }
 
 void ABaseBattlePawn::VulnerableProcess(ABattlePlayerState* playerState)
@@ -931,18 +966,23 @@ void ABaseBattlePawn::BleedingEnemyProcess(UEnemyBattleState* enemyState)
 
 void ABaseBattlePawn::MouseClick(const FInputActionValue& value)
 {
-	if (!bIsMoveMode) return;
-	
+	if (!bIsMoveMode)
+	{
+		return;
+	}
+
 	FHitResult hitInfo;
 	FVector start, end, dir;
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(this);
 
 	// 마우스 클릭 위치 얻기
-	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(start, dir);
+	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(
+		start, dir);
 	end = start + dir * 10000;
 
-	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, params))
+	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,
+	                                         ECC_Visibility, params))
 	{
 		AGridTile* clickTile = Cast<AGridTile>(hitInfo.GetActor());
 		if (clickTile)
@@ -954,7 +994,8 @@ void ABaseBattlePawn::MouseClick(const FInputActionValue& value)
 			FVector pawnStart = GetActorLocation();
 			FVector pawnEnd = pawnStart + FVector::DownVector * 1000;
 
-			if (GetWorld()->LineTraceSingleByChannel(startHit, pawnStart, pawnEnd, ECC_Visibility, params))
+			if (GetWorld()->LineTraceSingleByChannel(
+				startHit, pawnStart, pawnEnd, ECC_Visibility, params))
 			{
 				// 시작 타일 직접 설정
 				startTile = Cast<AGridTile>(startHit.GetActor());
@@ -968,22 +1009,29 @@ void ABaseBattlePawn::MouseClick(const FInputActionValue& value)
 				}
 				else
 				{
-					UE_LOG(LogTemp, Error, TEXT("StartTile is Invalid Cannot start pathFinding"));
+					UE_LOG(LogTemp, Error,
+					       TEXT("StartTile is Invalid Cannot start pathFinding"
+					       ));
 				}
 			}
 			else
 			{
-				UE_LOG(LogTemp, Error, TEXT("Fail to LineTrace downwards to find clickTile"));
+				UE_LOG(LogTemp, Error,
+				       TEXT("Fail to LineTrace downwards to find clickTile"));
 			}
 
 			bIsMoveMode = false; // 클릭했으니까 모드 종료
 		}
-		
 	}
 }
 
 void ABaseBattlePawn::PathFind()
 {
+	UE_LOG(LogTemp, Warning,
+	       TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),
+	       pathArray.Num(), moveRange);
+	UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),
+	       bIsMoving ? TEXT("true") : TEXT("false"));
 	if (openArray.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("OpenArray is empty"));
@@ -991,10 +1039,15 @@ void ABaseBattlePawn::PathFind()
 	}
 
 	int32 safetyCounter = 0;
-	const int32 maxSafetyCount = 1000;
-	
+	constexpr int32 maxSafetyCount = 1000;
+
 	while (openArray.Num() > 0 && safetyCounter++ < maxSafetyCount)
 	{
+		UE_LOG(LogTemp, Warning,
+		       TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),
+		       pathArray.Num(), moveRange);
+		UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),
+		       bIsMoving ? TEXT("true") : TEXT("false"));
 		if (safetyCounter > maxSafetyCount)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Path Safe Break"));
@@ -1005,12 +1058,14 @@ void ABaseBattlePawn::PathFind()
 
 		if (!IsValid(currentTile))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s currentTile PathFind Error"), *GetName());
+			UE_LOG(LogTemp, Warning, TEXT("%s currentTile PathFind Error"),
+			       *GetName());
 			return;
 		}
 		if (!IsValid(goalTile))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s goalTile PathFind Error"), *GetName());
+			UE_LOG(LogTemp, Warning, TEXT("%s goalTile PathFind Error"),
+			       *GetName());
 			return;
 		}
 		// 목표 도달했으면 종료
@@ -1033,10 +1088,12 @@ void ABaseBattlePawn::PathFind()
 
 	UE_LOG(LogTemp, Warning, TEXT("길을 찾지 못했습니다"));
 }
+
 void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 {
 	FIntPoint nextCoord = currentTile->gridCoord + offset;
-	AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
+	AGridTileManager* tileManger = Cast<AGridTileManager>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
 
 	if (AGridTile* tile = tileManger->map.FindRef(nextCoord))
 	{
@@ -1046,11 +1103,14 @@ void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 		if (!tile->parentTile || tile->tCostValue < previousCost)
 		{
 			tile->parentTile = currentTile;
-			
+
 			int32 i = 0;
 			for (; i < openArray.Num(); ++i)
 			{
-				if (openArray[i]->tCostValue >= tile->tCostValue) break;
+				if (openArray[i]->tCostValue >= tile->tCostValue)
+				{
+					break;
+				}
 			}
 			openArray.Insert(tile, i);
 		}
@@ -1066,73 +1126,83 @@ void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 		// }
 	}
 }
+
 void ABaseBattlePawn::BuildPath()
 {
-	TSet<AGridTile*> visitePathTiles;
+	UE_LOG(LogTemp, Warning, TEXT("BuildPath: moveRange = %d"), moveRange);
 	
+	// goalTile 또는 goalTile->parentTile 자체가 nullptr일 수 있다.
+	if (!goalTile || !goalTile->parentTile)
+	{
+		UE_LOG(LogTemp, Error, TEXT("BuildPath aborted: goalTile or parent is null"));
+		OnMoveEnd();
+		return;
+	}
+	if (startTile == goalTile)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Start tile is same as goal tile"));
+		OnMoveEnd();
+		return;
+	}
+	
+	TSet<AGridTile*> visitePathTiles;
 	// 찾은 길 표시
 	AGridTile* temp = goalTile;
+	
 	while (temp && temp->parentTile)
 	{
 		if (visitePathTiles.Contains(temp))
 		{
-			UE_LOG(LogTemp, Warning, TEXT(" Infinite loop detected in BuildPath"));
+			UE_LOG(LogTemp, Warning,
+			       TEXT(" Infinite loop detected in BuildPath"));
 			break;
 		}
+		
 		visitePathTiles.Add(temp);
 		pathArray.Insert(temp, 0); // 역방향으로 삽입
 		temp = temp->parentTile;
 	}
-
-	if (auto* player = Cast<ABattlePlayer>(turnManager->curUnit))
+	
+	if (pathArray.Num() == 0)
 	{
-		player->moveRange = player->battlePlayerState->playerStatus.move_Range;
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
-	{
-		enemy->moveRange = enemy->enemybattleState->move_Range;
+		OnMoveEnd(); // 이동 실패 시 턴 종료
+		return;
 	}
 	
 	// 경로 저장 완료했으면 이동 시작
 	if (pathArray.Num() > moveRange)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Path too long! Max Move Range = %d, Path Length = %d"), moveRange, pathArray.Num());
-        
-		// 경로 초기화하고 이동 금지
-		pathArray.Empty();
-		bIsMoving = false;
-
-		return;
+		UE_LOG(LogTemp, Warning, TEXT("Path too long! moveRange = %d, path length = %d"), moveRange, pathArray.Num());
+		pathArray.SetNum(moveRange); // 최대 이동 가능 거리만큼 잘라 이동
 	}
 	
-	if (pathArray.Num() > 0)
-	{
-		bIsMoving = true;
-		currentPathIndex = 0;
-	}
+	bIsMoving = true;
+	currentPathIndex = 0;
 }
 
 void ABaseBattlePawn::AddOpenArray(FVector dir)
 {
 	FVector start = currentTile->GetActorLocation();
 	FVector end = start + dir * 200;
-	
+
 	FHitResult hitInfo;
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(this);
 	params.AddIgnoredActor(currentTile);
 
 	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f);
-	
-	if (bool isHit = GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, params))
+
+	if (bool isHit = GetWorld()->LineTraceSingleByChannel(
+		hitInfo, start, end, ECC_Visibility, params))
 	{
 		AGridTile* tile = Cast<AGridTile>(hitInfo.GetActor());
 		// openArray, closeArray에 해당 tile이 없을 때만
-		if (IsValid(tile) && !openArray.Contains(tile) && !closedArray.Contains(tile))
+		if (IsValid(tile) && !openArray.Contains(tile) && !closedArray.
+			Contains(tile))
 		{
 			// 해당 tile에 Cost 구하기
 			tile->SetCost(currentTile, goalTile);
-			
+
 			// openArray 값에 tile 추가 (cost 값이 작은 tile 앞쪽에)
 			int32 i = 0;
 			for (i = 0; i < openArray.Num(); ++i)
@@ -1155,10 +1225,11 @@ void ABaseBattlePawn::UnitMove()
 		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation();
 		FVector currentLoc = GetActorLocation();
 
-		FVector newLoc = FMath::VInterpConstantTo(currentLoc, targetLoc, GetWorld()->GetDeltaSeconds(), moveSpeed);
+		FVector newLoc = FMath::VInterpConstantTo(
+			currentLoc, targetLoc, GetWorld()->GetDeltaSeconds(), moveSpeed);
 
 		SetActorLocation(newLoc);
-		
+
 		// 목표 지점에 거의 도착하면 다음 목표로 이동
 		if (FVector::DistSquared(newLoc, targetLoc) < FMath::Square(5.0f))
 		{
@@ -1184,14 +1255,19 @@ void ABaseBattlePawn::UnitMove()
 void ABaseBattlePawn::OnMoveEnd()
 {
 	// AI에 턴을 종료하거나 다음 액션 처리 등을 여기서 처리
+	OnTurnEnd();
 	UE_LOG(LogTemp, Warning, TEXT("Move Complete"));
 }
 
 void ABaseBattlePawn::InitValues()
 {
-	AGridTileManager* tileManager = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
-	if (!tileManager) return;
-	
+	AGridTileManager* tileManager = Cast<AGridTileManager>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
+	if (!tileManager)
+	{
+		return;
+	}
+
 	for (auto& pair : tileManager->map)
 	{
 		if (pair.Value)
@@ -1203,14 +1279,20 @@ void ABaseBattlePawn::InitValues()
 	}
 	for (AGridTile* tile : closedArray)
 	{
-		if (IsValid(tile)) tile->parentTile = nullptr;
+		if (IsValid(tile))
+		{
+			tile->parentTile = nullptr;
+		}
 	}
-    
+
 	for (AGridTile* tile : openArray)
 	{
-		if (IsValid(tile)) tile->parentTile = nullptr;
+		if (IsValid(tile))
+		{
+			tile->parentTile = nullptr;
+		}
 	}
-	
+
 	// 배열 및 변수 초기화
 	openArray.Empty();
 	closedArray.Empty();
@@ -1221,4 +1303,3 @@ void ABaseBattlePawn::InitValues()
 	startTile = nullptr;
 	goalTile = nullptr;
 }
-

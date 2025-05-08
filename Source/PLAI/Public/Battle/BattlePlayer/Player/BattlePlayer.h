@@ -16,6 +16,7 @@ class PLAI_API ABattlePlayer : public ABaseBattlePawn
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 	virtual void PossessedBy(AController* NewController) override;	
 public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;

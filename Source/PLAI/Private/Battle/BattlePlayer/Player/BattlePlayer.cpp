@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Kismet/GameplayStatics.h"
 
 void ABattlePlayer::BeginPlay()
 {
@@ -13,6 +14,16 @@ void ABattlePlayer::BeginPlay()
 	// 플레이어 세팅
 	
 	// GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABaseBattlePawn::TryInitStatus, 0.1f, true);
+}
+
+void ABattlePlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::SpaceBar))
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), TEXT("Mk_LevelVillage"));
+	}
 }
 
 void ABattlePlayer::PossessedBy(AController* NewController)
