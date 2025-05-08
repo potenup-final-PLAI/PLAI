@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UiMonWorld.h"
 #include "PLAI/Item/Monster/MonsterMaster.h"
 #include "MonWorld.generated.h"
 
@@ -28,11 +29,23 @@ public:
 	
     UPROPERTY()
 	float CurrentTime = 0;
-	UPROPERTY()
 	
+	UPROPERTY(EditAnywhere)
+	float CastingDistance = 500.0f;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUiMonWorld> UIMonWorldFactory;
+	UPROPERTY(EditAnywhere)
+	class UUiMonWorld* UIMonWorld;
+	
+	UPROPERTY(EditAnywhere)
+	FVector FirstInitLoc;
+	UPROPERTY(EditAnywhere)
 	FVector InitLoc = FVector::ZeroVector;
 	
 	FVector RandLocation();
 	
 	void MoveToLocation();
+
+	void CastPlayer();
 };

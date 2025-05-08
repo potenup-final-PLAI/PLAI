@@ -4,6 +4,8 @@
 #include "MonWorld.h"
 
 #include "MonWorldFsm.h"
+#include "Engine/OverlapResult.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 
 // Sets default values
@@ -18,6 +20,7 @@ void AMonWorld::BeginPlay()
 {
 	Super::BeginPlay();
 	InitLoc = GetActorLocation() + RandLocation();
+	FirstInitLoc = InitLoc;
 }
 
 // Called every frame
@@ -50,6 +53,7 @@ FVector AMonWorld::RandLocation()
 	DrawDebugLine(GetWorld(),GetActorLocation() + hit.Location + FVector(0,0,3000),hit.Location,FColor::Blue,
 		false,2);
 	DrawDebugSphere(GetWorld(),GetActorLocation() + hit.Location,30,30,FColor::Red,false,2);
+
 	return FVector(hit.Location);
 }
 
@@ -65,10 +69,43 @@ void AMonWorld::MoveToLocation()
 	else
 	{
 		UE_LOG(LogTemp,Error,TEXT("AMonWorld::MoveToLocation"));
-		InitLoc = GetActorLocation() + RandLocation();
+		FVector Candidate;
+		do
+		{ Candidate = GetActorLocation() + RandLocation(); }
+		while (FVector::Distance(Candidate, FirstInitLoc) > 1000.f);
+		
+		InitLoc = Candidate;
 		FVector Dist = InitLoc - GetActorLocation(); 
 		SetActorRotation(Dist.Rotation());
+		CastPlayer();
 		CurrentTime = 0;
+	}
+}
+
+void AMonWorld::CastPlayer()
+{
+	TArray<FOverlapResult> Hits;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->OverlapMultiByChannel(Hits,GetActorLocation(),FQuat::Identity,ECC_Pawn,
+		FCollisionShape::MakeSphere(CastingDistance),Params);
+	DrawDebugSphere(GetWorld(),GetActorLocation(),CastingDistance,10,FColor::Blue,false,1);
+	if (bHit)
+	{
+		for (FOverlapResult Hit : Hits)
+		{
+			if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Hit.GetActor()))
+			{
+				UE_LOG(LogTemp,Error,TEXT("AMonWorld::CastPlayer"));
+				UIMonWorld = CreateWidget<UUiMonWorld>(GetWorld(),UIMonWorldFactory);
+				UIMonWorld->AddToViewport();
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp,Error,TEXT("AMonWorld::CastPlayer Hit안됨"));
 	}
 }
 
