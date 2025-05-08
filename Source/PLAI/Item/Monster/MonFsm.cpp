@@ -90,7 +90,7 @@ void UMonFsm::MoveDestination()
 	if (Distance.Length() < 75)
 	{
 		LineDestination();
-		if (FVector::Distance(TargetLocation,InitLocation) > 3000)
+		if (FVector::Distance(TargetLocation,InitLocation) > InitLocationFloat)
 		{
 			FVector NewLoc = InitLocation - Monster->GetActorLocation();
 			NewLoc.Normalize();
@@ -130,7 +130,7 @@ void UMonFsm::LineDestination()
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Monster);
 
-	FVector Start = Monster->GetActorLocation() + RandLocation() + FVector(0,0,2000);
+	FVector Start = Monster->GetActorLocation() + RandLocation(RandLocationFloat,RandLocationFloat) + FVector(0,0,2000);
 	FVector End = Start + FVector(0,0, -10000);
 	
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_Visibility,Params);
