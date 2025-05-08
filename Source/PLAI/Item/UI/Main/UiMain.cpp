@@ -26,7 +26,7 @@ void UUiMain::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	UGameplayStatics::SetGamePaused(GetWorld(),true);
+	// UGameplayStatics::SetGamePaused(GetWorld(),true);
 
     Wbp_UIChaMain->UiMain = this;
 	Wbp_UiSubMain->UiMain = this;
@@ -63,7 +63,12 @@ void UUiMain::Login()
 	LoginComp->OnLogin.BindLambda([this](bool bLogin)
 	{
 		if (bLogin)
-		{   CanvasMain->RemoveFromParent(); }
+		{
+			CanvasMain->RemoveFromParent();
+			//해야하나?
+			LoginComp->HttpCreatePost(TEXT("안녕하세요"));
+			
+		}
 		else
 		{   LoginFail->SetVisibility(ESlateVisibility::Visible);
 			FTimerHandle TimerHandle;

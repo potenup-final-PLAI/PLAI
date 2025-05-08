@@ -184,7 +184,7 @@ void ULoginComp::HttpLoginPost()
 		FLoginStructGet LoginStructGet;
 		if (bProcessedSuccessfully)
 		{ FString JsonString = HttpResponse->GetContentAsString();
-			UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인%s"), *JsonString);
+			UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인 JsonString무엇 [%s]"), *JsonString);
 
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &LoginStructGet);
 			if (LoginStructGetInit.user_id != LoginStructGet.user_id)
@@ -431,7 +431,6 @@ void ULoginComp::ConnectWebSocket()
 	const FString Protocol = TEXT("");
 	
 	WebSocket = FWebSocketsModule::Get().CreateWebSocket(URL, Protocol);
-	
 	// 연결 성공
 	WebSocket->OnConnected().AddUObject(this, &ULoginComp::OnWebSocketConnected);
 	// 메시지 수신
