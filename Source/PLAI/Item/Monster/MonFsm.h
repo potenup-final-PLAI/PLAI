@@ -46,6 +46,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	FVector InitLocation;
 	UPROPERTY(EditAnywhere)
+	float InitLocationFloat = 3000.0f;
+	
+	UPROPERTY(EditAnywhere)
 	FVector TargetLocation = FVector::ZeroVector;
 	UPROPERTY(EditAnywhere)
 	FVector RandLoc;
@@ -60,6 +63,7 @@ public:
 	bool bMoveArrive = false;
 
 	FVector RandLocation(float X = 1000.0f, float Y = 1000.0f, float Z = 50.0f);
+	float RandLocationFloat = 1000.0f;
 
 	void MoveDestination();
 	void LineDestination();
