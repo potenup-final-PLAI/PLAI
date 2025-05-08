@@ -28,10 +28,7 @@ void AMonWorld::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bBattle == false)
-	{
-		MoveToLocation();
-	}
+	MoveToLocation();
 }
 
 // Called to bind functionality to input
@@ -63,11 +60,19 @@ FVector AMonWorld::RandLocation()
 void AMonWorld::MoveToLocation()
 {
 	CurrentTime += GetWorld()->GetDeltaSeconds();
+	if (CurrentTime > 1.5)
+	{
+		CastPlayer();
+		CurrentTime = 0;
+	}
 	
 	if (FVector::Distance(GetActorLocation(),InitLoc) > 25)
 	{
-		FVector Dist = InitLoc - GetActorLocation(); 
-		AddActorWorldOffset(Dist.GetSafeNormal() * 5);
+		if (bBattle == false)
+		{
+			FVector Dist = InitLoc - GetActorLocation(); 
+			AddActorWorldOffset(Dist.GetSafeNormal() * 5);
+		}
 	}
 	else
 	{
@@ -80,13 +85,16 @@ void AMonWorld::MoveToLocation()
 		InitLoc = Candidate;
 		FVector Dist = InitLoc - GetActorLocation(); 
 		SetActorRotation(Dist.Rotation());
-		CastPlayer();
-		CurrentTime = 0;
 	}
 }
 
 void AMonWorld::CastPlayer()
 {
+	if (UIMonWorld)
+	{ UIMonWorld->RemoveFromParent(); }
+	bBattle = false;
+
+	UE_LOG(LogTemp,Error,TEXT("AMonWorld::CastPlayer 캐스팅 플레이어중"));
 	TArray<FOverlapResult> Hits;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
@@ -100,18 +108,17 @@ void AMonWorld::CastPlayer()
 		{
 			if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Hit.GetActor()))
 			{
-				UE_LOG(LogTemp,Error,TEXT("AMonWorld::CastPlayer"));
-				UIMonWorld = CreateWidget<UUiMonWorld>(GetWorld(),UIMonWorldFactory);
-				UIMonWorld->AddToViewport();
-				UIMonWorld->MonWorld = this;
-				UIMonWorld->TestPlayer = TestPlayer;
-				bBattle = true;
+				FVector Dir = TestPlayer->GetActorLocation() - GetActorLocation();
+				if (FVector::DotProduct(GetActorForwardVector() ,Dir.GetSafeNormal()) > 0)
+				{
+					UIMonWorld = CreateWidget<UUiMonWorld>(GetWorld(),UIMonWorldFactory);
+					UIMonWorld->AddToViewport();
+					UIMonWorld->MonWorld = this;
+					UIMonWorld->TestPlayer = TestPlayer;
+					bBattle = true;
+				}
 			}
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp,Error,TEXT("AMonWorld::CastPlayer Hit안됨"));
 	}
 }
 
