@@ -63,6 +63,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	TArray<ABaseBattlePawn*> unitQueue;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	TArray<ABaseBattlePawn*> httpUnitQueue;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase")
 	TSubclassOf<ABaseBattlePawn> unitFactory;
 
@@ -83,4 +86,40 @@ public:
 	void EndEnemyPhase();
 	// 전투 종료
 	void BattleEnd();
+
+	//--------------Test ------------------
+	bool bAPITest = true;
+	FTimerHandle timerBattleStartHandle;
+
+	void SetBeforeBattle();
+	
+	void TrySendInitialState();
+	FEnvironmentState SetStartBattleAPI();
+	
+	// HttpActor 탐색용
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Phase")
+	TSubclassOf<class ABattleHttpActor> httpActorFactory;
+	
+	FBattleTurnState SetBattleProcessingAPI();
+	void TrySendbattleState(ABaseBattlePawn* unit);
+	bool AreAllUnitsInitialized() const;
+
+	//GridTileManager
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	class AGridTileManager* gridTileManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Phase")
+	TSubclassOf<class AGridTileManager> girdTileManagerFactory;
+
+	//-------------Set Status-----------------------
+	bool bIsInitialized = false;
+	
+	UFUNCTION()
+	void TryInitStatus(ABaseBattlePawn* unit);
+	void SetStatus(ABaseBattlePawn* unit);
+
+	//------------Status 이름 변경--------------------
+	FString GetStatusEffectsString(EStatusEffect effect);
+	
+	
 };

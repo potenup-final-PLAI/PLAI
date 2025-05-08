@@ -5,11 +5,9 @@
 
 #include "BaseBattlePawn.h"
 #include "Battle/TurnSystem/PhaseManager.h"
-#include "Developer/AITestSuite/Public/AITestsCommon.h"
 #include "Enemy/BaseEnemy.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
 
 DEFINE_LOG_CATEGORY(TPS);
@@ -26,7 +24,6 @@ void ATurnManager::BeginPlay()
 {
 	Super::BeginPlay();
 	phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
-	
 }
 
 // Called every frame
@@ -62,7 +59,9 @@ void ATurnManager::StartPlayerTurn()
 {
 	if (curTurnState == ETurnState::TurnEnd && curTurnState == ETurnState::PlayerTurn && curTurnState == ETurnState::EnemyTurn) return;
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Player Turn"));
+	// Player 턴 시작
 	SetTurnState(ETurnState::PlayerTurn);
+	
 	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("playerPawn is Player %s"), *playerPawn->GetActorNameOrLabel());

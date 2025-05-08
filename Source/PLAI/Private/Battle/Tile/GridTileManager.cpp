@@ -6,10 +6,7 @@
 #include "BaseBattlePawn.h"
 #include "GridTile.h"
 #include "Algo/RandomShuffle.h"
-#include "Battle/UI/ActionUI.h"
-#include "Developer/AITestSuite/Public/AITestsCommon.h"
 #include "Enemy/BaseEnemy.h"
-#include "Evaluation/MovieSceneTimeWarping.h"
 #include "Player/BattlePlayer.h"
 
 // Sets default values
@@ -34,15 +31,16 @@ void AGridTileManager::Tick(float DeltaTime)
 
 void AGridTileManager::InitGridTile()
 {
-	TArray<FIntPoint> AllCoords;
-	AllCoords.Reserve(625);
+	TArray<FIntPoint> allCoords;
+	allCoords.Reserve(625);
+	// allCoords.Reserve(49);
 
 	for (int32 Y = 0; Y < 25; ++Y)
 	{
 		for (int32 X = 0; X < 25; ++X)
 		{
 			FVector spawnLoc = GetActorLocation() + FVector(
-				Y * 110, X * 110, 0.0f);
+				Y * 100, X * 100, 0.0f);
 			FRotator spawnRot = FRotator::ZeroRotator;
 			FActorSpawnParameters spawnParams;
 
@@ -60,56 +58,76 @@ void AGridTileManager::InitGridTile()
 				FString s = map.FindRef(FIntPoint(X, Y))->GetActorNameOrLabel();
 				// UE_LOG(LogTemp, Warning, TEXT("X = %d, Y = %d, TileName = %s"),
 				//        X, Y, *s);
-				AllCoords.Add(Coord); // 좌표 저장
+				// 좌표 저장
+				allCoords.Add(Coord);
 			}
 		}
 	}
 
-	Algo::RandomShuffle(AllCoords);
+	Algo::RandomShuffle(allCoords);
 
-	TArray<FIntPoint> PlayerCoords;
-	for (int32 i = 0; i < 5 && i < AllCoords.Num(); ++i)
+	TArray<FIntPoint> playerCoords;
+	for (int32 i = 0; i < 4 && i < allCoords.Num(); ++i)
 	{
-		PlayerCoords.Add(AllCoords[i]);
+		playerCoords.Add(allCoords[i]);
 	}
 
 	// 플레이어 좌표를 AllCoords에서 제거
-	for (const FIntPoint& Coord : PlayerCoords)
+	for (const FIntPoint& Coord : playerCoords)
 	{
-		AllCoords.Remove(Coord);
+		allCoords.Remove(Coord);
 	}
 
 	// 그 다음 적 좌표 뽑기
-	TArray<FIntPoint> EnemyCoords;
-	for (int32 i = 0; i < 5 && i < AllCoords.Num(); ++i)
+	TArray<FIntPoint> enemyCoords;
+	for (int32 i = 0; i < 4 && i < allCoords.Num(); ++i)
 	{
-		EnemyCoords.Add(AllCoords[i]);
+		enemyCoords.Add(allCoords[i]);
 	}
 
 	// 플레이어 유닛 스폰
-	for (const FIntPoint& Coord : PlayerCoords)
+	for (const FIntPoint& coord : playerCoords)
 	{
-		if (AGridTile* Tile = map.FindRef(Coord))
+		if (AGridTile* gridTile = map.FindRef(coord))
 		{
-			FVector SpawnLoc = Tile->GetActorLocation() + FVector(
+			FVector spawnLoc = gridTile->GetActorLocation() + FVector(
 				0.f, 0.f, 10.f);
-			auto* player = GetWorld()->SpawnActor<ABattlePlayer>(
-				battlePlayerFactory, SpawnLoc, FRotator::ZeroRotator);
-			player->speed = FMath::RandRange(1, 10);
+			if (auto* player = GetWorld()->SpawnActor<ABattlePlayer>(battlePlayerFactory, spawnLoc, FRotator::ZeroRotator))
+			{
+				// player->speed = FMath::RandRange(1, 10);
+				player->currentTile = gridTile;
+				unitArray.Add(player);
+			}
 		}
 	}
 
 	// 적 유닛 스폰
-	for (const FIntPoint& Coord : EnemyCoords)
+	for (const FIntPoint& coord : enemyCoords)
 	{
-		if (AGridTile* Tile = map.FindRef(Coord))
+		if (AGridTile* gridTile = map.FindRef(coord))
 		{
-			FVector SpawnLoc = Tile->GetActorLocation() + FVector(
+			FVector spawnLoc = gridTile->GetActorLocation() + FVector(
 				0.f, 0.f, 10.f);
-			auto* enemey = GetWorld()->SpawnActor<ABaseEnemy>(
-				enemyFactory, SpawnLoc,
-				FRotator::ZeroRotator);
-			enemey->speed = FMath::RandRange(1, 10);
+			if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(enemyFactory, spawnLoc,FRotator::ZeroRotator))
+			{
+				enemy->speed = FMath::RandRange(1, 10);
+				enemy->currentTile = gridTile;
+				unitArray.Add(enemy);
+			}
 		}
 	}
+}
+AGridTile* AGridTileManager::FindCurrentTile(FVector worldLoc)
+{
+
+	FVector loc = worldLoc - GetActorLocation();
+	int32 x = FMath::RoundToInt(loc.Y / 100.0f);
+	int32 y = FMath::RoundToInt(loc.X / 100.0f);
+	
+	return map.FindRef(FIntPoint(x, y));
+}
+
+AGridTile* AGridTileManager::GetTile(int32 x, int32 y)
+{
+	return map.FindRef(FIntPoint(x, y));
 }

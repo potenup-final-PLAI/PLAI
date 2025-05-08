@@ -5,6 +5,7 @@
 
 #include "Components/BoxComponent.h"
 
+
 // Sets default values
 AGridTile::AGridTile()
 {
@@ -15,6 +16,12 @@ AGridTile::AGridTile()
 	SetRootComponent(boxComp);
 	boxComp->SetRelativeScale3D(FVector(1.0f, 1.0f, 0.1f));
 	boxComp->SetBoxExtent(FVector(50));
+
+	// 변수 초기화
+	sCostValue = 0;
+	tCostValue = 0;
+	parentTile = nullptr;
+	gridCoord = FIntPoint(0, 0);
 }
 
 // Called when the game starts or when spawned
@@ -35,3 +42,33 @@ void AGridTile::SetGridCoord(FIntPoint coord)
 	// UE_LOG(LogTemp, Warning, TEXT("Coord X = %d Coord Y = %d, TileName = %s"),
 	//        gridCoord.X, gridCoord.Y, *this->GetActorNameOrLabel());
 }
+
+void AGridTile::SetCost(AGridTile* s, AGridTile* g)
+{
+	if (!IsValid(s) || !IsValid(g))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetCost : Invalid pointers passed"));
+		return;
+	}
+	// 이전 타일의 위치
+	FVector prevPos = s->GetActorLocation();
+	// 목적지 타일의 위치
+	FVector goalPos = g->GetActorLocation();
+	// 현재 나의 위치
+	FVector curPos = GetActorLocation();
+
+	// sCost 구하기
+	sCostValue = FMath::Abs(prevPos.X - curPos.X) + FMath::Abs(prevPos.Y - curPos.Y);
+	sCostValue += s->sCostValue;
+	
+	// gCost 구하기
+	float gCostValue = FMath::Abs(goalPos.X - curPos.X) + FMath::Abs(goalPos.Y - curPos.Y);
+
+	// tCost 구하기
+	tCostValue = sCostValue + gCostValue;
+	
+	// 누구를 기준으로 Cost를 계산했냐?
+	parentTile = s;
+}
+
+

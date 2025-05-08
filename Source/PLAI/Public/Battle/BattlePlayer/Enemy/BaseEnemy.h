@@ -27,4 +27,15 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
+	
+	
+	//--------------Test---------------------
+	void MoveToPlayer(class ABattlePlayer* player, class AGridTileManager* tileManager);
+	class ABattlePlayer* FindClosestPlayer(TArray<class ABattlePlayer*>& allPlayers);
+
+	void FindAndAttackPlayer();
+
+	// 받은 데이터로 enemy 움직임
+	void ProcessAction(const FActionRequest& actionRequest);
+	ABaseBattlePawn* FindUnitById(const FString& Id);
 };
