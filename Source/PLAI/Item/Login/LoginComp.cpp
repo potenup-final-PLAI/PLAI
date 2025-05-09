@@ -229,14 +229,15 @@ void ULoginComp::HttpSignPost()
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 가입요청 성공 %s 답변코드 %d"),*JsonString,HttpResponse->GetResponseCode());
 			if (UiMain->WbpUiSign)
 			{
+				UiMain->WbpUiSign->SignCompleteBox->SetVisibility(ESlateVisibility::Visible);
 				if (HttpResponse->GetResponseCode() == 200)
 				{
-					UiMain->WbpUiSign->SignCompleteBox->SetVisibility(ESlateVisibility::Visible);
+					// UiMain->WbpUiSign->SignCompleteBox->SetVisibility(ESlateVisibility::Visible);
 					UiMain->WbpUiSign->bSingComplete->SetText(FText::FromString(TEXT("가입 완료")));
 				}
 				else
 				{
-					UiMain->WbpUiSign->SignCompleteBox->SetVisibility(ESlateVisibility::Visible);
+					// UiMain->WbpUiSign->SignCompleteBox->SetVisibility(ESlateVisibility::Visible);
 					UiMain->WbpUiSign->bSingComplete->SetText(FText::FromString(TEXT("가입 실패")));
 					UiMain->WbpUiSign->bSingCompleteDetail->SetText(FText::FromString(JsonString));
 				}
