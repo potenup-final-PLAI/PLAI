@@ -41,7 +41,8 @@ void ANpcStart::WarriorStarter()
 	for (FName RawName : RawNames)
 	{
 		FItemStructTable* A = ItemTable->FindRow<FItemStructTable>(RawName,TEXT("NpcStart"));
-		if (A->ItemTop == 1 && TArray<int32>({0,1,2}).Contains(A->ItemIndex) && A->ItemIndexType == 0)
+		if (A->ItemTop == 1 && TArray<int32>({0,1,2}).Contains(A->ItemIndex) && A->ItemIndexType == 0 &&
+			A->ItemIndexDetail == 0)
 		{
 			ItemStructTables.ItemStructTables.Add(*A);
 		}
@@ -58,7 +59,8 @@ void ANpcStart::HunterStarter()
 	for (FName RawName : RawNames)
 	{
 		FItemStructTable* A = ItemTable->FindRow<FItemStructTable>(RawName,TEXT("NpcStart"));
-		if (A->ItemTop == 1 && TArray<int32>({0,1,2}).Contains(A->ItemIndex) && A->ItemIndexType == 1)
+		if (A->ItemTop == 1 && TArray<int32>({0,1,2}).Contains(A->ItemIndex) && A->ItemIndexType == 1
+			&& A->ItemIndexDetail == 0)
 		{
 			ItemStructTables.ItemStructTables.Add(*A);
 		}

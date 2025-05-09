@@ -169,8 +169,9 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 					FlipflopStart = true;
 					if (bStartEquip == true)
 					{
-						Start->UiNpcStart->StartJobText->SetText(FText::FromString(
-							FString("이미 장비를 지급해 드렸습니다")));
+						Start->UiNpcStart->StartJobText->SetText(FText::FromString(FString(TEXT("이미 장비를 지급해 드렸습니다"))));
+						Start->UiNpcStart->TextA->SetVisibility(ESlateVisibility::Hidden);
+						Start->UiNpcStart->TextB->SetVisibility(ESlateVisibility::Hidden);
 					}
 					if (bStartEquip == false)
 					{
@@ -446,6 +447,10 @@ void UInvenComp::NpcItem(const FItemStructTables ItemStructTables)
 
 void UInvenComp::EquipSetting(const FItemStructTables& ItemStructTables)
 {
+	if (!TestPlayer->IsLocallyControlled())
+	{
+		return;
+	}
 	for (int32 i = 0; ItemStructTables.ItemStructTables.Num() > i; i++)
 	{
 		for (UWidget* Widget : MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())

@@ -995,6 +995,18 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "x@x.x",
+			"pw": "x",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }

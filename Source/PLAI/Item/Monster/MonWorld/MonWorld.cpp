@@ -52,8 +52,7 @@ FVector AMonWorld::RandLocation()
 	
 	// DrawDebugLine(GetWorld(),GetActorLocation() + hit.Location + FVector(0,0,3000),hit.Location,FColor::Blue,
 	// 	false,2);
-	DrawDebugSphere(GetWorld(),GetActorLocation() + hit.Location,30,30,FColor::Red,false,2);
-
+	// DrawDebugSphere(GetWorld(),GetActorLocation() + hit.Location,30,30,FColor::Red,false,2);
 	return FVector(hit.Location);
 }
 
@@ -65,7 +64,6 @@ void AMonWorld::MoveToLocation()
 		CastPlayer();
 		CurrentTime = 0;
 	}
-	
 	if (FVector::Distance(GetActorLocation(),InitLoc) > 25)
 	{
 		if (bBattle == false)
@@ -101,7 +99,7 @@ TArray<FOverlapResult> AMonWorld::GetHitResult(float Distance)
 
 	bool bHit = GetWorld()->OverlapMultiByChannel(Hits,GetActorLocation(),FQuat::Identity,ECC_Pawn,
 		FCollisionShape::MakeSphere(Distance),Params);
-	DrawDebugSphere(GetWorld(),GetActorLocation(),Distance,10,FColor::Blue,false,1);
+	// DrawDebugSphere(GetWorld(),GetActorLocation(),Distance,10,FColor::Blue,false,1);
 	if (bHit)
 	{
 		return Hits;
@@ -122,7 +120,7 @@ void AMonWorld::CastPlayer()
 
 	bool bHit = GetWorld()->OverlapMultiByChannel(Hits,GetActorLocation(),FQuat::Identity,ECC_Pawn,
 		FCollisionShape::MakeSphere(CastingDistance),Params);
-	DrawDebugSphere(GetWorld(),GetActorLocation(),CastingDistance,10,FColor::Blue,false,1);
+	// DrawDebugSphere(GetWorld(),GetActorLocation(),CastingDistance,10,FColor::Blue,false,1);
 	if (bHit)
 	{
 		for (FOverlapResult Hit : Hits)
