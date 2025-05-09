@@ -31,16 +31,8 @@
 
 // Sets default values for this component's properties
 ULoginComp::ULoginComp()
-{
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+{ PrimaryComponentTick.bCanEverTick = true; }
 
-	// ...
-}
-
-
-// Called when the game starts
 void ULoginComp::BeginPlay()
 {
 	Super::BeginPlay();
@@ -63,6 +55,12 @@ void ULoginComp::BeginPlay()
 				UiMain->LoginComp = this;
 				UiMain->WbpUiSign->LoginComp = this;
 			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("LoginComp 이미 접속한 캐릭터 Gi UserFullInfo 불러오기"));
+				UserFullInfo = WorldGi->UserFullInfoGi;
+				HttpMePost();
+			}
 		}
 	}
 }
@@ -73,24 +71,12 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 100),
-	// FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
-	// 				              "LoginComp 나의 CharacterId [%s]"),*UserFullInfo.user_id, *UserFullInfo.character_info.character_id),
-	// 				  nullptr,FColor::Red,0.f,false);
-
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::One)) // 1 캐릭터 생성 요청
 	{   UE_LOG(LogTemp,Display,TEXT("로그인 컴프 1키 User 구조체 UserId 정보조회 %s"),*UserFullInfo.user_id);
 		UE_LOG(LogTemp,Display,TEXT("로그인 컴프 1키 User Character Id 정보조회 %s"),*character_id);
 	}
 	}
-	
-	// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	// { if (PC->WasInputKeyJustPressed(EKeys::C)) // C 캐릭터 생성 요청
-	// 	{   UE_LOG(LogTemp,Display,TEXT("Input C 캐릭터 생성 요청 Key JustPressed"));
-	// 	    HttpCreatePost();
-	// 	}
-	// }
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::M)) // M 캐릭터 생성 내 정보 요청
@@ -308,27 +294,30 @@ void ULoginComp::HttpMePost()
 			
 			FJsonObjectConverter::UStructToJsonObjectString(UserFullInfo,GetJson);
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
-
-			UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
-
-			FUserFullInfo InitUserFullInfo;
-			if (InitUserFullInfo.character_info.character_name != UserFullInfo.character_info.character_name)
+			if (UiMain)
 			{
-				UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성된 캐릭터 닉넴은? %s"),*UserFullInfo.character_info.character_name);
-				UiMain->Wbp_UiInitMain->RemoveFromParent();
+				UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
+				FUserFullInfo InitUserFullInfo;
+				if (InitUserFullInfo.character_info.character_name != UserFullInfo.character_info.character_name)
+				{
+					UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성된 캐릭터 닉넴은? %s"),*UserFullInfo.character_info.character_name);
+					UiMain->Wbp_UiInitMain->RemoveFromParent();
+				}else
+				{
+					UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성되지 않은 캐릭터 입니다? %s"),*UserFullInfo.character_info.character_name);
+				}
 			}
 			else
 			{
-				UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성되지 않은 캐릭터 입니다? %s"),*UserFullInfo.character_info.character_name);
+				UE_LOG(LogTemp,Warning,TEXT("LoginComp 턴제후 넘어오면 UiMain이 없어요"));
 			}
-
 			LoadEquipItem();
 			LoadInvenItem();
 			
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->NameCha->SetText
 			(FText::FromString(UserFullInfo.character_info.character_name));
-			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->JobCha->SetText(
-			FText::FromString(UserFullInfo.character_info.job));
+			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->JobCha->SetText
+			(FText::FromString(UserFullInfo.character_info.job));
 		}
 	});
 	httpRequest->ProcessRequest();
@@ -494,3 +483,17 @@ void ULoginComp::OnWebSocketClosed(int32 StatusCode, const FString& Reason, bool
 {
 	UE_LOG(LogTemp,Warning,TEXT("🔒LoginCOmp 웹소켓 Closed: Code=%d Reason=%s Clean=%d"), StatusCode, *Reason, bWasClean);
 }
+
+
+
+// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+// { if (PC->WasInputKeyJustPressed(EKeys::C)) // C 캐릭터 생성 요청
+// 	{   UE_LOG(LogTemp,Display,TEXT("Input C 캐릭터 생성 요청 Key JustPressed"));
+// 	    HttpCreatePost();
+// 	}
+// }
+
+// DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 100),
+// FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
+// 				              "LoginComp 나의 CharacterId [%s]"),*UserFullInfo.user_id, *UserFullInfo.character_info.character_id),
+// 				  nullptr,FColor::Red,0.f,false);

@@ -44,14 +44,10 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::L))//장비창 불러오기
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::L키 장비창 불러오기"));
-		
 		GetEquipInfo();
 		GetInvenInfo();
 	}
-
-	// ...
 }
-
 
 void ULogItemComp::GetEquipInfo()
 {
@@ -86,7 +82,7 @@ void ULogItemComp::GetEquipInfo()
 	FString jsonString;
 	FJsonObjectConverter::UStructToJsonObjectString(PostEquipId,jsonString);
 	UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo PostEquipId: %s"), *jsonString);
-
+	
 	HttpEquipPost(jsonString);
 }
 

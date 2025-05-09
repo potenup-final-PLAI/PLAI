@@ -7,6 +7,7 @@
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
+#include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 void UUiMonWorld::NativeConstruct()
@@ -22,6 +23,7 @@ void UUiMonWorld::OnButtonYes()
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
+			WorldGi->UserFullInfoGi = TestPlayer->LoginComp->UserFullInfo;
 			WorldGi->bGameStart = true;
 			WorldGi->bBattleReward = true;
 		}

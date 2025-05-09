@@ -184,6 +184,7 @@ public:
     void Server_HttpMePost();
 	UFUNCTION(Client, Reliable)
 	void Client_HttpMePost();
+	
 	void HttpMePost();
 
     void SetTrait();

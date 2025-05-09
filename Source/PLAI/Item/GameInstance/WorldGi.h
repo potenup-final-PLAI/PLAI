@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "PLAI/Item/Login/UserStruct.h"
 #include "WorldGi.generated.h"
 
 /**
@@ -24,4 +25,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	bool bBattleReward = false;
+
+	UPROPERTY(EditAnywhere)
+	FUserFullInfo UserFullInfoGi;
 };

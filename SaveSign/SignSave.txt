@@ -1271,6 +1271,18 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "ewqe",
+			"pw": "qwr",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }
