@@ -60,6 +60,10 @@ void ULoginComp::BeginPlay()
 				UE_LOG(LogTemp, Warning, TEXT("LoginComp 이미 접속한 캐릭터 Gi UserFullInfo 불러오기"));
 				UserFullInfo = WorldGi->UserFullInfoGi;
 				HttpMePost();
+				
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+				{ TestPlayer->InvenComp->TurnReward(); },1.0,false);
 			}
 		}
 	}
@@ -311,6 +315,7 @@ void ULoginComp::HttpMePost()
 			{
 				UE_LOG(LogTemp,Warning,TEXT("LoginComp 턴제후 넘어오면 UiMain이 없어요"));
 			}
+			
 			LoadEquipItem();
 			LoadInvenItem();
 			

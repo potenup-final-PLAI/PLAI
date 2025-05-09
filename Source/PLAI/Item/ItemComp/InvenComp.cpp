@@ -57,7 +57,7 @@ void UInvenComp::BeginPlay()
 			MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
-			TurnReward();
+			// TurnReward();
 			WorldGi->bBattleReward = false;
 		}
 	}
