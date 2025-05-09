@@ -161,6 +161,10 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
         PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 		if (Hit.bBlockingHit)
 		{
+			if (ANpcCharacter* Npc = Cast<ANpcCharacter>(Hit.GetActor()))
+			{
+				NpcCharacter = Npc;
+			}
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
 				if (FlipflopStart == false)

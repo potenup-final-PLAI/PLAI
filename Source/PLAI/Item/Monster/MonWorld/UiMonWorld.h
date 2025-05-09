@@ -27,6 +27,7 @@ public:
 
 	UPROPERTY()
 	class ATestPlayer* TestPlayer;
+	
 	UPROPERTY()
 	class AMonWorld* MonWorld;
 

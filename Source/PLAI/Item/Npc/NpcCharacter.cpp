@@ -21,6 +21,7 @@ ANpcCharacter::ANpcCharacter()
 void ANpcCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	UiNpc = CreateWidget<UUiNpc>(GetWorld(),UiNpcFactory);
     WidgetComp->SetWidget(UiNpc);
 	WidgetComp->SetDrawSize(FVector2D(300.0f,45.0f));
@@ -44,4 +45,3 @@ void ANpcCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
-

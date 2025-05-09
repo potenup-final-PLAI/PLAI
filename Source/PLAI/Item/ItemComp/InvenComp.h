@@ -61,6 +61,9 @@ public:
 	int32 Gold = 0;
 	
 	EquipSlotType StartSlotType;
+
+	UPROPERTY(EditAnywhere)
+	class ANpcCharacter* NpcCharacter;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UMenuInven> MenuInvenFactory;

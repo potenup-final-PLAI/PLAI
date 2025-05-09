@@ -23,6 +23,9 @@ void UUiMonWorld::OnButtonYes()
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
+			TestPlayer->LogItemComp->GetInvenInfo();
+			TestPlayer->LogItemComp->GetEquipInfo();
+
 			WorldGi->UserFullInfoGi = TestPlayer->LoginComp->UserFullInfo;
 			WorldGi->bGameStart = true;
 			WorldGi->bBattleReward = true;
