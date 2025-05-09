@@ -13,4 +13,8 @@ UCLASS()
 class PLAI_API UUiNpcStart : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StartJobText;
 };

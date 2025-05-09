@@ -15,6 +15,7 @@
 #include "PLAI/Item/Creture/Creature.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/Item/ItemMaster.h"
+#include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/Monster/MonWorld/MonWorld.h"
 #include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/Npc/NpcStore.h"
@@ -160,17 +161,38 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
         PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 		if (Hit.bBlockingHit)
 		{
-            
-			
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
-				Start->OnNpcStart.BindUObject(this,&UInvenComp::NpcItem);
-				Start->WarriorStarter();
+				if (!Start->UiNpcStart)
+				{
+					Start->UiNpcStart = CreateWidget<UUiNpcStart>(GetWorld(),Start->UiNpcStartFactory);
+					Start->UiNpcStart->AddToViewport();
+					Start->UiNpcStart->StartJobText->SetText(FText::FromString(TestPlayer->LoginComp->UserFullInfo.character_info.job));
+					if (TestPlayer->LoginComp->UserFullInfo.character_info.job == FString("warrior"))
+					{
+						Start->OnNpcStart.BindUObject(this,&UInvenComp::NpcItem);
+						Start->WarriorStarter();
+					}
+					else if (TestPlayer->LoginComp->UserFullInfo.character_info.job == FString("archor"))
+					{
+						Start->OnNpcStart.BindUObject(this,&UInvenComp::NpcItem);
+						Start->HunterStarter();
+					}
+					else
+					{
+						UE_LOG(LogTemp,Warning,TEXT("LoginComp StartNpc 직업 아직 없음"))
+					}
+				}
+				else
+				{
+					Start->UiNpcStart->RemoveFromParent();
+				}
+				
 			}
 			else if (ANpcStore* Store = Cast<ANpcStore>(Hit.GetActor()))
 			{
 				TestPlayer->StoreComp->SetStoreInven(Store->ItemTable);
-
+			
 				if (FlipflopStore == false)
 				{
 					TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Visible);
@@ -181,22 +203,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 					TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Hidden);
 					FlipflopStore = false;
 				}
-			}
-		}
-	}
-	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::RightMouseButton))
-	{
-		FHitResult Hit;
-		PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-		if (Hit.bBlockingHit)
-		{
-			// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 마우스 왼쪽 찍은 엑터는? %s"),*Hit.GetActor()->GetName())
-			DrawDebugSphere(GetWorld(), Hit.Location, 20, 20, FColor::Red, false,1);
-			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
-			{
-				// 이 딜리게이트는 NpcStart에 있음
-				Start->OnNpcStart.BindUObject(this,&UInvenComp::NpcItem);
-				Start->HunterStarter();
 			}
 		}
 	}
@@ -576,3 +582,23 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 	DOREPLIFETIME(UInvenComp, ItemMaster);
 }
 
+
+
+
+
+// if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::RightMouseButton))
+// {
+// 	FHitResult Hit;
+// 	PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+// 	if (Hit.bBlockingHit)
+// 	{
+// 		// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 마우스 왼쪽 찍은 엑터는? %s"),*Hit.GetActor()->GetName())
+// 		DrawDebugSphere(GetWorld(), Hit.Location, 20, 20, FColor::Red, false,1);
+// 		if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
+// 		{
+// 			// 이 딜리게이트는 NpcStart에 있음
+// 			Start->OnNpcStart.BindUObject(this,&UInvenComp::NpcItem);
+// 			Start->HunterStarter();
+// 		}
+// 	}
+// }
