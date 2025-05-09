@@ -523,7 +523,7 @@ FBattleTurnState AUPhaseManager::SetBattleProcessingAPI()
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 		{
 			charStatus.hp = player->battlePlayerState->playerStatus.hp;
-			charStatus.ap = player->battlePlayerState->curAP;
+			charStatus.ap = player->curAP;
 			charStatus.mov = player->battlePlayerState->playerStatus.move_Range;
 			// 상태 이상 정보 추가
 			for (const auto& Elem : player->activeStatusEffects)

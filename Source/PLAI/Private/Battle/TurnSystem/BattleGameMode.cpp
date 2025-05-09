@@ -3,5 +3,12 @@
 
 #include "Battle/TurnSystem/BattleGameMode.h"
 
+#include "GridTileManager.h"
 
 
+void ABattleGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	
+}

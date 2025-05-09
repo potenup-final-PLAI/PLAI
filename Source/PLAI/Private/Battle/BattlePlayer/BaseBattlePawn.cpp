@@ -36,11 +36,7 @@ void ABaseBattlePawn::BeginPlay()
 	turnManager = Cast<ATurnManager>(
 		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
 
-	if (ABasePlayerState* ps = Cast<ABasePlayerState>(GetPlayerState()))
-	{
-		ps->SetAP();
-	}
-	
+	SetAP();
 }
 
 // Called every frame
@@ -111,18 +107,15 @@ void ABaseBattlePawn::OnTurnStart()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TurnManager is nullptr"));
 	}
+	
 	// 상태이상이 있다면 대미지 및 버프, 디버프 처리하기
 	ApplyStatusEffect();
 
 	// Player라면
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 	{
-		// 턴 시작 시 AP 증가
-		if (ABattlePlayerState* ps = Cast<ABattlePlayerState>(GetPlayerState()))
-		{
-			ps->curAP += ps->GetAP(ps->curAP);
-			UE_LOG(LogTemp, Warning, TEXT("Current AP: %d"), ps->curAP);
-		}
+		player->GetAP();
+		UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(), player->curAP);
 	}
 	// Enemy라면
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
@@ -632,7 +625,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 			{
 			case EActionMode::Paralysis:
 				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
+				if (!baseAttackPlayer->CanConsumeAP(1))
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 					return;
@@ -643,7 +636,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 				break;
 			case EActionMode::Poison:
 				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
+				if (!baseAttackPlayer->CanConsumeAP(1))
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 					return;
@@ -652,7 +645,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 				break;
 			case EActionMode::Vulnerable:
 				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
+				if (!baseAttackPlayer->CanConsumeAP(1))
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 					return;
@@ -661,7 +654,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 				break;
 			case EActionMode::Weakening:
 				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
+				if (!baseAttackPlayer->CanConsumeAP(1))
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 					return;
@@ -670,7 +663,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 				break;
 			case EActionMode::Fatal:
 				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(2))
+				if (!baseAttackPlayer->CanConsumeAP(2))
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 					return;
@@ -680,7 +673,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 				break;
 			case EActionMode::Rupture:
 				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(2))
+				if (!baseAttackPlayer->CanConsumeAP(2))
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 					return;
@@ -690,7 +683,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 				break;
 			case EActionMode::Roar:
 				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(1))
+				if (!baseAttackPlayer->CanConsumeAP(1))
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 					return;
@@ -699,7 +692,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 				break;
 			case EActionMode::BattleCry:
 				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->battlePlayerState->CanConsumeAP(2))
+				if (!baseAttackPlayer->CanConsumeAP(2))
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 					return;
