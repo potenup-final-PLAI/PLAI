@@ -22,6 +22,7 @@
 #include "PLAI/Item/Npc/NpcNet.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/TestPlayer/TraitStructTable/TraitStructTable.h"
+#include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Main/UIChaMain.h"
@@ -301,6 +302,7 @@ void ULoginComp::HttpMePost()
 			if (UiMain)
 			{
 				UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
+				TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&UserFullInfo);
 				FUserFullInfo InitUserFullInfo;
 				if (InitUserFullInfo.character_info.character_name != UserFullInfo.character_info.character_name)
 				{

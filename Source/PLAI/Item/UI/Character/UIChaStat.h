@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UIChaStat.generated.h"
 
+struct FUserFullInfo;
 /**
  * 
  */
@@ -21,7 +22,7 @@ public:
 	class UTextBlock* Job;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Gen;
-
+	
 	// UPROPERTY(meta = (BindWidget))
 	// class UVerticalBox* TraitsName;
 	//

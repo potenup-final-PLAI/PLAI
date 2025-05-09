@@ -2,7 +2,9 @@
 
 
 #include "UIChaStat.h"
-
+#include "Components/ProgressBar.h"
+#include "PLAI/Item/Login/UserStruct.h"
+#include "Components/TextBlock.h"
 
 void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
 {
@@ -13,19 +15,18 @@ void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
 	// Traits->SetText(FText::AsNumber(UserFullInfo->character_info.traits[0].
 	
 	Level->SetText(FText::AsNumber(UserFullInfo->character_info.level));
-	HpSco->SetText(FText::AsNumber(UserFullInfo->character_info.stats.hp));
+	// HpSco->SetText(FText::AsNumber(UserFullInfo->character_info.stats.hp));
 
 	Atk->SetText(FText::AsNumber(UserFullInfo->character_info.stats.attack));
 	Def->SetText(FText::AsNumber(UserFullInfo->character_info.stats.defense));
 	Res->SetText(FText::AsNumber(UserFullInfo->character_info.stats.resistance));
 	Cri->SetText(FText::AsNumber(UserFullInfo->character_info.stats.critical_rate));
-	Crid->SetText(FText::AsNumber(UserFullInfo->character_info.stats.critical_damage));
+	CriD->SetText(FText::AsNumber(UserFullInfo->character_info.stats.critical_damage));
 	Spe->SetText(FText::AsNumber(UserFullInfo->character_info.stats.speed));
 
-	Gold->SetText(FText::AsNumber(UserFullInfo->inventory_info.gold));
 	if (UserFullInfo->character_info.current_exp > 0 && UserFullInfo->character_info.max_exp > 0)
 	{
-		Exp->SetPercent(UserFullInfo->character_info.current_exp/UserFullInfo->character_info.max_exp);
+		ExpBar->SetPercent(UserFullInfo->character_info.current_exp/UserFullInfo->character_info.max_exp);
 	}
 	else
 	{
