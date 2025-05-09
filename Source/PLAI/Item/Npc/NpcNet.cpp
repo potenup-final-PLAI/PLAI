@@ -42,6 +42,14 @@ void ANpcNet::OpenQuest()
     UIPost = CreateWidget<UUiPost>(GetWorld(),UIPostFactory);
 	UIPost->AddToViewport();
 	UIPost->OnNetPost.BindUObject(this,&ANpcNet::NetPost);
+	NpcUiMaster = Cast<UUserWidget>(UIPost);
+	if (!NpcUiMaster){
+		UE_LOG(LogTemp,Error,TEXT("NpcNet NpcUiMaster 생성 실패"));
+	}
+	else
+	{
+		UE_LOG(LogTemp,Error,TEXT("NpcNet NpcUiMaster 생성 성공"));
+	};
 }
 
 void ANpcNet::NetPost(FString String)

@@ -19,6 +19,7 @@ void ANpcStart::BeginPlay()
 	UiNpcStart = CreateWidget<UUiNpcStart>(GetWorld(),UiNpcStartFactory);
 	UiNpcStart->AddToViewport();
     UiNpcStart->SetVisibility(ESlateVisibility::Hidden);
+	NpcUiMaster = Cast<UUserWidget>(UiNpcStart);
 	
 	NpcNameString = TEXT("말론 (StartEquip)");
 }

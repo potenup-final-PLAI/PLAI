@@ -6,6 +6,7 @@
 #include "NpcCharacter.h"
 #include "GameFramework/Character.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 #include "NpcStore.generated.h"
 
 UCLASS()
@@ -33,6 +34,17 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	AItem* Item;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UStoreInven>StoreInvenFactory;
+	
+	UPROPERTY(EditAnywhere)
+	class UStoreInven* StoreInven;
+
+	UPROPERTY(EditAnywhere)
+	class ATestPlayer* TestPlayer;
+
+	void SetStoreInven();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

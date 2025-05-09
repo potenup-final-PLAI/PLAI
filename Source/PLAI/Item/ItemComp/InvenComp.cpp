@@ -163,7 +163,18 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		{
 			if (ANpcCharacter* Npc = Cast<ANpcCharacter>(Hit.GetActor()))
 			{
-				NpcCharacter = Npc;
+				TArray<AActor*> Actors;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(),ANpcCharacter::StaticClass(),Actors);
+				for (AActor* Actor : Actors)
+				{
+					if (ANpcCharacter* OtherNpc = Cast<ANpcCharacter>(Actor))
+					{
+						if (OtherNpc->NpcUiMaster)
+						{
+							OtherNpc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden);
+						}
+					}
+				}
 			}
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
@@ -206,18 +217,31 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			}
 			else if (ANpcStore* Store = Cast<ANpcStore>(Hit.GetActor()))
 			{
-				TestPlayer->StoreComp->SetStoreInven(Store->ItemTable);
-			
+				Store->TestPlayer = TestPlayer;
+                Store->SetStoreInven();
 				if (FlipflopStore == false)
 				{
-					TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Visible);
+					Store->StoreInven->SetVisibility(ESlateVisibility::Visible);
 					FlipflopStore = true;
 				}
 				else
 				{
-					TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Hidden);
+					Store->StoreInven->SetVisibility(ESlateVisibility::Hidden);
 					FlipflopStore = false;
 				}
+				
+				// TestPlayer->StoreComp->SetStoreInven(Store->ItemTable);
+				//
+				// if (FlipflopStore == false)
+				// {
+				// 	TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Visible);
+				// 	FlipflopStore = true;
+				// }
+				// else
+				// {
+				// 	TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Hidden);
+				// 	FlipflopStore = false;
+				// }
 			}
 		}
 	}

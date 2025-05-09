@@ -30,9 +30,11 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	class TSubclassOf<UUiNpc>UiNpcFactory;
-	
 	UPROPERTY(EditAnywhere)
 	class UUiNpc* UiNpc;
+
+	UPROPERTY(EditAnywhere)
+	class UWidget* NpcUiMaster;
 
 	UPROPERTY(EditAnywhere)
 	FString NpcNameString = TEXT("초기 NPC");
