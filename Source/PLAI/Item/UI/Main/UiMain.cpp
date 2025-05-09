@@ -66,8 +66,8 @@ void UUiMain::Login()
 		{
 			CanvasMain->RemoveFromParent();
 			//해야하나?
-			LoginComp->HttpCreatePost(TEXT("안녕하세요"));
 			
+			LoginComp->HttpMePost();
 		}
 		else
 		{   LoginFail->SetVisibility(ESlateVisibility::Visible);

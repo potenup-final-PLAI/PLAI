@@ -59,7 +59,7 @@ void ULoginComp::BeginPlay()
 			if (WorldGi->bGameStart == false)
 			{
 				UiMain = CreateWidget<UUiMain>(GetWorld(),UiMainFactory);
-				UiMain->AddToViewport();
+				UiMain->AddToViewport(2);
 				UiMain->LoginComp = this;
 				UiMain->WbpUiSign->LoginComp = this;
 			}
@@ -306,6 +306,17 @@ void ULoginComp::HttpMePost()
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
 
 			UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
+
+			FUserFullInfo InitUserFullInfo;
+			if (InitUserFullInfo.character_info.character_name != UserFullInfo.character_info.character_name)
+			{
+				UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성된 캐릭터 닉넴은? %s"),*UserFullInfo.character_info.character_name);
+				UiMain->Wbp_UiInitMain->RemoveFromParent();
+			}
+			else
+			{
+				UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성되지 않은 캐릭터 입니다? %s"),*UserFullInfo.character_info.character_name);
+			}
 
 			LoadEquipItem();
 			LoadInvenItem();
