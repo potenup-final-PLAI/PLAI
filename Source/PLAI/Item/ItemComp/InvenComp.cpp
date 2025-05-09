@@ -175,6 +175,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 						}
 					}
 				}
+				// Npc->NpcUiMaster->SetVisibility(ESlateVisibility::Visible);
 			}
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
@@ -229,19 +230,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 					Store->StoreInven->SetVisibility(ESlateVisibility::Hidden);
 					FlipflopStore = false;
 				}
-				
-				// TestPlayer->StoreComp->SetStoreInven(Store->ItemTable);
-				//
-				// if (FlipflopStore == false)
-				// {
-				// 	TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Visible);
-				// 	FlipflopStore = true;
-				// }
-				// else
-				// {
-				// 	TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Hidden);
-				// 	FlipflopStore = false;
-				// }
 			}
 		}
 	}
@@ -644,4 +632,18 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 // 			Start->HunterStarter();
 // 		}
 // 	}
+// }
+
+
+// TestPlayer->StoreComp->SetStoreInven(Store->ItemTable);
+//
+// if (FlipflopStore == false)
+// {
+// 	TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Visible);
+// 	FlipflopStore = true;
+// }
+// else
+// {
+// 	TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Hidden);
+// 	FlipflopStore = false;
 // }
