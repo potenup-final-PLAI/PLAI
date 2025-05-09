@@ -53,6 +53,10 @@ public:
 	EEnumKey EnumKey;
 
     void SetGold(int32 Getgold);
+
+	UPROPERTY(EditAnywhere)
+	bool bStartEquip = false;
+	
 	UPROPERTY(EditAnywhere)
 	int32 Gold = 0;
 	
@@ -144,4 +148,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool Flipflop = false;
 	bool FlipflopStore = false;
+
+	UPROPERTY(EditAnywhere)
+	bool FlipflopStart = false;
 };

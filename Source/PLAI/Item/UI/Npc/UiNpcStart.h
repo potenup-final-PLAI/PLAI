@@ -17,4 +17,10 @@ class PLAI_API UUiNpcStart : public UUserWidget
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StartJobText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* TextA;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* TextB;
 };
