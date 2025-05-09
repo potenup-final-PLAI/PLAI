@@ -126,6 +126,9 @@ public:
 
 	//------------Status 이름 변경--------------------
 	FString GetStatusEffectsString(EStatusEffect effect);
-	
+
+	//-----------Unit UI 이름 확인 쉽게 세팅할 변수------------
+	int8 unitPlayerNameindex = 0;
+	int8 unitEnemyNameindex = 0;
 	
 };

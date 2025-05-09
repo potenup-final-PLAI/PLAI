@@ -24,6 +24,12 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	//-------------------기본 콜리전 세팅----------------------
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* boxComp;
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* cameraComp;
 	
 	//--------------------AP System--------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
@@ -236,6 +242,10 @@ public:
 	void InitValues();
 
 
-	
+	//-------------Unit 이름, HP, Armor 세팅------------------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
+	class UWidgetComponent* battleUnitStateComp;
+
+	void BillboardBattleUnitStateUI();
 	
 };

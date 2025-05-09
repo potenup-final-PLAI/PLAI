@@ -3,7 +3,6 @@
 
 #include "Battle/BattlePlayer/BaseBattlePawn.h"
 
-#include "BasePlayerState.h"
 #include "EnhancedInputSubsystems.h"
 #include "GridTile.h"
 #include "GridTileManager.h"
@@ -11,11 +10,16 @@
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
+#include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/MainBattleUI.h"
+#include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Enemy/BaseEnemy.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Player/BattlePlayer.h"
 #include "Player/BattlePlayerState.h"
 
@@ -24,6 +28,20 @@ ABaseBattlePawn::ABaseBattlePawn()
 {
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	boxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("boxComp"));
+	SetRootComponent(boxComp);
+	boxComp->SetBoxExtent(FVector(50));
+
+	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("cameraComp"));
+	cameraComp->SetupAttachment(RootComponent);
+	cameraComp->SetRelativeLocationAndRotation(FVector(-600, 0, 1000), FRotator(-60, 0, 0));
+	
+	// 이름, HP, Armor 설정 컴포넌트
+	battleUnitStateComp = CreateDefaultSubobject<UWidgetComponent>("BattleUnitStateComp");
+	battleUnitStateComp->SetupAttachment(RootComponent);
+	battleUnitStateComp->SetCastShadow(false);
+	
 }
 
 // Called when the game starts or when spawned
@@ -75,6 +93,7 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 			}
 		}
 	}
+	BillboardBattleUnitStateUI();
 }
 
 void ABaseBattlePawn::OnTurnStart()
@@ -399,6 +418,7 @@ void ABaseBattlePawn::InitEnemyState()
 		// 처음 값 세팅
 		enemybattleState = NewObject<UEnemyBattleState>(this);
 		enemybattleState->hp = 80;
+		
 		enemybattleState->attack = 9;
 		enemybattleState->defense = 6;
 		enemybattleState->resistance = 3;
@@ -409,7 +429,7 @@ void ABaseBattlePawn::InitEnemyState()
 
 		// enemy에 moveRange 세팅 작업
 		enemy->moveRange = enemy->enemybattleState->move_Range;
-
+		
 		// 전송용 구조체에 값 세팅
 		enemybattleState->enemyStatus.hp = enemybattleState->hp;
 		enemybattleState->enemyStatus.attack = enemybattleState->attack;
@@ -421,6 +441,19 @@ void ABaseBattlePawn::InitEnemyState()
 		enemybattleState->enemyStatus.critical_Damage = enemybattleState->
 			critical_Damage;
 		enemybattleState->enemyStatus.speed = enemybattleState->speed;
+
+		if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(enemy->battleUnitStateComp->GetWidget()))
+		{
+			FString name = "";
+			if (auto* pm = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
+			{
+				name = FString::Printf(TEXT("Enemy%d"), pm->unitEnemyNameindex);
+				pm->unitEnemyNameindex++;
+			}
+			ui->SetUnitName(name);
+			ui->SetHPUI(enemy);
+			
+		}
 	}
 }
 
@@ -432,28 +465,31 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("state && state->playerStatus.hp > 0"));
 		// 피를 깎는다.
-		player->battlePlayerState->playerStatus.hp = FMath::Max(
-			0, player->battlePlayerState->playerStatus.hp - damage);
-		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage,
-		       player->battlePlayerState->playerStatus.hp);
-
+		player->battlePlayerState->playerStatus.hp = FMath::Max(0, player->battlePlayerState->playerStatus.hp - damage);
+		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage,player->battlePlayerState->playerStatus.hp);
+		// HP를 UI에 업데이트
+		if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(player->battleUnitStateComp->GetWidget()))
+		{
+			ui->UpdateHP(player->battlePlayerState->playerStatus.hp);
+		}
 		// hp가 0보다 작으면 사망
 		if (player->battlePlayerState->playerStatus.hp <= 0)
 		{
 			player->battlePlayerState->playerLifeState = ELifeState::Dead;
-			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),
-			       *UEnum::GetValueAsString(player->battlePlayerState->
-				       playerLifeState));
+			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),*UEnum::GetValueAsString(player->battlePlayerState->playerLifeState));
 		}
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 	{
 		// 피를 깎는다.
-		enemy->enemybattleState->enemyStatus.hp = FMath::Max(
-			0, enemy->enemybattleState->enemyStatus.hp - damage);
+		enemy->enemybattleState->hp = FMath::Max(
+			0, enemy->enemybattleState->hp - damage);
 		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage,
-		       enemy->enemybattleState->enemyStatus.hp);
-
+		       enemy->enemybattleState->hp);
+		if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(enemy->battleUnitStateComp->GetWidget()))
+		{
+			ui->UpdateHP(enemy->enemybattleState->hp);
+		}
 		// hp가 0보다 작으면 사망
 		if (enemy->enemybattleState->hp <= 0)
 		{
@@ -807,10 +843,18 @@ void ABaseBattlePawn::HandleStateusEffect(EStatusEffect effect)
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
 			player->battlePlayerState->playerStatus.hp -= 5;
+			if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(player->battleUnitStateComp->GetWidget()))
+			{
+				ui->UpdateHP(player->battlePlayerState->playerStatus.hp);
+			}
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
 			enemy->enemybattleState->hp -= 5;
+			if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(enemy->battleUnitStateComp->GetWidget()))
+			{
+				ui->UpdateHP(enemy->enemybattleState->hp);
+			}
 		}
 		break;
 	case EStatusEffect::Vulnerable:
@@ -847,11 +891,19 @@ void ABaseBattlePawn::HandleStateusEffect(EStatusEffect effect)
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
 			player->battlePlayerState->playerStatus.hp -= 5;
+			if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(player->battleUnitStateComp->GetWidget()))
+			{
+				ui->UpdateHP(player->battlePlayerState->playerStatus.hp);
+			}
 			BleedingProcess(player->battlePlayerState);
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
 			enemy->enemybattleState->hp -= 5;
+			if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(enemy->battleUnitStateComp->GetWidget()))
+			{
+				ui->UpdateHP(enemy->enemybattleState->hp);
+			}
 			BleedingEnemyProcess(enemy->enemybattleState);
 		}
 		break;
@@ -1284,4 +1336,14 @@ void ABaseBattlePawn::InitValues()
 	currentTile = nullptr;
 	startTile = nullptr;
 	goalTile = nullptr;
+}
+
+void ABaseBattlePawn::BillboardBattleUnitStateUI()
+{
+	// 내가 컨트롤하고 있는 카메라를 가져오자
+	AActor* cam = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	// 카메라의 앞방향(반대), 윗방향을 이용해서 Rotator를 구하자.
+	FRotator rot = UKismetMathLibrary::MakeRotFromXZ(-cam->GetActorForwardVector(), cam->GetActorUpVector());
+	// battleUnitStateComp를 구한 Rotator 값으로 설정.
+	battleUnitStateComp->SetWorldRotation(rot);
 }

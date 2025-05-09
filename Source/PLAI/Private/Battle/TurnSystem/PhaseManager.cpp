@@ -9,6 +9,7 @@
 #include "Battle/Http/BattleHttpActor.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
+#include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/CycleAndTurn.h"
 #include "Battle/UI/MainBattleUI.h"
 #include "Enemy/BaseEnemy.h"
@@ -17,6 +18,7 @@
 #include "Player/BattlePlayer.h"
 #include "Battle/Util/BattleType/BattleTypes.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/WidgetComponent.h"
 #include "Player/BattlePlayerState.h"
 
 void AUPhaseManager::BeginPlay()
@@ -666,6 +668,14 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		UE_LOG(LogTemp, Warning, TEXT("state : %s"),
 		       *UEnum::GetValueAsString(player->battlePlayerState->
 			       playerLifeState));
+
+		if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(player->battleUnitStateComp->GetWidget()))
+		{
+			FString name = FString::Printf(TEXT("player%d"),unitPlayerNameindex);
+			ui->SetUnitName(name);
+			ui->SetHPUI(player);
+			++unitPlayerNameindex;
+		}
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 	{
