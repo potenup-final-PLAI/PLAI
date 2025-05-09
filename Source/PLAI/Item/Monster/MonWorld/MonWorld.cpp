@@ -122,4 +122,27 @@ void AMonWorld::CastPlayer()
 	}
 }
 
+void AMonWorld::CastObject()
+{
+	TArray<FHitResult> Hits;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->SweepMultiByChannel(Hits,GetActorLocation(),GetActorLocation() + GetActorForwardVector() * 50,
+		FQuat::Identity,ECC_Visibility,FCollisionShape::MakeBox(FVector(25,25,25)),Params);
+	
+	if (bHit)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("AMonWorld::CastObject 박스 콜리전 부딛힘"));
+		for (FHitResult Hit : Hits)
+		{
+			if (FVector::Distance(Hit.Location,GetActorLocation()) < 50)
+			{
+				InitLoc = GetActorLocation() + RandLocation();
+				break;
+			}
+		}
+	}
+}
+
 

@@ -51,4 +51,6 @@ public:
 	void MoveToLocation();
 
 	void CastPlayer();
+
+	void CastObject();
 };
