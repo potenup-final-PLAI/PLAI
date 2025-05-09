@@ -323,8 +323,11 @@ void ULoginComp::HttpMePost()
 
 			LoadEquipItem();
 			LoadInvenItem();
+			
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->NameCha->SetText
 			(FText::FromString(UserFullInfo.character_info.character_name));
+			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->JobCha->SetText(
+			FText::FromString(UserFullInfo.character_info.job));
 		}
 	});
 	httpRequest->ProcessRequest();

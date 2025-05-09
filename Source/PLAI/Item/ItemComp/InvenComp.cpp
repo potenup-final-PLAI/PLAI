@@ -160,6 +160,8 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
         PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 		if (Hit.bBlockingHit)
 		{
+            
+			
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
 				Start->OnNpcStart.BindUObject(this,&UInvenComp::NpcItem);

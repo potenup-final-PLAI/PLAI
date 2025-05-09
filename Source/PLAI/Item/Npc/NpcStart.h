@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "PLAI/Item/Item/ItemStruct.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/UI/Npc/UiNpcStart.h"
 #include "NpcStart.generated.h"
 
 DECLARE_DELEGATE_OneParam(FOnNpcStart, const FItemStructTables)
@@ -41,6 +42,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UDataTable* ItemTable;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUiNpcStart>UiNpcStartFactory;
+
+	UPROPERTY(EditAnywhere)
+	class UUiNpcStart* UiNpcStart;
 	
 	void HunterStarter();
 	
