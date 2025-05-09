@@ -28,6 +28,9 @@ public:
 	class UQuickInven* WBP_QuickInven;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UUIChaStat* Wbp_UIChaStat;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class USlotCre* WBP_SlotCre;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))

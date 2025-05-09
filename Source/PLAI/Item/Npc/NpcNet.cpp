@@ -55,7 +55,7 @@ void ANpcNet::OpenQuest()
 void ANpcNet::NetPost(FString String)
 {
 	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
-	HttpRequest->SetURL("http://192.168.10.96:8054/npc/chat");
+	HttpRequest->SetURL("https://919e-221-148-189-129.ngrok-free.app/service1/npc/chat");
 	HttpRequest->SetVerb("POST");
 	HttpRequest->SetHeader("Content-Type", "application/json");
 
@@ -73,7 +73,7 @@ void ANpcNet::NetPost(FString String)
 			FNpcStructGet NpcStruct;
 			FString JsonString = HttpResponse->GetContentAsString();
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&NpcStruct);
-			UE_LOG(LogTemp, Display, TEXT("ANpcNet::NetPost 성공함 %s"),*JsonString);
+			UE_LOG(LogTemp, Warning, TEXT("ANpcNet::NetPost 성공함 JsonString은? [%s] 서버코드 %d"),*JsonString,HttpResponse->GetResponseCode());
 			UIPost->TextGet->SetText(FText::FromString(NpcStruct.response));
 		}
 	});

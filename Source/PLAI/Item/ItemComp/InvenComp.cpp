@@ -20,6 +20,7 @@
 #include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/Npc/NpcStore.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
@@ -106,6 +107,17 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		else
 		{
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp Q키 안맞음"))
+		}
+	}
+	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Three))
+	{
+		if (MenuInven->Wbp_UIChaStat->GetVisibility() == ESlateVisibility::Hidden)
+		{
+			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
