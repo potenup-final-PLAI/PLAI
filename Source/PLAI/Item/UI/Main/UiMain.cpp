@@ -65,8 +65,7 @@ void UUiMain::Login()
 		if (bLogin)
 		{
 			CanvasMain->RemoveFromParent();
-			//해야하나?
-			LoginComp->HttpMePost();
+			//여기까지 아이디는 들어왔음
 		}
 		else
 		{   LoginFail->SetVisibility(ESlateVisibility::Visible);
@@ -87,7 +86,43 @@ void UUiMain::CreateCharacter()
 
 void UUiMain::HttpLoginMe()
 {
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest(); FNgrok Ngrok;
+	FString url = FString::Printf(TEXT("%s/me/"),*Ngrok.Ngrok);
+
+	httpRequest->SetURL(url);
+	httpRequest->SetVerb("POST");
+	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	FString JsonString;
+	FMeStruct MeStruct;
 	
+	MeStruct.user_id = LoginComp->UserFullInfo.user_id;
+	
+	FJsonObjectConverter::UStructToJsonObjectString(MeStruct,JsonString);
+	httpRequest->SetContentAsString(JsonString);
+	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
+	{
+		if (bProcessedSuccessfully)
+		{
+			FString JsonString = HttpResponse->GetContentAsString();
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 GetAsContetAsString된 제이슨값 성공 %s 요청코드는%d"),
+				*JsonString,HttpResponse->GetResponseCode());
+			// UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 성공 %s"),*JsonString);
+			FUserFullInfo InitUserFullInfo;
+			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &LoginComp->UserFullInfo);
+			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의 캐릭터 아이디 [%s]"),*LoginComp->UserFullInfo.character_info.character_name);
+			if (LoginComp->UserFullInfo.character_info.character_name != InitUserFullInfo.character_info.character_name)
+			{
+				Wbp_UiInitMain->RemoveFromParent();
+			}
+			
+			// FString GetJson;
+			// FJsonObjectConverter::UStructToJsonObjectString(&LoginComp->UserFullInfo,GetJson);
+			// UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
+			// Wbp_UIChaMain->SetUiChaStat(&LoginComp->UserFullInfo);
+		}
+	});
+	httpRequest->ProcessRequest();
 }
 
 void UUiMain::OnButtonStart()

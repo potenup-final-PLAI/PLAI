@@ -189,8 +189,11 @@ void ULoginComp::HttpLoginPost()
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &LoginStructGet);
 			if (LoginStructGetInit.user_id != LoginStructGet.user_id)
 			{ OnLogin.ExecuteIfBound(true);
-				UE_LOG(LogTemp, Warning, TEXT("로그인컴프 통신성공 로그인%s"),*LoginStructGet.user_id);
+				UE_LOG(LogTemp, Error, TEXT("로그인컴프 통신성공 로그인 User Id는? [%s]"),*LoginStructGet.user_id);
 				UserFullInfo.user_id = LoginStructGet.user_id;
+				// 답변이 온 딜리게이트에다가 me를 해야할듯
+				UE_LOG(LogTemp, Display , TEXT("UiMain HttpLoginMe 보내자"));
+				UiMain->HttpLoginMe();
 			}
 			else
 			{ OnLogin.ExecuteIfBound(false);
