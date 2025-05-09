@@ -113,6 +113,8 @@ public:
 
 	UFUNCTION()
 	void CreateCharacter();
+
+	void HttpLoginMe();
 	
 	
 	virtual void NativeConstruct() override;

@@ -66,7 +66,6 @@ void UUiMain::Login()
 		{
 			CanvasMain->RemoveFromParent();
 			//해야하나?
-			
 			LoginComp->HttpMePost();
 		}
 		else
@@ -84,6 +83,11 @@ void UUiMain::CreateCharacter()
 	FString CharacterName = CreatePost->GetText().ToString();
 	LoginComp->HttpCreatePost(CharacterName);
 	CanvasInit->RemoveFromParent();
+}
+
+void UUiMain::HttpLoginMe()
+{
+	
 }
 
 void UUiMain::OnButtonStart()
