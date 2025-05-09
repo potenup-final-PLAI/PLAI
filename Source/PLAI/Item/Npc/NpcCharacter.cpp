@@ -15,13 +15,6 @@ ANpcCharacter::ANpcCharacter()
 	WidgetComp = CreateDefaultSubobject<UWidgetComponent>("Widget");
 	WidgetComp->SetupAttachment(RootComponent);
 	// WidgetComp->SetMobility(EComponentMobility::Movable);
-
-
-
-	
-
-	
-	
 }
 
 // Called when the game starts or when spawned

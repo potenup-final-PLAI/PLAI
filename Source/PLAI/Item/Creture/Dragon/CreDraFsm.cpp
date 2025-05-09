@@ -37,9 +37,9 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 150),
-	FString::Printf(TEXT("CreDreFsm DraState 현재[%s]"),*UEnum::GetValueAsString(EDraState(static_cast<int32>
-		(Drastate)))),nullptr,FColor::Red,0.f,false);
+	// DrawDebugString(GetWorld(),TestPlayer->GetActorLocation() + FVector(0, 0, 150),
+	// FString::Printf(TEXT("CreDreFsm DraState 현재[%s]"),*UEnum::GetValueAsString(EDraState(static_cast<int32>
+	// 	(Drastate)))),nullptr,FColor::Red,0.f,false);
 	
 	switch (Drastate)
 	{
