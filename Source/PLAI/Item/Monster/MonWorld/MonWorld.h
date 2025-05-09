@@ -50,6 +50,8 @@ public:
 	
 	void MoveToLocation();
 
+	TArray<FOverlapResult> GetHitResult(float Distance = 50.0f);
+	
 	void CastPlayer();
 
 	void CastObject();

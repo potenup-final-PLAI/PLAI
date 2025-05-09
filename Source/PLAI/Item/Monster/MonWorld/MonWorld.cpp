@@ -88,6 +88,27 @@ void AMonWorld::MoveToLocation()
 	}
 }
 
+TArray<FOverlapResult> AMonWorld::GetHitResult(float Distance)
+{
+	if (UIMonWorld)
+	{ UIMonWorld->RemoveFromParent(); }
+	bBattle = false;
+
+	// UE_LOG(LogTemp,Error,TEXT("AMonWorld::CastPlayer 캐스팅 플레이어중"));
+	TArray<FOverlapResult> Hits;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->OverlapMultiByChannel(Hits,GetActorLocation(),FQuat::Identity,ECC_Pawn,
+		FCollisionShape::MakeSphere(Distance),Params);
+	DrawDebugSphere(GetWorld(),GetActorLocation(),Distance,10,FColor::Blue,false,1);
+	if (bHit)
+	{
+		return Hits;
+	}
+	return TArray<FOverlapResult>();
+}
+
 void AMonWorld::CastPlayer()
 {
 	if (UIMonWorld)

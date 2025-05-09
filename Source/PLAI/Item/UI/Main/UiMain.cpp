@@ -111,6 +111,9 @@ void UUiMain::HttpLoginMe()
 			FUserFullInfo InitUserFullInfo;
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &LoginComp->UserFullInfo);
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의 캐릭터 아이디 [%s]"),*LoginComp->UserFullInfo.character_info.character_name);
+
+			LoginComp->ConnectWebSocket();
+
 			if (LoginComp->UserFullInfo.character_info.character_name != InitUserFullInfo.character_info.character_name)
 			{
 				Wbp_UiInitMain->RemoveFromParent();

@@ -923,6 +923,30 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "H@h.h",
+			"pw": "h",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "H@h.h",
+			"pw": "h",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }
