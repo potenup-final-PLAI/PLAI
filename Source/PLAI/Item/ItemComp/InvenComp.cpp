@@ -463,8 +463,9 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 아직 로그인 안됨 bLoginMe머고 %d"),WorldGi->bLoginMe) return;
 		};
 	};
+	
 	FitemInfo ItemInfo;
-	FEquipmentInfo EquipmentInfo;
+	TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Empty();
 	for (UWidget* widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
 	{
 		if (USlotEquip* SlotEquip = Cast<USlotEquip>(widget))
@@ -484,12 +485,14 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 			ItemInfo.item_id = SlotEquip->ItemStructTable.Item_Id;
 			ItemInfo.item_name = SlotEquip->ItemStructTable.Name;
 			ItemInfo.price = SlotEquip->ItemStructTable.ItemGold;
-			
-			EquipmentInfo.item_list.Add(ItemInfo);
+			TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Add(ItemInfo);
 		}
 	}
-	TestPlayer->LoginComp->UserFullInfo.equipment_info = EquipmentInfo;
+	
+	FString JsonString;
 	TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
+	FJsonObjectConverter::UStructToJsonObjectString(TestPlayer->LoginComp->UserFullInfo,JsonString);
+	UE_LOG(LogTemp,Display,TEXT("InvenComp 장비 스텟창 띄우기전 Json String: [%s]"),*JsonString);
 }
 
 void UInvenComp::NpcItem(const FItemStructTables ItemStructTables)

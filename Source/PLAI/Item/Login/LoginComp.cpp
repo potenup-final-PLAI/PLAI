@@ -295,15 +295,16 @@ void ULoginComp::HttpMePost()
 			
 			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 성공 %s"),*JsonString);
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &UserFullInfo);
-			FString GetJson;
-			
-			FJsonObjectConverter::UStructToJsonObjectString(UserFullInfo,GetJson);
-			UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
+			// FString GetJson;
+			// FJsonObjectConverter::UStructToJsonObjectString(UserFullInfo,GetJson);
+			// UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
+
 			if (UiMain)
 			{
 				UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
 				TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&UserFullInfo);
 				FUserFullInfo InitUserFullInfo;
+				
 				if (InitUserFullInfo.character_info.character_name != UserFullInfo.character_info.character_name)
 				{
 					UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성된 캐릭터 닉넴은? %s"),*UserFullInfo.character_info.character_name);
@@ -328,11 +329,6 @@ void ULoginComp::HttpMePost()
 		}
 	});
 	httpRequest->ProcessRequest();
-}
-
-void ULoginComp::SetTrait()
-{
-	
 }
 
 void ULoginComp::LoadEquipItem()
