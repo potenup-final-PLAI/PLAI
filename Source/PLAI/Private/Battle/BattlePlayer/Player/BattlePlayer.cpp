@@ -6,12 +6,33 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/BattlePlayerAnimInstance.h"
+
+ABattlePlayer::ABattlePlayer()
+{
+	// 플레이어 세팅
+	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("meshComp"));
+	meshComp->SetupAttachment(RootComponent);
+	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100), FRotator(0, -90, 0));
+	
+	// Mesh Setting
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonGreystone/Characters/Heroes/Greystone/Meshes/Greystone.Greystone'"));
+	if (tempMesh.Succeeded())
+	{
+		meshComp->SetSkeletalMesh(tempMesh.Object);
+	}
+	
+	// Animation Instance 세팅
+	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnimInstance(TEXT("/Script/Engine.AnimBlueprint'/Game/JS/Blueprints/Animation/ABP_BattlePlayer.ABP_BattlePlayer_C'"));
+	if (tempAnimInstance.Succeeded())
+	{
+		meshComp->SetAnimInstanceClass(tempAnimInstance.Class);
+	}
+}
 
 void ABattlePlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// 플레이어 세팅
 	
 	// GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABaseBattlePawn::TryInitStatus, 0.1f, true);
 }
@@ -37,6 +58,7 @@ void ABattlePlayer::PossessedBy(AController* NewController)
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
 	}
+	playerAnim = Cast<UBattlePlayerAnimInstance>(meshComp->GetAnimInstance());
 }
 
 void ABattlePlayer::SetupPlayerInputComponent(

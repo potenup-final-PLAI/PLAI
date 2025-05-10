@@ -237,7 +237,6 @@ public:
 	int32 moveRange = 0;
 	
 	// 골 위치를 클릭 했을 때 그쪽으로 이동
-	void UnitMove();
 	void OnMoveEnd();
 	void InitValues();
 
@@ -245,7 +244,16 @@ public:
 	//-------------Unit 이름, HP, Armor 세팅------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
 	class UWidgetComponent* battleUnitStateComp;
-
+	
 	void BillboardBattleUnitStateUI();
+
+	//-----------Anim Instace---------------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
+	class ABaseEnemy* targetEnemy;
+	
+	//-------------Rotation 처리--------------------
+	bool bWantsToAttack = false;
+	bool bStartMontage = false;
+	ABaseBattlePawn* attackTarget;
 	
 };

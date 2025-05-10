@@ -1,0 +1,36 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Animation/AnimInstance.h"
+#include "BattlePlayerAnimInstance.generated.h"
+
+enum class ELifeState : uint8;
+enum class EActionMode : uint8;
+/**
+ * 
+ */
+UCLASS()
+class PLAI_API UBattlePlayerAnimInstance : public UAnimInstance
+{
+	GENERATED_BODY()
+public:
+	virtual void NativeBeginPlay() override;
+public:
+	// Player가 살아 있는지 죽었는지 판단해서 Animation 업데이트하는 변수
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
+	ELifeState lifeState;
+	// 현재 턴인 Player의 동작 상태를 애니메이션에 업데이트하는 변수
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
+	EActionMode actionMode;
+
+	//----------Battle Player-----------------
+	UPROPERTY(BlueprintReadOnly)
+	class ABattlePlayer* battlePlayer;
+	UFUNCTION(BlueprintImplementableEvent, Category = "Anim")
+	void PlayBaseAttackAnimation(FName sectionName);
+	
+	UFUNCTION()
+	void AnimNotify_BaseAttackPoint();
+};

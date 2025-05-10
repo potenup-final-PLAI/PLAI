@@ -21,6 +21,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/BattlePlayer.h"
+#include "Player/BattlePlayerAnimInstance.h"
 #include "Player/BattlePlayerState.h"
 
 // Sets default values
@@ -31,7 +32,7 @@ ABaseBattlePawn::ABaseBattlePawn()
 
 	boxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("boxComp"));
 	SetRootComponent(boxComp);
-	boxComp->SetBoxExtent(FVector(50));
+	boxComp->SetBoxExtent(FVector(50, 50, 100));
 
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("cameraComp"));
 	cameraComp->SetupAttachment(RootComponent);
@@ -40,7 +41,16 @@ ABaseBattlePawn::ABaseBattlePawn()
 	// 이름, HP, Armor 설정 컴포넌트
 	battleUnitStateComp = CreateDefaultSubobject<UWidgetComponent>("BattleUnitStateComp");
 	battleUnitStateComp->SetupAttachment(RootComponent);
+	battleUnitStateComp->SetRelativeLocationAndRotation(FVector(0, 0, 170), FRotator(0));
 	battleUnitStateComp->SetCastShadow(false);
+
+	ConstructorHelpers::FClassFinder<UBattleUnitStateUI> tempBattleUnitStateUI(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/JS/UI/WBP_BattleUnitState.WBP_BattleUnitState_C'"));
+	if (tempBattleUnitStateUI.Succeeded())
+	{
+		battleUnitStateComp->SetWidgetClass(tempBattleUnitStateUI.Class);
+		battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
+	}
+
 	
 }
 
@@ -55,6 +65,7 @@ void ABaseBattlePawn::BeginPlay()
 		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
 
 	SetAP();
+	
 }
 
 // Called every frame
@@ -64,16 +75,43 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 
 	if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
 	{
-		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() +
-			FVector(0, 0, 10);
+		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() + FVector(0, 0, 100);
 		FVector currentLoc = GetActorLocation();
-		FVector nextLoc = FMath::VInterpConstantTo(
-			currentLoc, targetLoc, DeltaTime, 500.f);
-		SetActorLocation(nextLoc);
+		FVector direction = (targetLoc - currentLoc).GetSafeNormal();
+
+		// 메시 회전 부드럽게 보간 처리
+		FRotator targetRot = direction.Rotation();
+		const float yawOffset = -90.f;
+		const float interpSpeed = 8.f;
+
+		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
+		{
+			if (player->meshComp)
+			{
+				FRotator currentRot = player->meshComp->GetRelativeRotation();
+				FRotator desiredRot(0.f, targetRot.Yaw + yawOffset, 0.f);
+				FRotator smoothRot = FMath::RInterpTo(currentRot, desiredRot, DeltaTime, interpSpeed);
+				player->meshComp->SetRelativeRotation(smoothRot);
+			}
+		}
+		else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
+		{
+			if (enemy->meshComp)
+			{
+				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
+				FRotator desiredRot(0.f, targetRot.Yaw + yawOffset, 0.f);
+				FRotator smoothRot = FMath::RInterpTo(currentRot, desiredRot, DeltaTime, interpSpeed);
+				enemy->meshComp->SetRelativeRotation(smoothRot);
+			}
+		}
+
+		// 위치 보간 이동
+		FVector newLoc = FMath::VInterpConstantTo(currentLoc, targetLoc, DeltaTime, 500.f);
+		SetActorLocation(newLoc);
 
 		if (FVector::DistSquared(currentLoc, targetLoc) < FMath::Square(5.f))
 		{
-			++currentPathIndex;
+			currentPathIndex++;
 			if (!pathArray.IsValidIndex(currentPathIndex))
 			{
 				bIsMoving = false;
@@ -82,17 +120,64 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 
 				if (auto* enemy = Cast<ABaseEnemy>(this))
 				{
-					// Player 찾아서 공격  
 					enemy->FindAndAttackPlayer();
 				}
-				// else
-				// {
-				// 	// 이동 끝났으면 턴 종료 처리
-				// 	OnTurnEnd();
-				// }
 			}
 		}
 	}
+
+	// 타겟 방향으로 회전
+	if (bWantsToAttack && attackTarget)
+	{
+		FVector directionToTarget = (attackTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+		FRotator desiredRot = directionToTarget.Rotation();
+		const float interpSpeed = 5.f;
+		// 캐릭터의 forward 기준에 맞게 조정
+		const float yawOffset = -90.f; 
+
+		// 현재 유닛이 Player라면
+		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
+		{
+			if (player->meshComp)
+			{
+				FRotator currentRot = player->meshComp->GetRelativeRotation();
+				FRotator targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
+				FRotator newRot = FMath::RInterpTo(currentRot, targetMeshRot, DeltaTime, interpSpeed);
+				player->meshComp->SetRelativeRotation(newRot);
+
+				// 회전이 다 됐는지 체크
+				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
+				{
+					bWantsToAttack = false;
+
+					if (player->bStartMontage)
+					{
+						// 회전 끝나고 몽타주 실행
+						player->playerAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
+						player->bStartMontage = false;
+						UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+					}
+					
+				}
+			}
+		}
+		else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
+		{
+			if (enemy->meshComp)
+			{
+				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
+				FRotator targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
+				FRotator newRot = FMath::RInterpTo(currentRot, targetMeshRot, DeltaTime, interpSpeed);
+				enemy->meshComp->SetRelativeRotation(newRot);
+
+				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
+				{
+					bWantsToAttack = false;
+				}
+			}
+		}
+	}
+	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
 }
 
@@ -232,6 +317,7 @@ void ABaseBattlePawn::OnMouseLeftClick()
 			break;
 		case EActionMode::BaseAttack:
 			PlayerBaseAttack(hitInfo);
+			UE_LOG(LogTemp, Warning, TEXT("OnMouseLeftClick BaseAttack"));
 			break;
 		case EActionMode::Paralysis:
 			UE_LOG(LogTemp, Warning, TEXT("OnMouseLeftClick Paralysis"));
@@ -265,13 +351,51 @@ void ABaseBattlePawn::OnMouseLeftClick()
 void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 {
 	// 이동을 위한 타일이라면
+	// if (AGridTile* testTile = Cast<AGridTile>(hitInfo.GetActor()))
+	// {
+	// 	FVector targetLoc = FVector(testTile->GetActorLocation().X, testTile->GetActorLocation().Y, testTile->GetActorLocation().Z + 100);
+	// 	
+	// 	SetActorLocation(targetLoc);
+	// 	// goalTile 쪽으로 이동
+	// 	targetTile = testTile;
+	// 	currentTile = testTile;
+	// }
+
+	// AStar로 이동
 	if (AGridTile* testTile = Cast<AGridTile>(hitInfo.GetActor()))
 	{
-		FVector targetLoc = testTile->GetActorLocation();
-		SetActorLocation(targetLoc);
-		// goalTile 쪽으로 이동
-		targetTile = testTile;
-		currentTile = testTile;
+		// 타일 초기화
+		InitValues();
+
+		goalTile = testTile;
+		
+		// 시작 타일 찾기
+		FHitResult startHit;
+		FVector start = GetActorLocation();
+		FVector end = start + FVector::DownVector * 1000;
+		FCollisionQueryParams params;
+		params.AddIgnoredActor(this);
+
+		if (GetWorld()->LineTraceSingleByChannel(startHit, start, end, ECC_Visibility, params))
+		{
+			startTile = Cast<AGridTile>(startHit.GetActor());
+			if (startTile)
+			{
+				startTile->sCostValue = 0;
+				openArray.Add(startTile);
+
+				// A* 시작
+				PathFind();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("StartTile is nullptr"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to trace start tile"));
+		}
 	}
 }
 
@@ -284,14 +408,24 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 	}
 
 	bBaseAttack = false;
-	// 공격을 위한 enemy라면
+	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		ApplyAttack(enemy, EActionMode::BaseAttack);
+		// 타겟 저장
+		targetEnemy = enemy;
+		bWantsToAttack = true;
+		attackTarget = targetEnemy;
+		
+		if (auto* player = Cast<ABattlePlayer>(this))
+		{
+			player->bStartMontage = true;
+		}
+		
 	}
-	// 공격을 위한 player라면
+	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
+		
 		ApplyAttack(player, EActionMode::BaseAttack);
 	}
 }
@@ -540,7 +674,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 					return;
 				}
 				skillMultiplier = 0.8f;
-			// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
+				// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
 				player->AddStatusEffect(EStatusEffect::Weakening, 2);
 				break;
 			case EActionMode::Poison:
@@ -599,9 +733,9 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 					return;
 				}
-			// 자신과 동료들에게 버프 부여
-			// 주위 동료들에게 피해 증가 버프 부여
-			// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
+				// 자신과 동료들에게 버프 부여
+				// 주위 동료들에게 피해 증가 버프 부여
+				// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
 				enemy->AddStatusEffect(EStatusEffect::Angry, 1);
 				break;
 			default:
@@ -636,6 +770,8 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 					status_effect));
 				UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
 			}
+			
+			// 대미지 입히기
 			GetDamage(player, damage);
 		}
 	}
@@ -733,8 +869,8 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 					return;
 				}
-			// 자신 및 주위 동료들에게 피해 증가 버프 부여
-			// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
+				// 자신 및 주위 동료들에게 피해 증가 버프 부여
+				// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
 				baseAttackPlayer->AddStatusEffect(EStatusEffect::Angry, 1);
 				break;
 			default:
@@ -769,6 +905,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 					status_effect));
 				UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
 			}
+			
 			GetDamage(enemy, damage);
 		}
 	}
@@ -1251,46 +1388,10 @@ void ABaseBattlePawn::AddOpenArray(FVector dir)
 	}
 }
 
-void ABaseBattlePawn::UnitMove()
-{
-	// 유닛이 찾은 길을 따라 움직이기
-	if (pathArray.IsValidIndex(currentPathIndex))
-	{
-		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation();
-		FVector currentLoc = GetActorLocation();
-
-		FVector newLoc = FMath::VInterpConstantTo(
-			currentLoc, targetLoc, GetWorld()->GetDeltaSeconds(), moveSpeed);
-
-		SetActorLocation(newLoc);
-
-		// 목표 지점에 거의 도착하면 다음 목표로 이동
-		if (FVector::DistSquared(newLoc, targetLoc) < FMath::Square(5.0f))
-		{
-			SetActorLocation(targetLoc);
-			++currentPathIndex;
-
-			// 인덱스가 array보다 크거나 같다면
-			if (currentPathIndex >= pathArray.Num())
-			{
-				// 이동 종료
-				bIsMoving = false;
-				// AI 액션 처리를 위한 함수
-				OnMoveEnd();
-			}
-		}
-	}
-	else
-	{
-		bIsMoving = false;
-	}
-}
-
 void ABaseBattlePawn::OnMoveEnd()
 {
-	// AI에 턴을 종료하거나 다음 액션 처리 등을 여기서 처리
-	OnTurnEnd();
 	UE_LOG(LogTemp, Warning, TEXT("Move Complete"));
+	OnTurnEnd();
 }
 
 void ABaseBattlePawn::InitValues()

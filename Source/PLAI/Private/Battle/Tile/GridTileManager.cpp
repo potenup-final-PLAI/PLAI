@@ -90,8 +90,7 @@ void AGridTileManager::InitGridTile()
 	{
 		if (AGridTile* gridTile = map.FindRef(coord))
 		{
-			FVector spawnLoc = gridTile->GetActorLocation() + FVector(
-				0.f, 0.f, 10.f);
+			FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 100.f);
 			if (auto* player = GetWorld()->SpawnActor<ABattlePlayer>(battlePlayerFactory, spawnLoc, FRotator::ZeroRotator))
 			{
 				// player->speed = FMath::RandRange(1, 10);
@@ -106,8 +105,7 @@ void AGridTileManager::InitGridTile()
 	{
 		if (AGridTile* gridTile = map.FindRef(coord))
 		{
-			FVector spawnLoc = gridTile->GetActorLocation() + FVector(
-				0.f, 0.f, 10.f);
+			FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 100.f);
 			if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(enemyFactory, spawnLoc,FRotator::ZeroRotator))
 			{
 				enemy->speed = FMath::RandRange(1, 10);
