@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BasePlayerState.h"
+#include "Battle/Util/BattleType/BattleTypes.h"
 #include "BattlePlayerState.generated.h"
 
 /**

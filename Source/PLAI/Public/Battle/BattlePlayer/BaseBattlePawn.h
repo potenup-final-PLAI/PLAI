@@ -24,6 +24,54 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	//-------------------기본 콜리전 세팅----------------------
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* boxComp;
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* cameraComp;
+	
+	//--------------------AP System--------------------
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	int32 maxActionPoints = 5;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	int32 curAP = 0;
+
+
+	// Player AP 세팅
+	void SetAP()
+	{
+		curAP = 0;
+	}
+
+	// AP 증가 시키는 함수
+	void GetAP()
+	{
+		if (curAP < maxActionPoints)
+		{
+			curAP++;
+		}
+	}
+
+	// 스킬이 사용한지 체크하는 함수
+	bool CanUseSkill(int32 cost)
+	{
+		// 호출하는 대상의 AP를 검사해서 크다면 스킬 실행
+		return curAP >= cost;
+	}
+	// AP 소비하는 함수
+	bool CanConsumeAP(int32 cost)
+	{
+		if (!CanUseSkill(cost))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Not enough AP"));
+			return false;
+		}
+		// 호출하는 대상에 ap를 받아서 AP 증감처리 
+		curAP = FMath::Max(0, curAP - cost);
+		// 처리된 ap를 다시 호출한 대상 AP에 업데이트
+		return true;
+	}
 	
 	//----------Speed State-------------
 	int32 speed = 0;
@@ -85,7 +133,7 @@ public:
 	TSubclassOf<class AGridTileManager> TileManagerFactory;
 
 	// PlayerState 부분
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Test)
 	class ABattlePlayerState* battlePlayerState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
@@ -194,6 +242,10 @@ public:
 	void InitValues();
 
 
-	
+	//-------------Unit 이름, HP, Armor 세팅------------------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
+	class UWidgetComponent* battleUnitStateComp;
+
+	void BillboardBattleUnitStateUI();
 	
 };
