@@ -463,36 +463,44 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 아직 로그인 안됨 bLoginMe머고 %d"),WorldGi->bLoginMe) return;
 		};
 	};
-	
-	FitemInfo ItemInfo;
-	TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Empty();
-	for (UWidget* widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 	{
-		if (USlotEquip* SlotEquip = Cast<USlotEquip>(widget))
+		FitemInfo ItemInfo;
+		TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Empty();
+		for (UWidget* widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
 		{
-			if (SlotEquip->ItemStructTable.ItemTop == -1)
+			if (USlotEquip* SlotEquip = Cast<USlotEquip>(widget))
 			{
-				UE_LOG(LogTemp,Warning,TEXT("LogItemComp GetEquipInfo 장비슬롯 있음 인덱스 무엇?%d"),
-					TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(SlotEquip))
-				continue;
+				if (SlotEquip->ItemStructTable.ItemTop == -1)
+				{
+					UE_LOG(LogTemp,Warning,TEXT("LogItemComp GetEquipInfo 장비슬롯 있음 인덱스 무엇?%d"),
+						TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(SlotEquip))
+					continue;
+				}
+				ItemInfo.options.attack = SlotEquip->ItemStructTable.ItemStructStat.item_ATK;
+				ItemInfo.options.hp = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
+				ItemInfo.options.defense = SlotEquip->ItemStructTable.ItemStructStat.item_DEF;
+				ItemInfo.options.resistance = SlotEquip->ItemStructTable.ItemStructStat.item_RES;
+				ItemInfo.options.critical_rate = SlotEquip->ItemStructTable.ItemStructStat.Item_CRIT;
+				ItemInfo.options.critical_damage =SlotEquip->ItemStructTable.ItemStructStat.item_CRITDMG;
+				ItemInfo.item_id = SlotEquip->ItemStructTable.Item_Id;
+				ItemInfo.item_name = SlotEquip->ItemStructTable.Name;
+				ItemInfo.price = SlotEquip->ItemStructTable.ItemGold;
+				TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Add(ItemInfo);
 			}
-			ItemInfo.options.attack = SlotEquip->ItemStructTable.ItemStructStat.item_ATK;
-			ItemInfo.options.hp = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
-			ItemInfo.options.defense = SlotEquip->ItemStructTable.ItemStructStat.item_DEF;
-			ItemInfo.options.resistance = SlotEquip->ItemStructTable.ItemStructStat.item_RES;
-			ItemInfo.options.critical_rate = SlotEquip->ItemStructTable.ItemStructStat.Item_CRIT;
-			ItemInfo.options.critical_damage =SlotEquip->ItemStructTable.ItemStructStat.item_CRITDMG;
-			ItemInfo.item_id = SlotEquip->ItemStructTable.Item_Id;
-			ItemInfo.item_name = SlotEquip->ItemStructTable.Name;
-			ItemInfo.price = SlotEquip->ItemStructTable.ItemGold;
-			TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Add(ItemInfo);
 		}
-	}
+		FString JsonString;
+		TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
 	
-	FString JsonString;
-	TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
-	FJsonObjectConverter::UStructToJsonObjectString(TestPlayer->LoginComp->UserFullInfo,JsonString);
-	UE_LOG(LogTemp,Display,TEXT("InvenComp 장비 스텟창 띄우기전 Json String: [%s]"),*JsonString);
+		for (int32 i = 0; i < TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Num(); i++)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenCOmp 497번쨰줄 SetUiChaStat에 들어가는 장비정보 [%s]"),
+				*TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list[i].item_name);
+		}
+		
+	},1,false);
 }
 
 void UInvenComp::NpcItem(const FItemStructTables ItemStructTables)
