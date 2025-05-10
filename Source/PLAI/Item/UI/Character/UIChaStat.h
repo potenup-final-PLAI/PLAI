@@ -40,7 +40,9 @@ public:
 	// UPROPERTY(meta = (BindWidget))//아직못함
 	// class UTextBlock* HpSco;
 	
-	// 오른쪽 캐릭터 스텟창
+	// 오리지날 스텟
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* HP;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Atk;
 	UPROPERTY(meta = (BindWidget))
@@ -52,7 +54,61 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* CriD;
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Spe;
+	class UTextBlock* Spd;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Mov;
+
+	// 특성 스텟
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* HpT;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* AtkT;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* DefT;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* ResT;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CriT;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CriDT;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* SpdT;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* MovT;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* HpE;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* AtkE;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* DefE;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* ResE;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CriE;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CriDE;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* SpdE;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* MovE;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* HpTot;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* AtkTot;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* DefTot;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* ResTot;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CriTot;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CriDTot;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* SpdTot;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* MovTot;
 
 	UPROPERTY(meta = (BindWidget))
 	class UGridPanel* TraitsBox;
