@@ -384,14 +384,6 @@ void ULoginComp::LoadInvenItem()
 			}
 		}
 	}
-	
-	// for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
-	// {
-	// 	if (USlot* SlOT = Cast<USlot>(Widget))
-	// 	{
-	// 		
-	// 	}
-	// }
 }
 
 

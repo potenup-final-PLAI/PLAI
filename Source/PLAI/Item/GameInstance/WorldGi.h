@@ -31,4 +31,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	FUserFullInfo UserFullInfoGiStat;
+
+	UPROPERTY(EditAnywhere)
+	bool bLoginMe = false;
 };

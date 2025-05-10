@@ -455,10 +455,41 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		if (ItemStructTable.Material)
 		{ Itemboots->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
-	
-	TestPlayer->LogItemComp->GetEquipInfo();
-	
-	// TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
+
+	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+	{
+		if( WorldGi->bLoginMe == false)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp 아직 로그인 안됨 bLoginMe머고 %d"),WorldGi->bLoginMe) return;
+		};
+	};
+	FitemInfo ItemInfo;
+	FEquipmentInfo EquipmentInfo;
+	for (UWidget* widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
+	{
+		if (USlotEquip* SlotEquip = Cast<USlotEquip>(widget))
+		{
+			if (SlotEquip->ItemStructTable.ItemTop == -1)
+			{
+				UE_LOG(LogTemp,Warning,TEXT("LogItemComp GetEquipInfo 장비슬롯 있음 인덱스 무엇?%d"),
+					TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(SlotEquip))
+				continue;
+			}
+			ItemInfo.options.attack = SlotEquip->ItemStructTable.ItemStructStat.item_ATK;
+			ItemInfo.options.hp = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
+			ItemInfo.options.defense = SlotEquip->ItemStructTable.ItemStructStat.item_DEF;
+			ItemInfo.options.resistance = SlotEquip->ItemStructTable.ItemStructStat.item_RES;
+			ItemInfo.options.critical_rate = SlotEquip->ItemStructTable.ItemStructStat.Item_CRIT;
+			ItemInfo.options.critical_damage =SlotEquip->ItemStructTable.ItemStructStat.item_CRITDMG;
+			ItemInfo.item_id = SlotEquip->ItemStructTable.Item_Id;
+			ItemInfo.item_name = SlotEquip->ItemStructTable.Name;
+			ItemInfo.price = SlotEquip->ItemStructTable.ItemGold;
+			
+			EquipmentInfo.item_list.Add(ItemInfo);
+		}
+	}
+	TestPlayer->LoginComp->UserFullInfo.equipment_info = EquipmentInfo;
+	TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
 }
 
 void UInvenComp::NpcItem(const FItemStructTables ItemStructTables)

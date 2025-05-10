@@ -7,6 +7,7 @@
 #include "UiMain.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -34,4 +35,7 @@ void UUiSUbMain::OnButtonSingle()
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->SetVisibility(ESlateVisibility::Visible);
 	
 	RemoveFromParent();
+
+	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+	{ WorldGi->bLoginMe = true; UE_LOG(LogTemp,Warning,TEXT("UiSubMain bLoginMe 바꼈냐 [%d]"),WorldGi->bLoginMe); }
 }

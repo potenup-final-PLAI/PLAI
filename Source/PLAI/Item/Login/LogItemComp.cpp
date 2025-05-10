@@ -11,6 +11,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
@@ -54,10 +55,6 @@ void ULogItemComp::GetEquipInfo()
 	// 장비 보낼떄 구조체
 	FPostEquipId PostEquipId;
 	Fequipment_info equipment_info;
-	// 장비 받을떄 구조체
-	FUserFullInfo UserFullInfoEquip;
-	FitemInfo ItemInfo;
-	FEquipmentInfo EquipmentInfo;
 	
 	for (UWidget* widget : TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetAllChildren())
 	{
@@ -79,26 +76,9 @@ void ULogItemComp::GetEquipInfo()
 			equipment_info.item_id = SlotEquip->ItemStructTable.Item_Id;
 			
 			PostEquipId.equipment_info.Add(equipment_info);
-
-            // 여기서 뽀록나는 느낌이 강하노
-			// 내 UserInfo에 장비정보 저장
-			
-			// ItemInfo.options.attack = SlotEquip->ItemStructTable.ItemStructStat.item_ATK;
-			// ItemInfo.options.hp = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
-			// ItemInfo.options.defense = SlotEquip->ItemStructTable.ItemStructStat.item_DEF;
-			// ItemInfo.options.resistance = SlotEquip->ItemStructTable.ItemStructStat.item_RES;
-			// ItemInfo.options.critical_rate = SlotEquip->ItemStructTable.ItemStructStat.Item_CRIT;
-			// ItemInfo.options.critical_damage =SlotEquip->ItemStructTable.ItemStructStat.item_CRITDMG;
-			// ItemInfo.item_id = SlotEquip->ItemStructTable.Item_Id;
-			// ItemInfo.item_name = SlotEquip->ItemStructTable.Name;
-			// ItemInfo.price = SlotEquip->ItemStructTable.ItemGold;
-			//
-			// EquipmentInfo.item_list.Add(ItemInfo);
 		}
 	}
 	PostEquipId.character_id = TestPlayer->LoginComp->UserFullInfo.character_info.character_id;
-
-	// TestPlayer->LoginComp->UserFullInfo.equipment_info = EquipmentInfo;
 	
 	UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo Test->Character Id = PostEquipId  [%s]"),*TestPlayer->LoginComp->UserFullInfo.character_info.character_id);
 	UE_LOG(LogTemp, Display, TEXT("LogItemComp GetEuqipInfo 캐릭터 아이디 구조체 LoginComp %s"),*TestPlayer->LoginComp->UserFullInfo.user_id);
