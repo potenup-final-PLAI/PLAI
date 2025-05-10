@@ -53,6 +53,12 @@ public:
 	class UTextBlock* CriD;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Spe;
+
+	UPROPERTY(meta = (BindWidget))
+	class UGridPanel* TraitsBox;
+
+	UPROPERTY(EditAnywhere)
+    UDataTable* TraitStructTable;
 	
 	void SetUiChaStat(FUserFullInfo* UserFullInfo);
 };
