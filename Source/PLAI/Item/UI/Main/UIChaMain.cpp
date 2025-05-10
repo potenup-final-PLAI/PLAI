@@ -54,13 +54,8 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 				TraitsStatNameBox->AddChild(TraitStatName);
 			}
 		}
-		
 		UTextBlock* NewTB = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 		NewTB->SetText(FText::FromString(UserFullInfo->character_info.traits[index]));
-
-		// FSlateFontInfo FontInfo = NewTB->GetFont();
-		// FontInfo.Size = 18;
-		// NewTB->SetFont(FontInfo);
 		
 		NewTB->SetFont(FSlateFontInfo(NewTB->GetFont().FontObject, 18));
 		TraitsName->AddChild(NewTB);
@@ -70,8 +65,6 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 	Name->SetText(FText::FromString(UserFullInfo->character_info.character_name));
 	Job->SetText(FText::FromString(UserFullInfo->character_info.job));
 	Gen->SetText(FText::FromString(UserFullInfo->character_info.gender));
-
-	// Traits->SetText(FText::AsNumber(UserFullInfo->character_info.traits[0].
 	
 	Level->SetText(FText::AsNumber(UserFullInfo->character_info.level));
 	HpSco->SetText(FText::AsNumber(UserFullInfo->character_info.stats.hp));

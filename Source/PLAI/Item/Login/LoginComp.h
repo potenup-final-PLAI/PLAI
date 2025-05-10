@@ -138,6 +138,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(EditAnywhere)
+	FUserFullInfo UserFullInfoStat;
 
 	UPROPERTY(EditAnywhere)
 	FUserFullInfo UserFullInfo;

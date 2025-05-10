@@ -17,15 +17,18 @@ class PLAI_API UWorldGi : public UGameInstance
 
 public:
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	TArray<int32>bWorldSpawnInt;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	bool bGameStart = false;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	bool bBattleReward = false;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	FUserFullInfo UserFullInfoGi;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
+	FUserFullInfo UserFullInfoGiStat;
 };

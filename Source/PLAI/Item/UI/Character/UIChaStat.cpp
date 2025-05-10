@@ -9,6 +9,7 @@
 #include "Components/ProgressBar.h"
 #include "PLAI/Item/Login/UserStruct.h"
 #include "Components/TextBlock.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/TestPlayer/TraitStructTable/TraitStructTable.h"
 
 void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
@@ -99,30 +100,38 @@ void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
     	UTextBlock* TraitStat = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
     	TraitName->SetText(FText::FromString(FString::Printf(TEXT("%s"), *UserFullInfo->character_info.traits[i])));
     }
-
 	HpTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.hp+EHp) * (1.0f + THp/100.0f) ));
-	AtkTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.attack+EAtk) * TAtk));
-	DefTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.defense+EDef) * TDef));
-	ResTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.resistance+ERes) * TRes));
-	CriTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.critical_rate+ECri) * TCri));
-	CriDTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.critical_damage+ECriD) * TCriD));
-	SpdTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.speed + ESpd) * TSpd));
-	MovTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.move_range+EMov) * TMov));
-	
+	AtkTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.attack+EAtk) * (1.0f + TAtk/100.0f) ));
+	DefTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.defense+EDef) * (1.0f + TDef/100.0f) ));
+	ResTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.resistance+ERes) * (1.0f + TRes/100.0f) ));
+	CriTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.critical_rate * 100 +ECri) *(1.0f + TCri/100.0f) ));
+	CriDTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.critical_damage+ECriD) *(1.0f + TCriD/100.0f) ));
+	SpdTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.speed + ESpd) * (1.0f + TSpd/100.0f) ));
+	MovTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.move_range+EMov) *(1.0f + TMov/100.0f) ));
+
+	FUserFullInfo UserFullInfoStat = *UserFullInfo;
+	UserFullInfo->character_info.stats.hp = (UserFullInfo->character_info.stats.hp+EHp) * (1.0f + THp/100.0f);
+	UserFullInfo->character_info.stats.attack = (UserFullInfo->character_info.stats.attack+EAtk) * (1.0f + TAtk/100.0f);
+	UserFullInfo->character_info.stats.defense = (UserFullInfo->character_info.stats.defense+EDef) * (1.0f + TDef/100.0f);
+	UserFullInfo->character_info.stats.resistance = (UserFullInfo->character_info.stats.resistance+ERes) * (1.0f + TRes/100.0f);
+	UserFullInfo->character_info.stats.critical_rate = (UserFullInfo->character_info.stats.critical_rate * 100 +ECri) *(1.0f + TCri/100.0f);
+	UserFullInfo->character_info.stats.critical_damage = (UserFullInfo->character_info.stats.critical_damage+ECriD) *(1.0f + TCriD/100.0f);
+	UserFullInfo->character_info.stats.speed = (UserFullInfo->character_info.stats.speed + ESpd) * (1.0f + TSpd/100.0f);
+	UserFullInfo->character_info.stats.move_range = (UserFullInfo->character_info.stats.move_range+EMov) *(1.0f + TMov/100.0f);
+
+	UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
+	WorldGi->UserFullInfoGiStat = UserFullInfoStat;
+
 	Name->SetText(FText::FromString(UserFullInfo->character_info.character_name));
 	Job->SetText(FText::FromString(UserFullInfo->character_info.job));
 	Gen->SetText(FText::FromString(UserFullInfo->character_info.gender));
-
-	// Traits->SetText(FText::AsNumber(UserFullInfo->character_info.traits[0].
-	
 	Level->SetText(FText::AsNumber(UserFullInfo->character_info.level));
-	// HpSco->SetText(FText::AsNumber(UserFullInfo->character_info.stats.hp));
 
 	HP->SetText(FText::AsNumber(UserFullInfo->character_info.stats.hp));
 	Atk->SetText(FText::AsNumber(UserFullInfo->character_info.stats.attack));
 	Def->SetText(FText::AsNumber(UserFullInfo->character_info.stats.defense));
 	Res->SetText(FText::AsNumber(UserFullInfo->character_info.stats.resistance));
-	Cri->SetText(FText::AsNumber(UserFullInfo->character_info.stats.critical_rate));
+	Cri->SetText(FText::AsNumber(UserFullInfo->character_info.stats.critical_rate * 100));
 	CriD->SetText(FText::AsNumber(UserFullInfo->character_info.stats.critical_damage));
 	Spd->SetText(FText::AsNumber(UserFullInfo->character_info.stats.speed));
 	Mov->SetText(FText::AsNumber(UserFullInfo->character_info.stats.move_range));
@@ -136,12 +145,3 @@ void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
 		UE_LOG(LogTemp,Warning,TEXT("UicahMain SetUiChaStat 경험치 안들어옴"))
 	}
 }
-
-// HpTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.hp+EHp) * (THp/100) + 1) );
-// AtkTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.attack+EAtk) * (TAtk/100) + 1) );
-// DefTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.defense+EDef) * (TDef/100) + 1) );
-// ResTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.resistance+ERes) * (TRes/100) + 1) );
-// CriTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.critical_rate+ECri) * (TCri/100) + 1) );
-// CriDTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.critical_damage+ECriD) * (TCriD/100) + 1) );
-// SpdTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.speed + ESpd) * (TSpd/100) + 1) );
-// MovTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.move_range+EMov) * (TMov/100) + 1) );
