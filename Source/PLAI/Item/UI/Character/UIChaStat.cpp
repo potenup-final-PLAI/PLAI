@@ -110,31 +110,32 @@ void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
 	MovTot->SetText(FText::AsNumber((UserFullInfo->character_info.stats.move_range+EMov) *(1.0f + TMov/100.0f) ));
 
 	FUserFullInfo UserFullInfoStat = *UserFullInfo;
-	UserFullInfo->character_info.stats.hp = (UserFullInfo->character_info.stats.hp+EHp) * (1.0f + THp/100.0f);
-	UserFullInfo->character_info.stats.attack = (UserFullInfo->character_info.stats.attack+EAtk) * (1.0f + TAtk/100.0f);
-	UserFullInfo->character_info.stats.defense = (UserFullInfo->character_info.stats.defense+EDef) * (1.0f + TDef/100.0f);
-	UserFullInfo->character_info.stats.resistance = (UserFullInfo->character_info.stats.resistance+ERes) * (1.0f + TRes/100.0f);
-	UserFullInfo->character_info.stats.critical_rate = (UserFullInfo->character_info.stats.critical_rate * 100 +ECri) *(1.0f + TCri/100.0f);
-	UserFullInfo->character_info.stats.critical_damage = (UserFullInfo->character_info.stats.critical_damage+ECriD) *(1.0f + TCriD/100.0f);
-	UserFullInfo->character_info.stats.speed = (UserFullInfo->character_info.stats.speed + ESpd) * (1.0f + TSpd/100.0f);
-	UserFullInfo->character_info.stats.move_range = (UserFullInfo->character_info.stats.move_range+EMov) *(1.0f + TMov/100.0f);
+	
+	UserFullInfoStat.character_info.stats.hp = (UserFullInfo->character_info.stats.hp+EHp) * (1.0f + THp/100.0f);
+	UserFullInfoStat.character_info.stats.attack = (UserFullInfo->character_info.stats.attack+EAtk) * (1.0f + TAtk/100.0f);
+	UserFullInfoStat.character_info.stats.defense = (UserFullInfo->character_info.stats.defense+EDef) * (1.0f + TDef/100.0f);
+	UserFullInfoStat.character_info.stats.resistance = (UserFullInfo->character_info.stats.resistance+ERes) * (1.0f + TRes/100.0f);
+	UserFullInfoStat.character_info.stats.critical_rate = (UserFullInfo->character_info.stats.critical_rate * 100 +ECri) *(1.0f + TCri/100.0f);
+	UserFullInfoStat.character_info.stats.critical_damage = (UserFullInfo->character_info.stats.critical_damage+ECriD) *(1.0f + TCriD/100.0f);
+	UserFullInfoStat.character_info.stats.speed = (UserFullInfo->character_info.stats.speed + ESpd) * (1.0f + TSpd/100.0f);
+	UserFullInfoStat.character_info.stats.move_range = (UserFullInfo->character_info.stats.move_range+EMov) *(1.0f + TMov/100.0f);
 
 	UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
 	WorldGi->UserFullInfoGiStat = UserFullInfoStat;
 
-	Name->SetText(FText::FromString(UserFullInfo->character_info.character_name));
-	Job->SetText(FText::FromString(UserFullInfo->character_info.job));
-	Gen->SetText(FText::FromString(UserFullInfo->character_info.gender));
-	Level->SetText(FText::AsNumber(UserFullInfo->character_info.level));
+	Name->SetText(FText::FromString(UserFullInfoStat.character_info.character_name));
+	Job->SetText(FText::FromString(UserFullInfoStat.character_info.job));
+	Gen->SetText(FText::FromString(UserFullInfoStat.character_info.gender));
+	Level->SetText(FText::AsNumber(UserFullInfoStat.character_info.level));
 
 	HP->SetText(FText::AsNumber(UserFullInfo->character_info.stats.hp));
-	Atk->SetText(FText::AsNumber(UserFullInfo->character_info.stats.attack));
-	Def->SetText(FText::AsNumber(UserFullInfo->character_info.stats.defense));
-	Res->SetText(FText::AsNumber(UserFullInfo->character_info.stats.resistance));
-	Cri->SetText(FText::AsNumber(UserFullInfo->character_info.stats.critical_rate * 100));
-	CriD->SetText(FText::AsNumber(UserFullInfo->character_info.stats.critical_damage));
-	Spd->SetText(FText::AsNumber(UserFullInfo->character_info.stats.speed));
-	Mov->SetText(FText::AsNumber(UserFullInfo->character_info.stats.move_range));
+	Atk->SetText(FText::AsNumber(UserFullInfoStat.character_info.stats.attack));
+	Def->SetText(FText::AsNumber(UserFullInfoStat.character_info.stats.defense));
+	Res->SetText(FText::AsNumber(UserFullInfoStat.character_info.stats.resistance));
+	Cri->SetText(FText::AsNumber(UserFullInfoStat.character_info.stats.critical_rate * 100));
+	CriD->SetText(FText::AsNumber(UserFullInfoStat.character_info.stats.critical_damage));
+	Spd->SetText(FText::AsNumber(UserFullInfoStat.character_info.stats.speed));
+	Mov->SetText(FText::AsNumber(UserFullInfoStat.character_info.stats.move_range));
 
 	if (UserFullInfo->character_info.current_exp > 0 && UserFullInfo->character_info.max_exp > 0)
 	{

@@ -58,6 +58,7 @@ void UInvenComp::BeginPlay()
 			MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 			// TurnReward();
 			WorldGi->bBattleReward = false;
 		}
@@ -454,6 +455,10 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		if (ItemStructTable.Material)
 		{ Itemboots->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
+	
+	TestPlayer->LogItemComp->GetEquipInfo();
+	
+	// TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
 }
 
 void UInvenComp::NpcItem(const FItemStructTables ItemStructTables)
