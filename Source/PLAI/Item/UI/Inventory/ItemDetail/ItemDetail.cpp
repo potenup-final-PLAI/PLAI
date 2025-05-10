@@ -29,6 +29,10 @@ void UItemDetail::SetItemDetail(const FItemStructTable& ItemStruct)
 		FString Index = FString::Printf(TEXT("T[%d] I[%d] Y[%d] D[%d]"), ItemStruct.ItemTop, ItemStruct.ItemIndex, 
 	    ItemStruct.ItemIndexType, ItemStruct.ItemIndexDetail);
 		StatE->SetText(FText::FromString(Index));
+		StatD->SetText(FText::AsNumber(ItemStruct.ItemGold));
+		
+		StatNameE->SetText(FText::AsNumber(ItemStruct.ItemStructStat.Item_CRIT));
+		StatNameC->SetText(FText::FromString(ItemStruct.ItemStructStatName.Item_CRIT));
 		
         if (ItemStruct.ItemTop == 1 && ItemStruct.ItemIndex == 0)
         {// 공격아이템

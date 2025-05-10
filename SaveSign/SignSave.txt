@@ -1331,6 +1331,42 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "smk6931@naver.com",
+			"pw": "asd",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "qwe@qwe.qwe",
+			"pw": "qwe",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "1234@q.q",
+			"pw": "q",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }

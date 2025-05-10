@@ -59,8 +59,9 @@ FVector AMonWorld::RandLocation()
 void AMonWorld::MoveToLocation()
 {
 	CurrentTime += GetWorld()->GetDeltaSeconds();
-	if (CurrentTime > 1.5)
+	if (CurrentTime > 1)
 	{
+		CastObject();
 		CastPlayer();
 		CurrentTime = 0;
 	}
@@ -147,7 +148,7 @@ void AMonWorld::CastObject()
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 
-	bool bHit = GetWorld()->SweepMultiByChannel(Hits,GetActorLocation(),GetActorLocation() + GetActorForwardVector() * 50,
+	bool bHit = GetWorld()->SweepMultiByChannel(Hits,GetActorLocation(),GetActorLocation() + GetActorForwardVector() * 25,
 		FQuat::Identity,ECC_Visibility,FCollisionShape::MakeBox(FVector(25,25,25)),Params);
 	
 	if (bHit)
