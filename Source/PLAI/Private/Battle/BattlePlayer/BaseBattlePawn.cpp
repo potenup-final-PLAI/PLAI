@@ -128,38 +128,27 @@ void ABaseBattlePawn::OnTurnStart()
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
 		// 턴 시작 시 AP 증가
-		enemybattleState->curAP += enemybattleState->GetAP(
-			enemybattleState->curAP);
-		UE_LOG(LogTemp, Warning, TEXT("Current AP: %d"),
-		       enemybattleState->curAP);
+		if (!enemybattleState)
+		{
+			UE_LOG(LogTemp, Error, TEXT("enemybattleState is null on OnTurnStart"));
+			return;
+		}
+
+		enemybattleState->curAP += enemybattleState->GetAP(enemybattleState->curAP);
+		UE_LOG(LogTemp, Warning, TEXT("Current AP: %d"), enemybattleState->curAP);
 
 		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnTurnStart"));
 		ABaseBattlePawn* CapturedUnit = this;
 
 		FTimerHandle battleAPIHandle;
-		GetWorld()->GetTimerManager().SetTimer(battleAPIHandle,
-		                                       FTimerDelegate::CreateLambda(
-			                                       [this, CapturedUnit]()
-			                                       {
-				                                       UE_LOG(LogTemp, Warning,
-					                                       TEXT(
-						                                       "BaseBattlePawn::In Lambda"
-					                                       ));
-				                                       if (turnManager &&
-					                                       turnManager->
-					                                       phaseManager)
-				                                       {
-					                                       UE_LOG(LogTemp,
-						                                       Warning,
-						                                       TEXT(
-							                                       "BaseBattlePawn::turnManager, phaseManager is Set"
-						                                       ));
-					                                       turnManager->
-						                                       phaseManager->
-						                                       TrySendbattleState(
-							                                       CapturedUnit);
-				                                       }
-			                                       }), 4.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(battleAPIHandle,FTimerDelegate::CreateLambda([this, CapturedUnit]()
+       {
+           UE_LOG(LogTemp, Warning,TEXT("BaseBattlePawn::In Lambda"));
+           if (turnManager && turnManager->phaseManager)
+           {
+               UE_LOG(LogTemp,Warning,TEXT("BaseBattlePawn::turnManager, phaseManager is Set"));turnManager->phaseManager->TrySendbattleState(CapturedUnit);
+           }
+       }), 4.0f, false);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
 }
