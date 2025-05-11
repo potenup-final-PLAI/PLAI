@@ -19,5 +19,8 @@ protected:
 	virtual void NativeConstruct() override;
 public:
 	UPROPERTY(meta = (BindWidget))
-	UCycleAndTurn* WBP_CycleAndTurn;
+	class UCycleAndTurn* WBP_CycleAndTurn;
+
+	UPROPERTY(meta = (BindWidget))
+	class UBattlePlayerInfoUI* WBP_Player;
 };

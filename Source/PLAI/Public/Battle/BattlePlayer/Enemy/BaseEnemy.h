@@ -29,6 +29,10 @@ public:
 		class UInputComponent* PlayerInputComponent) override;
 
 
+	//-------------enemy Settings--------------------
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	class USkeletalMeshComponent* meshComp;
+	
 	//--------------Test---------------------
 	void MoveToPlayer(class AGridTile* player,
 	                  class AGridTileManager* tileManager);

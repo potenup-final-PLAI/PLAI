@@ -28,7 +28,7 @@ class PLAI_API AUPhaseManager : public AGameStateBase
 
 protected:
 	virtual void BeginPlay() override;
-
+	virtual void Tick(float DeltaTime) override;
 public:
 	// 구현 해야하는 내용
 	// 상태에 따라 UI, 사운드, 이펙트 바꾸기
@@ -126,6 +126,9 @@ public:
 
 	//------------Status 이름 변경--------------------
 	FString GetStatusEffectsString(EStatusEffect effect);
-	
+
+	//-----------Unit UI 이름 확인 쉽게 세팅할 변수------------
+	int8 unitPlayerNameindex = 0;
+	int8 unitEnemyNameindex = 0;
 	
 };

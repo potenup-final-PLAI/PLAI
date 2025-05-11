@@ -22,4 +22,5 @@ public:
 	TSubclassOf<UMainBattleUI> mainUIFactory;
 	
 	
+	
 };

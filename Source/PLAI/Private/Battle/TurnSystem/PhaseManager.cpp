@@ -9,6 +9,8 @@
 #include "Battle/Http/BattleHttpActor.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
+#include "Battle/UI/BattlePlayerInfoUI.h"
+#include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/CycleAndTurn.h"
 #include "Battle/UI/MainBattleUI.h"
 #include "Enemy/BaseEnemy.h"
@@ -17,6 +19,7 @@
 #include "Player/BattlePlayer.h"
 #include "Battle/Util/BattleType/BattleTypes.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/WidgetComponent.h"
 #include "Player/BattlePlayerState.h"
 
 void AUPhaseManager::BeginPlay()
@@ -32,6 +35,12 @@ void AUPhaseManager::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(timerBattleStartHandle, this,
 	                                       &AUPhaseManager::SetBeforeBattle,
 	                                       0.2f, true);
+}
+
+void AUPhaseManager::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
 }
 
 void AUPhaseManager::SetCycle()
@@ -205,25 +214,6 @@ void AUPhaseManager::StartBattle()
 		// 애너미 턴 시작
 		StartEnemyPhase();
 	}
-	// UE_LOG(LogTemp, Warning, TEXT("PhaseManager : Start Battle"));
-	//
-	// // 유닛에 0번을 tempUnit에 저장
-	// ABaseBattlePawn* tempUnit = unitQueue[0];
-	// // 현재 턴이 진행 중인 유닛 저장
-	// turnManager->curUnit = tempUnit;
-	// // 큐에 들어 있는 처음 유닛 제거
-	// unitQueue.RemoveAt(0);
-	//
-	// if (ABattlePlayer* playerUnit = Cast<ABattlePlayer>(tempUnit))
-	// {
-	// 	// 플레이어 턴 시작
-	// 	StartPlayerPhase();
-	// }
-	// else if (ABaseEnemy* enemyUnit = Cast<ABaseEnemy>(tempUnit))
-	// {
-	// 	// 애너미 턴 시작
-	// 	StartEnemyPhase();
-	// }
 }
 
 void AUPhaseManager::StartPlayerPhase()
@@ -375,6 +365,60 @@ void AUPhaseManager::SetBeforeBattle()
 				TryInitStatus(unit);
 				UE_LOG(LogTemp, Warning,
 				       TEXT("Set Before Battle : Possess!!!"));
+
+				// 가장 가까운 적 찾기
+				ABaseBattlePawn* closestTarget = nullptr;
+				float minDistSquared = TNumericLimits<float>::Max();
+
+				for (ABaseBattlePawn* other : baseUnits)
+				{
+					if (unit == other) continue;
+
+					// 같은 팀이면 무시
+					const bool bothPlayer = unit->IsA<ABattlePlayer>() && other->IsA<ABattlePlayer>();
+					const bool bothEnemy = unit->IsA<ABaseEnemy>() && other->IsA<ABaseEnemy>();
+					
+					if (bothPlayer || bothEnemy) continue;
+
+					float distSq = FVector::DistSquared(unit->GetActorLocation(), other->GetActorLocation());
+					if (distSq < minDistSquared)
+					{
+						minDistSquared = distSq;
+						closestTarget = other;
+					}
+				}
+				if (closestTarget)
+				{
+					// 기본 회전 보정값
+					float yawOffset = -90.f;
+					
+					// 매쉬만 회전
+					if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
+					{
+						if (player->meshComp)
+						{
+							FVector dir = closestTarget->GetActorLocation() - player->GetActorLocation();
+							FRotator meshRot = dir.Rotation();
+							player->meshComp->SetRelativeRotation(FRotator(0, meshRot.Yaw + yawOffset, 0));
+						}
+					}
+					else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
+					{
+						if (enemy->meshComp)
+						{
+							FVector dir = closestTarget->GetActorLocation() - enemy->GetActorLocation();
+							FRotator meshRot = dir.Rotation();
+							enemy->meshComp->SetWorldRotation(FRotator(0, meshRot.Yaw+ yawOffset, 0));
+						}
+					}
+					else
+					{
+						// enemy 임시로 회전
+						FVector dir = closestTarget->GetActorLocation() - unit->GetActorLocation();
+						FRotator lookRot = dir.Rotation();
+						unit->SetActorRotation(FRotator(0, lookRot.Yaw, 0));
+					}
+				}
 			}
 			else
 			{
@@ -523,7 +567,7 @@ FBattleTurnState AUPhaseManager::SetBattleProcessingAPI()
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 		{
 			charStatus.hp = player->battlePlayerState->playerStatus.hp;
-			charStatus.ap = player->battlePlayerState->curAP;
+			charStatus.ap = player->curAP;
 			charStatus.mov = player->battlePlayerState->playerStatus.move_Range;
 			// 상태 이상 정보 추가
 			for (const auto& Elem : player->activeStatusEffects)
@@ -666,6 +710,15 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		UE_LOG(LogTemp, Warning, TEXT("state : %s"),
 		       *UEnum::GetValueAsString(player->battlePlayerState->
 			       playerLifeState));
+
+		if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(player->battleUnitStateComp->GetWidget()))
+		{
+			FString name = FString::Printf(TEXT("player%d"),unitPlayerNameindex);
+			ui->SetUnitName(name);
+			ui->SetHPUI(player);
+			++unitPlayerNameindex;
+			
+		}
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 	{
