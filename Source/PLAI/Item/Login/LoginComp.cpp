@@ -92,8 +92,11 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::N)) // N 내아이템 주셈
-		{   UE_LOG(LogTemp,Display,TEXT("Input N 내 아이템 주셈 Key JustPressed"));
-		LoadEquipItem();
+		{   UE_LOG(LogTemp,Display,TEXT("Input N 장비아이템 붙이기 테스트"));
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+		{
+			WorldGi->EquipActor(TestPlayer);
+		}
 		}
 	}
 
