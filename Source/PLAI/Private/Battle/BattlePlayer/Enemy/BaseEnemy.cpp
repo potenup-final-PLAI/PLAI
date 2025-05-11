@@ -3,9 +3,9 @@
 
 #include "Battle/BattlePlayer/Enemy/BaseEnemy.h"
 
-#include "BasePlayerState.h"
 #include "GridTile.h"
 #include "GridTileManager.h"
+#include "Enemy/BattleEnemyAnimInstance.h"
 #include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
@@ -21,11 +21,18 @@ ABaseEnemy::ABaseEnemy()
 	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100), FRotator(0, -90, 0));
 	
 	// Mesh Setting
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Wood_Monster/CharacterParts/Meshes/SK_wood_giant_01_a.SK_wood_giant_01_a'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("'/Game/Wood_Monster/CharacterParts/Meshes/SK_wood_giant_01_a.SK_wood_giant_01_a'"));
 	if (tempMesh.Succeeded())
 	{
 		meshComp->SetSkeletalMesh(tempMesh.Object);
 	}
+	
+	// Animation Instance 세팅
+	// ConstructorHelpers::FClassFinder<UAnimInstance> tempAnimInstance(TEXT("'/Game/JS/Blueprints/Animation/ABP_BattleEnemy.ABP_BattleEnemy_C'"));
+	// if (tempAnimInstance.Succeeded())
+	// {
+	// 	meshComp->SetAnimInstanceClass(tempAnimInstance.Class);
+	// }
 	
 }
 
@@ -35,6 +42,13 @@ void ABaseEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	// GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABaseBattlePawn::TryInitStatus, 0.1f, true);
+}
+
+void ABaseEnemy::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	enemyAnim = Cast<UBattleEnemyAnimInstance>(meshComp->GetAnimInstance());
 }
 
 // Called every frame
@@ -211,11 +225,9 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	// 2. 스킬 처리 (예: 타격이면 공격)
 	if (Action.skill == TEXT("타격"))
 	{
-		ABaseBattlePawn* Target = FindUnitById(Action.target_character_id);
-		if (Target)
-		{
-			ApplyAttack(Target, EActionMode::BaseAttack); // 공격 실행
-		}
+		attackTarget = FindUnitById(Action.target_character_id);
+		bWantsToAttack = true;
+		bStartMontage = true;
 	}
 
 	// 3. 이동/행동력 소진 후 턴 종료

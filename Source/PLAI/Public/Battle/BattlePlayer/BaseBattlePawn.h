@@ -211,8 +211,6 @@ public:
 	// 움직임 플래그
 	bool bIsMoveMode = false;
 	
-	// mouse Click
-	void MouseClick(const FInputActionValue& value);
 	// UI에서 이동을 눌렀을 때 범위 활성화
 	void PathFind();
 	void BuildPath();
@@ -250,13 +248,20 @@ public:
 	
 	void BillboardBattleUnitStateUI();
 	void OnMouseHover();
-	//-----------Anim Instace---------------------
+	//-----------Player Anim Instace---------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABaseEnemy* targetEnemy;
+	
+	//-----------Enemy Anim Instace---------------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
+	class ABattlePlayer* targetPlayer;
 	
 	//-------------Rotation 처리--------------------
 	bool bWantsToAttack = false;
 	bool bStartMontage = false;
 	ABaseBattlePawn* attackTarget;
+
+	//------------Enemy Turn 여러 번 호출 방지--------
+	bool bTurnEnded = false;
 	
 };

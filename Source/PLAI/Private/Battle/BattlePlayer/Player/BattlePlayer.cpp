@@ -16,14 +16,14 @@ ABattlePlayer::ABattlePlayer()
 	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100), FRotator(0, -90, 0));
 	
 	// Mesh Setting
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonGreystone/Characters/Heroes/Greystone/Meshes/Greystone.Greystone'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("'/Game/ParagonGreystone/Characters/Heroes/Greystone/Meshes/Greystone.Greystone'"));
 	if (tempMesh.Succeeded())
 	{
 		meshComp->SetSkeletalMesh(tempMesh.Object);
 	}
 	
 	// Animation Instance 세팅
-	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnimInstance(TEXT("/Script/Engine.AnimBlueprint'/Game/JS/Blueprints/Animation/ABP_BattlePlayer.ABP_BattlePlayer_C'"));
+	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnimInstance(TEXT("'/Game/JS/Blueprints/Animation/ABP_BattlePlayer.ABP_BattlePlayer_C'"));
 	if (tempAnimInstance.Succeeded())
 	{
 		meshComp->SetAnimInstanceClass(tempAnimInstance.Class);
