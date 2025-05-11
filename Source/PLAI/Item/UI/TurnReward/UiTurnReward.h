@@ -23,4 +23,7 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	class UWrapBox* RewardBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* RewardGold;
 };

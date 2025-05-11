@@ -637,6 +637,10 @@ void UInvenComp::TurnReward()
 {
 	UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
 	UiTurnReward->AddToViewport();
+
+	int32 RandGold = FMath::RandRange(1000,5000);
+    UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
+	SetGold(RandGold);
 	
 	int32 RandomReward = FMath::RandRange(2,4);
 	for (int32 i = 0; i < RandomReward; i++)

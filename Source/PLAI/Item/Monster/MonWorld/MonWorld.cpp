@@ -47,8 +47,10 @@ FVector AMonWorld::RandLocation()
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(this);
 
-	bool bHit = GetWorld()->LineTraceSingleByObjectType(hit,FVector(x,y,z) + FVector(0,0,2000),
-		FVector(x,y,z) + FVector(0,0,-2000), ECC_GameTraceChannel1, params);
+	bool bHit = GetWorld()->LineTraceSingleByObjectType
+	(hit,FVector(x,y,z) + FVector(0,0,2000),
+		FVector(x,y,z) + FVector(0,0,-2000),
+		ECC_GameTraceChannel1, params);
 	
 	// DrawDebugLine(GetWorld(),GetActorLocation() + hit.Location + FVector(0,0,3000),hit.Location,FColor::Blue,
 	// 	false,2);
@@ -89,23 +91,16 @@ void AMonWorld::MoveToLocation()
 
 TArray<FOverlapResult> AMonWorld::GetHitResult(float Distance)
 {
-	if (UIMonWorld)
-	{ UIMonWorld->RemoveFromParent(); }
-	bBattle = false;
-
-	// UE_LOG(LogTemp,Error,TEXT("AMonWorld::CastPlayer 캐스팅 플레이어중"));
-	TArray<FOverlapResult> Hits;
-	FCollisionQueryParams Params;
+	if (UIMonWorld){ UIMonWorld->RemoveFromParent(); }bBattle = false;
+	TArray<FOverlapResult> Hits; FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-
-	bool bHit = GetWorld()->OverlapMultiByChannel(Hits,GetActorLocation(),FQuat::Identity,ECC_Pawn,
-		FCollisionShape::MakeSphere(Distance),Params);
-	// DrawDebugSphere(GetWorld(),GetActorLocation(),Distance,10,FColor::Blue,false,1);
-	if (bHit)
-	{
-		return Hits;
-	}
+	
+	bool bHit = GetWorld()->OverlapMultiByChannel(Hits,GetActorLocation(),
+		FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Distance),Params);
+	if (bHit){ return Hits; }
 	return TArray<FOverlapResult>();
+	
+	// DrawDebugSphere(GetWorld(),GetActorLocation(),Distance,10,FColor::Blue,false,1);
 }
 
 void AMonWorld::CastPlayer()
