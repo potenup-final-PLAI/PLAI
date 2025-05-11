@@ -60,6 +60,8 @@ void ULogItemComp::GetEquipInfo()
 	{
 		if (USlotEquip* SlotEquip = Cast<USlotEquip>(widget))
 		{
+			int32 index = TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(SlotEquip);
+			
 			if (SlotEquip->ItemStructTable.ItemTop == -1)
 			{
 				UE_LOG(LogTemp,Warning,TEXT("LogItemComp GetEquipInfo 장비슬롯 있음 인덱스 무엇?%d"),
@@ -76,6 +78,8 @@ void ULogItemComp::GetEquipInfo()
 			equipment_info.item_id = SlotEquip->ItemStructTable.Item_Id;
 			
 			PostEquipId.equipment_info.Add(equipment_info);
+			
+			TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list[index].item_id = SlotEquip->ItemStructTable.Item_Id;
 		}
 	}
 	PostEquipId.character_id = TestPlayer->LoginComp->UserFullInfo.character_info.character_id;

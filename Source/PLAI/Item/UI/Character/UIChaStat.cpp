@@ -142,6 +142,7 @@ void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
 	UserFullInfoStat.character_info.stats.critical_damage = (UserFullInfo->character_info.stats.critical_damage+ECriD) *(1.0f + TCriD/100.0f);
 	UserFullInfoStat.character_info.stats.speed = (UserFullInfo->character_info.stats.speed + ESpd) * (1.0f + TSpd/100.0f);
 	UserFullInfoStat.character_info.stats.move_range = (UserFullInfo->character_info.stats.move_range+EMov) *(1.0f + TMov/100.0f);
+	
 	UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
 	WorldGi->UserFullInfoGiStat = UserFullInfoStat;
 }
