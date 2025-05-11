@@ -57,7 +57,7 @@ void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
     {
     	UTextBlock* TraitName = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
     	TraitName->SetText(FText::FromString(FString::Printf(TEXT("%s"), *UserFullInfo->character_info.traits[i])));
-    	TraitName->SetFont(FSlateFontInfo(TraitName->GetFont().FontObject, 16));
+    	TraitName->SetFont(FSlateFontInfo(TraitName->GetFont().FontObject, 14));
     	UGridSlot* GridSlot = TraitsBox->AddChildToGrid(TraitName);
     	GridSlot->SetRow(i);
 	    GridSlot->SetRowSpan(1);

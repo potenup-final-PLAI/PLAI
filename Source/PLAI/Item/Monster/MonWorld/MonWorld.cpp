@@ -52,9 +52,9 @@ FVector AMonWorld::RandLocation()
 		FVector(x,y,z) + FVector(0,0,-2000),
 		ECC_GameTraceChannel1, params);
 	
-	DrawDebugLine(GetWorld(),GetActorLocation() + hit.Location + FVector(0,0,3000),hit.Location,FColor::Blue,
-		false,2);
-	DrawDebugSphere(GetWorld(),GetActorLocation() + hit.Location,30,30,FColor::Red,false,2);
+	// DrawDebugLine(GetWorld(),GetActorLocation() + hit.Location + FVector(0,0,3000),hit.Location,FColor::Blue,
+	// 	false,2);
+	// DrawDebugSphere(GetWorld(),GetActorLocation() + hit.Location,30,30,FColor::Red,false,2);
 	return FVector(hit.Location);
 }
 
@@ -128,6 +128,7 @@ void AMonWorld::CastPlayer()
 				{
 					UIMonWorld = CreateWidget<UUiMonWorld>(GetWorld(),UIMonWorldFactory);
 					UIMonWorld->AddToViewport();
+					
 					UIMonWorld->MonWorld = this;
 					UIMonWorld->TestPlayer = TestPlayer;
 					bBattle = true;
