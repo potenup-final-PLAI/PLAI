@@ -10,6 +10,7 @@
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
+#include "Battle/UI/BattlePlayerInfoUI.h"
 #include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/MainBattleUI.h"
 #include "Camera/CameraComponent.h"
@@ -232,6 +233,24 @@ void ABaseBattlePawn::OnTurnStart()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TurnManager is nullptr"));
 	}
+
+	// BattlePlayerInfo UI 세팅
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
+		{
+			if (ABattleHUD* hud = Cast<ABattleHUD>(pc->GetHUD()))
+			{
+				if (hud->mainUI && hud->mainUI->WBP_Player)
+				{
+					FString name = player->GetActorNameOrLabel();
+					hud->mainUI->WBP_Player->SetPlayerName(name);
+					hud->mainUI->WBP_Player->SetPlayerHPUI(player);
+				}
+			}
+		}
+	}
+	
 	
 	// 상태이상이 있다면 대미지 및 버프, 디버프 처리하기
 	ApplyStatusEffect();
@@ -266,7 +285,7 @@ void ABaseBattlePawn::OnTurnStart()
            {
                UE_LOG(LogTemp,Warning,TEXT("BaseBattlePawn::turnManager, phaseManager is Set"));turnManager->phaseManager->TrySendbattleState(CapturedUnit);
            }
-       }), 4.0f, false);
+       }), 1.0f, false);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
 }
@@ -665,7 +684,6 @@ void ABaseBattlePawn::InitEnemyState()
 			}
 			ui->SetUnitName(name);
 			ui->SetHPUI(enemy);
-			
 		}
 	}
 }
@@ -684,6 +702,18 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 		if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(player->battleUnitStateComp->GetWidget()))
 		{
 			ui->UpdateHP(player->battlePlayerState->playerStatus.hp);
+			
+			// BattlePlayerInfo HP 업데이트
+			if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
+			{
+				if (ABattleHUD* hud = Cast<ABattleHUD>(pc->GetHUD()))
+				{
+					if (hud->mainUI && hud->mainUI->WBP_Player)
+					{
+						hud->mainUI->WBP_Player->PlayerUpdateHP(player, player->battlePlayerState->playerStatus.hp);
+					}
+				}
+			}
 		}
 		// hp가 0보다 작으면 사망
 		if (player->battlePlayerState->playerStatus.hp <= 0)
@@ -1079,6 +1109,17 @@ void ABaseBattlePawn::HandleStateusEffect(EStatusEffect effect)
 			{
 				ui->UpdateHP(player->battlePlayerState->playerStatus.hp);
 			}
+			// BattlePlayerInfo UI 세팅
+			if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
+			{
+				if (ABattleHUD* hud = Cast<ABattleHUD>(pc->GetHUD()))
+				{
+					if (hud->mainUI && hud->mainUI->WBP_Player)
+					{
+						hud->mainUI->WBP_Player->SetPlayerHPUI(player);
+					}
+				}
+			}
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
@@ -1126,6 +1167,17 @@ void ABaseBattlePawn::HandleStateusEffect(EStatusEffect effect)
 			if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(player->battleUnitStateComp->GetWidget()))
 			{
 				ui->UpdateHP(player->battlePlayerState->playerStatus.hp);
+			}
+			// BattlePlayerInfo UI 세팅
+			if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
+			{
+				if (ABattleHUD* hud = Cast<ABattleHUD>(pc->GetHUD()))
+				{
+					if (hud->mainUI && hud->mainUI->WBP_Player)
+					{
+						hud->mainUI->WBP_Player->SetPlayerHPUI(player);
+					}
+				}
 			}
 			BleedingProcess(player->battlePlayerState);
 		}

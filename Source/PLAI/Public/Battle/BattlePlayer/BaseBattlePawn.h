@@ -247,7 +247,7 @@ public:
 	class UWidgetComponent* battleUnitStateComp;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
 	class ABaseBattlePawn* lastHoveredPawn;
-
+	
 	void BillboardBattleUnitStateUI();
 	void OnMouseHover();
 	//-----------Anim Instace---------------------

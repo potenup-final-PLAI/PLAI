@@ -9,6 +9,7 @@
 #include "Battle/Http/BattleHttpActor.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
+#include "Battle/UI/BattlePlayerInfoUI.h"
 #include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/CycleAndTurn.h"
 #include "Battle/UI/MainBattleUI.h"
@@ -716,6 +717,7 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			ui->SetUnitName(name);
 			ui->SetHPUI(player);
 			++unitPlayerNameindex;
+			
 		}
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
