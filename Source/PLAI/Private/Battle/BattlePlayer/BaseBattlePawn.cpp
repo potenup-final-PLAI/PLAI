@@ -93,8 +93,8 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 
 		// 메시 회전 부드럽게 보간 처리
 		FRotator targetRot = direction.Rotation();
-		const float yawOffset = -90.f;
-		const float interpSpeed = 8.f;
+		constexpr float yawOffset = -90.f;
+		constexpr float interpSpeed = 8.f;
 
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
@@ -126,6 +126,15 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 			currentPathIndex++;
 			if (!pathArray.IsValidIndex(currentPathIndex))
 			{
+				currentActionMode = EActionMode::None;
+				if (auto* player = Cast<ABattlePlayer>(this))
+				{
+					if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+					{
+						anim->actionMode = currentActionMode;
+						UE_LOG(LogTemp, Warning, TEXT("actionMode set to None"));
+					}
+				}
 				bIsMoving = false;
 				currentTile = pathArray.Last();
 				pathArray.Empty();
@@ -143,9 +152,9 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	{
 		FVector directionToTarget = (attackTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
 		FRotator desiredRot = directionToTarget.Rotation();
-		const float interpSpeed = 5.f;
+		constexpr float interpSpeed = 5.f;
 		// 캐릭터의 forward 기준에 맞게 조정
-		const float yawOffset = -90.f; 
+		constexpr float yawOffset = -90.f; 
 
 		// 현재 유닛이 Player라면
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
@@ -312,7 +321,7 @@ void ABaseBattlePawn::OnMouseLeftClick()
 			UE_LOG(LogTemp, Warning, TEXT("Test Click : Dist too be far"));
 			return;
 		}
-
+		
 		EActionMode curSkillState = currentActionMode;
 		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),
 		       *UEnum::GetValueAsString(curSkillState));
@@ -361,17 +370,13 @@ void ABaseBattlePawn::OnMouseLeftClick()
 
 void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 {
-	// 이동을 위한 타일이라면
-	// if (AGridTile* testTile = Cast<AGridTile>(hitInfo.GetActor()))
-	// {
-	// 	FVector targetLoc = FVector(testTile->GetActorLocation().X, testTile->GetActorLocation().Y, testTile->GetActorLocation().Z + 100);
-	// 	
-	// 	SetActorLocation(targetLoc);
-	// 	// goalTile 쪽으로 이동
-	// 	targetTile = testTile;
-	// 	currentTile = testTile;
-	// }
-
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 	// AStar로 이동
 	if (AGridTile* testTile = Cast<AGridTile>(hitInfo.GetActor()))
 	{
@@ -417,6 +422,13 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 		UE_LOG(LogTemp, Warning, TEXT("Use BaseAttack Before"));
 		return;
 	}
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 
 	bBaseAttack = false;
 	// 공격 대상이 enemy라면
@@ -443,6 +455,13 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 
 void ABaseBattlePawn::PlayerParalysis(FHitResult& hitInfo)
 {
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 	UE_LOG(LogTemp, Warning, TEXT("PlayerParalysis In"));
 	// 공격을 위한 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
@@ -460,6 +479,13 @@ void ABaseBattlePawn::PlayerParalysis(FHitResult& hitInfo)
 
 void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 {
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 	// 공격을 위한 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
@@ -474,6 +500,13 @@ void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 
 void ABaseBattlePawn::PlayerVulnerable(FHitResult& hitInfo)
 {
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 	// 공격을 위한 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
@@ -488,6 +521,13 @@ void ABaseBattlePawn::PlayerVulnerable(FHitResult& hitInfo)
 
 void ABaseBattlePawn::PlayerWeaking(FHitResult& hitInfo)
 {
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 	// 공격을 위한 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
@@ -502,6 +542,13 @@ void ABaseBattlePawn::PlayerWeaking(FHitResult& hitInfo)
 
 void ABaseBattlePawn::PlayerFatal(FHitResult& hitInfo)
 {
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 	// 공격을 위한 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
@@ -516,6 +563,13 @@ void ABaseBattlePawn::PlayerFatal(FHitResult& hitInfo)
 
 void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
 {
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 	// 공격을 위한 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
@@ -530,6 +584,13 @@ void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
 
 void ABaseBattlePawn::PlayerRoar(FHitResult& hitInfo)
 {
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 	// 공격을 위한 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
@@ -544,6 +605,13 @@ void ABaseBattlePawn::PlayerRoar(FHitResult& hitInfo)
 
 void ABaseBattlePawn::PlayerBattleCry(FHitResult& hitInfo)
 {
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 	// 공격을 위한 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
@@ -646,7 +714,13 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	}
 
 	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
-	currentActionMode = EActionMode::None;
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 }
 
 void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
@@ -918,6 +992,16 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 			}
 			
 			GetDamage(enemy, damage);
+		}
+	}
+
+	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
+	currentActionMode = EActionMode::None;
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
 		}
 	}
 }
