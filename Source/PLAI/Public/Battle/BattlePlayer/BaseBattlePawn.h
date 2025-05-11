@@ -241,12 +241,15 @@ public:
 	void InitValues();
 
 
+	//------------- UI --------------
 	//-------------Unit 이름, HP, Armor 세팅------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
 	class UWidgetComponent* battleUnitStateComp;
-	
-	void BillboardBattleUnitStateUI();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
+	class ABaseBattlePawn* lastHoveredPawn;
 
+	void BillboardBattleUnitStateUI();
+	void OnMouseHover();
 	//-----------Anim Instace---------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABaseEnemy* targetEnemy;

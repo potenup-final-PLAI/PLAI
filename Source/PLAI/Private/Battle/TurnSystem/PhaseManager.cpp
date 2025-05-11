@@ -36,6 +36,12 @@ void AUPhaseManager::BeginPlay()
 	                                       0.2f, true);
 }
 
+void AUPhaseManager::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+}
+
 void AUPhaseManager::SetCycle()
 {
 	cycle = FMath::Min(6, cycle + 1);
@@ -207,25 +213,6 @@ void AUPhaseManager::StartBattle()
 		// 애너미 턴 시작
 		StartEnemyPhase();
 	}
-	// UE_LOG(LogTemp, Warning, TEXT("PhaseManager : Start Battle"));
-	//
-	// // 유닛에 0번을 tempUnit에 저장
-	// ABaseBattlePawn* tempUnit = unitQueue[0];
-	// // 현재 턴이 진행 중인 유닛 저장
-	// turnManager->curUnit = tempUnit;
-	// // 큐에 들어 있는 처음 유닛 제거
-	// unitQueue.RemoveAt(0);
-	//
-	// if (ABattlePlayer* playerUnit = Cast<ABattlePlayer>(tempUnit))
-	// {
-	// 	// 플레이어 턴 시작
-	// 	StartPlayerPhase();
-	// }
-	// else if (ABaseEnemy* enemyUnit = Cast<ABaseEnemy>(tempUnit))
-	// {
-	// 	// 애너미 턴 시작
-	// 	StartEnemyPhase();
-	// }
 }
 
 void AUPhaseManager::StartPlayerPhase()

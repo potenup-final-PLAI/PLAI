@@ -42,13 +42,14 @@ ABaseBattlePawn::ABaseBattlePawn()
 	battleUnitStateComp = CreateDefaultSubobject<UWidgetComponent>("BattleUnitStateComp");
 	battleUnitStateComp->SetupAttachment(RootComponent);
 	battleUnitStateComp->SetRelativeLocationAndRotation(FVector(0, 0, 170), FRotator(0));
+	battleUnitStateComp->SetGenerateOverlapEvents(false); // 충돌 막기
+	battleUnitStateComp->SetVisibility(true); 
 	battleUnitStateComp->SetCastShadow(false);
 
 	ConstructorHelpers::FClassFinder<UBattleUnitStateUI> tempBattleUnitStateUI(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/JS/UI/WBP_BattleUnitState.WBP_BattleUnitState_C'"));
 	if (tempBattleUnitStateUI.Succeeded())
 	{
 		battleUnitStateComp->SetWidgetClass(tempBattleUnitStateUI.Class);
-		battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
 	}
 
 	
@@ -64,8 +65,15 @@ void ABaseBattlePawn::BeginPlay()
 	turnManager = Cast<ATurnManager>(
 		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
 
+	// AP 세팅
 	SetAP();
-	
+
+	// BaseHP UI 보여주기
+	if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(this->battleUnitStateComp->GetWidget()))
+	{
+		battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+		ui->ShowBaseUI();
+	}
 }
 
 // Called every frame
@@ -73,6 +81,10 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Hover UI 띄우기 위한 함수
+	OnMouseHover();
+
+	// AStar로 나온 방향으로 이동
 	if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
 	{
 		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() + FVector(0, 0, 100);
@@ -288,8 +300,7 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		start, dir);
 	end = start + dir * 10000;
 
-	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,
-	                                         ECC_Visibility, params))
+	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,ECC_Visibility, params))
 	{
 		// 상대와 거리 측정
 		float dist = FVector::Dist(GetActorLocation(),
@@ -656,8 +667,8 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 			int32 atk = enemybattleState->enemyStatus.attack;
 			int32 weapon = 2;
 			float critical = enemybattleState->enemyStatus.critical_Rate;
-			int32 personality = 2;
-			int32 status_effect = 4;
+			int32 personality = 0;
+			int32 status_effect = 0;
 			int32 damage = 0;
 
 			// 스킬 계수 및 추가 효과
@@ -785,8 +796,8 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 			int32 atk = battlePlayerState->playerStatus.attack;
 			int32 weapon = 2;
 			float critical = battlePlayerState->playerStatus.critical_Rate;
-			int32 personality = 2;
-			int32 status_effect = 4;
+			int32 personality = 0;
+			int32 status_effect = 0;
 			int32 damage = 0;
 
 
@@ -1447,4 +1458,42 @@ void ABaseBattlePawn::BillboardBattleUnitStateUI()
 	FRotator rot = UKismetMathLibrary::MakeRotFromXZ(-cam->GetActorForwardVector(), cam->GetActorUpVector());
 	// battleUnitStateComp를 구한 Rotator 값으로 설정.
 	battleUnitStateComp->SetWorldRotation(rot);
+}
+
+void ABaseBattlePawn::OnMouseHover()
+{
+	FVector start, end, dir;
+	FHitResult hitInfo;
+	FCollisionQueryParams params;
+
+	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(start, dir);
+	end = start + dir * 10000;
+
+	bool bHitUnit = false;
+
+	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, params))
+	{
+		if (ABaseBattlePawn* hoveredUnit = Cast<ABaseBattlePawn>(hitInfo.GetActor()))
+		{
+			// 유닛에 마우스를 올리고 있을 때
+			if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(hoveredUnit->battleUnitStateComp->GetWidget()))
+			{
+				hoveredUnit->battleUnitStateComp->SetDrawSize(FVector2D(150, 130));
+				ui->ShowHoverUI();
+				lastHoveredPawn = hoveredUnit;
+				bHitUnit = true;
+			}
+		}
+	}
+
+	// 이전에 호버 중이었던 유닛이 있었는데 지금은 안 겹친 경우 → Base UI로 전환
+	if (!bHitUnit && lastHoveredPawn)
+	{
+		if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(lastHoveredPawn->battleUnitStateComp->GetWidget()))
+		{
+			lastHoveredPawn->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+			ui->ShowBaseUI();
+		}
+		lastHoveredPawn = nullptr;
+	}
 }

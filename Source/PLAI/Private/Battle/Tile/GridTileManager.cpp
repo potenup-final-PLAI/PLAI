@@ -63,9 +63,10 @@ void AGridTileManager::InitGridTile()
 			}
 		}
 	}
-
+	
 	Algo::RandomShuffle(allCoords);
 
+	// player 좌표 뽑기
 	TArray<FIntPoint> playerCoords;
 	for (int32 i = 0; i < 4 && i < allCoords.Num(); ++i)
 	{

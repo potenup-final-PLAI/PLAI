@@ -17,6 +17,14 @@ class PLAI_API UBattleUnitStateUI : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 public:
+	//----------------Base UI ------------------------
+	UPROPERTY(meta = (BindWidget))
+	class UWidgetSwitcher* WS_BattleUnitState;
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* PGB_BaseHP;
+
+	void ShowBaseUI();
+	//----------------Hover UI------------------------
 	// Unit 이름 
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* txt_UnitName;
@@ -37,7 +45,7 @@ public:
 	class UTextBlock* txt_HP;
 	int32 maxHP = 0;
 
-	
+	void ShowHoverUI();
 	void SetHPUI(class ABaseBattlePawn* unit);
 	void UpdateHP(int32 hp);
 	

@@ -186,32 +186,6 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		int32 targetX = Action.move_to[0];
 		int32 targetY = Action.move_to[1];
 
-		// 자동 탐색 전 가까운 적을 찾는 로직
-		// AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
-		//
-		// TArray<AActor*> playerActors;
-		// UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABattlePlayer::StaticClass(), playerActors);
-		//
-		// TArray<ABattlePlayer*> players;
-		// for (AActor* actor : playerActors)
-		// {
-		// 	if (ABattlePlayer* p = Cast<ABattlePlayer>(actor))
-		// 	{
-		// 		players.Add(p);
-		// 	}
-		// }
-		//
-		// if (ABattlePlayer* target = this->FindClosestPlayer(players))
-		// {
-		// 	this->MoveToPlayer(target, tileManger);
-		// }
-		//
-		// FTimerHandle timerHandle;
-		// GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([this]()
-		// {
-		// 	OnTurnEnd();
-		// }), 5.0f, false);
-
 		// GridTileManager 통해 목표 타일 찾기
 		if (AGridTileManager* tileManager = Cast<AGridTileManager>(
 			UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory)))
