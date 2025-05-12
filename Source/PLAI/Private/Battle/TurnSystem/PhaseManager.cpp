@@ -20,6 +20,7 @@
 #include "Battle/Util/BattleType/BattleTypes.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetComponent.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "Player/BattlePlayerState.h"
 
 void AUPhaseManager::BeginPlay()
@@ -32,9 +33,9 @@ void AUPhaseManager::BeginPlay()
 	gridTileManager = Cast<AGridTileManager>(
 		UGameplayStatics::GetActorOfClass(GetWorld(), girdTileManagerFactory));
 
-	GetWorld()->GetTimerManager().SetTimer(timerBattleStartHandle, this,
-	                                       &AUPhaseManager::SetBeforeBattle,
-	                                       0.2f, true);
+	GetWorld()->GetTimerManager().SetTimer(timerBattleStartHandle, this,&AUPhaseManager::SetBeforeBattle,0.2f, true);
+
+	gi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
 }
 
 void AUPhaseManager::Tick(float DeltaTime)
@@ -125,7 +126,9 @@ void AUPhaseManager::SetUnitQueue()
 			if (ABattlePlayer* player = Cast<ABattlePlayer>(pawn))
 			{
 				if (!player->battlePlayerState || player->battlePlayerState->playerStatus.hp <= 0)
+				{
 					continue;
+				}
 
 				player->speed = player->battlePlayerState->playerStatus.speed;
 				alivePlayers++;
@@ -133,7 +136,9 @@ void AUPhaseManager::SetUnitQueue()
 			else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(pawn))
 			{
 				if (!enemy->enemybattleState || enemy->enemybattleState->enemyStatus.hp <= 0)
+				{
 					continue;
+				}
 
 				enemy->speed = enemy->enemybattleState->enemyStatus.speed;
 				aliveEnemies++;
@@ -180,12 +185,16 @@ ABaseBattlePawn* AUPhaseManager::PopNextAliveUnit()
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(candidate))
 		{
 			if (player->battlePlayerState && player->battlePlayerState->playerStatus.hp > 0)
+			{
 				return candidate;
+			}
 		}
 		else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(candidate))
 		{
 			if (enemy->enemybattleState && enemy->enemybattleState->enemyStatus.hp > 0)
+			{
 				return candidate;
+			}
 		}
 	}
 	return nullptr;
@@ -372,13 +381,19 @@ void AUPhaseManager::SetBeforeBattle()
 
 				for (ABaseBattlePawn* other : baseUnits)
 				{
-					if (unit == other) continue;
+					if (unit == other)
+					{
+						continue;
+					}
 
 					// 같은 팀이면 무시
 					const bool bothPlayer = unit->IsA<ABattlePlayer>() && other->IsA<ABattlePlayer>();
 					const bool bothEnemy = unit->IsA<ABaseEnemy>() && other->IsA<ABaseEnemy>();
 					
-					if (bothPlayer || bothEnemy) continue;
+					if (bothPlayer || bothEnemy)
+					{
+						continue;
+					}
 
 					float distSq = FVector::DistSquared(unit->GetActorLocation(), other->GetActorLocation());
 					if (distSq < minDistSquared)
@@ -678,21 +693,43 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			return;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("!!! Before setting PlayerStatus"));
-		player->battlePlayerState->playerStatus.hp = 100;
-		player->battlePlayerState->playerStatus.attack = 7;
-		player->battlePlayerState->playerStatus.defense = 10;
-		player->battlePlayerState->playerStatus.resistance = 7;
-		player->battlePlayerState->playerStatus.move_Range = 5;
-		player->battlePlayerState->playerStatus.critical_Rate = 0.05f;
-		player->battlePlayerState->playerStatus.critical_Damage = 1.5f;
-		player->battlePlayerState->playerStatus.speed = FMath::RandRange(1, 10);
-
+		// 데이터 받아와서 세팅
+		// 장비 장착
+		if (gi)
+		{
+			gi->EquipActor(player);
+			UE_LOG(LogTemp, Warning, TEXT("Eqirment"));
+			
+			// 스테이터스 세팅
+			UE_LOG(LogTemp, Warning, TEXT("!!! Before setting PlayerStatus"));
+			player->battlePlayerState->playerStatus.hp = gi->UserFullInfoGiStat.character_info.stats.hp;
+			player->battlePlayerState->playerStatus.attack = gi->UserFullInfoGiStat.character_info.stats.attack;
+			player->battlePlayerState->playerStatus.defense = gi->UserFullInfoGiStat.character_info.stats.defense;
+			player->battlePlayerState->playerStatus.resistance = gi->UserFullInfoGiStat.character_info.stats.resistance;
+			player->battlePlayerState->playerStatus.move_Range = gi->UserFullInfoGiStat.character_info.stats.move_range;
+			player->battlePlayerState->playerStatus.critical_Rate = gi->UserFullInfoGiStat.character_info.stats.critical_rate;
+			player->battlePlayerState->playerStatus.critical_Damage = gi->UserFullInfoGiStat.character_info.stats.critical_damage;
+			player->battlePlayerState->playerStatus.speed = gi->UserFullInfoGiStat.character_info.stats.speed;
+			UE_LOG(LogTemp, Warning, TEXT("!!! After setting PlayerStatus"));
+		}
+		else
+		{
+			player->battlePlayerState->playerStatus.hp = 100;
+			player->battlePlayerState->playerStatus.attack = 7;
+			player->battlePlayerState->playerStatus.defense = 10;
+			player->battlePlayerState->playerStatus.resistance = 7;
+			player->battlePlayerState->playerStatus.move_Range = 5;
+			player->battlePlayerState->playerStatus.critical_Rate = 0.05f;
+			player->battlePlayerState->playerStatus.critical_Damage = 1.5f;
+			player->battlePlayerState->playerStatus.speed = FMath::RandRange(1, 10);
+			UE_LOG(LogTemp, Warning, TEXT("not Set Eqirment"));
+		}
+		
 		// moveRange 세팅 작업 진행
 		player->moveRange = player->battlePlayerState->playerStatus.move_Range;
 
 		player->battlePlayerState->playerLifeState = ELifeState::Alive;
-		UE_LOG(LogTemp, Warning, TEXT("!!! After setting PlayerStatus"));
+		
 
 		UE_LOG(LogTemp, Warning,
 		       TEXT(
@@ -765,3 +802,5 @@ FString AUPhaseManager::GetStatusEffectsString(EStatusEffect effect)
 	const FString* FoundName = StatusEffectNames.Find(effect);
 	return FoundName ? *FoundName : TEXT("알 수 없음");
 }
+
+

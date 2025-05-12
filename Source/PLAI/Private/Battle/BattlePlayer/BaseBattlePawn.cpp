@@ -208,7 +208,7 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 						if (enemy->enemyAnim)
 						{
 							enemy->enemyAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
-							UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+							UE_LOG(LogTemp, Warning, TEXT("PlayBaseAttackAnimation"));
 						}
 						else
 						{
@@ -421,16 +421,23 @@ void ABaseBattlePawn::OnMouseLeftClick()
 
 void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 {
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
 	// AStar로 이동
 	if (AGridTile* testTile = Cast<AGridTile>(hitInfo.GetActor()))
 	{
+		if (currentTile == testTile)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CurrentTile == TestTile"));
+			return;
+		}
+
+		// AnimInstance actionMode 업데이트
+		if (auto* player = Cast<ABattlePlayer>(this))
+		{
+			if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+			{
+				anim->actionMode = currentActionMode;
+			}
+		}
 		// 타일 초기화
 		InitValues();
 
