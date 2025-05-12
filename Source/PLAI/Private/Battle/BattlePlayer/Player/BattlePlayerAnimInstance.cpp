@@ -17,13 +17,13 @@ void UBattlePlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
 
-	if (auto* player = Cast<ABaseBattlePawn>(TryGetPawnOwner()))
-	{
-		// 전방방향 벡터 구하기
-		FVector velocity = player->GetVelocity();
-		FVector forward = player->GetActorForwardVector();
-		moveSpeed = FVector::DotProduct(velocity, forward);
-	}
+	// if (auto* player = Cast<ABaseBattlePawn>(TryGetPawnOwner()))
+	// {
+	// 	// 전방방향 벡터 구하기
+	// 	FVector velocity = player->GetVelocity();
+	// 	FVector forward = player->GetActorForwardVector();
+	// 	moveSpeed = FVector::DotProduct(velocity, forward);
+	// }
 }
 
 void UBattlePlayerAnimInstance::AnimNotify_BaseAttackPoint()

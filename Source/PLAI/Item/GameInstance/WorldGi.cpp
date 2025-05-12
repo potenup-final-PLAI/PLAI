@@ -41,6 +41,7 @@ void UWorldGi::EquipActor(AActor* MyActor)
 						
 						Item->AttachToActor(MyActor,FAttachmentTransformRules::KeepWorldTransform);
 						Item->StaticMesh->SetMaterial(0,ItemStructTable->Material);
+						Item->StaticMesh->SetVisibility(false);
 					}
 				}
 			}

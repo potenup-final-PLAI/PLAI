@@ -3,7 +3,6 @@
 
 #include "Battle/BattlePlayer/BaseBattlePawn.h"
 
-#include "EnhancedInputSubsystems.h"
 #include "GridTile.h"
 #include "GridTileManager.h"
 #include "Battle/Http/BattleHttpActor.h"
@@ -17,6 +16,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Enemy/BaseEnemy.h"
+#include "Enemy/BattleEnemyAnimInstance.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
@@ -88,7 +88,7 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	// AStar로 나온 방향으로 이동
 	if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
 	{
-		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() + FVector(0, 0, 100);
+		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() + FVector(0, 0, 80);
 		FVector currentLoc = GetActorLocation();
 		FVector direction = (targetLoc - currentLoc).GetSafeNormal();
 
@@ -134,6 +134,13 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 					{
 						anim->actionMode = currentActionMode;
 						UE_LOG(LogTemp, Warning, TEXT("actionMode set to None"));
+					}
+				}
+				else if (auto* enemy = Cast<ABaseEnemy>(this))
+				{
+					if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+					{
+						anim->actionMode = currentActionMode;
 					}
 				}
 				bIsMoving = false;
@@ -195,6 +202,24 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
 				{
 					bWantsToAttack = false;
+					if (enemy->bStartMontage)
+					{
+						// 회전 끝나고 몽타주 실행
+						if (enemy->enemyAnim)
+						{
+							enemy->enemyAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
+							UE_LOG(LogTemp, Warning, TEXT("PlayBaseAttackAnimation"));
+						}
+						else
+						{
+							UE_LOG(LogTemp, Error, TEXT("enemy->enemyAnim is nullptr!"));
+						}
+						enemy->bStartMontage = false;
+						UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+
+						// 끝났으면 턴 종료 처리
+						// OnTurnEnd();
+					}
 				}
 			}
 		}
@@ -205,6 +230,9 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 
 void ABaseBattlePawn::OnTurnStart()
 {
+	// 턴 종료 초기화
+	bTurnEnded = false;
+	
 	// 기본 공격 초기화
 	bBaseAttack = true;
 
@@ -292,6 +320,10 @@ void ABaseBattlePawn::OnTurnStart()
 
 void ABaseBattlePawn::OnTurnEnd()
 {
+	// 여러 번 호출 방지
+	if (bTurnEnded) return;
+	bTurnEnded = true;
+	
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *GetName());
 	// 입력 막고 FSM 종료
 
@@ -389,16 +421,23 @@ void ABaseBattlePawn::OnMouseLeftClick()
 
 void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 {
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
 	// AStar로 이동
 	if (AGridTile* testTile = Cast<AGridTile>(hitInfo.GetActor()))
 	{
+		if (currentTile == testTile)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CurrentTile == TestTile"));
+			return;
+		}
+
+		// AnimInstance actionMode 업데이트
+		if (auto* player = Cast<ABattlePlayer>(this))
+		{
+			if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+			{
+				anim->actionMode = currentActionMode;
+			}
+		}
 		// 타일 초기화
 		InitValues();
 
@@ -441,13 +480,6 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 		UE_LOG(LogTemp, Warning, TEXT("Use BaseAttack Before"));
 		return;
 	}
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
 
 	bBaseAttack = false;
 	// 공격 대상이 enemy라면
@@ -460,6 +492,10 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 		
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
+			if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+			{
+				anim->actionMode = currentActionMode;
+			}
 			player->bStartMontage = true;
 		}
 		
@@ -467,8 +503,16 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
+		// 타겟 저장
+		targetPlayer = player;
+		bWantsToAttack = true;
+		attackTarget = targetPlayer;
 		
-		ApplyAttack(player, EActionMode::BaseAttack);
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+		enemy->bStartMontage = true;
 	}
 }
 
@@ -481,14 +525,21 @@ void ABaseBattlePawn::PlayerParalysis(FHitResult& hitInfo)
 			anim->actionMode = currentActionMode;
 		}
 	}
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
 	UE_LOG(LogTemp, Warning, TEXT("PlayerParalysis In"));
-	// 공격을 위한 enemy라면
+	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PlayerParalysis In Enemy"));
 		ApplyAttack(enemy, EActionMode::Paralysis);
 	}
-	// 공격을 위한 player라면
+	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PlayerParalysis In Player"));
@@ -505,12 +556,19 @@ void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 			anim->actionMode = currentActionMode;
 		}
 	}
-	// 공격을 위한 enemy라면
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
+	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
 		ApplyAttack(enemy, EActionMode::Poison);
 	}
-	// 공격을 위한 player라면
+	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
 		ApplyAttack(player, EActionMode::Poison);
@@ -526,12 +584,19 @@ void ABaseBattlePawn::PlayerVulnerable(FHitResult& hitInfo)
 			anim->actionMode = currentActionMode;
 		}
 	}
-	// 공격을 위한 enemy라면
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
+	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
 		ApplyAttack(enemy, EActionMode::Vulnerable);
 	}
-	// 공격을 위한 player라면
+	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
 		ApplyAttack(player, EActionMode::Vulnerable);
@@ -547,12 +612,20 @@ void ABaseBattlePawn::PlayerWeaking(FHitResult& hitInfo)
 			anim->actionMode = currentActionMode;
 		}
 	}
-	// 공격을 위한 enemy라면
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
+	
+	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
 		ApplyAttack(enemy, EActionMode::Weakening);
 	}
-	// 공격을 위한 player라면
+	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
 		ApplyAttack(player, EActionMode::Weakening);
@@ -568,12 +641,19 @@ void ABaseBattlePawn::PlayerFatal(FHitResult& hitInfo)
 			anim->actionMode = currentActionMode;
 		}
 	}
-	// 공격을 위한 enemy라면
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
+	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
 		ApplyAttack(enemy, EActionMode::Fatal);
 	}
-	// 공격을 위한 player라면
+	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
 		ApplyAttack(player, EActionMode::Fatal);
@@ -589,12 +669,19 @@ void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
 			anim->actionMode = currentActionMode;
 		}
 	}
-	// 공격을 위한 enemy라면
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
+	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
 		ApplyAttack(enemy, EActionMode::Rupture);
 	}
-	// 공격을 위한 player라면
+	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
 		ApplyAttack(player, EActionMode::Rupture);
@@ -610,12 +697,19 @@ void ABaseBattlePawn::PlayerRoar(FHitResult& hitInfo)
 			anim->actionMode = currentActionMode;
 		}
 	}
-	// 공격을 위한 enemy라면
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
+	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
 		ApplyAttack(enemy, EActionMode::Roar);
 	}
-	// 공격을 위한 player라면
+	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
 		ApplyAttack(player, EActionMode::Roar);
@@ -631,12 +725,19 @@ void ABaseBattlePawn::PlayerBattleCry(FHitResult& hitInfo)
 			anim->actionMode = currentActionMode;
 		}
 	}
-	// 공격을 위한 enemy라면
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
+	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
 		ApplyAttack(enemy, EActionMode::BattleCry);
 	}
-	// 공격을 위한 player라면
+	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
 		ApplyAttack(player, EActionMode::BattleCry);
@@ -747,6 +848,13 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	if (auto* player = Cast<ABattlePlayer>(this))
 	{
 		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
 		{
 			anim->actionMode = currentActionMode;
 		}
@@ -918,7 +1026,7 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 					return;
 				}
 				skillMultiplier = 0.8f;
-			// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
+				// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
 				enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
 				break;
 			case EActionMode::Poison:
@@ -1030,6 +1138,13 @@ void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,
 	if (auto* player = Cast<ABattlePlayer>(this))
 	{
 		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+		{
+			anim->actionMode = currentActionMode;
+		}
+	}
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
 		{
 			anim->actionMode = currentActionMode;
 		}
@@ -1282,74 +1397,10 @@ void ABaseBattlePawn::BleedingEnemyProcess(UEnemyBattleState* enemyState)
 	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
 }
 
-void ABaseBattlePawn::MouseClick(const FInputActionValue& value)
-{
-	if (!bIsMoveMode)
-	{
-		return;
-	}
-
-	FHitResult hitInfo;
-	FVector start, end, dir;
-	FCollisionQueryParams params;
-	params.AddIgnoredActor(this);
-
-	// 마우스 클릭 위치 얻기
-	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(
-		start, dir);
-	end = start + dir * 10000;
-
-	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,
-	                                         ECC_Visibility, params))
-	{
-		AGridTile* clickTile = Cast<AGridTile>(hitInfo.GetActor());
-		if (clickTile)
-		{
-			goalTile = clickTile;
-
-			// 시작 타일 다시 설정
-			FHitResult startHit;
-			FVector pawnStart = GetActorLocation();
-			FVector pawnEnd = pawnStart + FVector::DownVector * 1000;
-
-			if (GetWorld()->LineTraceSingleByChannel(
-				startHit, pawnStart, pawnEnd, ECC_Visibility, params))
-			{
-				// 시작 타일 직접 설정
-				startTile = Cast<AGridTile>(startHit.GetActor());
-				if (IsValid(startTile))
-				{
-					// 시작 비용 초기화
-					startTile->sCostValue = 0;
-					openArray.Add(startTile);
-					// 길찾기 시작
-					PathFind();
-				}
-				else
-				{
-					UE_LOG(LogTemp, Error,
-					       TEXT("StartTile is Invalid Cannot start pathFinding"
-					       ));
-				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error,
-				       TEXT("Fail to LineTrace downwards to find clickTile"));
-			}
-
-			bIsMoveMode = false; // 클릭했으니까 모드 종료
-		}
-	}
-}
-
 void ABaseBattlePawn::PathFind()
 {
-	UE_LOG(LogTemp, Warning,
-	       TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),
-	       pathArray.Num(), moveRange);
-	UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),
-	       bIsMoving ? TEXT("true") : TEXT("false"));
+	UE_LOG(LogTemp, Warning, TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"), pathArray.Num(), moveRange);
+	UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"), bIsMoving ? TEXT("true") : TEXT("false"));
 	if (openArray.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("OpenArray is empty"));
@@ -1361,11 +1412,8 @@ void ABaseBattlePawn::PathFind()
 
 	while (openArray.Num() > 0 && safetyCounter++ < maxSafetyCount)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),
-		       pathArray.Num(), moveRange);
-		UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),
-		       bIsMoving ? TEXT("true") : TEXT("false"));
+		UE_LOG(LogTemp, Warning, TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"), pathArray.Num(), moveRange);
+		UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"), bIsMoving ? TEXT("true") : TEXT("false"));
 		if (safetyCounter > maxSafetyCount)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Path Safe Break"));
@@ -1410,15 +1458,17 @@ void ABaseBattlePawn::PathFind()
 void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 {
 	FIntPoint nextCoord = currentTile->gridCoord + offset;
-	AGridTileManager* tileManger = Cast<AGridTileManager>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
+	AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
 
 	if (AGridTile* tile = tileManger->map.FindRef(nextCoord))
 	{
 		float previousCost = tile->tCostValue;
 		tile->SetCost(currentTile, goalTile);
 
-		if (!tile->parentTile || tile->tCostValue < previousCost)
+		// if (!tile->parentTile || tile->tCostValue < previousCost)
+		// {
+		// 	tile->parentTile = currentTile;
+		if (tile != currentTile && (!tile->parentTile || tile->tCostValue < previousCost))
 		{
 			tile->parentTile = currentTile;
 
@@ -1432,16 +1482,6 @@ void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 			}
 			openArray.Insert(tile, i);
 		}
-		// if (!openArray.Contains(tile) && !closedArray.Contains(tile))
-		// {
-		// 	tile->SetCost(currentTile, goalTile);
-		// 	int32 i = 0;
-		// 	for (i = 0; i < openArray.Num(); ++i)
-		// 	{
-		// 		if (openArray[i]->tCostValue >= tile->tCostValue) break;
-		// 	}
-		// 	openArray.Insert(tile, i);
-		// }
 	}
 }
 
@@ -1469,7 +1509,7 @@ void ABaseBattlePawn::BuildPath()
 	
 	while (temp && temp->parentTile)
 	{
-		if (visitePathTiles.Contains(temp))
+		if (visitePathTiles.Contains(temp) || temp == temp->parentTile)
 		{
 			UE_LOG(LogTemp, Warning,
 			       TEXT(" Infinite loop detected in BuildPath"));
