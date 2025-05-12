@@ -29,33 +29,32 @@ void AWorldDamageUIActor::BeginPlay()
 	if (!damageUI)
 	{
 		UE_LOG(LogTemp, Error, TEXT("WorldDamageUIActor: damageUI is null!"));
-		return;
 	}
-	GetWorld()->GetTimerManager().SetTimer(damageTimerHandle, this, &AWorldDamageUIActor::MoveUI, 0.1f, true);
+	
 }
 
 // Called every frame
 void AWorldDamageUIActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-}
 
-void AWorldDamageUIActor::MoveUI()
-{
-	if (bShowUI && index <= 60)
+	
+	if (bShowUI)
 	{
-		ShowDamageUI();
-		FVector P0 = GetActorLocation();
-		FVector vt = GetActorUpVector() * speed * GetWorld()->GetDeltaSeconds();
-		FVector P = P0 + vt;
-		SetActorLocation(P);
-		++index;
-	}
-	else
-	{
-		index = 0;
-		HideDamageUI();
+		elapsed += DeltaTime;
+		float Alpha = FMath::Clamp(elapsed / moveDuration, 0.f, 1.f);
+
+		// EaseOut : 처음 빠르고 나중에 느려짐
+		float EasedAlpha = FMath::InterpEaseOut(0.f, 1.f, Alpha, 2.0f);
+
+		FVector NewLoc = FMath::Lerp(startLoc, endLoc, EasedAlpha);
+		SetActorLocation(NewLoc);
+
+		if (Alpha >= 1.f)
+		{
+			// UI 다시 안보이게 처리
+			HideDamageUI();
+		}
 	}
 }
 
@@ -63,6 +62,10 @@ void AWorldDamageUIActor::ShowDamageUI()
 {
 	bShowUI = true;
 	damageUIComp->SetVisibility(true);
+
+	startLoc = GetActorLocation();
+	endLoc = startLoc + FVector(0, 0, 60.f);
+	elapsed = 0.f;
 }
 
 void AWorldDamageUIActor::HideDamageUI()

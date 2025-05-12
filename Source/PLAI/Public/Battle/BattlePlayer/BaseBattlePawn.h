@@ -266,8 +266,5 @@ public:
 
 	//------------Enemy Turn 여러 번 호출 방지--------
 	bool bTurnEnded = false;
-
-	//-------------Damage Actor Widget-----------------
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DamageUI")
-	TSubclassOf<class AWorldDamageUIActor> damageUIFactory;
+	
 };

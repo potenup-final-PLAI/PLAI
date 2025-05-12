@@ -27,12 +27,16 @@ public:
 	class UWidgetComponent* damageUIComp;
 	UPROPERTY(EditAnywhere)
 	class UWorldDamageUI* damageUI;
+	
 	float speed = 250;
-	int32 index = 0;
 	bool bShowUI = false;
+
+	FVector startLoc;
+	FVector endLoc;
+	float moveDuration = 2.f;
+	float elapsed = 0.f;
 	
 	FTimerHandle damageTimerHandle;
-	void MoveUI();
 	void ShowDamageUI();
 	void HideDamageUI();
 };
