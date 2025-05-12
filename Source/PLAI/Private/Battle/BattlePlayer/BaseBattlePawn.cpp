@@ -817,6 +817,11 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 				}
 			}
 		}
+		if (player->playerAnim)
+		{
+			player->playerAnim->PlayHitMotionAnimation(TEXT("StartPlayerHitMotion"));
+			UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
+		}
 		// hp가 0보다 작으면 사망
 		if (player->battlePlayerState->playerStatus.hp <= 0)
 		{
