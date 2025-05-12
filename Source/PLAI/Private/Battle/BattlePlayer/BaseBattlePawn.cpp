@@ -438,6 +438,7 @@ void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 				anim->actionMode = currentActionMode;
 			}
 		}
+		
 		// 타일 초기화
 		InitValues();
 
