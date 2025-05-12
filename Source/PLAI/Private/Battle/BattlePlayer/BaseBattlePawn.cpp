@@ -827,13 +827,16 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 	{
 		// 피를 깎는다.
-		enemy->enemybattleState->hp = FMath::Max(
-			0, enemy->enemybattleState->hp - damage);
-		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage,
-		       enemy->enemybattleState->hp);
+		enemy->enemybattleState->hp = FMath::Max(0, enemy->enemybattleState->hp - damage);
+		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage,enemy->enemybattleState->hp);
 		if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(enemy->battleUnitStateComp->GetWidget()))
 		{
 			ui->UpdateHP(enemy->enemybattleState->hp);
+		}
+		if (enemy->enemyAnim)
+		{
+			enemy->enemyAnim->PlayHitMotionAnimation(TEXT("StartHitMotion"));
+			UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
 		}
 		// hp가 0보다 작으면 사망
 		if (enemy->enemybattleState->hp <= 0)
