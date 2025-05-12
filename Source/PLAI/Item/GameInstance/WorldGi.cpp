@@ -3,9 +3,11 @@
 
 #include "WorldGi.h"
 
+#include "Player/BattlePlayer.h"
+
 void UWorldGi::EquipActor(AActor* MyActor)
 {
-	if (MyActor)
+	if (ABattlePlayer* Player = Cast<ABattlePlayer>(MyActor))
 	{
 		for (int32 i = 0; i < UserFullInfoGiStat.equipment_info.item_list.Num(); i++)
 		{
@@ -17,27 +19,26 @@ void UWorldGi::EquipActor(AActor* MyActor)
 					if (Raw == UserFullInfoGiStat.equipment_info.item_list[i].item_id)
 					{
 						FRotator Rotator = MyActor->GetActorRotation();
-						FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(Raw,TEXT("WorldGi"));
 						
+						FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(Raw,TEXT("WorldGi"));
+						// 여기부터 장비 장착
 						Item->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
 						if (ItemStructTable->ItemIndex == 0)
 						{
-							Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorRightVector() * 100);
+							Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_rSocket"));
+							// Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorRightVector() * 100);
 						}
 						else if (ItemStructTable->ItemIndex == 1)
 						{
-							Item->SetActorLocation(MyActor->GetActorLocation() + FVector(0,0,-10));
-							Item->SetActorScale3D(FVector(0.95,0.95,0.95));
-							Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 180, 0));
+							Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Chest"));
 						}
 						else if (ItemStructTable->ItemIndex == 2)
 						{
-							Item->SetActorLocation(MyActor->GetActorLocation() +FVector(0, 0, 125));
+							Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("headSocket"));
 						} 
 						else if (ItemStructTable->ItemIndex == 3)
 						{
-							Item->SetActorLocation(MyActor->GetActorLocation() + FVector(0, 10, -70));
-							Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 180, 0));
+							Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Chest"));
 						}
 
 						// Item->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
