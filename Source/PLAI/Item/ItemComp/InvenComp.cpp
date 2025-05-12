@@ -640,6 +640,7 @@ void UInvenComp::TurnReward()
 	int32 RandGold = FMath::RandRange(1000,5000);
     UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
 	SetGold(RandGold);
+	TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
 	
 	int32 RandomReward = FMath::RandRange(2,4);
 	for (int32 i = 0; i < RandomReward; i++)
@@ -662,6 +663,9 @@ void UInvenComp::TurnReward()
 	{
 		if (UiTurnReward)
 		{
+			TestPlayer->LogItemComp->GetEquipInfo();
+			TestPlayer->LogItemComp->GetInvenInfo();
+			
 			UiTurnReward->RemoveFromParent();
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
 		}

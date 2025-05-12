@@ -26,7 +26,8 @@ void UWorldGi::EquipActor(AActor* MyActor)
 						}
 						else if (ItemStructTable->ItemIndex == 1)
 						{
-							Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorForwardVector() * 100);
+							Item->SetActorLocation(MyActor->GetActorLocation() + FVector(0,0,-10));
+							Item->SetActorScale3D(FVector(0.95,0.95,0.95));
 							Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 180, 0));
 						}
 						else if (ItemStructTable->ItemIndex == 2)
@@ -35,13 +36,35 @@ void UWorldGi::EquipActor(AActor* MyActor)
 						} 
 						else if (ItemStructTable->ItemIndex == 3)
 						{
-							Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorForwardVector() * -100);
+							Item->SetActorLocation(MyActor->GetActorLocation() + FVector(0, 10, -70));
 							Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 180, 0));
 						}
+
+						// Item->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+						// if (ItemStructTable->ItemIndex == 0)
+						// {
+						// 	Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorRightVector() * 100);
+						// }
+						// else if (ItemStructTable->ItemIndex == 1)
+						// {
+						// 	Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorForwardVector() * 100);
+						// 	Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 180, 0));
+						// }
+						// else if (ItemStructTable->ItemIndex == 2)
+						// {
+						// 	Item->SetActorLocation(MyActor->GetActorLocation() +FVector(0, 0, 125));
+						// } 
+						// else if (ItemStructTable->ItemIndex == 3)
+						// {
+						// 	Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorForwardVector() * -100);
+						// 	Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 180, 0));
+						// }
+
+						
 						
 						Item->AttachToActor(MyActor,FAttachmentTransformRules::KeepWorldTransform);
 						Item->StaticMesh->SetMaterial(0,ItemStructTable->Material);
-						Item->StaticMesh->SetVisibility(false);
+						// Item->StaticMesh->SetVisibility(false);
 					}
 				}
 			}
