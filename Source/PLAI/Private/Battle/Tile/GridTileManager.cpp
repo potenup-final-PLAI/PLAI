@@ -63,7 +63,7 @@ void AGridTileManager::InitGridTile()
 			}
 		}
 	}
-	
+
 	Algo::RandomShuffle(allCoords);
 
 	// player 좌표 뽑기
@@ -91,8 +91,10 @@ void AGridTileManager::InitGridTile()
 	{
 		if (AGridTile* gridTile = map.FindRef(coord))
 		{
-			FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
-			if (auto* player = GetWorld()->SpawnActor<ABattlePlayer>(battlePlayerFactory, spawnLoc, FRotator::ZeroRotator))
+			FVector spawnLoc = gridTile->GetActorLocation() + FVector(
+				0.f, 0.f, 80.f);
+			if (auto* player = GetWorld()->SpawnActor<ABattlePlayer>(
+				battlePlayerFactory, spawnLoc, FRotator::ZeroRotator))
 			{
 				// player->speed = FMath::RandRange(1, 10);
 				player->currentTile = gridTile;
@@ -106,8 +108,10 @@ void AGridTileManager::InitGridTile()
 	{
 		if (AGridTile* gridTile = map.FindRef(coord))
 		{
-			FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
-			if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(enemyFactory, spawnLoc,FRotator::ZeroRotator))
+			FVector spawnLoc = gridTile->GetActorLocation() + FVector(
+				0.f, 0.f, 80.f);
+			if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(
+				enemyFactory, spawnLoc, FRotator::ZeroRotator))
 			{
 				enemy->speed = FMath::RandRange(1, 10);
 				enemy->currentTile = gridTile;
@@ -116,13 +120,13 @@ void AGridTileManager::InitGridTile()
 		}
 	}
 }
+
 AGridTile* AGridTileManager::FindCurrentTile(FVector worldLoc)
 {
-
 	FVector loc = worldLoc - GetActorLocation();
 	int32 x = FMath::RoundToInt(loc.Y / 100.0f);
 	int32 y = FMath::RoundToInt(loc.X / 100.0f);
-	
+
 	return map.FindRef(FIntPoint(x, y));
 }
 

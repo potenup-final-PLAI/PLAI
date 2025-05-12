@@ -12,6 +12,8 @@
 #include "Battle/UI/BattlePlayerInfoUI.h"
 #include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/MainBattleUI.h"
+#include "Battle/UI/WorldDamageUI.h"
+#include "Battle/UI/WorldDamageUIActor.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
@@ -74,6 +76,16 @@ void ABaseBattlePawn::BeginPlay()
 	{
 		battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
 		ui->ShowBaseUI();
+	}
+
+	// DamageUI Spawn
+	if (auto* damageUIActor = GetWorld()->SpawnActor<AWorldDamageUIActor>(damageUIFactory))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DamageUIActor created"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Fail DamageUI Spawn"));
 	}
 }
 
@@ -822,6 +834,16 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 			player->playerAnim->PlayHitMotionAnimation(TEXT("StartPlayerHitMotion"));
 			UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
 		}
+		if (auto* damageUIActor = Cast<AWorldDamageUIActor>(UGameplayStatics::GetActorOfClass(GetWorld(), damageUIFactory)))
+		{
+			// Actor 위치 옮기고 UI Actor 보이게
+			FVector loc = FVector(damageUIActor->GetActorLocation().X, damageUIActor->GetActorLocation().Y, damageUIActor->GetActorLocation().Z + 250);
+			damageUIActor->SetActorLocation(loc);
+			damageUIActor->ShowDamageUI();
+			// 대미지 텍스트 변경
+			damageUIActor->damageUI->SetDamageText(damage);
+		}
+		
 		// hp가 0보다 작으면 사망
 		if (player->battlePlayerState->playerStatus.hp <= 0)
 		{
@@ -842,6 +864,15 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 		{
 			enemy->enemyAnim->PlayHitMotionAnimation(TEXT("StartHitMotion"));
 			UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
+		}
+
+		if (auto* damageUIActor = Cast<AWorldDamageUIActor>(UGameplayStatics::GetActorOfClass(GetWorld(), damageUIFactory)))
+		{
+			// Actor 위치 옮기고 UI Actor 보이게
+			damageUIActor->SetActorLocation(unit->GetActorLocation());
+			damageUIActor->ShowDamageUI();
+			// 대미지 텍스트 변경
+			damageUIActor->damageUI->SetDamageText(damage);
 		}
 		// hp가 0보다 작으면 사망
 		if (enemy->enemybattleState->hp <= 0)
@@ -1643,6 +1674,12 @@ void ABaseBattlePawn::BillboardBattleUnitStateUI()
 	FRotator rot = UKismetMathLibrary::MakeRotFromXZ(-cam->GetActorForwardVector(), cam->GetActorUpVector());
 	// battleUnitStateComp를 구한 Rotator 값으로 설정.
 	battleUnitStateComp->SetWorldRotation(rot);
+	if (auto* damageUIActor = Cast<AWorldDamageUIActor>(UGameplayStatics::GetActorOfClass(GetWorld(), damageUIFactory)))
+	{
+		// Actor 위치 옮기고 UI Actor 보이게
+		damageUIActor->damageUIComp->SetWorldRotation(rot);
+	}
+	
 }
 
 void ABaseBattlePawn::OnMouseHover()
