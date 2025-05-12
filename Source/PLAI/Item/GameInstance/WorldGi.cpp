@@ -26,20 +26,37 @@ void UWorldGi::EquipActor(AActor* MyActor)
 						if (ItemStructTable->ItemIndex == 0)
 						{
 							Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_rSocket"));
-							// Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorRightVector() * 100);
+							Item->AddActorWorldOffset(FVector(30, 5, -10));
+							Item->AddActorLocalRotation(FRotator(-165, 10, 100));
+							
+							// Item->AddActorWorldRotation(FRotator(0, 105, 0));
 						}
 						else if (ItemStructTable->ItemIndex == 1)
 						{
 							Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Chest"));
+							Item->AddActorWorldOffset(FVector(-20, 0, -80));
+							Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 90, 0));
+							Item->SetActorScale3D(FVector(1.05, 1.05, 1.05));
 						}
 						else if (ItemStructTable->ItemIndex == 2)
 						{
 							Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("headSocket"));
+
+							Item->AddActorWorldOffset(FVector(-0, 0, 10));
+							
+							Item->AddActorLocalRotation(FRotator(0, -90, 90));
+							
+							Item->SetActorScale3D(FVector(0.8,0.8,0.8));
 						} 
 						else if (ItemStructTable->ItemIndex == 3)
 						{
-							Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Chest"));
+							Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("FX_Ult_Passive"));
+
+							Item->AddActorWorldOffset(FVector(-0, 0, -130));
+							Item->AddActorLocalRotation(FRotator(0, 100, 0));
 						}
+						Item->StaticMesh->SetMaterial(0,ItemStructTable->Material);
+
 
 						// Item->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
 						// if (ItemStructTable->ItemIndex == 0)
@@ -60,12 +77,8 @@ void UWorldGi::EquipActor(AActor* MyActor)
 						// 	Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorForwardVector() * -100);
 						// 	Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 180, 0));
 						// }
-
-						
-						
-						Item->AttachToActor(MyActor,FAttachmentTransformRules::KeepWorldTransform);
-						Item->StaticMesh->SetMaterial(0,ItemStructTable->Material);
-						// Item->StaticMesh->SetVisibility(false);
+						// Item->AttachToActor(MyActor,FAttachmentTransformRules::KeepWorldTransform);
+						// Item->StaticMesh->SetMaterial(0,ItemStructTable->Material);
 					}
 				}
 			}

@@ -640,7 +640,6 @@ void UInvenComp::TurnReward()
 	int32 RandGold = FMath::RandRange(1000,5000);
     UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
 	SetGold(RandGold);
-	TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
 	
 	int32 RandomReward = FMath::RandRange(2,4);
 	for (int32 i = 0; i < RandomReward; i++)
@@ -659,10 +658,11 @@ void UInvenComp::TurnReward()
 		Server_GetItem(*ItemStructTable);
 	}
 	FTimerHandle TurnRewardTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this]()
+	GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this, RandGold]()
 	{
 		if (UiTurnReward)
 		{
+			TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
 			TestPlayer->LogItemComp->GetEquipInfo();
 			TestPlayer->LogItemComp->GetInvenInfo();
 			
