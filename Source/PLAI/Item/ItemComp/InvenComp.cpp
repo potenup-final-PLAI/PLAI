@@ -658,10 +658,14 @@ void UInvenComp::TurnReward()
 		Server_GetItem(*ItemStructTable);
 	}
 	FTimerHandle TurnRewardTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this]()
+	GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this, RandGold]()
 	{
 		if (UiTurnReward)
 		{
+			TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
+			TestPlayer->LogItemComp->GetEquipInfo();
+			TestPlayer->LogItemComp->GetInvenInfo();
+			
 			UiTurnReward->RemoveFromParent();
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
 		}
