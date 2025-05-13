@@ -37,6 +37,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Anim")
 	void PlayBaseAttackAnimation(FName sectionName);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Anim")
+	void PlayHitMotionAnimation(FName sectionName);
+
 	UFUNCTION()
 	void AnimNotify_BaseAttackPoint();
 };

@@ -13,6 +13,7 @@
 #include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/CycleAndTurn.h"
 #include "Battle/UI/MainBattleUI.h"
+#include "Battle/UI/WorldDamageUIActor.h"
 #include "Enemy/BaseEnemy.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
@@ -36,6 +37,17 @@ void AUPhaseManager::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(timerBattleStartHandle, this,&AUPhaseManager::SetBeforeBattle,0.2f, true);
 
 	gi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
+
+	// DamageUI Spawn
+	damageUIActor = GetWorld()->SpawnActor<AWorldDamageUIActor>(damageUIFactory);
+	if (damageUIActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DamageUIActor created"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Fail DamageUI Spawn"));
+	}
 }
 
 void AUPhaseManager::Tick(float DeltaTime)

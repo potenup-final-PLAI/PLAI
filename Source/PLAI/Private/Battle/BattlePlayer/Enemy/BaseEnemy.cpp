@@ -78,7 +78,19 @@ void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
 		       TEXT("BaseEnemy : MoveToPlayer - player/goalTile is nullptr"));
 		return;
 	}
-
+	if (currentTile == goalTile)
+	{
+		currentActionMode = EActionMode::None;
+		if (auto* anim = Cast<UBattleEnemyAnimInstance>(this->meshComp->GetAnimInstance()))
+		{
+				
+			anim->actionMode = currentActionMode;
+			UE_LOG(LogTemp, Warning, TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(anim->actionMode));
+		}
+		OnTurnEnd();
+		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
+		return;
+	}
 	InitValues();
 
 	if (player)
@@ -197,6 +209,18 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	// 1. 이동 처리
 	if (Action.move_to.Num() == 2)
 	{
+		// enemy actionmode 업데이트
+		currentActionMode = EActionMode::Move;
+		if (auto* enemy = Cast<ABaseEnemy>(this))
+		{
+			if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+			{
+				
+				anim->actionMode = currentActionMode;
+				UE_LOG(LogTemp, Warning, TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(anim->actionMode));
+			}
+		}
+		
 		int32 targetX = Action.move_to[0];
 		int32 targetY = Action.move_to[1];
 

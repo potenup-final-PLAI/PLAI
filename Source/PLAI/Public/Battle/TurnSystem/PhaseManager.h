@@ -135,4 +135,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase")
 	class UWorldGi* gi;
+	
+	//-------------Damage Actor Widget-----------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DamageUI")
+	class AWorldDamageUIActor* damageUIActor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DamageUI")
+	TSubclassOf<class AWorldDamageUIActor> damageUIFactory;
 };
