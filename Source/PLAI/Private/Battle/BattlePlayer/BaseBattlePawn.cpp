@@ -840,6 +840,10 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 		if (player->battlePlayerState->playerStatus.hp <= 0)
 		{
 			player->battlePlayerState->playerLifeState = ELifeState::Dead;
+			if (player->playerAnim)
+			{
+				player->playerAnim->lifeState = ELifeState::Dead;
+			}
 			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),*UEnum::GetValueAsString(player->battlePlayerState->playerLifeState));
 		}
 	}
@@ -876,6 +880,10 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 		if (enemy->enemybattleState->hp <= 0)
 		{
 			enemy->enemybattleState->enemyLifeState = ELifeState::Dead;
+			if (enemy->enemyAnim)
+			{
+				enemy->enemyAnim->lifeState = ELifeState::Dead;
+			}
 			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),
 			       *UEnum::GetValueAsString(enemy->enemybattleState->
 				       enemyLifeState));
