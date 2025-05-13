@@ -464,6 +464,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		};
 	};
 
+	if (!TestPlayer->IsLocallyControlled()) return;
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 	{
