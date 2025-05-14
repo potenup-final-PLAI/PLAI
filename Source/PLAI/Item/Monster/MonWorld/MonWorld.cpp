@@ -54,11 +54,12 @@ FVector AMonWorld::RandLocation()
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(this);
 
+	FCollisionObjectQueryParams objParams;
+	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel1);
+
 	bool bHit = GetWorld()->LineTraceSingleByObjectType
 	(hit,FVector(x,y,z) + FVector(0,0,2000),
-		FVector(x,y,z) + FVector(0,0,-3000),
-		// ECC_Visibility, params);
-		ECC_GameTraceChannel1, params);
+		FVector(x,y,z) + FVector(0,0,-3000),ECC_GameTraceChannel1, params);
 	
 	DrawDebugLine(GetWorld(),GetActorLocation(),hit.Location,FColor::Blue,
 		false,2);
