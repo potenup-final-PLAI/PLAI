@@ -95,6 +95,7 @@ public:
 
 	//----------Speed State-------------
 	int32 speed = 0;
+	
 	//------------Turn System-----------------
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
@@ -120,9 +121,12 @@ public:
 	void PlayerRoar(FHitResult& hitInfo);
 	void PlayerBattleCry(FHitResult& hitInfo);
 
-	// 대미지 전달 함수
-	void ApplyAttack(ABaseBattlePawn* targetUnit,
-	                 EActionMode attackType = EActionMode::None);
+	
+	// Enemy 대미지 전달 함수
+	void EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType);
+	// Damage 계산 함수
+	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk, int32 weapon, float skillMultiplier, float criticalRate, float criticalDamage, int32 personality, int32 status_effect);
+	void PlayerApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
 
 	// 상태이상과 지속 턴 
 	TMap<EStatusEffect, int32> activeStatusEffects;
@@ -235,7 +239,9 @@ public:
 	void PathFind();
 	void BuildPath();
 	void AddOpenArray(FVector dir);
+	//--------------이동 및 공격------------------
 
+	void UnitMoveRotateAttack();
 	//--------------Unit Move-------------------
 	// 이동 경로 저장 Array
 	UPROPERTY(EditAnywhere)
@@ -268,6 +274,10 @@ public:
 
 	void BillboardBattleUnitStateUI();
 	void OnMouseHover();
+	//------------Print Skill UI --------
+	FString curSkillName = "";
+
+	void SkillNameJudgment(const EActionMode curAction);
 	//-----------Player Anim Instace---------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABaseEnemy* targetEnemy;
@@ -280,8 +290,9 @@ public:
 	bool bWantsToAttack = false;
 	bool bStartMontage = false;
 	ABaseBattlePawn* attackTarget;
-
+	
 	//------------Enemy Turn 여러 번 호출 방지--------
 	bool bTurnEnded = false;
+	
 	
 };

@@ -93,204 +93,12 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 
 	// Hover UI 띄우기 위한 함수
 	OnMouseHover();
-
-	// AStar로 나온 방향으로 이동
-	if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
-	{
-		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() + FVector(0, 0, 80);
-		FVector currentLoc = GetActorLocation();
-		FVector direction = (targetLoc - currentLoc).GetSafeNormal();
-
-		// 메시 회전 부드럽게 보간 처리
-		FRotator targetRot = direction.Rotation();
-		constexpr float yawOffset = -90.f;
-		constexpr float interpSpeed = 8.f;
-
-		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
-		{
-			if (player->meshComp)
-			{
-				FRotator currentRot = player->meshComp->GetRelativeRotation();
-				FRotator desiredRot(0.f, targetRot.Yaw + yawOffset, 0.f);
-				FRotator smoothRot = FMath::RInterpTo(currentRot, desiredRot, DeltaTime, interpSpeed);
-				player->meshComp->SetRelativeRotation(smoothRot);
-			}
-		}
-		else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
-		{
-			if (enemy->meshComp)
-			{
-				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
-				FRotator desiredRot(0.f, targetRot.Yaw + yawOffset, 0.f);
-				FRotator smoothRot = FMath::RInterpTo(currentRot, desiredRot, DeltaTime, interpSpeed);
-				enemy->meshComp->SetRelativeRotation(smoothRot);
-			}
-		}
-
-		// 위치 보간 이동
-		FVector newLoc = FMath::VInterpConstantTo(currentLoc, targetLoc, DeltaTime, 500.f);
-		SetActorLocation(newLoc);
-
-		if (FVector::DistSquared(currentLoc, targetLoc) < FMath::Square(5.f))
-		{
-			currentPathIndex++;
-			if (!pathArray.IsValidIndex(currentPathIndex))
-			{
-				currentActionMode = EActionMode::None;
-				if (auto* player = Cast<ABattlePlayer>(this))
-				{
-					if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-					{
-						anim->actionMode = currentActionMode;
-						UE_LOG(LogTemp, Warning, TEXT("actionMode set to None"));
-					}
-				}
-				else if (auto* enemy = Cast<ABaseEnemy>(this))
-				{
-					if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-					{
-						anim->actionMode = currentActionMode;
-					}
-				}
-				bIsMoving = false;
-				currentTile = pathArray.Last();
-				pathArray.Empty();
-
-				if (auto* enemy = Cast<ABaseEnemy>(this))
-				{
-					enemy->FindAndAttackPlayer();
-				}
-			}
-		}
-	}
-
-	// 타겟 방향으로 회전
-	if (bWantsToAttack && attackTarget)
-	{
-		FVector directionToTarget = (attackTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
-		FRotator desiredRot = directionToTarget.Rotation();
-		constexpr float interpSpeed = 5.f;
-		// 캐릭터의 forward 기준에 맞게 조정
-		constexpr float yawOffset = -90.f; 
-
-		// 현재 유닛이 Player라면
-		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
-		{
-			if (player->meshComp)
-			{
-				FRotator currentRot = player->meshComp->GetRelativeRotation();
-				FRotator targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
-				FRotator newRot = FMath::RInterpTo(currentRot, targetMeshRot, DeltaTime, interpSpeed);
-				player->meshComp->SetRelativeRotation(newRot);
-
-				// 회전이 다 됐는지 체크
-				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
-				{
-					bWantsToAttack = false;
-
-					if (player->bStartMontage)
-					{
-						// 회전 끝나고 몽타주 실행
-						player->playerAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
-						player->bStartMontage = false;
-						UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
-					}
-					
-				}
-			}
-		}
-		else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
-		{
-			if (enemy->meshComp)
-			{
-				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
-				FRotator targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
-				FRotator newRot = FMath::RInterpTo(currentRot, targetMeshRot, DeltaTime, interpSpeed);
-				enemy->meshComp->SetRelativeRotation(newRot);
-
-				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
-				{
-					bWantsToAttack = false;
-					if (enemy->bStartMontage)
-					{
-						// 회전 끝나고 몽타주 실행
-						if (enemy->enemyAnim)
-						{
-							enemy->enemyAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
-							UE_LOG(LogTemp, Warning, TEXT("PlayBaseAttackAnimation"));
-						}
-						else
-						{
-							UE_LOG(LogTemp, Error, TEXT("enemy->enemyAnim is nullptr!"));
-						}
-						enemy->bStartMontage = false;
-						UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
-
-						// 끝났으면 턴 종료 처리
-						// OnTurnEnd();
-					}
-				}
-			}
-		}
-	}
+	
+	// Unit 이동, 회전, 공격
+	UnitMoveRotateAttack();
+	
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
-}
-
-void ABaseBattlePawn::InitOtherClassPointer()
-{
-	// PhaseManager
-	phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
-	if (phaseManager)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("phaseManager is Set"));
-	}
-	// TurnManager
-	turnManager = Cast<ATurnManager>(UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
-	if (turnManager)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("turnManager is Set"));
-	}
-	// PC
-	pc = GetWorld()->GetFirstPlayerController();
-	if (pc)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PC is Set"));
-		
-		// hud 포인터 세팅
-		hud = Cast<ABattleHUD>(pc->GetHUD());
-		if (hud) UE_LOG(LogTemp, Warning, TEXT("hud is Set"));
-	}
-	// girdTile Setting
-	gridTileManager = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
-	if (gridTileManager)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("gridTileManager is Set"));
-	}
-	// BaseHP UI 보여주기
-	battleUnitStateUI = Cast<UBattleUnitStateUI>(this->battleUnitStateComp->GetWidget());
-	if (battleUnitStateUI) UE_LOG(LogTemp, Warning, TEXT("battleUnitStateUI is Set"));
-}
-
-void ABaseBattlePawn::InitAPUI()
-{
-	if (!(pc && hud && hud->mainUI && hud->mainUI->HB_AP))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("InitAPUI is Not Set : pc && hud && hud->mainUI && hud->mainUI->HB_AP"));
-		return;
-	}
-	
-	// AP UI 초기화
-	hud->mainUI->HB_AP->ClearChildren();
-
-	// 현재 턴 유닛이 Player인 경우에만
-	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
-	{
-		for (int32 i = 0; i < player->curAP; ++i)
-		{
-			hud->mainUI->AddAP(); // AP UI 하나씩 추가
-		}
-	}
 }
 
 void ABaseBattlePawn::OnTurnStart()
@@ -420,8 +228,9 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		}
 		
 		EActionMode curSkillState = currentActionMode;
-		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),
-		       *UEnum::GetValueAsString(curSkillState));
+		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),*UEnum::GetValueAsString(curSkillState));
+		// UI에 띄울 스킬 이름 저장 
+		SkillNameJudgment(curSkillState);
 		switch (curSkillState)
 		{
 		case EActionMode::None:
@@ -529,6 +338,7 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 	}
 
 	bBaseAttack = false;
+	
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
@@ -536,14 +346,14 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 		targetEnemy = enemy;
 		bWantsToAttack = true;
 		attackTarget = targetEnemy;
-		
+
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+			if (player->playerAnim)
 			{
-				anim->actionMode = currentActionMode;
+				player->playerAnim->actionMode = currentActionMode;
+				player->bStartMontage = true;
 			}
-			player->bStartMontage = true;
 		}
 		
 	}
@@ -554,288 +364,146 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 		targetPlayer = player;
 		bWantsToAttack = true;
 		attackTarget = targetPlayer;
+
+		// Anim 업데이트
+		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
 		
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
+		
 		enemy->bStartMontage = true;
 	}
 }
 
 void ABaseBattlePawn::PlayerParalysis(FHitResult& hitInfo)
 {
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(this))
-	{
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
 	UE_LOG(LogTemp, Warning, TEXT("PlayerParalysis In"));
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
+		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
 		UE_LOG(LogTemp, Warning, TEXT("PlayerParalysis In Enemy"));
-		ApplyAttack(enemy, EActionMode::Paralysis);
+		EnemyApplyAttack(enemy, EActionMode::Paralysis);
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
+		if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
 		UE_LOG(LogTemp, Warning, TEXT("PlayerParalysis In Player"));
-		ApplyAttack(player, EActionMode::Paralysis);
+		PlayerApplyAttack(player, EActionMode::Paralysis);
 	}
 }
 
 void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 {
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(this))
-	{
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		ApplyAttack(enemy, EActionMode::Poison);
+		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
+		EnemyApplyAttack(enemy, EActionMode::Poison);
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
-		ApplyAttack(player, EActionMode::Poison);
+		if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
+		PlayerApplyAttack(player, EActionMode::Poison);
 	}
 }
 
 void ABaseBattlePawn::PlayerVulnerable(FHitResult& hitInfo)
 {
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(this))
-	{
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		ApplyAttack(enemy, EActionMode::Vulnerable);
+		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
+		EnemyApplyAttack(enemy, EActionMode::Vulnerable);
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
-		ApplyAttack(player, EActionMode::Vulnerable);
+		if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
+		PlayerApplyAttack(player, EActionMode::Vulnerable);
 	}
 }
 
 void ABaseBattlePawn::PlayerWeaking(FHitResult& hitInfo)
 {
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(this))
-	{
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
-	
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		ApplyAttack(enemy, EActionMode::Weakening);
+		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
+		EnemyApplyAttack(enemy, EActionMode::Weakening);
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
-		ApplyAttack(player, EActionMode::Weakening);
+		if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
+		PlayerApplyAttack(player, EActionMode::Weakening);
 	}
 }
 
 void ABaseBattlePawn::PlayerFatal(FHitResult& hitInfo)
 {
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(this))
-	{
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		ApplyAttack(enemy, EActionMode::Fatal);
+		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
+		EnemyApplyAttack(enemy, EActionMode::Fatal);
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
-		ApplyAttack(player, EActionMode::Fatal);
+		if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
+		PlayerApplyAttack(player, EActionMode::Fatal);
 	}
 }
 
 void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
 {
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(this))
-	{
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		ApplyAttack(enemy, EActionMode::Rupture);
+		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
+		EnemyApplyAttack(enemy, EActionMode::Rupture);
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
-		ApplyAttack(player, EActionMode::Rupture);
+		if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
+		PlayerApplyAttack(player, EActionMode::Rupture);
 	}
 }
 
 void ABaseBattlePawn::PlayerRoar(FHitResult& hitInfo)
 {
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(this))
-	{
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		ApplyAttack(enemy, EActionMode::Roar);
+		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
+		EnemyApplyAttack(enemy, EActionMode::Roar);
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
-		ApplyAttack(player, EActionMode::Roar);
+		if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
+		PlayerApplyAttack(player, EActionMode::Roar);
 	}
 }
 
 void ABaseBattlePawn::PlayerBattleCry(FHitResult& hitInfo)
 {
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(this))
-	{
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		ApplyAttack(enemy, EActionMode::BattleCry);
+		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
+		EnemyApplyAttack(enemy, EActionMode::BattleCry);
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
-		ApplyAttack(player, EActionMode::BattleCry);
+		if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
+		PlayerApplyAttack(player, EActionMode::BattleCry);
 	}
 }
 
-void ABaseBattlePawn::InitEnemyState()
-{
-	if (!(battleUnitStateUI && phaseManager))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("InitEnemyState : !(battleUnitStateUI && phaseManager"));
-		return;
-	}
-	
-	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
-	{
-		// 처음 값 세팅
-		enemybattleState = NewObject<UEnemyBattleState>(this);
-		enemybattleState->hp = 80;
-		
-		enemybattleState->attack = 9;
-		enemybattleState->defense = 6;
-		enemybattleState->resistance = 3;
-		enemybattleState->move_Range = 5;
-		enemybattleState->critical_Rate = 0.04f;
-		enemybattleState->critical_Damage = 1.5f;
-		enemybattleState->speed = 4;
-
-		// enemy에 moveRange 세팅 작업
-		enemy->moveRange = enemy->enemybattleState->move_Range;
-		
-		// 전송용 구조체에 값 세팅
-		enemybattleState->enemyStatus.hp = enemybattleState->hp;
-		enemybattleState->enemyStatus.attack = enemybattleState->attack;
-		enemybattleState->enemyStatus.defense = enemybattleState->defense;
-		enemybattleState->enemyStatus.resistance = enemybattleState->resistance;
-		enemybattleState->enemyStatus.move_Range = enemybattleState->move_Range;
-		enemybattleState->enemyStatus.critical_Rate = enemybattleState->
-			critical_Rate;
-		enemybattleState->enemyStatus.critical_Damage = enemybattleState->
-			critical_Damage;
-		enemybattleState->enemyStatus.speed = enemybattleState->speed;
-		
-		FString name = "";
-		name = FString::Printf(TEXT("Enemy%d"), phaseManager->unitEnemyNameindex);
-		phaseManager->unitEnemyNameindex++;
-		
-		battleUnitStateUI->SetUnitName(name);
-		battleUnitStateUI->SetHPUI(enemy);
-	}
-}
 
 void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 {
@@ -843,16 +511,17 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	UE_LOG(LogTemp, Warning, TEXT("In GetDamage"));
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("state && state->playerStatus.hp > 0"));
 		// 피를 깎는다.
 		player->battlePlayerState->playerStatus.hp = FMath::Max(0, player->battlePlayerState->playerStatus.hp - damage);
 		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage,player->battlePlayerState->playerStatus.hp);
+		
 		// HP를 UI에 업데이트
 		if (!(battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->WBP_Player && phaseManager && player->playerAnim))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("GetDamage(Player) : !(battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->WBP_Player)"));
 			return;
 		}
+		
 		// BattlePlayerInfo HP 업데이트
 		player->battleUnitStateUI->UpdateHP(player->battlePlayerState->playerStatus.hp);
 		player->hud->mainUI->WBP_Player->PlayerUpdateHP(player, player->battlePlayerState->playerStatus.hp);
@@ -929,307 +598,217 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	}
 }
 
-void ABaseBattlePawn::ApplyAttack(ABaseBattlePawn* targetUnit,EActionMode attackType)
+void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit,EActionMode attackType)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[ApplyAttack] Called by %s with attackType %d"), *GetName(), (int32)attackType);
+	auto* player = Cast<ABattlePlayer>(targetUnit);
+	auto* enemy = Cast<ABaseEnemy>(this);
+	if (!player || !enemy) return;
 
-	// (기본스탯 + 장비) * 스킬 계수 * (1 + (성격 + 상태효과))
-	if (auto* player = Cast<ABattlePlayer>(targetUnit))
+	UE_LOG(LogTemp, Warning, TEXT("[EnemyApplyAttack] Enemy %s attacking Player %s"), *enemy->GetName(), *player->GetName());
+
+	int32 atk = enemybattleState->attack;
+	int32 weapon = 2;
+	float critical = enemybattleState->critical_Rate;
+	float criticalDamage = enemybattleState->critical_Damage;
+	int32 personality = 0;
+	int32 status_effect = 0;
+	float skillMultiplier = 1.0f;
+
+	switch (attackType)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Enemy Attack Player"));
-		if (auto* enemy = Cast<ABaseEnemy>(this))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("In Cast Enemy"));
+	case EActionMode::Paralysis:
+		if (!enemy->TryConsumeAP(1)) return;
+		skillMultiplier = 0.8f;
+		player->AddStatusEffect(EStatusEffect::Weakening, 2);
+		break;
 
-			int32 atk = enemybattleState->enemyStatus.attack;
-			int32 weapon = 2;
-			float critical = enemybattleState->enemyStatus.critical_Rate;
-			int32 personality = 0;
-			int32 status_effect = 0;
-			int32 damage = 0;
+	case EActionMode::Poison:
+		if (!enemy->TryConsumeAP(1)) return;
+		player->AddStatusEffect(EStatusEffect::Poison, 3);
+		break;
 
-			// 스킬 계수 및 추가 효과
-			float skillMultiplier = 1.0f;
+	case EActionMode::Vulnerable:
+		if (!enemy->TryConsumeAP(1)) return;
+		player->AddStatusEffect(EStatusEffect::Vulnerable, 2);
+		break;
 
-			switch (attackType)
+	case EActionMode::Weakening:
+		if (!enemy->TryConsumeAP(1)) return;
+		player->AddStatusEffect(EStatusEffect::Weakening, 2);
+		break;
+
+	case EActionMode::Fatal:
+		if (!enemy->TryConsumeAP(2)) return;
+		skillMultiplier = 1.5f;
+		player->AddStatusEffect(EStatusEffect::Bleeding, 2);
+		break;
+
+	case EActionMode::Rupture:
+		if (!enemy->TryConsumeAP(2)) return;
+		skillMultiplier = 1.5f;
+		player->AddStatusEffect(EStatusEffect::Vulnerable, 1);
+		break;
+
+	case EActionMode::Roar:
+		if (!enemy->TryConsumeAP(1)) return;
+		player->AddStatusEffect(EStatusEffect::Weakening, 2);
+		return;
+
+	case EActionMode::BattleCry:
+		if (!enemy->TryConsumeAP(1)) return;
+		enemy->AddStatusEffect(EStatusEffect::Angry, 1);
+		return;
+
+	default:
+		// EnemySkillList에서 고유 스킬 처리
+		// HandleEnemyUniqueSkill(enemy, player, attackType);
+		break;
+	}
+
+	// 대미지 처리
+	CalculateAndApplyDamage(player, atk, weapon, skillMultiplier, critical, criticalDamage, personality, status_effect);
+
+	// 대미지를 줬다면 None으로 변경
+	currentActionMode = EActionMode::None;
+	if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
+		
+}
+
+void ABaseBattlePawn::CalculateAndApplyDamage(ABaseBattlePawn* target,
+	int32 atk, int32 weapon, float skillMultiplier, float criticalRate,
+	float criticalDamage, int32 personality, int32 status_effect)
+{
+	int32 damage = 0;
+	int32 chance = FMath::RoundToInt(criticalRate * 100.0f);
+	int32 roll = FMath::RandRange(1, 100);
+
+	if (bool bIsCrit = roll <= chance) {
+		damage = ((atk + weapon) * skillMultiplier * (1 + (personality + status_effect))) * criticalDamage;
+		UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
+	}
+	else {
+		damage = (atk + weapon) * skillMultiplier * (1 + (personality + status_effect));
+		UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
+	}
+
+	GetDamage(target, damage);
+}
+
+void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,EActionMode attackType)
+{
+	auto* player = Cast<ABattlePlayer>(this);
+	auto* enemy = Cast<ABaseEnemy>(targetUnit);
+	if (!player || !enemy) return;
+	
+	UE_LOG(LogTemp, Warning, TEXT("Player Attack Enemy"));
+	int32 atk = player->battlePlayerState->playerStatus.attack;
+	int32 weapon = 2;
+	float critical =  player->battlePlayerState->playerStatus.critical_Rate;
+	float criticalDamage = player->battlePlayerState->playerStatus.critical_Damage;
+	int32 personality = 0;
+	int32 status_effect = 0;
+	int32 damage = 0;
+
+	// 스킬 계수 및 추가 효과
+	float skillMultiplier = 1.0f;
+
+	switch (attackType)
+	{
+		case EActionMode::Paralysis:
+			// 현재 Ap가 cost보다 크다면 실행
+			UE_LOG(LogTemp, Warning, TEXT("In Paralysis"));
+			if (!enemy->enemybattleState->CanConsumeAP(1))
 			{
-			case EActionMode::Paralysis:
-				// 현재 Ap가 cost보다 크다면 실행
-				UE_LOG(LogTemp, Warning, TEXT("In Paralysis"));
-				if (!enemy->enemybattleState->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				skillMultiplier = 0.8f;
-				// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
-				player->AddStatusEffect(EStatusEffect::Weakening, 2);
-				break;
-			case EActionMode::Poison:
-				if (!enemy->enemybattleState->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				player->AddStatusEffect(EStatusEffect::Poison, 3);
-				break;
-			case EActionMode::Vulnerable:
-				if (!enemy->enemybattleState->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				player->AddStatusEffect(EStatusEffect::Vulnerable, 2);
-				break;
-			case EActionMode::Weakening:
-				if (!enemy->enemybattleState->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				player->AddStatusEffect(EStatusEffect::Weakening, 2);
-				break;
-			case EActionMode::Fatal:
-				if (!enemy->enemybattleState->CanConsumeAP(2))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				skillMultiplier = 1.5f;
-				player->AddStatusEffect(EStatusEffect::Bleeding, 2);
-				break;
-			case EActionMode::Rupture:
-				if (!enemy->enemybattleState->CanConsumeAP(2))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				skillMultiplier = 1.5f;
-				player->AddStatusEffect(EStatusEffect::Vulnerable, 1);
-				break;
-			case EActionMode::Roar:
-				if (!enemy->enemybattleState->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				player->AddStatusEffect(EStatusEffect::Weakening, 2);
-				break;
-			case EActionMode::BattleCry:
-				if (!enemy->enemybattleState->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				// 자신과 동료들에게 버프 부여
-				// 주위 동료들에게 피해 증가 버프 부여
-				// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
-				enemy->AddStatusEffect(EStatusEffect::Angry, 1);
-				break;
-			default:
-				// 기본 타격 스킬 배율
-				skillMultiplier = 1.0f;
-				break;
-			}
-
-			// Rour와 BattleCry는 비공격스킬 및 버프스킬이므로 return 시키면 될듯?
-			if (attackType == EActionMode::Roar || attackType ==
-				EActionMode::BattleCry)
-			{
+				UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 				return;
 			}
-
-			// 반올림 처리
-			int32 chance = FMath::RoundToInt(critical * 100.0f);
-			int32 roll = FMath::RandRange(1, 100);
-
-
-			if (bool bIsCrit = roll <= chance)
+			skillMultiplier = 0.8f;
+			// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
+			player->AddStatusEffect(EStatusEffect::Weakening, 2);
+			break;
+		case EActionMode::Poison:
+			if (!enemy->enemybattleState->CanConsumeAP(1))
 			{
-				int32 critical_Damage = enemybattleState->enemyStatus.
-					critical_Damage;
-				damage = ((atk + weapon) * skillMultiplier * (1 + (personality +
-					status_effect))) * critical_Damage;
-				UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
-			}
-			else
-			{
-				damage = (atk + weapon) * skillMultiplier * (1 + (personality +
-					status_effect));
-				UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
-			}
-			
-			// 대미지 입히기
-			GetDamage(player, damage);
-		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(targetUnit))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Player Attack Enemy"));
-		if (auto* baseAttackPlayer = Cast<ABattlePlayer>(this))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("In Cast baseAttackPlayer"));
-
-			int32 atk = battlePlayerState->playerStatus.attack;
-			int32 weapon = 2;
-			float critical = battlePlayerState->playerStatus.critical_Rate;
-			int32 personality = 0;
-			int32 status_effect = 0;
-			int32 damage = 0;
-
-
-			// 스킬 계수 및 추가 효과
-			float skillMultiplier = 1.0f;
-
-			switch (attackType)
-			{
-			case EActionMode::Paralysis:
-				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				// AP 감소 UI에 반영
-				InitAPUI();
-				skillMultiplier = 0.8f;
-				// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
-				enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
-				break;
-			case EActionMode::Poison:
-				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				// AP 감소 UI에 반영
-				InitAPUI();
-				enemy->AddStatusEffect(EStatusEffect::Poison, 3);
-				break;
-			case EActionMode::Vulnerable:
-				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				// AP 감소 UI에 반영
-				InitAPUI();
-				enemy->AddStatusEffect(EStatusEffect::Vulnerable, 2);
-				break;
-			case EActionMode::Weakening:
-				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				// AP 감소 UI에 반영
-				InitAPUI();
-				enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
-				break;
-			case EActionMode::Fatal:
-				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->CanConsumeAP(2))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				// AP 감소 UI에 반영
-				InitAPUI();
-				skillMultiplier = 1.5f;
-				enemy->AddStatusEffect(EStatusEffect::Bleeding, 2);
-				break;
-			case EActionMode::Rupture:
-				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->CanConsumeAP(2))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				// AP 감소 UI에 반영
-				InitAPUI();
-				skillMultiplier = 1.5f;
-				enemy->AddStatusEffect(EStatusEffect::Vulnerable, 1);
-				break;
-			case EActionMode::Roar:
-				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->CanConsumeAP(1))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				// AP 감소 UI에 반영
-				InitAPUI();
-				enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
-				break;
-			case EActionMode::BattleCry:
-				// 현재 Ap가 cost보다 크다면 실행
-				if (!baseAttackPlayer->CanConsumeAP(2))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-					return;
-				}
-				// AP 감소 UI에 반영
-				InitAPUI();
-				// 자신 및 주위 동료들에게 피해 증가 버프 부여
-				// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
-				baseAttackPlayer->AddStatusEffect(EStatusEffect::Angry, 1);
-				break;
-			default:
-				// 기본 타격 스킬 배율 
-				skillMultiplier = 1.0f;
-				break;
-			}
-
-			// Rour와 BattleCry는 비공격스킬 및 버프스킬이므로 return 시키면 될듯?
-			if (attackType == EActionMode::Roar || attackType ==
-				EActionMode::BattleCry)
-			{
+				UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 				return;
 			}
-
-			// 반올림 처리
-			int32 chance = FMath::RoundToInt(critical * 100.0f);
-			int32 roll = FMath::RandRange(1, 100);
-
-
-			if (bool bIsCrit = roll <= chance)
+			player->AddStatusEffect(EStatusEffect::Poison, 3);
+			break;
+		case EActionMode::Vulnerable:
+			if (!enemy->enemybattleState->CanConsumeAP(1))
 			{
-				int32 critical_Damage = battlePlayerState->playerStatus.
-					critical_Damage;
-				damage = ((atk + weapon) * skillMultiplier * (1 + (personality +
-					status_effect))) * critical_Damage;
-				UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
+				UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+				return;
 			}
-			else
+			player->AddStatusEffect(EStatusEffect::Vulnerable, 2);
+			break;
+		case EActionMode::Weakening:
+			if (!enemy->enemybattleState->CanConsumeAP(1))
 			{
-				damage = (atk + weapon) * skillMultiplier * (1 + (personality +
-					status_effect));
-				UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
+				UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+				return;
 			}
-			
-			GetDamage(enemy, damage);
-		}
+			player->AddStatusEffect(EStatusEffect::Weakening, 2);
+			break;
+		case EActionMode::Fatal:
+			if (!enemy->enemybattleState->CanConsumeAP(2))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+				return;
+			}
+			skillMultiplier = 1.5f;
+			player->AddStatusEffect(EStatusEffect::Bleeding, 2);
+			break;
+		case EActionMode::Rupture:
+			if (!enemy->enemybattleState->CanConsumeAP(2))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+				return;
+			}
+			skillMultiplier = 1.5f;
+			player->AddStatusEffect(EStatusEffect::Vulnerable, 1);
+			break;
+		case EActionMode::Roar:
+			if (!enemy->enemybattleState->CanConsumeAP(1))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+				return;
+			}
+			player->AddStatusEffect(EStatusEffect::Weakening, 2);
+			break;
+		case EActionMode::BattleCry:
+			if (!enemy->enemybattleState->CanConsumeAP(1))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+				return;
+			}
+			// 자신과 동료들에게 버프 부여
+			// 주위 동료들에게 피해 증가 버프 부여
+			// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
+			enemy->AddStatusEffect(EStatusEffect::Angry, 1);
+			break;
+		default:
+			// 기본 타격 스킬 배율
+			skillMultiplier = 1.0f;
+			break;
 	}
+
+	// AP 감소 UI에 반영
+	InitAPUI();
+
+	// Rour와 BattleCry는 비공격스킬 및 버프스킬이므로 return 시키면 될듯?
+	if (attackType == EActionMode::Roar || attackType ==
+		EActionMode::BattleCry)
+	{
+		return;
+	}
+
+			
+	CalculateAndApplyDamage(enemy, player->battlePlayerState->playerStatus.attack, weapon, skillMultiplier, critical, criticalDamage, personality, status_effect);
 
 	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
 	currentActionMode = EActionMode::None;
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(this))
-	{
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
-		{
-			anim->actionMode = currentActionMode;
-		}
-	}
+	if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
 }
 
 
@@ -1726,5 +1305,321 @@ void ABaseBattlePawn::OnMouseHover()
 		}
 
 		lastHoveredPawn = currentHovered;
+	}
+}
+
+void ABaseBattlePawn::SkillNameJudgment(const EActionMode curAction)
+{
+	switch (curAction)
+	{
+	case EActionMode::Move:
+		curSkillName = TEXT("이동!!");
+		break;
+	case EActionMode::BaseAttack:
+		curSkillName = TEXT("타격!!");
+		break;
+	case EActionMode::Paralysis:
+		curSkillName = TEXT("마비 일격!!");
+		break;
+	case EActionMode::Poison:
+		curSkillName = TEXT("맹독 공격!!");
+        break;
+    case EActionMode::Vulnerable:
+    	curSkillName = TEXT("취약 타격!!");
+        break;
+    case EActionMode::Weakening:
+    	curSkillName = TEXT("약화 일격!!");
+        break;
+	case EActionMode::Fatal:
+		curSkillName = TEXT("치명 일격!!");
+		break;
+	case EActionMode::Rupture:
+		curSkillName = TEXT("파열 일격!!");
+		break;
+	case EActionMode::Roar:
+		curSkillName = TEXT("포효!!");
+		break;
+	case EActionMode::BattleCry:
+		curSkillName = TEXT("전투의 외침!!");
+		break;
+	default:
+		break;
+	}
+}
+
+void ABaseBattlePawn::UnitMoveRotateAttack()
+{
+	// AStar로 나온 방향으로 이동
+	if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
+	{
+		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() + FVector(0, 0, 80);
+		FVector currentLoc = GetActorLocation();
+		FVector direction = (targetLoc - currentLoc).GetSafeNormal();
+
+		// 메시 회전 부드럽게 보간 처리
+		FRotator targetRot = direction.Rotation();
+		constexpr float yawOffset = -90.f;
+		constexpr float interpSpeed = 8.f;
+
+		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
+		{
+			if (player->meshComp)
+			{
+				FRotator currentRot = player->meshComp->GetRelativeRotation();
+				FRotator desiredRot(0.f, targetRot.Yaw + yawOffset, 0.f);
+				FRotator smoothRot = FMath::RInterpTo(currentRot, desiredRot, GetWorld()->GetDeltaSeconds(), interpSpeed);
+				player->meshComp->SetRelativeRotation(smoothRot);
+			}
+		}
+		else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
+		{
+			if (enemy->meshComp)
+			{
+				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
+				FRotator desiredRot(0.f, targetRot.Yaw + yawOffset, 0.f);
+				FRotator smoothRot = FMath::RInterpTo(currentRot, desiredRot, GetWorld()->GetDeltaSeconds(), interpSpeed);
+				enemy->meshComp->SetRelativeRotation(smoothRot);
+			}
+		}
+
+		// 위치 보간 이동
+		FVector newLoc = FMath::VInterpConstantTo(currentLoc, targetLoc, GetWorld()->GetDeltaSeconds(), 500.f);
+		SetActorLocation(newLoc);
+
+		if (FVector::DistSquared(currentLoc, targetLoc) < FMath::Square(5.f))
+		{
+			currentPathIndex++;
+			if (!pathArray.IsValidIndex(currentPathIndex))
+			{
+				currentActionMode = EActionMode::None;
+				if (auto* player = Cast<ABattlePlayer>(this))
+				{
+					if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+					{
+						anim->actionMode = currentActionMode;
+						UE_LOG(LogTemp, Warning, TEXT("actionMode set to None"));
+					}
+				}
+				else if (auto* enemy = Cast<ABaseEnemy>(this))
+				{
+					if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+					{
+						anim->actionMode = currentActionMode;
+					}
+				}
+				bIsMoving = false;
+				currentTile = pathArray.Last();
+				pathArray.Empty();
+
+				if (auto* enemy = Cast<ABaseEnemy>(this))
+				{
+					enemy->FindAndAttackPlayer();
+				}
+			}
+		}
+	}
+
+	// 타겟 방향으로 회전
+	if (bWantsToAttack && attackTarget)
+	{
+		FVector directionToTarget = (attackTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+		FRotator desiredRot = directionToTarget.Rotation();
+		constexpr float interpSpeed = 5.f;
+		// 캐릭터의 forward 기준에 맞게 조정
+		constexpr float yawOffset = -90.f; 
+
+		// 현재 유닛이 Player라면
+		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
+		{
+			if (player->meshComp)
+			{
+				FRotator currentRot = player->meshComp->GetRelativeRotation();
+				FRotator targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
+				FRotator newRot = FMath::RInterpTo(currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(), interpSpeed);
+				player->meshComp->SetRelativeRotation(newRot);
+
+				// 회전이 다 됐는지 체크
+				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
+				{
+					bWantsToAttack = false;
+
+					if (player->bStartMontage)
+					{
+						// 회전 끝나고 몽타주 실행
+						player->playerAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
+						player->bStartMontage = false;
+						UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+						
+						// 어떤 스킬 사용했는지
+						if (player->curSkillName == "") return;
+						player->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
+						player->battleUnitStateUI->SetPrintSkillName(player->curSkillName);
+						player->battleUnitStateUI->ShowPrintSkillNameUI();
+
+						FTimerHandle skillNameUIHandle;
+						GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
+						GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [player]()
+						{
+							if (player && player->battleUnitStateUI)
+							{
+								player->battleUnitStateUI->ShowBaseUI();
+								player->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+							}
+						}, 2.0f, false);
+					}
+				}
+			}
+		}
+		else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
+		{
+			if (enemy->meshComp)
+			{
+				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
+				FRotator targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
+				FRotator newRot = FMath::RInterpTo(currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(), interpSpeed);
+				enemy->meshComp->SetRelativeRotation(newRot);
+
+				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
+				{
+					bWantsToAttack = false;
+					if (enemy->bStartMontage)
+					{
+						// 회전 끝나고 몽타주 실행
+						if (enemy->enemyAnim)
+						{
+							enemy->enemyAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
+							UE_LOG(LogTemp, Warning, TEXT("EnemyBaseAttackAnimation"));
+							
+							// 어떤 스킬 사용했는지
+							if (enemy->curSkillName == "") return;
+							enemy->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
+							enemy->battleUnitStateUI->SetPrintSkillName(enemy->curSkillName);
+							enemy->battleUnitStateUI->ShowPrintSkillNameUI();
+							
+							FTimerHandle skillNameUIHandle;
+							GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
+							GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [enemy]()
+							{
+								if (enemy && enemy->battleUnitStateUI)
+								{
+									enemy->battleUnitStateUI->ShowBaseUI();
+									enemy->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+								}
+							}, 2.0f, false);
+						}
+						else
+						{
+							UE_LOG(LogTemp, Error, TEXT("enemy->enemyAnim is nullptr!"));
+						}
+						enemy->bStartMontage = false;
+						UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+
+						// 끝났으면 턴 종료 처리
+						// OnTurnEnd();
+					}
+				}
+			}
+		}
+	}
+}
+void ABaseBattlePawn::InitEnemyState()
+{
+	if (!(battleUnitStateUI && phaseManager))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InitEnemyState : !(battleUnitStateUI && phaseManager"));
+		return;
+	}
+	
+	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
+	{
+		// 처음 값 세팅
+		enemybattleState = NewObject<UEnemyBattleState>(this);
+		enemybattleState->hp = 80;
+		
+		enemybattleState->attack = 9;
+		enemybattleState->defense = 6;
+		enemybattleState->resistance = 3;
+		enemybattleState->move_Range = 5;
+		enemybattleState->critical_Rate = 0.04f;
+		enemybattleState->critical_Damage = 1.5f;
+		enemybattleState->speed = 4;
+
+		// enemy에 moveRange 세팅 작업
+		enemy->moveRange = enemy->enemybattleState->move_Range;
+		
+		// 전송용 구조체에 값 세팅
+		enemybattleState->enemyStatus.hp = enemybattleState->hp;
+		enemybattleState->enemyStatus.attack = enemybattleState->attack;
+		enemybattleState->enemyStatus.defense = enemybattleState->defense;
+		enemybattleState->enemyStatus.resistance = enemybattleState->resistance;
+		enemybattleState->enemyStatus.move_Range = enemybattleState->move_Range;
+		enemybattleState->enemyStatus.critical_Rate = enemybattleState->
+			critical_Rate;
+		enemybattleState->enemyStatus.critical_Damage = enemybattleState->
+			critical_Damage;
+		enemybattleState->enemyStatus.speed = enemybattleState->speed;
+		
+		FString name = "";
+		name = FString::Printf(TEXT("Enemy%d"), phaseManager->unitEnemyNameindex);
+		phaseManager->unitEnemyNameindex++;
+		
+		battleUnitStateUI->SetUnitName(name);
+		battleUnitStateUI->SetHPUI(enemy);
+	}
+}
+
+void ABaseBattlePawn::InitOtherClassPointer()
+{
+	// PhaseManager
+	phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
+	if (phaseManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("phaseManager is Set"));
+	}
+	// TurnManager
+	turnManager = Cast<ATurnManager>(UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
+	if (turnManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("turnManager is Set"));
+	}
+	// PC
+	pc = GetWorld()->GetFirstPlayerController();
+	if (pc)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PC is Set"));
+		
+		// hud 포인터 세팅
+		hud = Cast<ABattleHUD>(pc->GetHUD());
+		if (hud) UE_LOG(LogTemp, Warning, TEXT("hud is Set"));
+	}
+	// girdTile Setting
+	gridTileManager = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
+	if (gridTileManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("gridTileManager is Set"));
+	}
+	// BaseHP UI 보여주기
+	battleUnitStateUI = Cast<UBattleUnitStateUI>(this->battleUnitStateComp->GetWidget());
+	if (battleUnitStateUI) UE_LOG(LogTemp, Warning, TEXT("battleUnitStateUI is Set"));
+}
+
+void ABaseBattlePawn::InitAPUI()
+{
+	if (!(pc && hud && hud->mainUI && hud->mainUI->HB_AP))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InitAPUI is Not Set : pc && hud && hud->mainUI && hud->mainUI->HB_AP"));
+		return;
+	}
+	
+	// AP UI 초기화
+	hud->mainUI->HB_AP->ClearChildren();
+
+	// 현재 턴 유닛이 Player인 경우에만
+	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
+	{
+		for (int32 i = 0; i < player->curAP; ++i)
+		{
+			hud->mainUI->AddAP(); // AP UI 하나씩 추가
+		}
 	}
 }
