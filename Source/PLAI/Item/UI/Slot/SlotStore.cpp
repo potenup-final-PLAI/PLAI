@@ -12,9 +12,10 @@ bool USlotStore::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
                               UDragDropOperation* InOperation)
 {
 	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
-	if (ItemObject && ! ItemObject->ItemStructTable.ItemTop -1)
+	if (ItemObject->ItemStructTable.ItemIndex != -1)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SlotStore::NativeOnDrop: ItemObject is 아이템이 있네 %d"),ItemObject->ItemStructTable.ItemGold);
+	
 		ItemObject->SlotUi->ItemStructTable = FItemStructTable();
 		ItemObject->SlotUi->SlotImageUpdate();
 		
@@ -26,9 +27,10 @@ bool USlotStore::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 			}
 		}
 		return true;
-	}	
+	}
 	else
 	{
+		UE_LOG(LogTemp, Warning, TEXT("SlotStore::NativeOnDrop: ItemObject is 아이템이 없네 %d"),ItemObject->ItemStructTable.ItemGold);
 		return false;
 	}
 }
