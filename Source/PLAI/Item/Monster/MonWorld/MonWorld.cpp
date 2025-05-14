@@ -81,28 +81,19 @@ void AMonWorld::MoveToLocation()
 		{
 			FVector Dist = InitLoc - GetActorLocation(); 
 			AddActorWorldOffset(Dist.GetSafeNormal() * 5);
-			UE_LOG(LogTemp,Warning,TEXT("MonWorld 25보다 거리 적음 다음 이동 큼 거리는?[%f]"),FVector::Distance(GetActorLocation(),InitLoc));
-			DrawDebugSphere(GetWorld(),InitLoc,50,20,FColor::Red,false);
+		
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp,Warning,TEXT("MonWorld 25보다 거리 적음 다음 이동 근데 거리는?[%f]"),FVector::Distance(GetActorLocation(),InitLoc));
-		DrawDebugSphere(GetWorld(),InitLoc,50,20,FColor::Blue,false,2);
+		FVector Candidate;
+		do
+		{ Candidate = GetActorLocation() + RandLocation(); }
+		while (FVector::Distance(Candidate, FirstInitLoc) > 500.f);
 		
-		InitLoc = GetActorLocation() + RandLocation();
+		InitLoc = Candidate;
 		FVector Dist = InitLoc - GetActorLocation(); 
 		SetActorRotation(Dist.Rotation());
-		
-		// UE_LOG(LogTemp,Error,TEXT("AMonWorld::MoveToLocation"));
-		// FVector Candidate;
-		// do
-		// { Candidate = GetActorLocation() + RandLocation(); }
-		// while (FVector::Distance(Candidate, FirstInitLoc) > 500.f);
-		//
-		// InitLoc = Candidate;
-		// FVector Dist = InitLoc - GetActorLocation(); 
-		// SetActorRotation(Dist.Rotation());
 	}
 }
 
@@ -179,4 +170,14 @@ void AMonWorld::CastObject()
 	}
 }
 
+// 랜드 Loc 구하는 식 디버그
 
+// InitLoc = GetActorLocation() + RandLocation();
+// FVector Dist = InitLoc - GetActorLocation(); 
+// SetActorRotation(Dist.Rotation());
+
+// UE_LOG(LogTemp,Warning,TEXT("MonWorld 25보다 거리 적음 다음 이동 근데 거리는?[%f]"),FVector::Distance(GetActorLocation(),InitLoc));
+// DrawDebugSphere(GetWorld(),InitLoc,50,20,FColor::Blue,false,2);
+
+// UE_LOG(LogTemp,Warning,TEXT("MonWorld 25보다 거리 적음 다음 이동 큼 거리는?[%f]"),FVector::Distance(GetActorLocation(),InitLoc));
+// DrawDebugSphere(GetWorld(),InitLoc,50,20,FColor::Red,false);
