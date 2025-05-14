@@ -20,13 +20,20 @@ void AMonWorld::BeginPlay()
 {
 	Super::BeginPlay();
 	InitLoc = GetActorLocation() + RandLocation();
-	FirstInitLoc = InitLoc;
+	FirstInitLoc = GetActorLocation();
 }
 
 // Called every frame
 void AMonWorld::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	CurrentTimeTwo += DeltaTime;
+	if (CurrentTimeTwo > 1.0)
+	{
+		DrawDebugSphere(GetWorld(),InitLoc,50,20,FColor::Red,false);
+		CurrentTimeTwo = 0;
+	}
 
 	MoveToLocation();
 }
@@ -49,12 +56,13 @@ FVector AMonWorld::RandLocation()
 
 	bool bHit = GetWorld()->LineTraceSingleByObjectType
 	(hit,FVector(x,y,z) + FVector(0,0,2000),
-		FVector(x,y,z) + FVector(0,0,-2000),
+		FVector(x,y,z) + FVector(0,0,-3000),
+		// ECC_Visibility, params);
 		ECC_GameTraceChannel1, params);
 	
-	// DrawDebugLine(GetWorld(),GetActorLocation() + hit.Location + FVector(0,0,3000),hit.Location,FColor::Blue,
-	// 	false,2);
-	// DrawDebugSphere(GetWorld(),GetActorLocation() + hit.Location,30,30,FColor::Red,false,2);
+	DrawDebugLine(GetWorld(),GetActorLocation(),hit.Location,FColor::Blue,
+		false,2);
+	DrawDebugSphere(GetWorld(),hit.Location,30,30,FColor::Red,false,2);
 	return FVector(hit.Location);
 }
 
@@ -98,9 +106,10 @@ TArray<FOverlapResult> AMonWorld::GetHitResult(float Distance)
 	bool bHit = GetWorld()->OverlapMultiByChannel(Hits,GetActorLocation(),
 		FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Distance),Params);
 	if (bHit){ return Hits; }
+
+	DrawDebugSphere(GetWorld(),GetActorLocation(),Distance,10,FColor::Blue,false,1);
+
 	return TArray<FOverlapResult>();
-	
-	// DrawDebugSphere(GetWorld(),GetActorLocation(),Distance,10,FColor::Blue,false,1);
 }
 
 void AMonWorld::CastPlayer()

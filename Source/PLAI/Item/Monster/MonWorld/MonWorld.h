@@ -29,6 +29,9 @@ public:
 	
     UPROPERTY()
 	float CurrentTime = 0;
+
+	UPROPERTY()
+	float CurrentTimeTwo = 0;
 	
 	UPROPERTY(EditAnywhere)
 	float CastingDistance = 500.0f;

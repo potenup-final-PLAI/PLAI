@@ -27,7 +27,7 @@ ATestPlayer::ATestPlayer()
 	LoginComp = CreateDefaultSubobject<ULoginComp>(TEXT("LoginComp"));
 	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("CreComp"));
 	LogItemComp = CreateDefaultSubobject<ULogItemComp>(TEXT("ItemComp"));
-	InputComp = CreateDefaultSubobject<UInputComp>(TEXT("InputComp"));
+	InputTestComp = CreateDefaultSubobject<UInputComp>(TEXT("InputKeyComp"));
 
 	CaptureComp = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureComp"));
 	CaptureComp->SetupAttachment(RootComponent);

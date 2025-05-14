@@ -51,12 +51,27 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bLeftMouse = false;
 	UPROPERTY(EditAnywhere)
+	float MousePower = 0;
+	UPROPERTY(EditAnywhere)
+	float MouseTime = 0;
+	
+	UPROPERTY(EditAnywhere)
 	UInputAction* IE_LeftMouse;
+	
 	UFUNCTION()
 	void On_LeftMouseStart();
 	UFUNCTION()
 	void On_LeftMouseTriggered();
+	UFUNCTION()
+	void On_LeftMouseComplete();
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* IE_MouseWheel;
+	UFUNCTION()
+	void On_MouseWheelTriggered(const FInputActionValue& Value);
 	
 	UPROPERTY(EditAnywhere)
 	UInputAction* IE_Stat;
+
+	
 };
