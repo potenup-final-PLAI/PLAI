@@ -30,9 +30,12 @@ void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
 	
 	TArray<AActor*> Actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWarp::StaticClass(), Actors);
+	
+	if (Actors.Num() == 0){UE_LOG(LogTemp,Warning,TEXT("UiPortal 없냐? %d"),Actors.Num())return;}
+	
 	for (AActor* Actor : Actors)
 	{
-		UE_LOG(LogTemp,Display,TEXT("UiPortal Portal 이름은? [%s]"),*Actor->GetName());
+		// UE_LOG(LogTemp,Display,TEXT("UiPortal Portal 이름은? [%s]"),*Actor->GetName());
 		if (AWarp* MonSpawn = Cast<AWarp>(Actor))
 		{
 			if (MonSpawn->MonSpawnType ==  SpawnType)
@@ -45,7 +48,7 @@ void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
 
 void UUiPortal::OnButton_Village()
 {
-	Warp->WarpLevel(TestPlayer,0);
+	WarpTestPlayer(EMonSpawnType::Village);
 }
 
 void UUiPortal::OnButton_Mountain()

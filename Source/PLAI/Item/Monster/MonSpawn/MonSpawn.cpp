@@ -71,7 +71,6 @@ void AMonSpawn::SpawnMonster()
 	// int32 FactoryCount = MonsterFactory.Num();
 	// if (FactoryCount <= 0)
 	// { UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: MonsterFactory가 비어 있습니다.")); return; }
-
 	
 	MyTimer([this]()
 	{
@@ -90,6 +89,8 @@ void AMonSpawn::SpawnMonster()
 			TArray<FName>Raws = MonsterTable->GetRowNames();
 			for (FName Raw : Raws)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("MonSpawn 데이터테이블 도는중"))
+				
 				FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
 				int32 index = static_cast<int32>(MonSpawnType);
 				if (MonsterStruct && MonsterStruct->MonsterTop == static_cast<int32>(MonSpawnType))

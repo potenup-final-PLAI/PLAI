@@ -9,9 +9,10 @@
 UENUM(BlueprintType)
 enum class EMonSpawnType : uint8
 {
+	 Village UMETA(DisplayName = "Village"),
 	Mountain UMETA(DisplayName = "Mountain"),
-	Desert UMETA(DisplayName = "Desert"),
-	Dungeon UMETA(DisplayName = "Dungeon"),
+	  Desert UMETA(DisplayName = "Desert"),
+	 Dungeon UMETA(DisplayName = "Dungeon"),
 };
 
 UCLASS()
@@ -31,6 +32,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// UPROPERTY(EditAnywhere)
+	// TArray<TWeakObjectPtr<AMonster>> SpawnedMonsters;
+	
 	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<class AMonster>> MonsterFactory;
 
