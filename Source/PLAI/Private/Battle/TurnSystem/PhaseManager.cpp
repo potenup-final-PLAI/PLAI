@@ -106,7 +106,7 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 		break;
 	case EBattlePhase::BattleEnd:
 		// 끝났을 때 결과에 대한 UI 보여주면 될듯함.
-		BattleEnd();
+		//BattleEnd();
 		break;
 	default:
 		break;
@@ -740,9 +740,10 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		}
 
 		// 데이터 받아와서 세팅
-		// 장비 장착
-		if (gi)
+		// 장비 장착 
+		if (gi && gi->UserFullInfoGiStat.character_info.stats.hp != 0)
 		{
+			
 			gi->EquipActor(player);
 			UE_LOG(LogTemp, Warning, TEXT("Eqirment"));
 			
