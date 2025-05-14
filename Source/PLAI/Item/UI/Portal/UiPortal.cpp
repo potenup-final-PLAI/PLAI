@@ -19,13 +19,23 @@ void UUiPortal::NativeConstruct()
 	Button_Dessert->OnClicked.AddDynamic(this,&UUiPortal::OnButton_Dessert);
 	Button_Cave->OnClicked.AddDynamic(this,&UUiPortal::OnButton_Cave);
 	Button_OpenMap->OnClicked.AddDynamic(this,&UUiPortal::OnButton_OpenMap);
-	
 }
 
 
 
 void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
 {
+	TArray<AActor*> Mons;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMonster::StaticClass(), Mons);
+
+	for (AActor* Mon : Mons)
+	{
+		if (AMonster* Monster = Cast<AMonster>(Mon))
+		{
+			Monster->Destroy();
+		}
+	}
+	
 	UE_LOG(LogTemp,Warning,TEXT("UiPortal 어디소환중? [%s]"),*UEnum::GetValueAsString(SpawnType))
 	
 	TArray<AActor*> Actors;

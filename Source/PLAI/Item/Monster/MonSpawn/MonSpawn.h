@@ -31,15 +31,15 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// UPROPERTY(EditAnywhere)
-	// TArray<TWeakObjectPtr<AMonster>> SpawnedMonsters;
 	
 	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<class AMonster>> MonsterFactory;
-
+	
 	UPROPERTY(EditAnywhere)
-	TArray<class AMonster*> Monsters;
+	TArray<TWeakObjectPtr<AMonster>> Monsters;
+	
+	// UPROPERTY(EditAnywhere)
+	// TArray<class AMonster*> Monsters;
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComp;
