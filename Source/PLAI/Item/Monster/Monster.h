@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Monster.generated.h"
 
+
 UCLASS()
 class PLAI_API AMonster : public ACharacter
 {

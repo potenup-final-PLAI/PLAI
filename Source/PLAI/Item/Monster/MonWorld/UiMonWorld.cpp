@@ -29,8 +29,12 @@ void UUiMonWorld::OnButtonYes()
 			WorldGi->UserFullInfoGi = TestPlayer->LoginComp->UserFullInfo;
 			WorldGi->bGameStart = true;
 			WorldGi->bBattleReward = true;
+
+			if (MonWorld && MonWorld->MonsterType == EMonsterType::Monster)
+			{ UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap")); }
+			else if (MonWorld && MonWorld->MonsterType == EMonsterType::Boss)
+			{ UGameplayStatics::OpenLevel(TestPlayer,FName("Mk_BossMap")); }
 		}
-		UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
 	}
 }
 

@@ -7,6 +7,13 @@
 #include "PLAI/Item/Monster/MonsterMaster.h"
 #include "MonWorld.generated.h"
 
+UENUM(BlueprintType)
+enum class EMonsterType : uint8
+{
+	Monster UMETA(DisplayName = "Monster"),
+	Boss UMETA(DisplayName = "Boss"),
+};
+
 UCLASS()
 class PLAI_API AMonWorld : public ACharacter
 {
@@ -26,6 +33,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(EditAnywhere)
+	EMonsterType MonsterType;
 	
     UPROPERTY()
 	float CurrentTime = 0;

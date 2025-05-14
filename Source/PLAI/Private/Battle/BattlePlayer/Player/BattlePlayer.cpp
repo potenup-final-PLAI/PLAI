@@ -43,7 +43,7 @@ void ABattlePlayer::Tick(float DeltaTime)
 	
 	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::SpaceBar))
 	{
-		UGameplayStatics::OpenLevel(GetWorld(), TEXT("Mk_LevelVillage"));
+		UGameplayStatics::OpenLevel(GetWorld(), TEXT("Mk_WorldPartition"));
 	}
 }
 
