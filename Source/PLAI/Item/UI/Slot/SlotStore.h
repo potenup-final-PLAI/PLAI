@@ -13,4 +13,7 @@ UCLASS()
 class PLAI_API USlotStore : public USlot
 {
 	GENERATED_BODY()
+
+public:
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 };

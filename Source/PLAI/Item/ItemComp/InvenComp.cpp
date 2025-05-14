@@ -105,22 +105,8 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 				}
 			}
 		}
-		else
-		{
-			UE_LOG(LogTemp,Warning,TEXT("InvenComp Q키 안맞음"))
-		}
 	}
-	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Three))
-	{
-		if (MenuInven->Wbp_UIChaStat->GetVisibility() == ESlateVisibility::Hidden)
-		{
-			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
+	
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
 		Server_SpawnOneItem();
@@ -151,22 +137,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		SaveItemInventory();
 		SaveEquipInventory();
 	}
-
-	// 아이템창 출력
-	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::I))
-	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 I키 !"));
-		if (!MenuInven)	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 메뉴인벤 없다 ㅠㅠ %s"),
-			TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); return;};
-		EnumKey = EEnumKey::Item;
-			ItemInvenTory(EnumKey, MenuInven->WBP_ItemInven);
-	}
-    // 장비창 출력
-	if (PC && PC->IsLocalController() && PC->WasInputKeyJustReleased(EKeys::E))
-	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 E키 "));
-		if (!MenuInven)	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 메뉴인벤 없다 ㅠㅠ %s"),
-			TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); return;};
-		EnumKey = EEnumKey::Equip;
-		ItemInvenTory(EnumKey, MenuInven->WBP_EquipInven); }
+	
 
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
 	{
@@ -311,21 +282,7 @@ void UInvenComp::Server_UnEquip_Implementation(EquipSlotType SlotType)
 	}
 }
 
-void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
-{
-	if (Flipflop == false)
-	{
-		// UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 켯다"));
-		Inven->SetVisibility(ESlateVisibility::Visible);
-		Flipflop = true;
-	}
-	else
-	{
-		// UE_LOG(LogTemp,Warning,TEXT("UInvenComp::ItemInvenTory() 껏다"));
-		Inven->SetVisibility(ESlateVisibility::Hidden);
-		Flipflop = false;
-	}
-}
+
 
 void UInvenComp::Server_GetItem_Implementation(const FItemStructTable& ItemStructTable)
 {
@@ -714,3 +671,38 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 // 	TestPlayer->StoreComp->StoreInven->SetVisibility(ESlateVisibility::Hidden);
 // 	FlipflopStore = false;
 // }
+
+// 인벤토리 창열기
+
+// void UInvenComp::ItemInvenTory(EEnumKey Key, UUserWidget* Inven)
+// {
+// 	if (Flipflop == false)
+// 	{
+// 		Inven->SetVisibility(ESlateVisibility::Visible);
+// 		Flipflop = true;
+// 	}
+// 	else
+// 	{
+// 		Inven->SetVisibility(ESlateVisibility::Hidden);
+// 		Flipflop = false;
+// 	}
+// }
+
+// 장비창 / 인벤토리 열기 함수 구현
+
+// // 아이템창 출력
+// if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::I))
+// { UE_LOG(LogTemp, Warning, TEXT("인벤컴프 I키 !"));
+// 	if (!MenuInven)	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 메뉴인벤 없다 ㅠㅠ %s"),
+// 		TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); return;};
+// 	EnumKey = EEnumKey::Item;
+// 		ItemInvenTory(EnumKey, MenuInven->WBP_ItemInven);
+// }
+//    // 장비창 출력
+// if (PC && PC->IsLocalController() && PC->WasInputKeyJustReleased(EKeys::E))
+// { UE_LOG(LogTemp, Warning, TEXT("인벤컴프 E키 "));
+// 	if (!MenuInven)	{ UE_LOG(LogTemp, Warning, TEXT("인벤컴프 메뉴인벤 없다 ㅠㅠ %s"),
+// 		TestPlayer->HasAuthority() ? TEXT("서버") : TEXT("클라")); return;};
+// 	EnumKey = EEnumKey::Equip;
+// 	ItemInvenTory(EnumKey, MenuInven->WBP_EquipInven); }
+

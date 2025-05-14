@@ -9,7 +9,11 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Character/UIChaStat.h"
+#include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 
 // Sets default values for this component's properties
@@ -42,6 +46,7 @@ void UInputComp::BeginPlay()
 	{
 		InputComp->BindAction(IE_Equip, ETriggerEvent::Started, this, &UInputComp::On_Equip);
 		InputComp->BindAction(IE_Inven, ETriggerEvent::Started, this, &UInputComp::On_Inven);
+		InputComp->BindAction(IE_Stat, ETriggerEvent::Started, this, &UInputComp::On_Stat);
 		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Started, this, &UInputComp::On_LeftMouseStart);
 		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Triggered, this, &UInputComp::On_LeftMouseTriggered);
 		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Completed, this, &UInputComp::On_LeftMouseComplete);
@@ -59,15 +64,31 @@ void UInputComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 void UInputComp::On_Equip()
 {
 	if (!Pc->IsLocalController()) return;
-
-	UE_LOG(LogTemp, Warning, TEXT("InputComp On Equip"));
+	
+	if (TestPlayer->InvenComp->MenuInven->WBP_EquipInven->GetVisibility() == ESlateVisibility::Hidden)
+	{ TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Visible); }
+	else
+	{ TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden); }
 }
 
 void UInputComp::On_Inven()
 {
 	if (!Pc->IsLocalController()) return;
+	
+	if (TestPlayer->InvenComp->MenuInven->WBP_ItemInven->GetVisibility() == ESlateVisibility::Hidden) 
+	{ TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Visible);}
+	else
+	{ TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);}
+}
 
-	UE_LOG(LogTemp, Warning, TEXT("InputComp On Inven"));
+void UInputComp::On_Stat()
+{
+	if (!Pc->IsLocalController()) return;
+	
+	if (TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->GetVisibility() == ESlateVisibility::Hidden) 
+	{ TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Visible);}
+	else
+	{ TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);}
 }
 
 void UInputComp::On_LeftMouseStart()
@@ -95,7 +116,6 @@ void UInputComp::On_LeftMouseTriggered()
 	// 오른쪽 나의 벡터와 카메라 전방 벡터 내적
 	float Dot = FVector::DotProduct(FVector(TestPlayer->GetActorRightVector().X,TestPlayer->GetActorRightVector().Y,0),
 		FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
-    // 나의 전방 카메라 전방 벡터 내적
 
 	if (Dot > 0.13)
 	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-1,0)); }
@@ -117,15 +137,12 @@ void UInputComp::On_LeftMouseTriggered()
 			MouseTime = 1;
 		}
 	}
-	
-	// UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseTriggered 플레이어 카메라 전방 내적값은? [%f]"),Dot);
 	float MouseX, MouseY;
 	Pc->GetInputMouseDelta(MouseX, MouseY);
 	FRotator CameraBoomRot = TestPlayer->CameraBoom->GetRelativeRotation();
 
 	MousePower += MouseY;
 	
-	// UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseTriggered 마우스 Y축 힘 값은? [%f]"),MousePower);
 
 	if (FMath::Abs(MousePower) > 5.f)
 	{
@@ -141,13 +158,11 @@ void UInputComp::On_LeftMouseComplete()
 	bLeftMouse = false;
 	MousePower = 0;
 	MouseTime = 0;
-	UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart Completed false"));
 }
 
 void UInputComp::On_MouseWheelTriggered(const FInputActionValue& Value)
 {
 	float Axis = Value.Get<float>();
-	UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseWheel Value [%f]"),Axis);
 	TestPlayer->CameraBoom->TargetArmLength -= 250 * Axis;
 }
 

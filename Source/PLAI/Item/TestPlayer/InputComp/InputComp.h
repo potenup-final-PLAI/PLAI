@@ -49,6 +49,11 @@ public:
 	void On_Inven();
 
 	UPROPERTY(EditAnywhere)
+	UInputAction* IE_Stat;
+	UFUNCTION()
+	void On_Stat();
+
+	UPROPERTY(EditAnywhere)
 	bool bLeftMouse = false;
 	UPROPERTY(EditAnywhere)
 	float MousePower = 0;
@@ -64,14 +69,9 @@ public:
 	void On_LeftMouseTriggered();
 	UFUNCTION()
 	void On_LeftMouseComplete();
-
+	
 	UPROPERTY(EditAnywhere)
 	UInputAction* IE_MouseWheel;
 	UFUNCTION()
 	void On_MouseWheelTriggered(const FInputActionValue& Value);
-	
-	UPROPERTY(EditAnywhere)
-	UInputAction* IE_Stat;
-
-	
 };

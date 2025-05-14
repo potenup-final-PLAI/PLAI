@@ -2,3 +2,10 @@
 
 
 #include "SlotStore.h"
+
+bool USlotStore::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
+	UDragDropOperation* InOperation)
+{
+	
+	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+}
