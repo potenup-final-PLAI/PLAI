@@ -350,10 +350,12 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		UE_LOG(LogTemp,Warning,TEXT("UInvenComp::EquipSlot타입 %s"),*StaticEnum<EquipSlotType>()->GetNameStringByValue((int8)SlotType));
 		ItemWeapon = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,100,0),
 		FRotator(0,0,0),SpawnParams);
-		ItemWeapon->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_R"));
+		ItemWeapon->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_rSocket"));
 		ItemWeapon->ItemStructTable = ItemStructTable;
 		ItemWeapon->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+		ItemWeapon->AddActorWorldOffset(FVector(30, 5, -10));
+		ItemWeapon->AddActorLocalRotation(FRotator(-165, 10, 100));
 
 		if (ItemStructTable.Material)
 		{ ItemWeapon->StaticMesh->SetMaterial(0,ItemStructTable.Material);}

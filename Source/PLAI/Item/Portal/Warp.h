@@ -7,6 +7,7 @@
 #include "CoreMinimal.h"
 #include "NiagaraComponent.h"
 #include "GameFramework/Actor.h"
+#include "PLAI/Item/Monster/MonSpawn/MonSpawn.h"
 #include "Warp.generated.h"
 
 UCLASS()
@@ -27,6 +28,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	// FOnWalp OnWalp;
 
+	UPROPERTY(EditAnywhere)
+	EMonSpawnType MonSpawnType;
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUiPortal>UiPortalFactory;
 

@@ -5,6 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "PLAI/Item/Monster/MonSpawn/MonSpawn.h"
 #include "UiPortal.generated.h"
 
 /**
@@ -44,6 +45,11 @@ public:
 	class AWarp* Warp;
 	
 	virtual void NativeConstruct() override;
+
+	UPROPERTY(EditAnywhere)
+	TArray<AMonSpawn*> MonSpawns;
+
+	void WarpTestPlayer(EMonSpawnType SpawnType);
 
 	UFUNCTION()
 	void OnButton_Village();

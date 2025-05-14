@@ -111,7 +111,7 @@ public:
 	UFUNCTION(Server,Reliable)
 	void Server_DestroyItem(AItem* Item);
 	
-	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
+	// void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 
 	UFUNCTION(Server,Reliable)
 	void Server_GetItem(const FItemStructTable& ItemStructTable);

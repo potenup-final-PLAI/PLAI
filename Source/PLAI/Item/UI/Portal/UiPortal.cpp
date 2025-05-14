@@ -4,6 +4,9 @@
 
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
+#include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/Monster/Monster.h"
+#include "PLAI/Item/Monster/MonSpawn/MonSpawn.h"
 #include "PLAI/Item/Portal/Warp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
@@ -19,6 +22,27 @@ void UUiPortal::NativeConstruct()
 	
 }
 
+
+
+void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
+{
+	UE_LOG(LogTemp,Warning,TEXT("UiPortal 어디소환중? [%s]"),*UEnum::GetValueAsString(SpawnType))
+	
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWarp::StaticClass(), Actors);
+	for (AActor* Actor : Actors)
+	{
+		UE_LOG(LogTemp,Display,TEXT("UiPortal Portal 이름은? [%s]"),*Actor->GetName());
+		if (AWarp* MonSpawn = Cast<AWarp>(Actor))
+		{
+			if (MonSpawn->MonSpawnType ==  SpawnType)
+			{
+				TestPlayer->SetActorLocation(MonSpawn->GetActorLocation() + FVector(250,0,1000));
+			}
+		}
+	}
+}
+
 void UUiPortal::OnButton_Village()
 {
 	Warp->WarpLevel(TestPlayer,0);
@@ -26,17 +50,17 @@ void UUiPortal::OnButton_Village()
 
 void UUiPortal::OnButton_Mountain()
 {
-	Warp->WarpLevel(TestPlayer,1);
+	WarpTestPlayer(EMonSpawnType::Mountain);
 }
 
 void UUiPortal::OnButton_Dessert()
 {
-	Warp->WarpLevel(TestPlayer,2);
+	WarpTestPlayer(EMonSpawnType::Desert);
 }
 
 void UUiPortal::OnButton_Cave()
 {
-	Warp->WarpLevel(TestPlayer,3);
+	WarpTestPlayer(EMonSpawnType::Dungeon);
 }
 
 void UUiPortal::OnButton_OpenMap()
