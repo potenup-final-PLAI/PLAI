@@ -256,7 +256,11 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	// 3. 이동/행동력 소진 후 턴 종료
 	if (Action.remaining_ap <= 0 && Action.remaining_mov <= 0)
 	{
-		OnTurnEnd();
+		FTimerHandle timerHandle;
+		GetWorld()->GetTimerManager().SetTimer(timerHandle,FTimerDelegate::CreateLambda([=, this]()
+		{
+			OnTurnEnd();
+		}),1.0f,false);
 	}
 }
 

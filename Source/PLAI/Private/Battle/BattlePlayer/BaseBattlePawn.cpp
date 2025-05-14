@@ -1703,26 +1703,28 @@ void ABaseBattlePawn::OnMouseHover()
 	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(start, dir);
 	end = start + dir * 10000;
 
-	bool bHitUnit = false;
+	ABaseBattlePawn* currentHovered = nullptr;
 
 	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, params))
 	{
-		if (ABaseBattlePawn* hoveredUnit = Cast<ABaseBattlePawn>(hitInfo.GetActor()))
-		{
-			// 유닛에 마우스를 올리고 있을 때
-			hoveredUnit->battleUnitStateComp->SetDrawSize(FVector2D(150, 130));
-			hoveredUnit->battleUnitStateUI->ShowHoverUI();
-			lastHoveredPawn = hoveredUnit;
-			bHitUnit = true;
-			
-		}
+		currentHovered = Cast<ABaseBattlePawn>(hitInfo.GetActor());
 	}
 
-	// 이전에 호버 중이었던 유닛이 있었는데 지금은 안 겹친 경우 → Base UI로 전환
-	if (!bHitUnit && lastHoveredPawn)
+	// 이전과 현재가 다르면 UI 갱신
+	if (lastHoveredPawn != currentHovered)
 	{
-		lastHoveredPawn->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
-		battleUnitStateUI->ShowBaseUI();
-		lastHoveredPawn = nullptr;
+		if (lastHoveredPawn && lastHoveredPawn->battleUnitStateUI)
+		{
+			lastHoveredPawn->battleUnitStateUI->ShowBaseUI();
+			lastHoveredPawn->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+		}
+
+		if (currentHovered && currentHovered->battleUnitStateUI)
+		{
+			currentHovered->battleUnitStateUI->ShowHoverUI();
+			currentHovered->battleUnitStateComp->SetDrawSize(FVector2D(150, 130));
+		}
+
+		lastHoveredPawn = currentHovered;
 	}
 }
