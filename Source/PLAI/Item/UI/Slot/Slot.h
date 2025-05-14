@@ -23,7 +23,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemStructTable ItemStructTable;
-
+	 
 	UPROPERTY(EditAnywhere)
 	class UTexture2D* Texture;
 	

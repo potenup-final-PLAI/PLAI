@@ -3,9 +3,32 @@
 
 #include "SlotStore.h"
 
+#include "Blueprint/DragDropOperation.h"
+#include "PLAI/Item/Item/ItemObject.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
+
 bool USlotStore::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
-	UDragDropOperation* InOperation)
+                              UDragDropOperation* InOperation)
 {
-	
-	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
+	if (ItemObject && ! ItemObject->ItemStructTable.ItemTop -1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SlotStore::NativeOnDrop: ItemObject is 아이템이 있네 %d"),ItemObject->ItemStructTable.ItemGold);
+		ItemObject->SlotUi->ItemStructTable = FItemStructTable();
+		ItemObject->SlotUi->SlotImageUpdate();
+		
+		if (APlayerController* Pc = GetWorld()->GetFirstPlayerController())
+		{
+			if (ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetCharacter()))
+			{
+				Player->InvenComp->SetGold(ItemObject->ItemStructTable.ItemGold);
+			}
+		}
+		return true;
+	}	
+	else
+	{
+		return false;
+	}
 }

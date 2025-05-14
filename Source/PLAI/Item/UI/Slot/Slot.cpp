@@ -70,9 +70,6 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Slot::왼쪽마우스 NativeOnMouseButtonDown"));
-		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item id %s"),*ItemStructTable.Item_Id)
-		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Attack%d"),ItemStructTable.ItemStructStat.item_ATK)
-		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Defense%d"),ItemStructTable.ItemStructStat.item_DEF)
 		
 		return UWidgetBlueprintLibrary::DetectDragIfPressed(MouseEvent, this,
 			EKeys::LeftMouseButton).NativeReply;
@@ -140,15 +137,6 @@ bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDr
         	SlotPre->SlotImageUpdate();
         	SlotImageUpdate();
         } 
-		
-		// Swap(ItemObject->SlotUi->ItemStructTable, ItemStructTable);
-		// SlotImageUpdate();
-		// ItemObject->SlotUi->SlotImageUpdate();
-		// SlotCountUpdate(ItemStructTable.ItemNum);
-		// ItemObject->SlotUi->ItemStructTable = ItemStructTable;
-		// ItemObject->SlotUi->SlotImageUpdate();
-		// UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
-		
 		return true;
 	}
 	// 밑에거는 동기화까지는 끝내는거 확인했던 함수임!!
@@ -175,3 +163,13 @@ void USlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDr
 	SlotImageUpdate();
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop 다른창에 했음"));
 }
+
+
+
+// Swap(ItemObject->SlotUi->ItemStructTable, ItemStructTable);
+// SlotImageUpdate();
+// ItemObject->SlotUi->SlotImageUpdate();
+// SlotCountUpdate(ItemStructTable.ItemNum);
+// ItemObject->SlotUi->ItemStructTable = ItemStructTable;
+// ItemObject->SlotUi->SlotImageUpdate();
+// UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));

@@ -223,9 +223,9 @@ void UInvenComp::SetGold(int32 Getgold)
 {
 	if (TestPlayer->IsLocallyControlled())
 	{
-		Gold += Getgold;
-		MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(Gold));
-		MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(Gold));
+		TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += Getgold;
+		MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(TestPlayer->LoginComp->UserFullInfo.inventory_info.gold));
+		MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(TestPlayer->LoginComp->UserFullInfo.inventory_info.gold));
 	}
 }
 

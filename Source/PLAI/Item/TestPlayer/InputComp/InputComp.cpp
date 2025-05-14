@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "AI/NavigationSystemBase.h"
 #include "Camera/CameraComponent.h"
+#include "Components/WrapBox.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
@@ -94,10 +95,19 @@ void UInputComp::On_Stat()
 void UInputComp::On_LeftMouseStart()
 {
 	if (!Pc->IsLocalController()) return;
-
-	UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart true"));
+	// UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart true"));
 	bLeftMouse = true;
 
+	// FHitResult Hit;
+	// Pc->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+ //    if (USlot* Slot = Cast<USlot>(Hit.GetActor()))
+ //    { UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart 슬롯 맞춤 슬롯 위치는? %d"),
+ //    TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildIndex(Slot));}
+ //    else
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart 슬롯 캐스팅 실패"))
+	// }
+	
 	TestPlayer->GetController()->StopMovement();
 	TimeCamera = 0;
 }
