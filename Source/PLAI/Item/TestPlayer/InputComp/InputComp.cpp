@@ -82,11 +82,18 @@ void UInputComp::On_LeftMouseTriggered()
 
 	TimeCamera += GetWorld()->GetDeltaSeconds();
 
-	float Dot = FVector::DotProduct(FVector(TestPlayer->GetActorForwardVector().X,TestPlayer->GetActorForwardVector().Y,0),
-		FVector((Hit.Location-TestPlayer->GetActorLocation()).GetSafeNormal().X,(Hit.Location-TestPlayer->GetActorLocation().GetSafeNormal()).Y,0));
+	float Dot = FVector::DotProduct(FVector(TestPlayer->GetActorRightVector().X,TestPlayer->GetActorRightVector().Y,0),
+		FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
+	
+	if (Dot > 0.1)
+	{
+		TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-1,0));
+	}
+	else if (Dot < -0.1)
+	{
+		TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+1,0));
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseTriggered 플레이어 카메라 전방 내적값은? [%f]"),Dot);
-
-	// TestPlayer->CameraBoom->AddWorldRotation(FRotator());	// if (TimeCamera > 3)
-	// {TimeCamera = 3; }
 }
 
