@@ -125,7 +125,7 @@ void UInputComp::On_LeftMouseTriggered()
 
 	MousePower += MouseY;
 	
-	UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseTriggered 마우스 Y축 힘 값은? [%f]"),MousePower);
+	// UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseTriggered 마우스 Y축 힘 값은? [%f]"),MousePower);
 
 	if (FMath::Abs(MousePower) > 5.f)
 	{

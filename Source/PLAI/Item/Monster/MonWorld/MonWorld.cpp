@@ -31,7 +31,6 @@ void AMonWorld::Tick(float DeltaTime)
 	CurrentTimeTwo += DeltaTime;
 	if (CurrentTimeTwo > 1.0)
 	{
-		DrawDebugSphere(GetWorld(),InitLoc,50,20,FColor::Red,false);
 		CurrentTimeTwo = 0;
 	}
 
@@ -59,7 +58,7 @@ FVector AMonWorld::RandLocation()
 
 	bool bHit = GetWorld()->LineTraceSingleByObjectType
 	(hit,FVector(x,y,z) + FVector(0,0,2000),
-		FVector(x,y,z) + FVector(0,0,-3000),ECC_GameTraceChannel1, params);
+		FVector(x,y,z) + FVector(0,0,-3000),objParams, params);
 	
 	DrawDebugLine(GetWorld(),GetActorLocation(),hit.Location,FColor::Blue,
 		false,2);
@@ -76,25 +75,34 @@ void AMonWorld::MoveToLocation()
 		CastPlayer();
 		CurrentTime = 0;
 	}
-	if (FVector::Distance(GetActorLocation(),InitLoc) > 25)
+	if (FVector::Distance(FVector(GetActorLocation().X,GetActorLocation().Y,0),FVector(InitLoc.X,InitLoc.Y,0)) > 25)
 	{
 		if (bBattle == false)
 		{
 			FVector Dist = InitLoc - GetActorLocation(); 
 			AddActorWorldOffset(Dist.GetSafeNormal() * 5);
+			UE_LOG(LogTemp,Warning,TEXT("MonWorld 25보다 거리 적음 다음 이동 큼 거리는?[%f]"),FVector::Distance(GetActorLocation(),InitLoc));
+			DrawDebugSphere(GetWorld(),InitLoc,50,20,FColor::Red,false);
 		}
 	}
 	else
 	{
-		// UE_LOG(LogTemp,Error,TEXT("AMonWorld::MoveToLocation"));
-		FVector Candidate;
-		do
-		{ Candidate = GetActorLocation() + RandLocation(); }
-		while (FVector::Distance(Candidate, FirstInitLoc) > 500.f);
+		UE_LOG(LogTemp,Warning,TEXT("MonWorld 25보다 거리 적음 다음 이동 근데 거리는?[%f]"),FVector::Distance(GetActorLocation(),InitLoc));
+		DrawDebugSphere(GetWorld(),InitLoc,50,20,FColor::Blue,false,2);
 		
-		InitLoc = Candidate;
+		InitLoc = GetActorLocation() + RandLocation();
 		FVector Dist = InitLoc - GetActorLocation(); 
 		SetActorRotation(Dist.Rotation());
+		
+		// UE_LOG(LogTemp,Error,TEXT("AMonWorld::MoveToLocation"));
+		// FVector Candidate;
+		// do
+		// { Candidate = GetActorLocation() + RandLocation(); }
+		// while (FVector::Distance(Candidate, FirstInitLoc) > 500.f);
+		//
+		// InitLoc = Candidate;
+		// FVector Dist = InitLoc - GetActorLocation(); 
+		// SetActorRotation(Dist.Rotation());
 	}
 }
 
