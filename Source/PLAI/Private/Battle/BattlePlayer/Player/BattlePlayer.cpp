@@ -51,7 +51,7 @@ void ABattlePlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	if (const auto* pc = Cast<APlayerController>(Controller)) {
+	if (pc) {
 		//그 객체를 이용해서 EnhanceInputLocalPlayerSubSystem을 가져온다.
 		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
 		if (subSys) {

@@ -81,11 +81,11 @@ void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
 	if (currentTile == goalTile)
 	{
 		currentActionMode = EActionMode::None;
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(this->meshComp->GetAnimInstance()))
+		if (enemyAnim)
 		{
 				
-			anim->actionMode = currentActionMode;
-			UE_LOG(LogTemp, Warning, TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(anim->actionMode));
+			enemyAnim->actionMode = currentActionMode;
+			UE_LOG(LogTemp, Warning, TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
 		}
 		OnTurnEnd();
 		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
@@ -213,11 +213,11 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		currentActionMode = EActionMode::Move;
 		if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
-			if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
+			if (enemyAnim)
 			{
 				
-				anim->actionMode = currentActionMode;
-				UE_LOG(LogTemp, Warning, TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(anim->actionMode));
+				enemyAnim->actionMode = currentActionMode;
+				UE_LOG(LogTemp, Warning, TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
 			}
 		}
 		
@@ -225,10 +225,9 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		int32 targetY = Action.move_to[1];
 
 		// GridTileManager 통해 목표 타일 찾기
-		if (AGridTileManager* tileManager = Cast<AGridTileManager>(
-			UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory)))
+		if (gridTileManager)
 		{
-			AGridTile* goal = tileManager->GetTile(targetX, targetY);
+			AGridTile* goal = gridTileManager->GetTile(targetX, targetY);
 			if (goal)
 			{
 				goalTile = goal; // ✅ 기존 goalTile 변수에 대입
@@ -241,7 +240,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("goalTile is nullptr"));
 				}
-				MoveToPlayer(goalTile, tileManager); // ✅ 타겟 null로 넘기고 이동만 실행
+				MoveToPlayer(goalTile, gridTileManager); // ✅ 타겟 null로 넘기고 이동만 실행
 			}
 		}
 	}

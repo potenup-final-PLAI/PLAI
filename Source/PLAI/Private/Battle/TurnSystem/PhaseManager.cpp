@@ -124,7 +124,7 @@ void AUPhaseManager::SetUnitQueue()
 {
 	TArray<AActor*> unitArr;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), unitFactory, unitArr);
-
+	
 	unitQueue.Empty();
 	httpUnitQueue.Empty();
 
@@ -147,7 +147,7 @@ void AUPhaseManager::SetUnitQueue()
 			}
 			else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(pawn))
 			{
-				if (!enemy->enemybattleState || enemy->enemybattleState->enemyStatus.hp <= 0)
+				if (!enemy->enemybattleState || enemy->enemybattleState->hp <= 0)
 				{
 					continue;
 				}
@@ -187,6 +187,32 @@ void AUPhaseManager::SortUnitQueue()
 	});
 }
 
+void AUPhaseManager::SortUnitTurnEnd()
+{
+	for (int32 i = 0; i < unitQueue.Num(); ++i)
+	{
+		if (ABaseBattlePawn* pawn = Cast<ABaseBattlePawn>(unitQueue[i]))
+		{
+			bool bDead = false;
+			if (ABattlePlayer* player = Cast<ABattlePlayer>(pawn))
+			{
+				bDead = player->battlePlayerState->playerStatus.hp <= 0;
+			}
+			else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(pawn))
+			{
+				bDead = enemy->enemybattleState->hp <= 0;
+			}
+
+			if (bDead)
+			{
+				unitQueue.RemoveAt(i);
+				httpUnitQueue.Remove(pawn);
+				UE_LOG(LogTemp, Warning, TEXT("Removed dead unit from future queue: %s"), *pawn->GetName());
+			}
+		}
+	}
+}
+
 ABaseBattlePawn* AUPhaseManager::PopNextAliveUnit()
 {
 	while (unitQueue.Num() > 0)
@@ -215,7 +241,7 @@ ABaseBattlePawn* AUPhaseManager::PopNextAliveUnit()
 
 void AUPhaseManager::StartBattle()
 {
-	SetUnitQueue();
+	// SetUnitQueue();
 
 	ABaseBattlePawn* tempUnit = PopNextAliveUnit();
 	if (!tempUnit)
@@ -281,7 +307,8 @@ void AUPhaseManager::EndPlayerPhase()
 	UE_LOG(LogTemp, Warning, TEXT("End Player Phase"));
 
 	SetPhase(EBattlePhase::TurnProcessing);
-
+	
+	SortUnitTurnEnd();
 	// Casting을 통해 현재 유닛이 player 또는 enemy라면 그쪽 함수 실행
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
 	{
@@ -346,6 +373,7 @@ void AUPhaseManager::EndEnemyPhase()
 	SetPhase(EBattlePhase::TurnProcessing);
 	UE_LOG(LogTemp, Warning, TEXT("End Enemy Phase"));
 
+	SortUnitTurnEnd();
 	// Casting을 통해 현재 유닛이 player 또는 enemy라면 그쪽 함수 실행
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
 	{
@@ -626,11 +654,17 @@ FBattleTurnState AUPhaseManager::SetBattleProcessingAPI()
 
 void AUPhaseManager::TrySendbattleState(ABaseBattlePawn* unit)
 {
+	if (unit->enemybattleState->hp <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Enemy HP is 0"));
+		return;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("TrySendBattleState In "));
 	if (AreAllUnitsInitialized())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AreAllUnitsInitizlized clear!! "));
 
+		
 		FBattleTurnState battleData = SetBattleProcessingAPI();
 
 		if (auto* httpActor = Cast<ABattleHttpActor>(

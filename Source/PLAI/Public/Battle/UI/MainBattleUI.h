@@ -23,4 +23,13 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UBattlePlayerInfoUI* WBP_Player;
+	
+	// AP 추가될 패널
+	UPROPERTY(meta = (BindWidget))
+	class UHorizontalBox* HB_AP;
+	// AP 위젯 클레스
+	UPROPERTY(EditAnywhere)
+	class TSubclassOf<UUserWidget> apFactory;
+
+	void AddAP();
 };
