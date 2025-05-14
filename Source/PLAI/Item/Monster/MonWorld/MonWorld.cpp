@@ -60,9 +60,9 @@ FVector AMonWorld::RandLocation()
 	(hit,FVector(x,y,z) + FVector(0,0,2000),
 		FVector(x,y,z) + FVector(0,0,-3000),objParams, params);
 	
-	DrawDebugLine(GetWorld(),GetActorLocation(),hit.Location,FColor::Blue,
-		false,2);
-	DrawDebugSphere(GetWorld(),hit.Location,30,30,FColor::Red,false,2);
+	// DrawDebugLine(GetWorld(),GetActorLocation(),hit.Location,FColor::Blue,
+	// 	false,2);
+	// DrawDebugSphere(GetWorld(),hit.Location,30,30,FColor::Red,false,2);
 	return FVector(hit.Location);
 }
 
@@ -107,7 +107,7 @@ TArray<FOverlapResult> AMonWorld::GetHitResult(float Distance)
 		FQuat::Identity,ECC_Pawn,FCollisionShape::MakeSphere(Distance),Params);
 	if (bHit){ return Hits; }
 
-	DrawDebugSphere(GetWorld(),GetActorLocation(),Distance,10,FColor::Blue,false,1);
+	// DrawDebugSphere(GetWorld(),GetActorLocation(),Distance,10,FColor::Blue,false,1);
 
 	return TArray<FOverlapResult>();
 }
