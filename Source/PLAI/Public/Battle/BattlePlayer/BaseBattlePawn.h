@@ -32,13 +32,31 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* cameraComp;
 
+	//---------------------다른 클래스 포인터----------------------------
+	UPROPERTY(EditAnywhere)
+	class AUPhaseManager* phaseManager;
+	UPROPERTY(EditAnywhere)
+	class ATurnManager* turnManager;
+	UPROPERTY(EditAnywhere)
+	class APlayerController* pc;
+	UPROPERTY(EditAnywhere)
+	class AGridTileManager* gridTileManager;
+	// UI
+	UPROPERTY(EditAnywhere)
+	class UBattleUnitStateUI* battleUnitStateUI;
+	UPROPERTY(EditAnywhere)
+	class ABattleHUD* hud;
+	
+	// 다른 클래스 포인터 초기화
+	void InitOtherClassPointer();
+	
 	//--------------------AP System--------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	int32 maxActionPoints = 5;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	int32 curAP = 0;
 
-
+	void InitAPUI();
 	// Player AP 세팅
 	void SetAP()
 	{
@@ -80,8 +98,7 @@ public:
 	//------------Turn System-----------------
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
-	UPROPERTY(EditAnywhere)
-	class ATurnManager* turnManager;
+	
 	void OnTurnStart();
 	void OnTurnEnd();
 
@@ -113,7 +130,7 @@ public:
 	// 상태이상 관리 함수
 	void AddStatusEffect(EStatusEffect newEffect, int32 duration);
 	void ApplyStatusEffect();
-	void HandleStateusEffect(EStatusEffect effect);
+	void HandleStatusEffect(EStatusEffect effect);
 
 	// 약화 상태이상 처리 함수
 	// player 상태 처리

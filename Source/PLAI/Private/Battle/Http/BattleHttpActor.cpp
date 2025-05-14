@@ -114,9 +114,9 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,
 					// 최초 데이터를 보내면 Success 값이 잘 들어오는지만 판단
 					FString jsonData = Response->GetContentAsString();
 					UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
-
+					
 					if (auto* phaseManager = Cast<AUPhaseManager>(
-						GetWorld()->GetGameState()))
+					GetWorld()->GetGameState()))
 					{
 						// 현재 페이즈가 None이라면
 						if (phaseManager->currentPhase == EBattlePhase::None)

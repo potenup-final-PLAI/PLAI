@@ -69,12 +69,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase")
 	TSubclassOf<ABaseBattlePawn> unitFactory;
-
-
+	
 	// 유닛 첫 큐 세팅
 	void SetUnitQueue();
 	// 유닛 Array 큐 처럼 사용하기 위한 업데이트
 	void SortUnitQueue();
+	// 턴 끝날 때 유닛 포함 안시키게
+	void SortUnitTurnEnd();
 	// 이미 죽은 유닛 갱신하는 함수
 	ABaseBattlePawn* PopNextAliveUnit();
 	// 전투 시작
