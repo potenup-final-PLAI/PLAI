@@ -28,7 +28,8 @@ public:
 	TSubclassOf<class AGridTile> tileFactory;
 	UPROPERTY(EditAnywhere)
 	TMap<FIntPoint, class AGridTile*> map;
-
+	UPROPERTY(EditAnywhere)
+	TMap<class AGridTile*, FIntPoint> tileToCoordMap;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABattlePlayer> battlePlayerFactory;
 
@@ -45,4 +46,10 @@ public:
 	AGridTile* FindCurrentTile(FVector worldLoc);
 	// 맵에서 x, y위치에 있는 타일 얻기
 	AGridTile* GetTile(int32 x, int32 y);
+
+	FIntPoint GetTileLoc(AGridTile* targetTile);
+
+	bool IsValidTile(FIntPoint num);
+
+	void SetTileColor(AGridTile* targetTile, FColor color);
 };

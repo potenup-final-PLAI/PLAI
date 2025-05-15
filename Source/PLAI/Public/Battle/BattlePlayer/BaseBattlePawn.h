@@ -239,6 +239,8 @@ public:
 	void PathFind();
 	void BuildPath();
 	void AddOpenArray(FVector dir);
+	// 이동 범위 보일 수 있도록 주변 타일 색 변경 하는 함수
+	void SeeMoveRange(int32 move_Range);
 	//--------------이동 및 공격------------------
 
 	void UnitMoveRotateAttack();

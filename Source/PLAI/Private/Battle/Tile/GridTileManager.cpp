@@ -55,6 +55,8 @@ void AGridTileManager::InitGridTile()
 				spawnTile->SetGridCoord(Coord);
 				// 전체적인 타일 관리할 Map에 추가
 				map.Add(Coord, spawnTile);
+				// 타일에 대한 좌표 저장
+				tileToCoordMap.Add(spawnTile, Coord);
 				FString s = map.FindRef(FIntPoint(X, Y))->GetActorNameOrLabel();
 				// UE_LOG(LogTemp, Warning, TEXT("X = %d, Y = %d, TileName = %s"),
 				//        X, Y, *s);
@@ -133,4 +135,33 @@ AGridTile* AGridTileManager::FindCurrentTile(FVector worldLoc)
 AGridTile* AGridTileManager::GetTile(int32 x, int32 y)
 {
 	return map.FindRef(FIntPoint(x, y));
+}
+
+FIntPoint AGridTileManager::GetTileLoc(AGridTile* targetTile)
+{
+	if (tileToCoordMap.Contains(tile))
+	{
+		// UE_LOG(LogTemp, Warning, TEXT("%s의 좌표 : (%d, %d)"), *tile->GetActorNameOrLabel(), coord.X, coord.Y);
+		return tileToCoordMap[tile];
+	}
+
+	// 타일이 없다면
+	UE_LOG(LogTemp, Warning, TEXT("no have tileToCoordMap[Tile] Coord"));
+	return FIntPoint(-1, -1);
+}
+
+bool AGridTileManager::IsValidTile(FIntPoint num)
+{
+	// 좌표를 받아서 그 위치에 타일이 있는지 없는지 체크
+	if (map.Contains(num))
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+void AGridTileManager::SetTileColor(AGridTile* targetTile, FColor color)
+{
+	//그 위치 타일 색 변경
 }

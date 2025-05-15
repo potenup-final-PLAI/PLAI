@@ -1203,6 +1203,33 @@ void ABaseBattlePawn::AddOpenArray(FVector dir)
 	}
 }
 
+void ABaseBattlePawn::SeeMoveRange(int32 move_Range)
+{
+	if (!gridTileManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange: gridTileManager is null"));
+		return;
+	}
+	// currentTile 기준으로 이동 범위 상하좌우 moveRange 만큼 색 변경
+	FIntPoint coord = gridTileManager->GetTileLoc(currentTile);
+	int32 startX = coord.X;
+	int32 startY = coord.Y;
+	// 한쪽 두 길이를 통해 시작 타일과 끝타일을 알면 그
+	
+	for (int y = startY - move_Range; y <= startY + move_Range; y++)
+	{
+		for (int x = startX - move_Range; x <= startX + move_Range; x++)
+		{
+			// 타일이 있는지 체크
+			if (gridTileManager->IsValidTile(FIntPoint(y, x)))
+			{
+				// 있다면 그 타일에 생상 변경
+				gridTileManager->SetTileColor(gridTileManager->GetTile(y, x), FColor::Green);
+			}
+		}
+	}
+}
+
 void ABaseBattlePawn::OnMoveEnd()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Move Complete"));
