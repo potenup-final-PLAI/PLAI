@@ -10,7 +10,9 @@
 #include "Components/WrapBox.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/Npc/NpcCharacter.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
@@ -98,15 +100,24 @@ void UInputComp::On_LeftMouseStart()
 	// UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart true"));
 	bLeftMouse = true;
 
-	// FHitResult Hit;
-	// Pc->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
- //    if (USlot* Slot = Cast<USlot>(Hit.GetActor()))
- //    { UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart 슬롯 맞춤 슬롯 위치는? %d"),
- //    TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildIndex(Slot));}
- //    else
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart 슬롯 캐스팅 실패"))
-	// }
+	FHitResult Hit;
+	Pc->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+
+	ANpcCharacter* NpcCharacter = Cast<ANpcCharacter>(Hit.GetActor());
+	if (!NpcCharacter)
+	{
+		TArray<AActor*> Actors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANpcCharacter::StaticClass(), Actors);
+		for (AActor* Actor : Actors)
+		{
+			ANpcCharacter* Npc = Cast<ANpcCharacter>(Actor);
+			Npc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+    // if (USlot* Slot = Cast<USlot>(Hit.GetActor()))
+    // { UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart 슬롯 맞춤 슬롯 위치는? %d"),
+    // TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildIndex(Slot));}
+	// else { UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart 슬롯 캐스팅 실패")) }
 	
 	TestPlayer->GetController()->StopMovement();
 	TimeCamera = 0;

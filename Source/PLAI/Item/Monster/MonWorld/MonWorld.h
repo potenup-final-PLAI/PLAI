@@ -57,6 +57,12 @@ public:
 	FVector InitLoc = FVector::ZeroVector;
 
 	UPROPERTY(EditAnywhere)
+	float RandLocationDist = 350.0f;
+
+	UPROPERTY(EditAnywhere)
+	float InitLocationDist = 500.0f;
+
+	UPROPERTY(EditAnywhere)
 	bool bBattle = false;
 	
 	FVector RandLocation();
