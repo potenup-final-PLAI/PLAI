@@ -60,7 +60,7 @@ public:
 	float RandLocationDist = 350.0f;
 
 	UPROPERTY(EditAnywhere)
-	float InitLocationDist = 500.0f;
+	float InitLocationDist = 800.0f;
 
 	UPROPERTY(EditAnywhere)
 	bool bBattle = false;

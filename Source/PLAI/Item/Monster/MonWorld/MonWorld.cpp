@@ -45,8 +45,8 @@ void AMonWorld::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 FVector AMonWorld::RandLocation()
 {
-	float x = FMath::FRandRange(-350.f,350.f);
-	float y = FMath::FRandRange(-350.f,350.f);
+	float x = FMath::FRandRange(-RandLocationDist,RandLocationDist);
+	float y = FMath::FRandRange(-RandLocationDist,RandLocationDist);
 	float z = FMath::FRandRange(20.f,100.f);
 
 	FHitResult hit;
@@ -89,7 +89,7 @@ void AMonWorld::MoveToLocation()
 		FVector Candidate;
 		do
 		{ Candidate = GetActorLocation() + RandLocation(); }
-		while (FVector::Distance(Candidate, FirstInitLoc) > 500.f);
+		while (FVector::Distance(Candidate, FirstInitLoc) >  InitLocationDist);
 		
 		InitLoc = Candidate;
 		FVector Dist = InitLoc - GetActorLocation(); 

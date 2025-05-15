@@ -57,9 +57,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bStartEquip = false;
 	
-	UPROPERTY(EditAnywhere)
-	int32 Gold = 0;
-	
 	EquipSlotType StartSlotType;
 
 	UPROPERTY(EditAnywhere)

@@ -54,6 +54,7 @@ void UInputComp::BeginPlay()
 		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Triggered, this, &UInputComp::On_LeftMouseTriggered);
 		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Completed, this, &UInputComp::On_LeftMouseComplete);
 		InputComp->BindAction(IE_MouseWheel, ETriggerEvent::Triggered, this, &UInputComp::On_MouseWheelTriggered);
+		InputComp->BindAction(IE_RotateView, ETriggerEvent::Started, this, &UInputComp::On_RoatateView);
 	}
 }
 // ...
@@ -97,7 +98,6 @@ void UInputComp::On_Stat()
 void UInputComp::On_LeftMouseStart()
 {
 	if (!Pc->IsLocalController()) return;
-	// UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart true"));
 	bLeftMouse = true;
 
 	FHitResult Hit;
@@ -108,16 +108,19 @@ void UInputComp::On_LeftMouseStart()
 	{
 		TArray<AActor*> Actors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANpcCharacter::StaticClass(), Actors);
+		if (Actors.Num() == 0) return;
+			
 		for (AActor* Actor : Actors)
 		{
-			ANpcCharacter* Npc = Cast<ANpcCharacter>(Actor);
-			Npc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden);
+			if (ANpcCharacter* Npc = Cast<ANpcCharacter>(Actor))
+			{
+				if (Npc->NpcUiMaster)
+				{
+					Npc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden);
+				}
+			}
 		}
 	}
-    // if (USlot* Slot = Cast<USlot>(Hit.GetActor()))
-    // { UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart 슬롯 맞춤 슬롯 위치는? %d"),
-    // TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildIndex(Slot));}
-	// else { UE_LOG(LogTemp, Warning, TEXT("InputComp On LeftMouseStart 슬롯 캐스팅 실패")) }
 	
 	TestPlayer->GetController()->StopMovement();
 	TimeCamera = 0;
@@ -132,6 +135,8 @@ void UInputComp::On_LeftMouseTriggered()
 	Pc->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 	TestPlayer->AddMovementInput((Hit.Location - TestPlayer->GetActorLocation()).GetSafeNormal(),1.0f,false);
 
+	if (!bRotateView) return;
+	
 	TimeCamera += GetWorld()->GetDeltaSeconds();
 
 	// 오른쪽 나의 벡터와 카메라 전방 벡터 내적
@@ -163,7 +168,6 @@ void UInputComp::On_LeftMouseTriggered()
 	FRotator CameraBoomRot = TestPlayer->CameraBoom->GetRelativeRotation();
 
 	MousePower += MouseY;
-	
 
 	if (FMath::Abs(MousePower) > 5.f)
 	{
@@ -187,3 +191,15 @@ void UInputComp::On_MouseWheelTriggered(const FInputActionValue& Value)
 	TestPlayer->CameraBoom->TargetArmLength -= 250 * Axis;
 }
 
+void UInputComp::On_RoatateView()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UInputComp::On_RoatateView Bool 값 %d"),bRotateView);
+	if (bRotateView == true)
+	{
+		bRotateView = false;
+	}
+	else
+	{
+		bRotateView = true;
+	}
+}

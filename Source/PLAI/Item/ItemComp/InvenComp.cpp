@@ -71,41 +71,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     // 데이터테이블 템 먹기
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
-
-    //임시함수임
-	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::P)){ SetGold(500);}
-	
-	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
-	{   UE_LOG(LogTemp, Warning, TEXT("몬스터 트리거 Q키 !"));
-
-		TArray<FOverlapResult> Hits;
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(TestPlayer);
-
-		DrawDebugSphere(GetWorld(),TestPlayer->GetActorLocation()+TestPlayer->GetActorForwardVector() * 50,100,
-			20,FColor::Red,false,2)
-;		bool bHit = GetWorld()->OverlapMultiByChannel(Hits,TestPlayer->GetActorLocation()+TestPlayer->GetActorForwardVector() * 50,
-	FQuat::Identity, ECC_Visibility,FCollisionShape::MakeSphere(100),Params);
-		
-		if (bHit)
-		{
-			for (FOverlapResult Hit: Hits)
-			{
-				if (AMonWorld* MonWorld = Cast<AMonWorld>(Hit.GetActor()))
-				{
-					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 맞노"))
-					if (UWorldGi* Gi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-					{
-						UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
-					};
-				}
-				else
-				{
-					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 아니야"))
-				}
-			}
-		}
-	}
 	
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
@@ -708,3 +673,36 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 // 	EnumKey = EEnumKey::Equip;
 // 	ItemInvenTory(EnumKey, MenuInven->WBP_EquipInven); }
 
+// 몬스터 트리거
+
+// 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
+// 	{   UE_LOG(LogTemp, Warning, TEXT("몬스터 트리거 Q키 !"));
+//
+// 		TArray<FOverlapResult> Hits;
+// 		FCollisionQueryParams Params;
+// 		Params.AddIgnoredActor(TestPlayer);
+//
+// 		DrawDebugSphere(GetWorld(),TestPlayer->GetActorLocation()+TestPlayer->GetActorForwardVector() * 50,100,
+// 			20,FColor::Red,false,2)
+// ;		bool bHit = GetWorld()->OverlapMultiByChannel(Hits,TestPlayer->GetActorLocation()+TestPlayer->GetActorForwardVector() * 50,
+// 	FQuat::Identity, ECC_Visibility,FCollisionShape::MakeSphere(100),Params);
+// 		
+// 		if (bHit)
+// 		{
+// 			for (FOverlapResult Hit: Hits)
+// 			{
+// 				if (AMonWorld* MonWorld = Cast<AMonWorld>(Hit.GetActor()))
+// 				{
+// 					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 맞노"))
+// 					if (UWorldGi* Gi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 					{
+// 						UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
+// 					};
+// 				}
+// 				else
+// 				{
+// 					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 아니야"))
+// 				}
+// 			}
+// 		}
+// 	}
