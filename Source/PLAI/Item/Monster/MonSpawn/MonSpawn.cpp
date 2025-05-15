@@ -21,11 +21,6 @@ AMonSpawn::AMonSpawn()
 void AMonSpawn::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// UWorldPartitionSubsystem* WPS = GetWorld()->GetSubsystem<UWorldPartitionSubsystem>();
-	// WPS->OnU
-	// WPS->OnActorLoaded.AddUObject(this, &AMonSpawn::MyTimer);
-	// WPS->OnActorUnloaded.AddUObject(this, &AMonSpawn::HandleActorUnloaded);
 }
 
 // Called every frame
@@ -123,8 +118,6 @@ void AMonSpawn::SpawnMonster()
 }
 
 
-
-
 // FMonsterStruct* MonsterStruct = MonsterTable->FindRow<FMonsterStruct>(Raw,TEXT("MonSpawn"));
 // if (MonsterStruct && MonsterStruct->MonsterTop == 0)
 // {
@@ -147,3 +140,9 @@ void AMonSpawn::SpawnMonster()
 
 // DrawDebugLine(GetWorld(),Start,Hit.ImpactPoint,FColor::Red,false,1.5f);
 // DrawDebugSphere(GetWorld(),Hit.ImpactPoint,20,10,FColor::Blue,false,1.5f);
+
+
+// UWorldPartitionSubsystem* WPS = GetWorld()->GetSubsystem<UWorldPartitionSubsystem>();
+// WPS->OnU
+// WPS->OnActorLoaded.AddUObject(this, &AMonSpawn::MyTimer);
+// WPS->OnActorUnloaded.AddUObject(this, &AMonSpawn::HandleActorUnloaded);
