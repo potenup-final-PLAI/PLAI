@@ -171,54 +171,6 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,
 						       TEXT("Failed to parse ActionRequest JSON"));
 					}
 				}
-				// if (bHasTurn)
-				// {
-				// 	// Response 구조
-				// 	// {
-				// 	//   "current_character_id": "monster1",
-				// 	//   "actions": [
-				// 	// 	{
-				// 	// 	  "move_to": [
-				// 	// 		1,
-				// 	// 		11
-				// 	// 	  ],
-				// 	// 	  "skill": "타격",
-				// 	// 	  "target_character_id": "player1",
-				// 	// 	  "reason": "player1을 공격하기 위해 이동 후 타격 스킬 사용",
-				// 	// 	  "remaining_ap": 4,
-				// 	// 	  "remaining_mov": 0
-				// 	// 	}
-				// 	//   ]
-				// 	// }
-				// 	FString jsonData = Response->GetContentAsString();
-				// 	UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
-				// 	
-				// 	// 받은 데이터 구조체로 변환
-				// 	if (FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &ActionRequestData, 0, 0))
-				// 	{
-				// 		UE_LOG(LogTemp, Warning, TEXT("Success Response Json To Struct"));
-				// 		if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
-				// 		{
-				// 			UE_LOG(LogTemp, Warning, TEXT("BattleHttpActor : phaseManger Is Set"));
-				// 			// 현재 턴이 진행중이라면
-				// 			if (phaseManager->currentPhase == EBattlePhase::TurnProcessing)
-				// 			{
-				// 				UE_LOG(LogTemp, Warning, TEXT("BattleHttpActor : Is TurnProcessing"));
-				// 				// id를 확인
-				// 			 if (unit && unit->GetName() == ActionRequestData.current_character_id)
-				// 			 {
-				// 			 	UE_LOG(LogTemp, Warning, TEXT("BattleHttpActor : character id is Set %s"), *ActionRequestData.current_character_id);
-				// 				 // 애너미인지 재확인
-				// 				 if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
-				// 				 {
-				// 				 	UE_LOG(LogTemp, Warning, TEXT("BattleHttpActor : unit is %s"), *enemy->GetActorNameOrLabel());
-				// 				 	 enemy->ProcessAction(ActionRequestData);
-				// 				 }
-				// 			 }
-				// 			}
-				// 		}
-				// 	}
-				// }
 			}
 			// 실패
 			else

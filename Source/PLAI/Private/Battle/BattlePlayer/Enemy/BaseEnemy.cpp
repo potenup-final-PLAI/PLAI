@@ -89,9 +89,7 @@ void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
 		if (enemyAnim)
 		{
 			enemyAnim->actionMode = currentActionMode;
-			UE_LOG(LogTemp, Warning,
-			       TEXT("Processing anim actionMode Update !! %s"),
-			       *UEnum::GetValueAsString(enemyAnim->actionMode));
+			UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"),*UEnum::GetValueAsString(enemyAnim->actionMode));
 		}
 		OnTurnEnd();
 		UE_LOG(LogTemp, Warning,
@@ -199,7 +197,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		OnTurnEnd();
 		return;
 	}
-
+	
 	const FBattleAction& Action = actionRequest.actions[0];
 	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"),
 	       *actionRequest.current_character_id);
@@ -212,20 +210,38 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("actions"));
 	}
+	
+	// 3. API 행동 이유 출력
+	if (Action.reason != "")
+	{
+		FString reason = Action.reason;
+		this->battleUnitStateComp->SetDrawSize(FVector2d(150, 100));
+		this->battleUnitStateUI->ShowAPIReasonUI();
+		this->battleUnitStateUI->SetAPIReason(reason);
 
+		FTimerHandle actionReasonTimerHandle;
+		GetWorld()->GetTimerManager().ClearTimer(actionReasonTimerHandle);
+		GetWorld()->GetTimerManager().SetTimer(actionReasonTimerHandle,FTimerDelegate::CreateLambda([this]()
+		{
+			this->battleUnitStateUI->ShowBaseUI();
+			this->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+		}), 3.0f, false);
+	}
+	
 	// 1. 이동 처리
 	if (Action.move_to.Num() == 2)
 	{
 		// enemy actionmode 업데이트
-		currentActionMode = EActionMode::Move;
 		if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
+			enemy->currentActionMode = EActionMode::Move;
+			if (enemybattleState->move_Range) SeeMoveRange(this->enemybattleState->move_Range);
+			else UE_LOG(LogTemp, Warning, TEXT("Enemybattle not State"));
+			
 			if (enemyAnim)
 			{
 				enemyAnim->actionMode = currentActionMode;
-				UE_LOG(LogTemp, Warning,
-				       TEXT("Processing anim actionMode Update !! %s"),
-				       *UEnum::GetValueAsString(enemyAnim->actionMode));
+				UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
 			}
 		}
 
@@ -262,38 +278,15 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		bStartMontage = true;
 	}
 
-	// 3. API 행동 이유 출력
-	if (Action.reason != "")
-	{
-		FString reason = Action.reason;
-		this->battleUnitStateComp->SetDrawSize(FVector2d(150, 100));
-		this->battleUnitStateUI->ShowAPIReasonUI();
-		this->battleUnitStateUI->SetAPIReason(reason);
-
-		FTimerHandle actionReasonTimerHandle;
-		GetWorld()->GetTimerManager().ClearTimer(actionReasonTimerHandle);
-		GetWorld()->GetTimerManager().SetTimer(actionReasonTimerHandle,
-		                                       FTimerDelegate::CreateLambda(
-			                                       [this]()
-			                                       {
-				                                       this->battleUnitStateUI->
-					                                       ShowBaseUI();
-				                                       this->battleUnitStateComp
-					                                       ->SetDrawSize(
-						                                       FVector2D(
-							                                       50, 10));
-			                                       }), 2.0f, false);
-	}
+	
 	// 3. 이동/행동력 소진 후 턴 종료
 	if (Action.remaining_ap <= 0 && Action.remaining_mov <= 0)
 	{
 		FTimerHandle timerHandle;
-		GetWorld()->GetTimerManager().SetTimer(timerHandle,
-		                                       FTimerDelegate::CreateLambda(
-			                                       [=, this]()
-			                                       {
-				                                       OnTurnEnd();
-			                                       }), 1.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(timerHandle,FTimerDelegate::CreateLambda([=, this]()
+		{
+			OnTurnEnd();
+		}), 1.0f, false);
 	}
 }
 

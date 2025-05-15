@@ -171,13 +171,11 @@ void AGridTileManager::SetTileColor(AGridTile* targetTile,  bool bHighlight)
 
 	if (bHighlight)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("clearTileTogle SetTileColor"));
 		//그 위치 타일 색 변경
 		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.1f);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Draw SetTileColor"));
 		//그 위치 타일 색 변경
 		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
 	}

@@ -171,29 +171,15 @@ void ABaseBattlePawn::OnTurnStart()
 		ABaseBattlePawn* CapturedUnit = this;
 
 		FTimerHandle battleAPIHandle;
-		GetWorld()->GetTimerManager().SetTimer(battleAPIHandle,
-		                                       FTimerDelegate::CreateLambda(
-			                                       [this, CapturedUnit]()
-			                                       {
-				                                       UE_LOG(LogTemp, Warning,
-					                                       TEXT(
-						                                       "BaseBattlePawn::In Lambda"
-					                                       ));
-				                                       if (turnManager &&
-					                                       turnManager->
-					                                       phaseManager)
-				                                       {
-					                                       UE_LOG(LogTemp,
-						                                       Warning,
-						                                       TEXT(
-							                                       "BaseBattlePawn::turnManager, phaseManager is Set"
-						                                       ));
-					                                       turnManager->
-						                                       phaseManager->
-						                                       TrySendbattleState(
-							                                       CapturedUnit);
-				                                       }
-			                                       }), 1.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(battleAPIHandle,FTimerDelegate::CreateLambda([this, CapturedUnit]()
+		{
+			UE_LOG(LogTemp, Warning,TEXT("BaseBattlePawn::In Lambda"));
+			if (turnManager && turnManager->phaseManager)
+			{
+				UE_LOG(LogTemp,Warning,TEXT("BaseBattlePawn::turnManager, phaseManager is Set"));
+				turnManager->phaseManager->TrySendbattleState(CapturedUnit);
+			}
+		}), 1.0f, false);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
 }
@@ -206,7 +192,9 @@ void ABaseBattlePawn::OnTurnEnd()
 		return;
 	}
 	bTurnEnded = true;
-
+	// 타일 범위 띄워 놨었다면 지우기
+	ClearGridTile();
+	
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *GetName());
 	// 입력 막고 FSM 종료
 
@@ -246,17 +234,24 @@ void ABaseBattlePawn::OnMouseLeftClick()
 	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,
 	                                         ECC_Visibility, params))
 	{
-		// 상대와 거리 측정
-		float dist = FVector::Dist(GetActorLocation(),
-		                           hitInfo.GetActor()->GetActorLocation());
-
-		// 자신의 moveRange * 100 보다 작거나 같을 때
-		if (dist > (this->battlePlayerState->playerStatus.move_Range * 100))
+		// // 상대와 거리 측정
+		// float dist = FVector::Dist(GetActorLocation(),hitInfo.GetActor()->GetActorLocation());
+		//
+		// // 자신의 moveRange * 100 보다 작거나 같을 때
+		// if (dist > (this->battlePlayerState->playerStatus.move_Range * 100))
+		// {
+		// 	UE_LOG(LogTemp, Warning, TEXT("Test Click : Dist too be far"));
+		// 	return;
+		// }
+		if (AGridTile* clickedTile = Cast<AGridTile>(hitInfo.GetActor()))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Test Click : Dist too be far"));
-			return;
+			if (!highlightedTiles.Contains(clickedTile))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("클릭한 타일이 이동 범위에 없습니다."));
+				return;
+			}
 		}
-
+		
 		EActionMode curSkillState = currentActionMode;
 		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),
 		       *UEnum::GetValueAsString(curSkillState));
@@ -1343,6 +1338,7 @@ void ABaseBattlePawn::BuildPath()
 		pathArray.SetNum(moveRange); // 최대 이동 가능 거리만큼 잘라 이동
 	}
 
+	ClearGridTile();
 	bIsMoving = true;
 	currentPathIndex = 0;
 }
@@ -1388,6 +1384,7 @@ void ABaseBattlePawn::SeeMoveRange(int32 move_Range)
 {
 	if (!gridTileManager || currentActionMode != EActionMode::Move)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange : !gridTileManager || currentActionMode != EActionMode::Move"));
 		return;
 	}
 
@@ -1403,11 +1400,22 @@ void ABaseBattlePawn::SeeMoveRange(int32 move_Range)
 	{
 		for (int x = startX - move_Range; x <= startX + move_Range; x++)
 		{
-			FIntPoint checkCoord(x, y);
-			// 타일이 있는지 체크
-			if (gridTileManager->IsValidTile(checkCoord))
+			// 더 넓은 정사각형 모양으로 머티리얼 수정
+			// FIntPoint checkCoord(x, y);
+			// // 타일이 있는지 체크
+			// if (gridTileManager->IsValidTile(checkCoord))
+			// {
+			// 	// 있다면 그 타일에 생상 변경
+			// 	AGridTile* tempTile = gridTileManager->GetTile(x, y);
+			// 	gridTileManager->SetTileColor(gridTileManager->GetTile(x, y), true);
+			// 	highlightedTiles.Add(tempTile);
+			// }
+			int dx = FMath::Abs(x - startX);
+			int dy = FMath::Abs(y - startY);
+
+			if (dx + dy <= move_Range)
 			{
-				// 있다면 그 타일에 생상 변경
+				// 이 타일은 이동 가능 범위 안에 있음
 				AGridTile* tempTile = gridTileManager->GetTile(x, y);
 				gridTileManager->SetTileColor(gridTileManager->GetTile(x, y), true);
 				highlightedTiles.Add(tempTile);

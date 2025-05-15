@@ -44,16 +44,11 @@ void AGridTile::Tick(float DeltaTime)
 void AGridTile::InitDecal()
 {
 	dynDecalInstance = meshComp->CreateDynamicMaterialInstance(0);
-	// UMaterialInterface* baseMat = decalComp->GetMaterial(0);
 	if (dynDecalInstance)
 	{
 		if (dynDecalInstance)
 		{
 			dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
-
-			// float value;
-			// dynDecalInstance->GetScalarParameterValue(TEXT("TileOpacity"), value);
-			// UE_LOG(LogTemp, Warning, TEXT("TileOpacity: %f"), value);
 		}
 	}
 }
