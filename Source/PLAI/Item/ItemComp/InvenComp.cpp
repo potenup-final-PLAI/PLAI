@@ -618,11 +618,10 @@ void UInvenComp::GetExp(int32 Exp)
 
 void UInvenComp::GetLevel()
 {
+	TArray<int32>LevelCounts;
 	TArray<FName>Levels = TestPlayer->LoginComp->LevelTable->GetRowNames();
 	for (FName Level : Levels)
 	{
-		TArray<int32>LevelCounts;
-		
 		FName NextLevelName = FName(*FString::FromInt(TestPlayer->LoginComp->UserFullInfo.character_info.level+1));
 		
 		FLevelInfo* LevelStruct = TestPlayer->LoginComp->LevelTable->FindRow<FLevelInfo>(Level,TEXT("InvenComp"));
@@ -632,6 +631,7 @@ void UInvenComp::GetLevel()
 
 		if (TestPlayer->LoginComp->UserFullInfo.character_info.current_exp < LevelStruct->Exp)
 		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp GetLevel에서 넘기는 레벨 배열 크기는? [%d]"),Levels.Num())
 			UiGetLevel(LevelCounts);
 			return;
 		}
@@ -639,6 +639,7 @@ void UInvenComp::GetLevel()
 			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp >= LevelStruct->Exp)
 		{
 			LevelCounts.Add(LevelStruct->level);
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp GetLevel에서 레벨스에 담기는 LevelStruct->level 값은? [%d]"),LevelStruct->level)
 			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp -= LevelStruct->Exp;
 			TestPlayer->LoginComp->UserFullInfo.character_info.max_exp = NextLevelStruct->Exp;
 			
@@ -653,14 +654,18 @@ void UInvenComp::GetLevel()
 void UInvenComp::UiGetLevel(TArray<int32>Levels)
 {
 	float Time = 0.f;
-
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this, Time, Levels]() mutable{
+	MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Visible);
+	UE_LOG(LogTemp,Warning,TEXT("InvenComp 레벨업 UI 떠야하는디 타이머 전에서 Levels 배열갯수는? [%d]"),Levels.Num())
+	
+	GetWorld()->GetTimerManager().SetTimer(LevelTimerHandle,[this, Time, Levels]() mutable{
 		Time += 0.02f;
 		if (Time >= 1.f)
 		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp 레벨업 UI 떠야하는디 Levels 배열갯수는? [%d]"),Levels.Num())
 			if (Levels.Num() == 0)
 			{
-				GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+				GetWorld()->GetTimerManager().ClearTimer(LevelTimerHandle);
+				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
 				return;
 			}
 			MenuInven->Wbp_UiChaLevelUp->LevelUpCount->SetText(FText::AsNumber(Levels[0]));

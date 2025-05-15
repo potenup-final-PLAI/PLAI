@@ -146,7 +146,7 @@ public:
     void GetExp(int32 Exp);
 	void GetLevel();
 	void UiGetLevel(TArray<int32>Levels);
-	FTimerHandle TimerHandle;
+	FTimerHandle LevelTimerHandle;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 public:

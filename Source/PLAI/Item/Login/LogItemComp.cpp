@@ -53,8 +53,9 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::K))//레벨업 셋팅
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::K키 레벨 초기화 불러오기"));
-		TestPlayer->LoginComp->UserFullInfo.character_info.level = 0;
+		TestPlayer->LoginComp->UserFullInfo.character_info.level = 1;
 		TestPlayer->LoginComp->UserFullInfo.character_info.current_exp = 0;
+		TestPlayer->LoginComp->UserFullInfo.character_info.max_exp = 1000;
 		TestPlayer->InvenComp->GetExp(500);
 	}
 }
