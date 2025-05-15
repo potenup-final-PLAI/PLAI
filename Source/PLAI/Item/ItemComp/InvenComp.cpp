@@ -20,6 +20,7 @@
 #include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/Npc/NpcStore.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Character/UiChaLevelUp.h"
 #include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
@@ -62,6 +63,7 @@ void UInvenComp::BeginPlay()
 			MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
+			MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
 			// TurnReward();
 			WorldGi->bBattleReward = false;
 		}
@@ -565,6 +567,11 @@ void UInvenComp::TurnReward()
 	UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
 	UiTurnReward->AddToViewport();
 
+	int32 Exp = FMath::RandRange(7300,8000);
+	TestPlayer->InvenComp->GetExp(Exp);
+
+    UiTurnReward->RewardExp->SetText(FText::AsNumber(Exp));
+	
 	int32 RandGold = FMath::RandRange(1000,5000);
     UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
 	SetGold(RandGold);
@@ -614,6 +621,8 @@ void UInvenComp::GetLevel()
 	TArray<FName>Levels = TestPlayer->LoginComp->LevelTable->GetRowNames();
 	for (FName Level : Levels)
 	{
+		TArray<int32>LevelCounts;
+		
 		FName NextLevelName = FName(*FString::FromInt(TestPlayer->LoginComp->UserFullInfo.character_info.level+1));
 		
 		FLevelInfo* LevelStruct = TestPlayer->LoginComp->LevelTable->FindRow<FLevelInfo>(Level,TEXT("InvenComp"));
@@ -623,11 +632,13 @@ void UInvenComp::GetLevel()
 
 		if (TestPlayer->LoginComp->UserFullInfo.character_info.current_exp < LevelStruct->Exp)
 		{
+			UiGetLevel(LevelCounts);
 			return;
 		}
 		if (TestPlayer->LoginComp->UserFullInfo.character_info.level == LevelStruct->level &&
 			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp >= LevelStruct->Exp)
 		{
+			LevelCounts.Add(LevelStruct->level);
 			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp -= LevelStruct->Exp;
 			TestPlayer->LoginComp->UserFullInfo.character_info.max_exp = NextLevelStruct->Exp;
 			
@@ -637,6 +648,26 @@ void UInvenComp::GetLevel()
 		}
 	}
 	GetLevel();
+}
+
+void UInvenComp::UiGetLevel(TArray<int32>Levels)
+{
+	float Time = 0.f;
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this, Time, Levels]() mutable{
+		Time += 0.02f;
+		if (Time >= 1.f)
+		{
+			if (Levels.Num() == 0)
+			{
+				GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+				return;
+			}
+			MenuInven->Wbp_UiChaLevelUp->LevelUpCount->SetText(FText::AsNumber(Levels[0]));
+			Levels.RemoveAt(0);
+			Time -= 1.f;
+		}
+	},0.02f,true);
 }
 
 void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

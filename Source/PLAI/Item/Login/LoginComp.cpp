@@ -66,9 +66,6 @@ void ULoginComp::BeginPlay()
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 				{
 					TestPlayer->InvenComp->TurnReward();
-					int32 Exp = FMath::RandRange(7300,8000);
-					TestPlayer->InvenComp->GetExp(Exp);
-					// TestPlayer->LogItemComp->GetUserLevel();
 				},1.0,false);
 			}
 		}
@@ -317,6 +314,8 @@ void ULoginComp::HttpMePost()
 			(FText::AsNumber(UserFullInfo.character_info.level));
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->ExpCha->SetText
 			(FText::AsNumber(UserFullInfo.character_info.current_exp));
+			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->MaxExpCha->SetText
+			(FText::AsNumber(UserFullInfo.character_info.max_exp));
 		}
 	});
 	httpRequest->ProcessRequest();
