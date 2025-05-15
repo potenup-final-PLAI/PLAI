@@ -135,23 +135,6 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		    }
 		};
 	}
-
-	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{
-		if (PC->WasInputKeyJustPressed(EKeys::P))
-		{
-			float CurrentDistance = TestPlayer->CameraBoom->TargetArmLength;
-			TestPlayer->CameraBoom->TargetArmLength = CurrentDistance + 300;
-		}
-	}
-	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{
-		if (PC->WasInputKeyJustPressed(EKeys::O))
-		{
-			float CurrentDistance = TestPlayer->CameraBoom->TargetArmLength;
-			TestPlayer->CameraBoom->TargetArmLength = CurrentDistance - 300;
-		}
-	}
 }
 
 void ULoginComp::HttpLoginPost()

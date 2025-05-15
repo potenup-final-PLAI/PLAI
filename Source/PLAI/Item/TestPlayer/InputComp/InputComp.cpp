@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "AI/NavigationSystemBase.h"
 #include "Camera/CameraComponent.h"
+#include "Components/TextBlock.h"
 #include "Components/WrapBox.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -16,6 +17,7 @@
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/InputUi/InputUi.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 
@@ -196,10 +198,14 @@ void UInputComp::On_RoatateView()
 	UE_LOG(LogTemp, Warning, TEXT("UInputComp::On_RoatateView Bool 값 %d"),bRotateView);
 	if (bRotateView == true)
 	{
+		TestPlayer->InvenComp->MenuInven->WBP_InputUi->InputUiHidden();
+		TestPlayer->InvenComp->MenuInven->WBP_InputUi->RotateViewText->SetText(FText::FromString(TEXT("고정 시점 모드")));
 		bRotateView = false;
 	}
 	else
 	{
+		TestPlayer->InvenComp->MenuInven->WBP_InputUi->InputUiHidden();
+		TestPlayer->InvenComp->MenuInven->WBP_InputUi->RotateViewText->SetText(FText::FromString(TEXT("자유 시점 모드")));
 		bRotateView = true;
 	}
 }
