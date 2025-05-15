@@ -126,9 +126,9 @@ void UUIChaStat::SetUiChaStat(FUserFullInfo* UserFullInfo)
 
 	if (UserFullInfo->character_info.current_exp > 0 && UserFullInfo->character_info.max_exp > 0)
 	{
-		ExpBar->SetPercent(UserFullInfo->character_info.current_exp/UserFullInfo->character_info.max_exp);
 		CurrentExp->SetText(FText::AsNumber(UserFullInfo->character_info.current_exp));
 		MaxExp->SetText(FText::AsNumber(UserFullInfo->character_info.max_exp));
+		ExpBar->SetPercent(static_cast<float>(UserFullInfo->character_info.current_exp)/static_cast<float>(UserFullInfo->character_info.max_exp));
 	}
 	else
 	{ UE_LOG(LogTemp,Warning,TEXT("UicahMain SetUiChaStat 경험치 안들어옴")) }

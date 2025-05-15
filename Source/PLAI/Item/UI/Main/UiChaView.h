@@ -29,6 +29,9 @@ public:
 	class UTextBlock* ExpCha;
 
 	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UTextBlock* MaxExpCha;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
 	class UProgressBar* ExpBar;
 
 	void SetUiChaView(FUserFullInfo UserFullInfo);

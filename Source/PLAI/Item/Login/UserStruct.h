@@ -6,6 +6,7 @@
 #include "LogItemComp.h"
 #include "UObject/Object.h"
 #include "UserStruct.generated.h"
+
 class ULogItemComp;
 
 USTRUCT(BlueprintType,Blueprintable)
@@ -36,6 +37,27 @@ public:
     float z= 0.0f;
 };
 
+
+USTRUCT(BlueprintType)
+struct FPutUserLevel
+{
+    GENERATED_BODY()
+	
+public:
+    UPROPERTY(EditAnywhere)
+    FString character_id = FString("char");
+    UPROPERTY(EditAnywhere)
+    int level = 0;
+    UPROPERTY(EditAnywhere)
+    int current_exp = 0;
+    UPROPERTY(EditAnywhere)
+    int max_exp = 0;
+    UPROPERTY(EditAnywhere)
+    TArray<FString>traits;
+    UPROPERTY(EditAnywhere)
+    FPosition position;
+};
+
 USTRUCT(BlueprintType)
 struct Fstats
 {
@@ -60,6 +82,8 @@ public:
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     int32 points;
 };
+
+
 
 // USTRUCT(BlueprintType) 얘네는 아이템 인벤 컴프? 장비 보내는 곳에서 정의해놨음
 // struct FOptions

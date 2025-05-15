@@ -619,6 +619,12 @@ void UInvenComp::GetLevel()
 		FLevelInfo* LevelStruct = TestPlayer->LoginComp->LevelTable->FindRow<FLevelInfo>(Level,TEXT("InvenComp"));
 		FLevelInfo* NextLevelStruct = TestPlayer->LoginComp->LevelTable->FindRow<FLevelInfo>(NextLevelName,TEXT("InvenComp"));
 
+		UE_LOG(LogTemp,Warning,TEXT("InvenComp 레벨업 경치 들어오는중? 테이블 도는중 레벨은? [%d]"),LevelStruct->level)
+
+		if (TestPlayer->LoginComp->UserFullInfo.character_info.current_exp < LevelStruct->Exp)
+		{
+			return;
+		}
 		if (TestPlayer->LoginComp->UserFullInfo.character_info.level == LevelStruct->level &&
 			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp >= LevelStruct->Exp)
 		{
@@ -628,10 +634,6 @@ void UInvenComp::GetLevel()
 			TestPlayer->LoginComp->UserFullInfo.character_info.level += 1;
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetUiChaView(TestPlayer->LoginComp->UserFullInfo);
 			TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
-		}
-		else
-		{
-			return;
 		}
 	}
 	GetLevel();

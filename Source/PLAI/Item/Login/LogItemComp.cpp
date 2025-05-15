@@ -47,6 +47,13 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::L키 장비창 불러오기"));
 		GetEquipInfo();
 		GetInvenInfo();
+		GetUserLevel();
+	}
+
+	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::K))//레벨업 셋팅
+	{
+		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::K키 레벨업 불러오기"));
+		TestPlayer->InvenComp->GetExp(0);
 	}
 }
 
@@ -61,6 +68,7 @@ void ULogItemComp::GetEquipInfo()
 		if (USlotEquip* SlotEquip = Cast<USlotEquip>(widget))
 		{
 			int32 index = TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetChildIndex(SlotEquip);
+			int32 idx = 0;
 			
 			if (SlotEquip->ItemStructTable.ItemTop == -1)
 			{
@@ -79,7 +87,10 @@ void ULogItemComp::GetEquipInfo()
 			
 			PostEquipId.equipment_info.Add(equipment_info);
 			
-			TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list[index].item_id = SlotEquip->ItemStructTable.Item_Id;
+			FitemInfo iteminfo;
+			iteminfo.item_id = SlotEquip->ItemStructTable.Item_Id;
+			TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Add(iteminfo); 
+			// TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list[index].item_id = SlotEquip->ItemStructTable.Item_Id;
 		}
 	}
 	PostEquipId.character_id = TestPlayer->LoginComp->UserFullInfo.character_info.character_id;
@@ -184,6 +195,44 @@ void ULogItemComp::HttpInvenPost(FString JsonString)
 			UE_LOG(LogTemp,Warning,TEXT("LogItemComp 인벤토리 정보 넘기기 실패 "))
 		}
 	});
+	httpRequest->ProcessRequest();
+}
+
+void ULogItemComp::GetUserLevel()
+{
+	FPutUserLevel PutUserLevel;
+	PutUserLevel.character_id = TestPlayer->LoginComp->UserFullInfo.character_info.character_id;
+	PutUserLevel.current_exp = TestPlayer->LoginComp->UserFullInfo.character_info.current_exp;
+	PutUserLevel.level = TestPlayer->LoginComp->UserFullInfo.character_info.level;
+	PutUserLevel.max_exp = TestPlayer->LoginComp->UserFullInfo.character_info.max_exp;
+	PutUserLevel.position = TestPlayer->LoginComp->UserFullInfo.character_info.position;
+	PutUserLevel.traits = TestPlayer->LoginComp->UserFullInfo.character_info.traits;
+
+	FString JsonString;
+	FJsonObjectConverter::UStructToJsonObjectString(PutUserLevel,JsonString);
+	HttpUserLevelPut(JsonString);
+}
+
+void ULogItemComp::HttpUserLevelPut(FString JsonString)
+{
+	FNgrok Ngrok;
+	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
+	// httpRequest->SetURL(Ngrok.Ngrok + TEXT("/users/login"));
+	// httpRequest->SetURL("https://919e-221-148-189-129.ngrok-free.app/service1/characters/update");
+	httpRequest->SetURL(Ngrok.Ngrok + TEXT("/characters/update"));
+	httpRequest->SetVerb("PUT");
+	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	httpRequest->SetContentAsString(JsonString);
+
+	httpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bProcessedSuccessfully)
+	{
+		if (bProcessedSuccessfully)
+		{
+			FString JsonString = HttpResponse->GetContentAsString();
+			UE_LOG(LogTemp,Warning,TEXT("LogItemComp 머라옴 답변 [%s]"),*JsonString);
+		}
+	});
+	
 	httpRequest->ProcessRequest();
 }
 

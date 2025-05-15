@@ -66,9 +66,9 @@ void ULoginComp::BeginPlay()
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 				{
 					TestPlayer->InvenComp->TurnReward();
-					// UserFullInfo.character_info.current_exp += 7200;
-					TestPlayer->InvenComp->GetExp(7200);
-					
+					int32 Exp = FMath::RandRange(7300,8000);
+					TestPlayer->InvenComp->GetExp(Exp);
+					// TestPlayer->LogItemComp->GetUserLevel();
 				},1.0,false);
 			}
 		}
@@ -133,10 +133,6 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			    		bQuest = true;
 			    	}
 			    }
-		    	else
-		    	{
-		    		// UE_LOG(LogTemp, Error, TEXT("LoginComp NpcNet 없네"));
-		    	}
 		    }
 		};
 	}

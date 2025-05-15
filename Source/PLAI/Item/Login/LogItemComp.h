@@ -81,6 +81,21 @@ public:
 	int32 Gold = 0;
 };
 
+// {
+// 	"character_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+// 	"level": 0,
+// 	"current_exp": 0,
+// 	"max_exp": 0,
+// 	"traits": [
+// 	  "string"
+// 	],
+// 	"position": {
+// 		"x": 0,
+// 		"y": 0,
+// 		"z": 0
+// 	  }
+// }
+
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API ULogItemComp : public UActorComponent
@@ -112,4 +127,8 @@ public:
 	void GetInvenInfo();
 
 	void HttpInvenPost(FString JsonString);
+
+	void GetUserLevel();
+
+	void HttpUserLevelPut(FString JsonString);
 };
