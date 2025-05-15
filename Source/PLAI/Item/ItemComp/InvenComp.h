@@ -144,6 +144,7 @@ public:
 	void TurnReward();
 
     void GetExp(int32 Exp);
+	void GetLevel();
 	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 public:

@@ -113,6 +113,11 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UGridPanel* TraitsBox;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CurrentExp;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* MaxExp;
+
 	UPROPERTY(EditAnywhere)
     UDataTable* TraitStructTable;
 	

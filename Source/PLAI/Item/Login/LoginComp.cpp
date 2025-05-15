@@ -66,9 +66,9 @@ void ULoginComp::BeginPlay()
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 				{
 					TestPlayer->InvenComp->TurnReward();
-					UserFullInfo.character_info.current_exp += 7200;
-					TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&UserFullInfo);
-					TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetUiChaView(UserFullInfo);
+					// UserFullInfo.character_info.current_exp += 7200;
+					TestPlayer->InvenComp->GetExp(7200);
+					
 				},1.0,false);
 			}
 		}

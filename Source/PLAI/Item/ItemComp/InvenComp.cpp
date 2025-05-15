@@ -605,6 +605,36 @@ void UInvenComp::GetExp(int32 Exp)
 {
 	TestPlayer->LoginComp->UserFullInfo.character_info.current_exp += Exp;
 	MenuInven->Wbp_ChaView->SetUiChaView(TestPlayer->LoginComp->UserFullInfo);
+
+	GetLevel();
+}
+
+void UInvenComp::GetLevel()
+{
+	TArray<FName>Levels = TestPlayer->LoginComp->LevelTable->GetRowNames();
+	for (FName Level : Levels)
+	{
+		FName NextLevelName = FName(*FString::FromInt(TestPlayer->LoginComp->UserFullInfo.character_info.level+1));
+		
+		FLevelInfo* LevelStruct = TestPlayer->LoginComp->LevelTable->FindRow<FLevelInfo>(Level,TEXT("InvenComp"));
+		FLevelInfo* NextLevelStruct = TestPlayer->LoginComp->LevelTable->FindRow<FLevelInfo>(NextLevelName,TEXT("InvenComp"));
+
+		if (TestPlayer->LoginComp->UserFullInfo.character_info.level == LevelStruct->level &&
+			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp >= LevelStruct->Exp)
+		{
+			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp -= LevelStruct->Exp;
+			TestPlayer->LoginComp->UserFullInfo.character_info.max_exp = NextLevelStruct->Exp;
+			
+			TestPlayer->LoginComp->UserFullInfo.character_info.level += 1;
+			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetUiChaView(TestPlayer->LoginComp->UserFullInfo);
+			TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
+		}
+		else
+		{
+			return;
+		}
+	}
+	GetLevel();
 }
 
 void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
