@@ -15,6 +15,13 @@ ANpcStart::ANpcStart()
 void ANpcStart::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	UiNpcStart = CreateWidget<UUiNpcStart>(GetWorld(),UiNpcStartFactory);
+	UiNpcStart->AddToViewport();
+    UiNpcStart->SetVisibility(ESlateVisibility::Hidden);
+	NpcUiMaster = Cast<UUserWidget>(UiNpcStart);
+	
+	NpcNameString = TEXT("말론 (StartEquip)");
 }
 
 // Called every frame
@@ -31,51 +38,36 @@ void ANpcStart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ANpcStart::WarriorStarter()
 {
-	FItemStruct WarriorWeaponStruct;
-	
-	WarriorWeaponStruct.ItemTop = 1;
-	WarriorWeaponStruct.ItemIndex = 0;
-	WarriorWeaponStruct.ItemIndexType = 0;
-	WarriorWeaponStruct.ItemIndexDetail = 0;
-	
-	ItemStructsArray.ItemStructs.Add(WarriorWeaponStruct);
-
-	FItemStruct WarriorArmorStruct;
-	
-	WarriorArmorStruct.ItemTop = 1;
-	WarriorArmorStruct.ItemIndex = 1;
-	WarriorArmorStruct.ItemIndexType = 0;
-	WarriorArmorStruct.ItemIndexDetail = 0;
-
-	ItemStructsArray.ItemStructs.Add(WarriorArmorStruct);
+	TArray<FName> RawNames = ItemTable->GetRowNames();
+	for (FName RawName : RawNames)
+	{
+		FItemStructTable* A = ItemTable->FindRow<FItemStructTable>(RawName,TEXT("NpcStart"));
+		if (A->ItemTop == 1 && TArray<int32>({0,1,2}).Contains(A->ItemIndex) && A->ItemIndexType == 0 &&
+			A->ItemIndexDetail == 0)
+		{
+			ItemStructTables.ItemStructTables.Add(*A);
+		}
+	}
 	//이 딜리게이트는 InvenComp NpcItem함수에 바인딩함
-	OnNpcStart.ExecuteIfBound(ItemStructsArray);
+	OnNpcStart.ExecuteIfBound(ItemStructTables);
 }
 
 
 void ANpcStart::HunterStarter()
 {
-	// 헌터셋팅
-	FItemStruct HunterWeaponStruct;
-	
-	HunterWeaponStruct.ItemTop = 1;
-	HunterWeaponStruct.ItemIndex = 0;
-	HunterWeaponStruct.ItemIndexType = 1;
-	HunterWeaponStruct.ItemIndexDetail = 0;
-	
-	ItemStructsArray.ItemStructs.Add(HunterWeaponStruct);
-
-	FItemStruct HunterArmorStruct;
-	
-	HunterArmorStruct.ItemTop = 1;
-	HunterArmorStruct.ItemIndex = 2;
-	HunterArmorStruct.ItemIndexType = 0;
-	HunterArmorStruct.ItemIndexDetail = 0;
-
-	ItemStructsArray.ItemStructs.Add(HunterArmorStruct);
-	
+	// 헌터
+	TArray<FName> RawNames = ItemTable->GetRowNames();
+	for (FName RawName : RawNames)
+	{
+		FItemStructTable* A = ItemTable->FindRow<FItemStructTable>(RawName,TEXT("NpcStart"));
+		if (A->ItemTop == 1 && TArray<int32>({0,1,2}).Contains(A->ItemIndex) && A->ItemIndexType == 1
+			&& A->ItemIndexDetail == 0)
+		{
+			ItemStructTables.ItemStructTables.Add(*A);
+		}
+	}
 	//이 딜리게이트는 InvenComp NpcItem함수에 바인딩함
-	OnNpcStart.ExecuteIfBound(ItemStructsArray);
+	OnNpcStart.ExecuteIfBound(ItemStructTables);
 }
 
 

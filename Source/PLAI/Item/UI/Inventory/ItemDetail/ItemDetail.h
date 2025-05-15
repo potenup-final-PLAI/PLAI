@@ -29,16 +29,23 @@ public:
 	class UTextBlock* StatB;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StatC;
-
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StatD;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StatE;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StatNameA;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StatNameB;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StatNameC;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StatNameE;
 	
 	UPROPERTY(meta = (BindWidget))
-	class UImage* IconImage; 
+	class UImage* IconImage;
 
-	void SetItemDetail(const FItemStruct& ItemStruct);
+	void SetItemDetail(const FItemStructTable& ItemStruct);
 };

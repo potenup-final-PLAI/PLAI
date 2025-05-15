@@ -10,6 +10,7 @@
 #include "PLAI/Item/Item/Equip//ItemEquip.h"
 #include "PLAI/Item/UI/Inventory/MenuInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
+#include "PLAI/Item/UI/TurnReward/UiTurnReward.h"
 #include "InvenComp.generated.h"
 
 class APlayerController;
@@ -52,13 +53,23 @@ public:
 	EEnumKey EnumKey;
 
     void SetGold(int32 Getgold);
+
 	UPROPERTY(EditAnywhere)
-	int32 Gold = 10000;
+	bool bStartEquip = false;
+	
+	UPROPERTY(EditAnywhere)
+	int32 Gold = 0;
 	
 	EquipSlotType StartSlotType;
+
+	UPROPERTY(EditAnywhere)
+	class ANpcCharacter* NpcCharacter;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UMenuInven> MenuInvenFactory;
+
+	UPROPERTY(EditAnywhere)
+	class UDataTable* ItemDataTable;
 	
 	UPROPERTY(EditAnywhere)
 	class UMenuInven* MenuInven;
@@ -90,7 +101,7 @@ public:
 	class AItemMaster* ItemGlove;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AItemMaster* Itemboots;
-
+	
 	UFUNCTION(Server,Reliable)
 	void Server_UnEquip(EquipSlotType SlotType);
 
@@ -100,26 +111,26 @@ public:
 	UFUNCTION(Server,Reliable)
 	void Server_DestroyItem(AItem* Item);
 	
-	void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
+	// void ItemInvenTory(EEnumKey key, UUserWidget* Inven);
 
 	UFUNCTION(Server,Reliable)
-	void Server_GetItem(const FItemStruct& ItemStruct);
+	void Server_GetItem(const FItemStructTable& ItemStructTable);
 	UFUNCTION(Client,Reliable)
-	void Client_GetItem(const FItemStruct& ItemStruct);
+	void Client_GetItem(const FItemStructTable& ItemStructTable);
 	
-	void GetItem(const FItemStruct& ItemStruct);
+	void GetItem(const FItemStructTable& ItemStructTable);
 	
 	UFUNCTION(Server,Reliable) // NetMulticast는 안써도됨 = 아이템이 자동으로 동기화중
- 	void Server_EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
+ 	void Server_EquipItem(const FItemStructTable& ItemStructTable, EquipSlotType SlotType);
 
-	void EquipItem(const FItemStruct& ItemStruct, EquipSlotType SlotType);
+	void EquipItem(const FItemStructTable& ItemStructTable, EquipSlotType SlotType);
 
 	UFUNCTION()
-	void NpcItem(const FItemStructsArray& ItemStructsArray);
+	void NpcItem(const FItemStructTables ItemStructTables);
 
 	void CatchItem();
 	
-	void EquipSetting(const FItemStructsArray& ItemStructsArray);
+	void EquipSetting(const FItemStructTables& ItemStructTables);
 	
 	void SaveItemInventory();
 	void LoadItemInventory();
@@ -127,9 +138,20 @@ public:
 	void SaveEquipInventory();
 	void LoadEquipInventory();
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUiTurnReward> UUiTurnRewardFactory;
+	
+	UPROPERTY(EditAnywhere)
+	class UUiTurnReward* UiTurnReward;
+	
+	void TurnReward();
+
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 public:
 	UPROPERTY(EditAnywhere)
 	bool Flipflop = false;
 	bool FlipflopStore = false;
+
+	UPROPERTY(EditAnywhere)
+	bool FlipflopStart = false;
 };

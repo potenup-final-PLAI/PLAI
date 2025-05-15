@@ -3,30 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NpcCharacter.h"
 #include "GameFramework/Character.h"
 #include "PLAI/Item/UI/Net/UiPost.h"
 #include "NpcNet.generated.h"
-USTRUCT(BlueprintType,Blueprintable)
-struct FNpcStructNetPost
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditAnywhere)
-	FString question = FString("Post");
-};
-
-USTRUCT(BlueprintType,Blueprintable)
-struct FNpcStructNetGet
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditAnywhere)
-	FString response = FString("Get");
-};
-
 
 UCLASS()
-class PLAI_API ANpcNet : public ACharacter
+class PLAI_API ANpcNet : public ANpcCharacter
 {
 	GENERATED_BODY()
 
@@ -48,7 +31,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUiPost>UIPostFactory;
-	
 	UPROPERTY(EditAnywhere)
 	class UUiPost* UIPost;
 

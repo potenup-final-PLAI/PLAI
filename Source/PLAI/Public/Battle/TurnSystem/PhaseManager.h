@@ -28,6 +28,7 @@ class PLAI_API AUPhaseManager : public AGameStateBase
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 public:
 	// 구현 해야하는 내용
@@ -63,14 +64,20 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	TArray<ABaseBattlePawn*> unitQueue;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	TArray<ABaseBattlePawn*> httpUnitQueue;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase")
 	TSubclassOf<ABaseBattlePawn> unitFactory;
-
-
+	
 	// 유닛 첫 큐 세팅
 	void SetUnitQueue();
 	// 유닛 Array 큐 처럼 사용하기 위한 업데이트
 	void SortUnitQueue();
+	// 턴 끝날 때 유닛 포함 안시키게
+	void SortUnitTurnEnd();
+	// 이미 죽은 유닛 갱신하는 함수
+	ABaseBattlePawn* PopNextAliveUnit();
 	// 전투 시작
 	void StartBattle();
 	// 플레이어 턴 시작
@@ -83,4 +90,56 @@ public:
 	void EndEnemyPhase();
 	// 전투 종료
 	void BattleEnd();
+
+	//--------------Start Battle API ------------------
+	FTimerHandle timerBattleStartHandle;
+
+	// 게임 시작 전 세팅 작업
+	void SetBeforeBattle();
+	// StartBattle API 호출
+	void TrySendInitialState();
+	// StartBattle API 들어갈 데이터 세팅 함수
+	FEnvironmentState SetStartBattleAPI();
+
+	//------------------Battle Action API-----------------------
+	// HttpActor 탐색용
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Phase")
+	TSubclassOf<class ABattleHttpActor> httpActorFactory;
+
+	// BattleAction API 호출
+	void TrySendbattleState(ABaseBattlePawn* unit);
+	// BattleAction API에 들어갈 데이터 세팅 함수
+	FBattleTurnState SetBattleProcessingAPI();
+	// unit에 state가 세팅 되었는지 체크 하는 함수
+	bool AreAllUnitsInitialized() const;
+
+	//----------------GridTileManager Tile 관리를 위한 선언--------------------------- 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	class AGridTileManager* gridTileManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Phase")
+	TSubclassOf<class AGridTileManager> girdTileManagerFactory;
+
+	//-------------Set Status-----------------------
+	bool bIsInitialized = false;
+
+	UFUNCTION()
+	void TryInitStatus(ABaseBattlePawn* unit);
+	void SetStatus(ABaseBattlePawn* unit);
+
+	//------------Status 이름 변경--------------------
+	FString GetStatusEffectsString(EStatusEffect effect);
+
+	//-----------Unit UI 이름 확인 쉽게 세팅할 변수------------
+	int8 unitPlayerNameindex = 0;
+	int8 unitEnemyNameindex = 0;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase")
+	class UWorldGi* gi;
+	
+	//-------------Damage Actor Widget-----------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DamageUI")
+	class AWorldDamageUIActor* damageUIActor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DamageUI")
+	TSubclassOf<class AWorldDamageUIActor> damageUIFactory;
 };

@@ -30,4 +30,15 @@ public:
 	FIntPoint gridCoord;
 
 	void SetGridCoord(FIntPoint coord);
+
+	//--------------------Move System------------------------
+	UPROPERTY(EditAnywhere)
+	float sCostValue = 0;
+	UPROPERTY(EditAnywhere)
+	float tCostValue = 0;
+	UPROPERTY(EditAnywhere)
+	AGridTile* parentTile;
+	
+	void SetCost(AGridTile* s, AGridTile* g);
+	
 };

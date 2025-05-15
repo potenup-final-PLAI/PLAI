@@ -28,11 +28,24 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 	ItemParent = ItemFactory->GetDefaultObject<AItem>();
-	// BoxComp->SetWorldScale3D(FVector(1.5));
+
+		// BoxComp->SetWorldScale3D(FVector(1.5));
 	BoxComp->OnComponentBeginOverlap.AddDynamic(this,&AItem::OnMyBeginOverlapped);
+
+	// ItemStructTable에 머티리얼이 있으면 아이템 머티리얼을 적용시켜라
+	if (ItemStructTable.Material)
+	{
+		StaticMesh->SetMaterial(0, ItemStructTable.Material);
+	}
 	
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AItem::SetMesh,0.5f,false);
+	// FTimerHandle TimerHandle;
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AItem::SetMesh,0.5f,false);
+}
+
+void AItem::OnRep_ReplicatedItem()
+{
+	if (ItemStructTable.ItemTop == -1) UE_LOG(LogTemp,Error,TEXT("Item. 아이템 테이블 동기화 실패"));
+	StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 }
 
 void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -53,8 +66,7 @@ void AItem::OnMyBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 
 void AItem::SetMesh()
 {
-	if (ItemStruct.ItemTop == -1) { UE_LOG(LogTemp,Warning,TEXT("아이템 탑 -1 초기화전")) return; }
-	
+	// if (ItemStruct.ItemTop == -1) { UE_LOG(LogTemp,Warning,TEXT("아이템 탑 -1 초기화전")) return; }
 	StaticMesh->SetStaticMesh(ItemParent->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].
 	ItemMeshIndexes[ItemStruct.ItemIndex].ItemMeshTypes[ItemStruct.ItemIndexType].StaticMeshes[ItemStruct.ItemIndexDetail]);
 }
@@ -62,7 +74,9 @@ void AItem::SetMesh()
 void AItem::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
 	DOREPLIFETIME(AItem,ItemStruct)
+	DOREPLIFETIME(AItem,ItemStructTable)
 }
 
 // Called every frame

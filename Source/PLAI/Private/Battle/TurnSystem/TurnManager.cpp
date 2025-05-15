@@ -5,11 +5,9 @@
 
 #include "BaseBattlePawn.h"
 #include "Battle/TurnSystem/PhaseManager.h"
-#include "Developer/AITestSuite/Public/AITestsCommon.h"
 #include "Enemy/BaseEnemy.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
 
 DEFINE_LOG_CATEGORY(TPS);
@@ -26,7 +24,6 @@ void ATurnManager::BeginPlay()
 {
 	Super::BeginPlay();
 	phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
-	
 }
 
 // Called every frame
@@ -62,7 +59,9 @@ void ATurnManager::StartPlayerTurn()
 {
 	if (curTurnState == ETurnState::TurnEnd && curTurnState == ETurnState::PlayerTurn && curTurnState == ETurnState::EnemyTurn) return;
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Player Turn"));
+	// Player 턴 시작
 	SetTurnState(ETurnState::PlayerTurn);
+	
 	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("playerPawn is Player %s"), *playerPawn->GetActorNameOrLabel());
@@ -77,13 +76,20 @@ void ATurnManager::StartPlayerTurn()
 			FTimerHandle possessHandle;
 			GetWorld()->GetTimerManager().ClearTimer(possessHandle);
 			// 이후에 값이 변경 및 삭제 될 수 있기 때문에 값 복사로 가져와서 람다 내에서 사용
-			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=]()
+			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
 			{
 				if (pc && playerPawn)
 				{
-					pc->Possess(playerPawn);
-					playerPawn->OnTurnStart();
-					UE_LOG(LogTemp, Warning, TEXT("possess unit %s"), *playerPawn->GetActorNameOrLabel());
+					pc->Possess(curUnit);
+					if (curUnit->IsValidLowLevelFast())
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Safe to call OnTurnStart on %s"), *curUnit->GetName());
+						curUnit->OnTurnStart();
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("curUnit is invalid when calling OnTurnStart"));
+					}
 				}
 			}), 1.0f, false);
 		}

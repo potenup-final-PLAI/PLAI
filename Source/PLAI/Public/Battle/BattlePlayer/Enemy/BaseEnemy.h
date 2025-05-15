@@ -19,6 +19,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;
 
 public:
 	// Called every frame
@@ -27,4 +28,23 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
+
+
+	//-------------enemy Settings--------------------
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	class USkeletalMeshComponent* meshComp;
+
+	//------------------Anim Instance--------------------------
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim)
+	class UBattleEnemyAnimInstance* enemyAnim;
+	
+	//--------------Test---------------------
+	void MoveToPlayer(class AGridTile* player,class AGridTileManager* tileManager);
+	class ABattlePlayer* FindClosestPlayer(TArray<class ABattlePlayer*>& allPlayers);
+
+	void FindAndAttackPlayer();
+
+	// 받은 데이터로 enemy 움직임
+	void ProcessAction(const FActionRequest& actionRequest);
+	ABaseBattlePawn* FindUnitById(const FString& Id);
 };

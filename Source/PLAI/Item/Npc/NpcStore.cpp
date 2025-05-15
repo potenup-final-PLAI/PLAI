@@ -3,6 +3,9 @@
 
 #include "NpcStore.h"
 
+#include "Components/WrapBox.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
+
 
 // Sets default values
 ANpcStore::ANpcStore()
@@ -15,38 +18,51 @@ ANpcStore::ANpcStore()
 void ANpcStore::BeginPlay()
 {
 	Super::BeginPlay();
+
+	NpcNameString = TEXT("토리 (Store)");
+	
 	Item = ItemFactory->GetDefaultObject<AItem>();
-	LoadNpcStore();
+
+	StoreInven = CreateWidget<UStoreInven>(GetWorld(),StoreInvenFactory);
+	StoreInven->AddToViewport();
+	StoreInven->SetVisibility(ESlateVisibility::Hidden);
+	NpcUiMaster = Cast<UWidget>(StoreInven);
 }
 
 // Called every frame
 void ANpcStore::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-}
-
-void ANpcStore::LoadNpcStore()
-{
-	for (int32 i = 0; i < 12; i++)
-	{
-		FItemStruct ItemStruct;
-		int32 Top = FMath::RandRange(0,2);
-		ItemStruct.ItemTop = Top;
-		// int32 Index = FMath::RandRange(0,Item->ItemStructTop.ItemMeshTops[Top].ItemMeshIndexes.Num());
-		ItemStruct.ItemIndex = 0;
-		// int32 Type = FMath::RandRange(0,Item->ItemStructTop.ItemMeshTops[Top].ItemMeshIndexes[Index].ItemMeshTypes.Num());
-		ItemStruct.ItemIndexType = 0;
-		// int32 Detail = FMath::RandRange(0,Item->ItemStructTop.ItemMeshTops[Top].ItemMeshIndexes[Index].ItemMeshTypes[Type].StaticMeshes.Num());
-		ItemStruct.ItemIndexDetail = 0;
-
-		ItemStructsArray.ItemStructs.Add(ItemStruct);
-	}
 }
 
 // Called to bind functionality to input
 void ANpcStore::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void ANpcStore::SetStoreInven()
+{
+	if (TestPlayer && TestPlayer->IsLocallyControlled())
+	{
+		for (UWidget* Widget : StoreInven->WrapBox->GetAllChildren())
+		{
+			USlotStore* Slot = Cast<USlotStore>(Widget);
+			int32 index = StoreInven->WrapBox->GetChildIndex(Slot);
+
+			TArray<FName>RawNames = ItemTable->GetRowNames();
+			FItemStructTable* RowData = ItemTable->FindRow<FItemStructTable>(RawNames[index],TEXT("StoreComp"));
+			Slot->ItemStructTable = *RowData;
+			if (Slot->ItemStructTable.ItemTop == -1)
+			{
+				UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 X %s"),*Slot->ItemStructTable.Name)
+			}
+			else
+			{
+				UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 되었음 %s"),*Slot->ItemStructTable.Name)
+			}
+			Slot->SlotImageUpdate();
+		}
+	}
 }
 

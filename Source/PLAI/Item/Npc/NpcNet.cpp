@@ -5,6 +5,7 @@
 
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
+#include "Components/TextBlock.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/UI/Main/UiMain.h"
@@ -21,6 +22,7 @@ ANpcNet::ANpcNet()
 void ANpcNet::BeginPlay()
 {
 	Super::BeginPlay();
+	NpcNameString = TEXT("바스 (Guide)");
 }
 
 // Called every frame
@@ -40,20 +42,27 @@ void ANpcNet::OpenQuest()
     UIPost = CreateWidget<UUiPost>(GetWorld(),UIPostFactory);
 	UIPost->AddToViewport();
 	UIPost->OnNetPost.BindUObject(this,&ANpcNet::NetPost);
+	NpcUiMaster = Cast<UUserWidget>(UIPost);
+	if (!NpcUiMaster){
+		UE_LOG(LogTemp,Error,TEXT("NpcNet NpcUiMaster 생성 실패"));
+	}
+	else
+	{
+		UE_LOG(LogTemp,Error,TEXT("NpcNet NpcUiMaster 생성 성공"));
+	};
 }
 
 void ANpcNet::NetPost(FString String)
 {
-	UE_LOG(LogTemp, Display, TEXT("ANpcNet::NetPost%s"), *String);
 	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
-	HttpRequest->SetURL("http://192.168.10.96:8054/npc/chat");
+	HttpRequest->SetURL("https://919e-221-148-189-129.ngrok-free.app/service1/npc/chat");
 	HttpRequest->SetVerb("POST");
 	HttpRequest->SetHeader("Content-Type", "application/json");
 
-	FNpcStructNetPost NpcStruct;
-	NpcStruct.question = String;
-	
+	UE_LOG(LogTemp,Warning,TEXT("NpcNet String받은값 무엇%s"),*String)
 	FString JsonString;
+	FNpcStructPost NpcStruct;
+	NpcStruct.question = String;
 	
 	FJsonObjectConverter::UStructToJsonObjectString(NpcStruct,JsonString);
 	HttpRequest->SetContentAsString(JsonString);
@@ -61,17 +70,13 @@ void ANpcNet::NetPost(FString String)
 	{
 		if (bSucceeded)
 		{
-			FNpcStructNetGet NpcStruct;
+			FNpcStructGet NpcStruct;
 			FString JsonString = HttpResponse->GetContentAsString();
-			FJsonObjectConverter::UStructToJsonObjectString(NpcStruct,JsonString);
-			UE_LOG(LogTemp, Display, TEXT("ANpcNet::NetPost 실패함"));
+			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&NpcStruct);
+			UE_LOG(LogTemp, Warning, TEXT("ANpcNet::NetPost 성공함 JsonString은? [%s] 서버코드 %d"),*JsonString,HttpResponse->GetResponseCode());
+			UIPost->TextGet->SetText(FText::FromString(NpcStruct.response));
 		}
-		else
-		{
-			UE_LOG(LogTemp, Display, TEXT("ANpcNet::NetPost 실패함"));
-		}
-	}
-    );
+	});
 	HttpRequest->ProcessRequest();
 }
 

@@ -18,7 +18,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -37,4 +36,13 @@ public:
 	TSubclassOf<class ABaseEnemy> enemyFactory;
 
 	void InitGridTile();
+	
+	//------------Test--------------------------
+	// 생성된 유닛들 담기
+	TArray<class ABaseBattlePawn*> unitArray;
+
+	// 현재 타일 위치
+	AGridTile* FindCurrentTile(FVector worldLoc);
+	// 맵에서 x, y위치에 있는 타일 얻기
+	AGridTile* GetTile(int32 x, int32 y);
 };

@@ -21,6 +21,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemStruct ItemStruct;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FItemStructTable ItemStructTable;
+	 
 	UPROPERTY(EditAnywhere)
 	class UTexture2D* Texture;
 	
@@ -42,6 +45,9 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UTextBlock* SlotCount;
 
+    UPROPERTY(EditAnywhere)
+	class UEquipInven* EquipInven;
+	
 	void SlotCountUpdate(const int32 Count);
 
 	void SlotImageUpdate();
@@ -51,8 +57,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UDataTable* ItemTable;
 
-	FItemStruct* ItemTableFind();
-	void ItemTableShow();
+	FItemStructTable* ItemTableFind();
 	
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;

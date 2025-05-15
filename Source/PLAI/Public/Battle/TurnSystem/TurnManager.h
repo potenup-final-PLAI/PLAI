@@ -79,7 +79,8 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
 	TArray<ABaseBattlePawn*> enemyQueue;
 
-	
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
+	int32 turnCount = 0;
 	//--------------Player Turn---------------------
 	// 플레이어 첫 유닛 실행
 	void StartPlayerTurn();

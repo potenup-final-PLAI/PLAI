@@ -21,46 +21,37 @@ void USlot::SlotCountUpdate(const int32 Count)
 
 void USlot::SlotImageUpdate()
 {
-	FSlateBrush Brush;
-	Brush.SetResourceObject(ParentItem->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].ItemMeshIndexes[ItemStruct.ItemIndex].
-		ItemMeshTypes[ItemStruct.ItemIndexType].Textures[ItemStruct.ItemIndexDetail]);
-	SlotImage->SetBrush(Brush);
+	if (ItemStructTable.ItemTop != -1)
+	{
+		FSlateBrush Brush;
+		Brush.SetResourceObject(ItemStructTable.Texture);
+		SlotImage->SetBrush(Brush);
+	}
 }
 
 void USlot::NativeConstruct()
 {
 	Super::NativeConstruct();
 	ParentItem = ItemFactory->GetDefaultObject<AItem>();
+
+	FSlateBrush Brush;
+	Brush.SetResourceObject(nullptr);
+	Brush.DrawAs = ESlateBrushDrawType::NoDrawType;
+	Brush.TintColor = FLinearColor(1.0f, 1.0f, 1.0f, 0.15f);
+	SlotImage->SetBrush(Brush);
 }
 
-// FItemStruct* USlot::ItemDetailShow()
-// {
-// 	const TArray<FName> Rownames = ItemTable->GetRowNames();
-//
-// 	for (const FName& RowName : Rownames)
-// 	{
-// 		FItemStruct* Row = ItemTable->FindRow<FItemStruct>(RowName, TEXT("ItemTable Slot"));
-// 		if (Row && Row->ItemIndex == ItemStruct.ItemIndex
-// 			&& Row->ItemTop == ItemStruct.ItemTop
-// 			&& Row->ItemIndexType == ItemStruct.ItemIndexType
-// 			&& Row->ItemIndexDetail == ItemStruct.ItemIndexDetail)
-// 		{
-// 			
-// 		}
-// 	}
-// }
-
-FItemStruct* USlot::ItemTableFind()
+FItemStructTable* USlot::ItemTableFind()
 {
 	const TArray<FName> Rownames = ItemTable->GetRowNames();
 
 	for (const FName& RowName : Rownames)
 	{
-		FItemStruct* Row = ItemTable->FindRow<FItemStruct>(RowName, TEXT("ItemTable Slot"));
-		if (Row && Row->ItemIndex == ItemStruct.ItemIndex
-			&& Row->ItemTop == ItemStruct.ItemTop
-			&& Row->ItemIndexType == ItemStruct.ItemIndexType
-			&& Row->ItemIndexDetail == ItemStruct.ItemIndexDetail)
+		FItemStructTable* Row = ItemTable->FindRow<FItemStructTable>(RowName, TEXT("ItemTable Slot"));
+		if (Row && Row->ItemIndex == ItemStructTable.ItemIndex
+			&& Row->ItemTop == ItemStructTable.ItemTop
+			&& Row->ItemIndexType == ItemStructTable.ItemIndexType
+			&& Row->ItemIndexDetail == ItemStructTable.ItemIndexDetail)
 		{
 			return Row;
 		}
@@ -68,28 +59,9 @@ FItemStruct* USlot::ItemTableFind()
 	return nullptr;
 }
 
-void USlot::ItemTableShow()
-{
-	if (APawn* TestPlayer = GetWorld()->GetFirstPlayerController()->GetPawn())
-	{
-		if (TestPlayer->IsLocallyControlled())
-		{
-			FItemStruct* ItemStructTable = ItemTableFind();
-	        if (ItemStructTable == nullptr){UE_LOG(LogTemp,Warning,TEXT("슬롯 테이블값 없음 리턴")) return;};
-	        ItemStruct = *ItemStructTable;
-	
-        	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 데이블 구조체 %s%s%s"),*ItemStructTable->Name,*ItemStructTable->NameType,
-	    	*ItemStructTable->NameDetail);
-
-        	UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() 아이템 구조체 %s%s%s"),*ItemStruct.Name,*ItemStruct.NameType,
-		    *ItemStruct.NameDetail);
-		}
-	}
-}
-
 FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-	if (ItemStruct.ItemTop == -1)
+	if (ItemStructTable.ItemTop == -1)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseButtonDown 슬롯 템 없음"));
 		return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);
@@ -98,8 +70,10 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Slot::왼쪽마우스 NativeOnMouseButtonDown"));
+		
 		return UWidgetBlueprintLibrary::DetectDragIfPressed(MouseEvent, this,
 			EKeys::LeftMouseButton).NativeReply;
+	
 	}
 	if (MouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
 	{
@@ -111,20 +85,8 @@ FReply USlot::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointe
 			ATestPlayer* TestPlayer = Cast<ATestPlayer>(PlayerController->GetPawn());
 			
 			bItemDetail = !bItemDetail;
-			ItemTableShow();
-
-			// UE_LOG(LogTemp, Display, TEXT("USlot::ItemTableShow() %s %s %s"),*ItemStruct.Name,*ItemStruct.NameType,
-			// *ItemStruct.NameDetail);
-			
 			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(bItemDetail ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetItemDetail(ItemStruct);
-			
-			// FGeometry Geometry = GetCachedGeometry();
-			// FVector2D Position = Geometry.GetAbsolutePosition();
-			// float Scale = UWidgetLayoutLibrary::GetViewportScale(this);
-			// FVector2D ScalePosition = Position / Scale;
-			// TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->
-			// SetRenderTranslation(ScalePosition);
+			TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetItemDetail(*ItemTableFind());
 		}
 	}
 	return Super::NativeOnMouseButtonDown(MyGeometry, MouseEvent);
@@ -146,9 +108,9 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 	Brush.DrawAs = ESlateBrushDrawType::Type::NoDrawType;
 	SlotImage->SetBrush(Brush);
 	
-    ItemObject->ItemStruct = ItemStruct;
-	ItemStruct = FItemStruct();
-	SlotCountUpdate(ItemStruct.ItemNum);
+    ItemObject->ItemStructTable = ItemStructTable;
+	ItemStructTable = FItemStructTable();
+	SlotCountUpdate(ItemStructTable.ItemNum);
 	
 	ItemObject->SlotUi = this;
 	
@@ -164,15 +126,32 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
 	UDragDropOperation* InOperation)
 {
-	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
-	Swap(ItemStruct, ItemObject->ItemStruct);
+	// Swap 추가 나중에 네트워크 동기화는 확인안해봐서 확인해볼것
+	if (ItemStructTable.ItemTop != -1)
+	{
+		UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
+        if (USlot* SlotPre = Cast<USlot>(ItemObject->SlotUi))
+        {
+	        SlotPre->ItemStructTable = ItemStructTable;
+        	ItemStructTable = ItemObject->ItemStructTable;
+        	SlotPre->SlotImageUpdate();
+        	SlotImageUpdate();
+        } 
+		return true;
+	}
+	// 밑에거는 동기화까지는 끝내는거 확인했던 함수임!!
+	else
+	{
+		UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
+		Swap(ItemStructTable, ItemObject->ItemStructTable);
 
-	SlotImageUpdate();
-	SlotCountUpdate(ItemStruct.ItemNum);
+		SlotImageUpdate();
+		SlotCountUpdate(ItemStructTable.ItemNum);
 	
-	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
-	return true;
-	// return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+		UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));
+		return true;
+		// return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+	}
 }
 
 void USlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -180,7 +159,17 @@ void USlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDr
 	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
 	
 	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
-	ItemStruct = ItemObject->ItemStruct;
+	ItemStructTable = ItemObject->ItemStructTable;
 	SlotImageUpdate();
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop 다른창에 했음"));
 }
+
+
+
+// Swap(ItemObject->SlotUi->ItemStructTable, ItemStructTable);
+// SlotImageUpdate();
+// ItemObject->SlotUi->SlotImageUpdate();
+// SlotCountUpdate(ItemStructTable.ItemNum);
+// ItemObject->SlotUi->ItemStructTable = ItemStructTable;
+// ItemObject->SlotUi->SlotImageUpdate();
+// UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop"));

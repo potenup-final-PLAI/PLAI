@@ -5,7 +5,6 @@
 
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Components/Button.h"
-#include "Developer/AITestSuite/Public/AITestsCommon.h"
 #include "Enemy/BaseEnemy.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
@@ -21,9 +20,16 @@ void UActionUI::NativeConstruct()
 	// UI 바인딩
 	btn_TurnEnd->OnClicked.AddDynamic(this, &UActionUI::OnClickedTurnEnd);
 	btn_Move->OnClicked.AddDynamic(this, &UActionUI::OnClickedMove);
-	btn_FirstSkill->OnClicked.AddDynamic(this, &UActionUI::OnClickedFirstSkill);
-	btn_SecondSkill->OnClicked.AddDynamic(
-		this, &UActionUI::OnClickedSecondSkill);
+	// skill 부분
+	btn_BaseAttack->OnClicked.AddDynamic(this, &UActionUI::OnClickedBaseAttack);
+	btn_Paralysis->OnClicked.AddDynamic(this, &UActionUI::OnClickedParalysis);
+	btn_Poison->OnClicked.AddDynamic(this, &UActionUI::OnClickedPoison);
+	btn_Vulnerable->OnClicked.AddDynamic(this, &UActionUI::OnClickedVulnerable);
+	btn_Weakening->OnClicked.AddDynamic(this, &UActionUI::OnClickedWeakening);
+	btn_Fatal->OnClicked.AddDynamic(this, &UActionUI::OnClickedFatal);
+	btn_Rupture->OnClicked.AddDynamic(this, &UActionUI::OnClickedRupture);
+	btn_Roar->OnClicked.AddDynamic(this, &UActionUI::OnClickedRoar);
+	btn_BattleCry->OnClicked.AddDynamic(this, &UActionUI::OnClickedBattleCry);
 }
 
 void UActionUI::OnClickedTurnEnd()
@@ -44,6 +50,9 @@ void UActionUI::OnClickedTurnEnd()
 		UE_LOG(LogTemp, Warning, TEXT("ActionUI OnClickedTurnEnd phaseManager nullPtr"));
 		return;
 	}
+	// 버튼 상태 업데이트
+	turnManager->curUnit->currentActionMode = EActionMode::TurnEnd;
+	
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
 	{
 		// 플레이어 턴 종료
@@ -60,15 +69,115 @@ void UActionUI::OnClickedTurnEnd()
 
 void UActionUI::OnClickedMove()
 {
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Move"));
+	turnManager->curUnit->currentActionMode = EActionMode::Move;
+	turnManager->curUnit->bIsMoveMode = true;
+	
 }
 
-void UActionUI::OnClickedFirstSkill()
+void UActionUI::OnClickedBaseAttack()
 {
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("FirstSkill"));
+	turnManager->curUnit->currentActionMode = EActionMode::BaseAttack;
 }
 
-void UActionUI::OnClickedSecondSkill()
+void UActionUI::OnClickedParalysis()
 {
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("SecondSkill"));
+	turnManager->curUnit->currentActionMode = EActionMode::Paralysis;
+}
+
+void UActionUI::OnClickedPoison()
+{
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
+	turnManager->curUnit->currentActionMode = EActionMode::Poison;
+}
+
+void UActionUI::OnClickedVulnerable()
+{
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
+	turnManager->curUnit->currentActionMode = EActionMode::Vulnerable;
+}
+
+void UActionUI::OnClickedWeakening()
+{
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
+	turnManager->curUnit->currentActionMode = EActionMode::Weakening;
+}
+
+void UActionUI::OnClickedFatal()
+{
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
+	turnManager->curUnit->currentActionMode = EActionMode::Fatal;
+}
+
+void UActionUI::OnClickedRupture()
+{
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
+	turnManager->curUnit->currentActionMode = EActionMode::Rupture;
+}
+
+void UActionUI::OnClickedRoar()
+{
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
+	turnManager->curUnit->currentActionMode = EActionMode::Roar;
+}
+
+void UActionUI::OnClickedBattleCry()
+{
+	if (!(Cast<ABattlePlayer>(turnManager->curUnit)))
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
+	turnManager->curUnit->currentActionMode = EActionMode::BattleCry;
 }

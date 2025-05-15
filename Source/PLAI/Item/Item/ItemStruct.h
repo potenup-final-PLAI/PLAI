@@ -56,7 +56,7 @@ USTRUCT(BlueprintType,Blueprintable)
 struct FItemStruct: public FTableRowBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	UPROPERTY(EditAnywhere)
 	int32 ItemTop = -1;
@@ -80,6 +80,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	FItemStructStatName ItemStructStatName;
 };
+
+
 
 USTRUCT(BlueprintType,Blueprintable)
 struct FItemMeshStruct
@@ -120,13 +122,14 @@ public:
 	TArray<FItemStructIndex>ItemMeshTops;
 };
 
-
 USTRUCT(BlueprintType,Blueprintable)
 struct FItemStructTable: public FTableRowBase
 {
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditAnywhere)
+	FString Item_Id = FString("Item_Id");
 	UPROPERTY(EditAnywhere)
 	int32 ItemTop = -1;
 	UPROPERTY(EditAnywhere)
@@ -143,16 +146,35 @@ public:
 	FString NameDetail = FString("Detail");
 	UPROPERTY(EditAnywhere)
 	int32 ItemNum = 0;
+	UPROPERTY(EditAnywhere)
+	int32 ItemGold = 0;
+	UPROPERTY(EditAnywhere)
+	int32 ItemLevel = 0;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* StaticMesh;
 	UPROPERTY(EditAnywhere)
 	UTexture2D* Texture;
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* Material;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ACreature>CreatureFactory;
 	
 	UPROPERTY(EditAnywhere)
 	FItemStructStat ItemStructStat;
 	UPROPERTY(EditAnywhere)
 	FItemStructStatName ItemStructStatName;
+};
+
+USTRUCT(Blueprintable,BlueprintType)
+struct FItemStructTables
+{
+	GENERATED_BODY()
+public:
+	
+	UPROPERTY(EditAnywhere)
+	TArray<FItemStructTable>ItemStructTables;
 };
 
 

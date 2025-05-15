@@ -6,13 +6,15 @@
 #include "JsonObjectConverter.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "Components/SizeBox.h"
+#include "Components/TextBlock.h"
 #include "PLAI/Item/Login/LoginComp.h"
 
 void UUiSign::NativeConstruct()
 {
 	Super::NativeConstruct();
-
 	ButtonSign->OnClicked.AddDynamic(this,&UUiSign::OnSignin);
+	SignCompleteBox->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UUiSign::OnSignin()
@@ -38,4 +40,13 @@ void UUiSign::OnSignin()
 	
 	FString path = FString::Printf(TEXT("%s/%s"),*FPaths::ProjectDir(),TEXT("SaveSign/SignSave.txt"));
 	FFileHelper::SaveStringToFile(JsonString,*path);
+
+	SignCompleteBox->SetVisibility(ESlateVisibility::Visible);
+	
+	// FTimerHandle TimerHandle;
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	// {
+	// 	UE_LOG(LogTemp,Display,TEXT("Sign Complete 1.5초뒤 지우자"));
+	// 	RemoveFromParent();
+	// },1.5,false);
 }
