@@ -20,22 +20,24 @@ ABaseEnemy::ABaseEnemy()
 
 	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("meshComp"));
 	meshComp->SetupAttachment(RootComponent);
-	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100), FRotator(0, -90, 0));
-	
+	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100),
+	                                         FRotator(0, -90, 0));
+	meshComp->bReceivesDecals = false;
 	// Mesh Setting
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("'/Game/Wood_Monster/CharacterParts/Meshes/SK_wood_giant_01_a.SK_wood_giant_01_a'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(
+		TEXT(
+			"'/Game/Wood_Monster/CharacterParts/Meshes/SK_wood_giant_01_a.SK_wood_giant_01_a'"));
 	if (tempMesh.Succeeded())
 	{
 		meshComp->SetSkeletalMesh(tempMesh.Object);
 	}
-	
+
 	// Animation Instance 세팅
 	// ConstructorHelpers::FClassFinder<UAnimInstance> tempAnimInstance(TEXT("'/Game/JS/Blueprints/Animation/ABP_BattleEnemy.ABP_BattleEnemy_C'"));
 	// if (tempAnimInstance.Succeeded())
 	// {
 	// 	meshComp->SetAnimInstanceClass(tempAnimInstance.Class);
 	// }
-	
 }
 
 // Called when the game starts or when spawned
@@ -58,8 +60,6 @@ void ABaseEnemy::PossessedBy(AController* NewController)
 void ABaseEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	
 }
 
 // Called to bind functionality to input
@@ -88,12 +88,14 @@ void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
 		currentActionMode = EActionMode::None;
 		if (enemyAnim)
 		{
-				
 			enemyAnim->actionMode = currentActionMode;
-			UE_LOG(LogTemp, Warning, TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
+			UE_LOG(LogTemp, Warning,
+			       TEXT("Processing anim actionMode Update !! %s"),
+			       *UEnum::GetValueAsString(enemyAnim->actionMode));
 		}
 		OnTurnEnd();
-		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
+		UE_LOG(LogTemp, Warning,
+		       TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
 		return;
 	}
 	InitValues();
@@ -199,7 +201,8 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	}
 
 	const FBattleAction& Action = actionRequest.actions[0];
-	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"), *actionRequest.current_character_id);
+	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"),
+	       *actionRequest.current_character_id);
 
 	if (actionRequest.actions.IsEmpty())
 	{
@@ -219,12 +222,13 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		{
 			if (enemyAnim)
 			{
-				
 				enemyAnim->actionMode = currentActionMode;
-				UE_LOG(LogTemp, Warning, TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
+				UE_LOG(LogTemp, Warning,
+				       TEXT("Processing anim actionMode Update !! %s"),
+				       *UEnum::GetValueAsString(enemyAnim->actionMode));
 			}
 		}
-		
+
 		int32 targetX = Action.move_to[0];
 		int32 targetY = Action.move_to[1];
 
@@ -244,7 +248,8 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("goalTile is nullptr"));
 				}
-				MoveToPlayer(goalTile, gridTileManager); // ✅ 타겟 null로 넘기고 이동만 실행
+				MoveToPlayer(goalTile, gridTileManager);
+				// ✅ 타겟 null로 넘기고 이동만 실행
 			}
 		}
 	}
@@ -267,20 +272,28 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 
 		FTimerHandle actionReasonTimerHandle;
 		GetWorld()->GetTimerManager().ClearTimer(actionReasonTimerHandle);
-		GetWorld()->GetTimerManager().SetTimer(actionReasonTimerHandle, FTimerDelegate::CreateLambda([this]()
-		{
-			this->battleUnitStateUI->ShowBaseUI();
-			this->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
-		}), 2.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(actionReasonTimerHandle,
+		                                       FTimerDelegate::CreateLambda(
+			                                       [this]()
+			                                       {
+				                                       this->battleUnitStateUI->
+					                                       ShowBaseUI();
+				                                       this->battleUnitStateComp
+					                                       ->SetDrawSize(
+						                                       FVector2D(
+							                                       50, 10));
+			                                       }), 2.0f, false);
 	}
 	// 3. 이동/행동력 소진 후 턴 종료
 	if (Action.remaining_ap <= 0 && Action.remaining_mov <= 0)
 	{
 		FTimerHandle timerHandle;
-		GetWorld()->GetTimerManager().SetTimer(timerHandle,FTimerDelegate::CreateLambda([=, this]()
-		{
-			OnTurnEnd();
-		}),1.0f,false);
+		GetWorld()->GetTimerManager().SetTimer(timerHandle,
+		                                       FTimerDelegate::CreateLambda(
+			                                       [=, this]()
+			                                       {
+				                                       OnTurnEnd();
+			                                       }), 1.0f, false);
 	}
 }
 
@@ -414,7 +427,8 @@ ABaseBattlePawn* ABaseEnemy::FindUnitById(const FString& Id)
 
 bool ABaseEnemy::TryConsumeAP(int32 amount)
 {
-	if (!enemybattleState->CanConsumeAP(amount)) {
+	if (!enemybattleState->CanConsumeAP(amount))
+	{
 		UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 		return false;
 	}

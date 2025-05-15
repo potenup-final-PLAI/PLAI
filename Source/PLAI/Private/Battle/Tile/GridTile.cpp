@@ -4,8 +4,7 @@
 #include "Battle/Tile/GridTile.h"
 
 #include "Components/BoxComponent.h"
-
-
+#include "Components/DecalComponent.h"
 // Sets default values
 AGridTile::AGridTile()
 {
@@ -16,6 +15,10 @@ AGridTile::AGridTile()
 	SetRootComponent(boxComp);
 	boxComp->SetRelativeScale3D(FVector(1.0f, 1.0f, 0.1f));
 	boxComp->SetBoxExtent(FVector(50));
+
+	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("meshComp"));
+	meshComp->SetupAttachment(RootComponent);
+	meshComp->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
 
 	// 변수 초기화
 	sCostValue = 0;
@@ -28,6 +31,8 @@ AGridTile::AGridTile()
 void AGridTile::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitDecal();
 }
 
 // Called every frame
@@ -36,11 +41,27 @@ void AGridTile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AGridTile::InitDecal()
+{
+	dynDecalInstance = meshComp->CreateDynamicMaterialInstance(0);
+	// UMaterialInterface* baseMat = decalComp->GetMaterial(0);
+	if (dynDecalInstance)
+	{
+		if (dynDecalInstance)
+		{
+			dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
+
+			// float value;
+			// dynDecalInstance->GetScalarParameterValue(TEXT("TileOpacity"), value);
+			// UE_LOG(LogTemp, Warning, TEXT("TileOpacity: %f"), value);
+		}
+	}
+}
+
 void AGridTile::SetGridCoord(FIntPoint coord)
 {
 	gridCoord = coord;
-	// UE_LOG(LogTemp, Warning, TEXT("Coord X = %d Coord Y = %d, TileName = %s"),
-	//        gridCoord.X, gridCoord.Y, *this->GetActorNameOrLabel());
+	// UE_LOG(LogTemp, Warning, TEXT("Coord X = %d Coord Y = %d, TileName = %s"), gridCoord.X, gridCoord.Y, *this->GetActorNameOrLabel());
 }
 
 void AGridTile::SetCost(AGridTile* s, AGridTile* g)
@@ -58,17 +79,17 @@ void AGridTile::SetCost(AGridTile* s, AGridTile* g)
 	FVector curPos = GetActorLocation();
 
 	// sCost 구하기
-	sCostValue = FMath::Abs(prevPos.X - curPos.X) + FMath::Abs(prevPos.Y - curPos.Y);
+	sCostValue = FMath::Abs(prevPos.X - curPos.X) + FMath::Abs(
+		prevPos.Y - curPos.Y);
 	sCostValue += s->sCostValue;
-	
+
 	// gCost 구하기
-	float gCostValue = FMath::Abs(goalPos.X - curPos.X) + FMath::Abs(goalPos.Y - curPos.Y);
+	float gCostValue = FMath::Abs(goalPos.X - curPos.X) + FMath::Abs(
+		goalPos.Y - curPos.Y);
 
 	// tCost 구하기
 	tCostValue = sCostValue + gCostValue;
-	
+
 	// 누구를 기준으로 Cost를 계산했냐?
 	parentTile = s;
 }
-
-

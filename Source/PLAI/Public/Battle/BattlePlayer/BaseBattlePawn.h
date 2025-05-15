@@ -46,10 +46,10 @@ public:
 	class UBattleUnitStateUI* battleUnitStateUI;
 	UPROPERTY(EditAnywhere)
 	class ABattleHUD* hud;
-	
+
 	// 다른 클래스 포인터 초기화
 	void InitOtherClassPointer();
-	
+
 	//--------------------AP System--------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	int32 maxActionPoints = 5;
@@ -95,11 +95,11 @@ public:
 
 	//----------Speed State-------------
 	int32 speed = 0;
-	
+
 	//------------Turn System-----------------
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
-	
+
 	void OnTurnStart();
 	void OnTurnEnd();
 
@@ -121,12 +121,16 @@ public:
 	void PlayerRoar(FHitResult& hitInfo);
 	void PlayerBattleCry(FHitResult& hitInfo);
 
-	
+
 	// Enemy 대미지 전달 함수
 	void EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType);
 	// Damage 계산 함수
-	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk, int32 weapon, float skillMultiplier, float criticalRate, float criticalDamage, int32 personality, int32 status_effect);
-	void PlayerApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
+	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk,
+	                             int32 weapon, float skillMultiplier,
+	                             float criticalRate, float criticalDamage,
+	                             int32 personality, int32 status_effect);
+	void PlayerApplyAttack(ABaseBattlePawn* targetUnit,
+	                       EActionMode attackType = EActionMode::None);
 
 	// 상태이상과 지속 턴 
 	TMap<EStatusEffect, int32> activeStatusEffects;
@@ -239,9 +243,14 @@ public:
 	void PathFind();
 	void BuildPath();
 	void AddOpenArray(FVector dir);
-	// 이동 범위 보일 수 있도록 주변 타일 색 변경 하는 함수
+	// 이동 범위 보일 수 있도록 주변 타일 색 변경 하는 함
+	UPROPERTY(EditAnywhere)
+	TArray<AGridTile*> highlightedTiles;
+
 	void SeeMoveRange(int32 move_Range);
+	void ClearGridTile();
 	//--------------이동 및 공격------------------
+
 
 	void UnitMoveRotateAttack();
 	//--------------Unit Move-------------------
@@ -292,9 +301,7 @@ public:
 	bool bWantsToAttack = false;
 	bool bStartMontage = false;
 	ABaseBattlePawn* attackTarget;
-	
+
 	//------------Enemy Turn 여러 번 호출 방지--------
 	bool bTurnEnded = false;
-	
-	
 };

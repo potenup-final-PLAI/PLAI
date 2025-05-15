@@ -139,10 +139,10 @@ AGridTile* AGridTileManager::GetTile(int32 x, int32 y)
 
 FIntPoint AGridTileManager::GetTileLoc(AGridTile* targetTile)
 {
-	if (tileToCoordMap.Contains(tile))
+	if (targetTile && tileToCoordMap.Contains(targetTile))
 	{
 		// UE_LOG(LogTemp, Warning, TEXT("%s의 좌표 : (%d, %d)"), *tile->GetActorNameOrLabel(), coord.X, coord.Y);
-		return tileToCoordMap[tile];
+		return tileToCoordMap[targetTile];
 	}
 
 	// 타일이 없다면
@@ -157,11 +157,28 @@ bool AGridTileManager::IsValidTile(FIntPoint num)
 	{
 		return true;
 	}
-	
+
 	return false;
 }
 
-void AGridTileManager::SetTileColor(AGridTile* targetTile, FColor color)
+void AGridTileManager::SetTileColor(AGridTile* targetTile,  bool bHighlight)
 {
-	//그 위치 타일 색 변경
+	if (!targetTile || !targetTile->dynDecalInstance)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetTileColor : !targetTile || !targetTile->dynDecalInstance"));
+		return;
+	}
+
+	if (bHighlight)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("clearTileTogle SetTileColor"));
+		//그 위치 타일 색 변경
+		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.1f);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Draw SetTileColor"));
+		//그 위치 타일 색 변경
+		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
+	}
 }

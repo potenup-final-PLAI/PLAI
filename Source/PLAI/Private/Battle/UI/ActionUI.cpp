@@ -47,12 +47,13 @@ void UActionUI::OnClickedTurnEnd()
 	}
 	if (phaseManager == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ActionUI OnClickedTurnEnd phaseManager nullPtr"));
+		UE_LOG(LogTemp, Warning,
+		       TEXT("ActionUI OnClickedTurnEnd phaseManager nullPtr"));
 		return;
 	}
 	// 버튼 상태 업데이트
 	turnManager->curUnit->currentActionMode = EActionMode::TurnEnd;
-	
+
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
 	{
 		// 플레이어 턴 종료
@@ -78,7 +79,11 @@ void UActionUI::OnClickedMove()
 	UE_LOG(LogTemp, Warning, TEXT("Move"));
 	turnManager->curUnit->currentActionMode = EActionMode::Move;
 	turnManager->curUnit->bIsMoveMode = true;
-	
+	// 범위 보이게 설정
+	turnManager->curUnit->SeeMoveRange(
+		turnManager->curUnit->battlePlayerState->playerStatus.move_Range);
+	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"),
+	       turnManager->curUnit->battlePlayerState->playerStatus.move_Range)
 }
 
 void UActionUI::OnClickedBaseAttack()
