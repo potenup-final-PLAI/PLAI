@@ -657,8 +657,9 @@ void UInvenComp::UiGetLevel(TArray<int32>Levels)
 	MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Visible);
 	UE_LOG(LogTemp,Warning,TEXT("InvenComp 레벨업 UI 떠야하는디 타이머 전에서 Levels 배열갯수는? [%d]"),Levels.Num())
 	
-	GetWorld()->GetTimerManager().SetTimer(LevelTimerHandle,[this, Time, Levels]() mutable{
-		Time += 0.02f;
+	GetWorld()->GetTimerManager().SetTimer(LevelTimerHandle,[this, Time, Levels]()mutable{
+		Time += 0.04f;
+		MenuInven->Wbp_UiChaLevelUp->SetOpacity(Time);
 		if (Time >= 1.f)
 		{
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 레벨업 UI 떠야하는디 Levels 배열갯수는? [%d]"),Levels.Num())
