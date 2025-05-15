@@ -64,7 +64,12 @@ void ULoginComp::BeginPlay()
 				
 				FTimerHandle TimerHandle;
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-				{ TestPlayer->InvenComp->TurnReward(); },1.0,false);
+				{
+					TestPlayer->InvenComp->TurnReward();
+					UserFullInfo.character_info.current_exp += 7200;
+					TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&UserFullInfo);
+					TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetUiChaView(UserFullInfo);
+				},1.0,false);
 			}
 		}
 	}

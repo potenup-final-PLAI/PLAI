@@ -16,6 +16,8 @@ void UInputUi::InputUiHidden()
 		
 		SetRenderOpacity(sin(Rad));
 		
+		SetRenderOpacity(FMath::Clamp(sin(Rad) ,0.0f, 1.0f));
+		
 		if (CurrentOpacity <= 0.f)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(TimerHandle);

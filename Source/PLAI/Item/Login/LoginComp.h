@@ -137,7 +137,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
-
+	
 	UPROPERTY(EditAnywhere)
 	FUserFullInfo UserFullInfoStat;
 
@@ -146,6 +146,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UDataTable* TraitStructTable;
+
+	UPROPERTY(EditAnywhere)
+	UDataTable* LevelTable;
 	
     UPROPERTY(EditAnywhere)
 	FString User_id = FString("user_id");
@@ -167,12 +170,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UUiMain* UiMain;
 
-	// UPROPERTY(EditAnywhere)
-	// TSubclassOf<class UMain> MainFactory;
-	//
-	// UPROPERTY(EditAnywhere)
-	// class UMain* Main;
-
 	UPROPERTY(EditAnywhere)
 	class ATestPlayer* TestPlayer;
 	
@@ -188,8 +185,6 @@ public:
 	void Client_HttpMePost();
 	
 	void HttpMePost();
-
-    void SetTrait();
 	
 	void LoadEquipItem();
 	void LoadInvenItem();

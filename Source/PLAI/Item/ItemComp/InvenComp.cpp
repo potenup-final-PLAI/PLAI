@@ -23,10 +23,12 @@
 #include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/InputUi/InputUi.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
+#include "PLAI/Item/UI/Main/UiChaView.h"
 #include "PLAI/Item/UI/Slot/SlotCre.h"
 
 
@@ -59,6 +61,7 @@ void UInvenComp::BeginPlay()
 			MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
+			MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 			// TurnReward();
 			WorldGi->bBattleReward = false;
 		}
@@ -596,6 +599,12 @@ void UInvenComp::TurnReward()
 		}
 	},2.5f,false);
 	
+}
+
+void UInvenComp::GetExp(int32 Exp)
+{
+	TestPlayer->LoginComp->UserFullInfo.character_info.current_exp += Exp;
+	MenuInven->Wbp_ChaView->SetUiChaView(TestPlayer->LoginComp->UserFullInfo);
 }
 
 void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

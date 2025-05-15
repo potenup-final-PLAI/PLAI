@@ -189,3 +189,14 @@ class PLAI_API UUserStruct : public UObject
 	GENERATED_BODY()
 };
 
+USTRUCT(BlueprintType)
+struct FLevelInfo : public FTableRowBase
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere)
+    int32 level = 1;
+    UPROPERTY(EditAnywhere)
+    int32 Exp = 0;
+};
+

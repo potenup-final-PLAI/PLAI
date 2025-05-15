@@ -143,6 +143,8 @@ public:
 	
 	void TurnReward();
 
+    void GetExp(int32 Exp);
+	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 public:
 	UPROPERTY(EditAnywhere)
