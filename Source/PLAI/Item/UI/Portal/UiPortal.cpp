@@ -33,6 +33,7 @@ void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
 		if (AMonster* Monster = Cast<AMonster>(Mon))
 		{
 			Monster->Destroy();
+			break;
 		}
 	}
 	
