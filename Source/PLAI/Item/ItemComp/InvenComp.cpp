@@ -57,14 +57,14 @@ void UInvenComp::BeginPlay()
 	{
 		if (WorldGi->bBattleReward == true)
 		{
-			MenuInven->AddToViewport();
+			MenuInven->AddToViewport(1);
 			MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
-			// TurnReward();
+			
 			WorldGi->bBattleReward = false;
 		}
 	}
@@ -129,7 +129,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 						}
 					}
 				}
-				// Npc->NpcUiMaster->SetVisibility(ESlateVisibility::Visible);
 			}
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
@@ -314,6 +313,42 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = GetOwner();
+
+	// Item->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
+	// if (ItemStructTable->ItemIndex == 0)
+	// {
+	// 	Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_rSocket"));
+	// 	Item->AddActorWorldOffset(FVector(30, 5, -10));
+	// 	Item->AddActorLocalRotation(FRotator(-165, 10, 100));
+	// 						
+	// 	// Item->AddActorWorldRotation(FRotator(0, 105, 0));
+	// }
+	// else if (ItemStructTable->ItemIndex == 1)
+	// {
+	// 	Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Chest"));
+	// 	Item->AddActorWorldOffset(FVector(-20, 0, -80));
+	// 	Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 90, 0));
+	// 	Item->SetActorScale3D(FVector(1.05, 1.05, 1.05));
+	// }
+	// else if (ItemStructTable->ItemIndex == 2)
+	// {
+	// 	Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("headSocket"));
+	//
+	// 	Item->AddActorWorldOffset(FVector(-0, 0, 10));
+	// 						
+	// 	Item->AddActorLocalRotation(FRotator(0, -90, 90));
+	// 						
+	// 	Item->SetActorScale3D(FVector(0.8,0.8,0.8));
+	// } 
+	// else if (ItemStructTable->ItemIndex == 3)
+	// {
+	// 	Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("FX_Ult_Passive"));
+	//
+	// 	Item->AddActorWorldOffset(FVector(-0, 0, -130));
+	// 	Item->AddActorLocalRotation(FRotator(0, 100, 0));
+	// }
+	// Item->StaticMesh->SetMaterial(0,ItemStructTable->Material);
+	
 	if (SlotType == EquipSlotType::Weapon)
 	{
 		if (ItemWeapon != nullptr) return;
@@ -324,7 +359,11 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemWeapon->ItemStructTable = ItemStructTable;
 		ItemWeapon->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+		// ItemWeapon->AddActorWorldOffset(FVector(30, 5, -10));
+		// ItemWeapon->AddActorLocalRotation(FRotator(-165, 10, 100));
+		// ItemWeapon->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_rSocket"));
 		ItemWeapon->AddActorWorldOffset(FVector(30, 5, -10));
+		
 		ItemWeapon->AddActorLocalRotation(FRotator(-165, 10, 100));
 
 		if (ItemStructTable.Material)
@@ -334,11 +373,16 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	{
 		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),
 		FRotator(0,0,0),SpawnParams);
-		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("spine_02Socket"));
+		// ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("spine_02Socket"));
+		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Chest"));
 		ItemArmor->ItemStructTable = ItemStructTable;
 		ItemArmor->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
-		ItemArmor->SetActorLocation(ItemArmor->GetActorLocation() + FVector(0,0,45));
+		// ItemArmor->SetActorLocation(ItemArmor->GetActorLocation() + FVector(0,0,45));
 		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+
+	    ItemArmor->AddActorWorldOffset(FVector(-20, 0, -80));
+	    ItemArmor->SetActorRotation(ItemWeapon->GetActorRotation() + FRotator(0, 90, 0));
+	    ItemArmor->SetActorScale3D(FVector(1.05, 1.05, 1.05));
 		
 		if (ItemStructTable.Material)
 		{ ItemArmor->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
@@ -350,7 +394,12 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemHelmet->ItemStructTable = ItemStructTable;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemHelmet->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
-		ItemHelmet->StaticMesh->SetRelativeRotation(FRotator(0,90,-90));
+		// ItemHelmet->StaticMesh->SetRelativeRotation(FRotator(0,90,-90));
+		// ItemHelmet->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("headSocket"));
+		
+		ItemHelmet->AddActorWorldOffset(FVector(-0, 0, 10));
+		ItemHelmet->AddActorLocalRotation(FRotator(0, -90, 90));
+		ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
 
 		if (ItemStructTable.Material)
 		{ ItemHelmet->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
@@ -372,14 +421,18 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	else if (SlotType == EquipSlotType::Boots)
 	{
 		Itemboots = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(75,75,75),FRotator(0,0,0));
-		Itemboots->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
+		// Itemboots->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
+		Itemboots->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("FX_Ult_Passive"));
 		Itemboots->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		Itemboots->ItemStructTable = ItemStructTable;
 		Itemboots->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
+		
+		Itemboots->AddActorWorldOffset(FVector(-0, 0, -130));
+		Itemboots->AddActorLocalRotation(FRotator(0, 100, 0));
  
 		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
-		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
-		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
+		// Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
+		// Itemboots->SetActorRelativeLocation(FVector(75,75,75));
 		
 		if (ItemStructTable.Material)
 		{ Itemboots->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
@@ -604,7 +657,7 @@ void UInvenComp::TurnReward()
 			UiTurnReward->RemoveFromParent();
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
 		}
-	},2.5f,false);
+	},1.5f,false);
 	
 }
 
@@ -632,6 +685,8 @@ void UInvenComp::GetLevel()
 		if (TestPlayer->LoginComp->UserFullInfo.character_info.current_exp < LevelStruct->Exp)
 		{
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp GetLevel에서 넘기는 레벨 배열 크기는? [%d]"),Levels.Num())
+			
+			LevelCounts.Add(LevelStruct->level);
 			UiGetLevel(LevelCounts);
 			return;
 		}
@@ -654,7 +709,6 @@ void UInvenComp::GetLevel()
 void UInvenComp::UiGetLevel(TArray<int32>Levels)
 {
 	float Time = 0.f;
-	MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Visible);
 	UE_LOG(LogTemp,Warning,TEXT("InvenComp 레벨업 UI 떠야하는디 타이머 전에서 Levels 배열갯수는? [%d]"),Levels.Num())
 	
 	GetWorld()->GetTimerManager().SetTimer(LevelTimerHandle,[this, Time, Levels]()mutable{
@@ -669,6 +723,8 @@ void UInvenComp::UiGetLevel(TArray<int32>Levels)
 				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
 				return;
 			}
+			if ( MenuInven->Wbp_UiChaLevelUp->GetVisibility() == ESlateVisibility::Hidden)
+			{ MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Visible); }
 			MenuInven->Wbp_UiChaLevelUp->LevelUpCount->SetText(FText::AsNumber(Levels[0]));
 			Levels.RemoveAt(0);
 			Time -= 1.f;

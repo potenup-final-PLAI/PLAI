@@ -41,15 +41,6 @@ void ATestPlayer::BeginPlay()
     
 	StoreComp->StoreInven->AddToViewport();
 	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
-    
-	
-	// if (APlayerController* Pc = Cast<APlayerController>(GetController()))
-	// {
-	// 	TopDownCameraComponent->SetActive(false);
-	// 	Pc->SetViewTarget(this);
-	// }
-	// //카메라붐 카메라 회전값적용
-	// CameraBoom->bUsePawnControlRotation = true;
 }
 
 // Called every frame

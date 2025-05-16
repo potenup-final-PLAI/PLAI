@@ -210,7 +210,11 @@ void ULogItemComp::GetUserLevel()
 	PutUserLevel.max_exp = TestPlayer->LoginComp->UserFullInfo.character_info.max_exp;
 	PutUserLevel.position = TestPlayer->LoginComp->UserFullInfo.character_info.position;
 	PutUserLevel.traits = TestPlayer->LoginComp->UserFullInfo.character_info.traits;
-
+	
+	PutUserLevel.position.x = TestPlayer->GetActorLocation().X;
+	PutUserLevel.position.y = TestPlayer->GetActorLocation().Y;
+	PutUserLevel.position.z = TestPlayer->GetActorLocation().Z;
+	
 	FString JsonString;
 	FJsonObjectConverter::UStructToJsonObjectString(PutUserLevel,JsonString);
 	HttpUserLevelPut(JsonString);

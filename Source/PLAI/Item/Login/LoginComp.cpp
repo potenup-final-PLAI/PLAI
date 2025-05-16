@@ -289,14 +289,14 @@ void ULoginComp::HttpMePost()
 				TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&UserFullInfo);
 				FUserFullInfo InitUserFullInfo;
 				
-				if (InitUserFullInfo.character_info.character_name != UserFullInfo.character_info.character_name)
-				{
-					UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성된 캐릭터 닉넴은? %s"),*UserFullInfo.character_info.character_name);
-					UiMain->Wbp_UiInitMain->RemoveFromParent();
-				}else
-				{
-					UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성되지 않은 캐릭터 입니다? %s"),*UserFullInfo.character_info.character_name);
-				}
+				// if (InitUserFullInfo.character_info.character_name != UserFullInfo.character_info.character_name)
+				// {
+				// 	UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성된 캐릭터 닉넴은? %s"),*UserFullInfo.character_info.character_name);
+				// 	UiMain->Wbp_UiInitMain->RemoveFromParent();
+				// }else
+				// {
+				// 	UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성되지 않은 캐릭터 입니다? %s"),*UserFullInfo.character_info.character_name);
+				// }
 			}
 			else
 			{
@@ -316,6 +316,16 @@ void ULoginComp::HttpMePost()
 			(FText::AsNumber(UserFullInfo.character_info.current_exp));
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->MaxExpCha->SetText
 			(FText::AsNumber(UserFullInfo.character_info.max_exp));
+
+			if (TestPlayer && UserFullInfo.character_info.position.x != 0)
+			{
+				TestPlayer->SetActorLocation(FVector(UserFullInfo.character_info.position.x,
+					UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z));
+			}
+			else
+			{
+				UE_LOG(LogTemp,Warning,TEXT("LoginComp 캐릭터 위치 불러오려다 TestPlayer 또는 X 좌표 0임"))
+			}
 		}
 	});
 	httpRequest->ProcessRequest();
