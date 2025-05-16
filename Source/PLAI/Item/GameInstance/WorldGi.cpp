@@ -2,8 +2,52 @@
 
 
 #include "WorldGi.h"
-
+#include "OnlineSubsystem.h"
+#include "OnlineSessionSettings.h"
 #include "Player/BattlePlayer.h"
+
+
+void UWorldGi::Init()
+{
+	Super::Init();
+
+	// 현재 사용하는 서브시스템을 가져오자
+	IOnlineSubsystem* Subsys = IOnlineSubsystem::Get();
+	if (Subsys)
+	{
+		SessionInterface = Subsys->GetSessionInterface();
+
+		SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this,&UWorldGi::OnCreateSessionComplete);
+	}
+}
+
+void UWorldGi::CreateSession(FString displayName, int32 playerCount)
+{
+	// 세션을 만들기 위한 옵션 설정
+	FOnlineSessionSettings SessionSettings;
+	FName SubSysName = IOnlineSubsystem::Get()->GetSubsystemName();
+	SessionSettings.bIsLANMatch = SubSysName.IsEqual(FName(TEXT("NULL")));
+	UE_LOG(LogTemp, Error, TEXT("WorldGi = Creating Session... 서브시스템 이름 [%s]"),*SubSysName.ToString());
+
+	SessionSettings.bUseLobbiesIfAvailable = true;
+	SessionSettings.bUsesPresence = true;
+	SessionSettings.bShouldAdvertise = true;
+	SessionSettings.NumPublicConnections = playerCount;
+
+	SessionInterface->CreateSession(0, FName(displayName), SessionSettings);
+}
+
+void UWorldGi::OnCreateSessionComplete(FName sessionName, bool success)
+{
+	if (success)
+	{
+		UE_LOG(LogTemp, Error, TEXT("WorldGi = OnCreateSessionComplete 세션성공 [%s]"),*sessionName.ToString());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("WorldGi = OnCreateSessionComplete 세션실패 [%s]"),*sessionName.ToString());
+	}
+}
 
 void UWorldGi::EquipActor(AActor* MyActor)
 {
@@ -60,3 +104,4 @@ void UWorldGi::EquipActor(AActor* MyActor)
 		}
 	}
 }
+

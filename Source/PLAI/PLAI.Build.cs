@@ -13,6 +13,7 @@ public class PLAI : ModuleRules
 			"Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem",
 			"AIModule", "Niagara", "EnhancedInput", "UMG", "Slate", "SlateCore",
 			"JsonUtilities","Json", "HTTP", "AITESTSUITE", "Niagara", "WebSockets"
+			,"OnlineSubsystem", "OnlineSubsystemSteam"
 		});
 
 		PublicIncludePaths.AddRange(new[]

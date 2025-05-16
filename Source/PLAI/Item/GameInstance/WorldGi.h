@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/GameInstance.h"
+#include "OnlineSubsystem.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Login/UserStruct.h"
 #include "WorldGi.generated.h"
@@ -39,6 +40,14 @@ class PLAI_API UWorldGi : public UGameInstance
 	GENERATED_BODY()
 
 public:
+
+	UFUNCTION(BlueprintCallable)
+	void CreateSession(FString displayName, int32 playerCount);
+	void OnCreateSessionComplete(FName sessionName, bool success);
+	
+	IOnlineSessionPtr SessionInterface;
+	
+	virtual void Init() override;
 	
 	UPROPERTY(EditAnywhere)
 	FUserShields UserShields;
@@ -75,5 +84,6 @@ public:
 
 	void EquipActor(AActor* MyActor);
 
+	
 	
 };
