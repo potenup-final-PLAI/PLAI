@@ -176,30 +176,22 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	}
 
 	// 배열이 비어 있다면 return
-	if (actionRequest.actions.IsEmpty())
+	if (actionRequest.action.target_character_id == "")
 	{
 		UE_LOG(LogTemp, Error, TEXT("ProcessAction: actions array is empty"));
 		OnTurnEnd();
 		return;
 	}
 	
-	const FBattleAction& Action = actionRequest.actions[0];
+	const FBattleAction& action = actionRequest.action;
 	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"),
 	       *actionRequest.current_character_id);
-
-	if (actionRequest.actions.IsEmpty())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No actions provided"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("actions"));
-	}
+	
 	
 	// 3. API 행동 이유 출력
-	if (Action.reason != "")
+	if (action.reason != "")
 	{
-		FString reason = Action.reason;
+		FString reason = action.reason;
 		this->battleUnitStateComp->SetDrawSize(FVector2d(150, 100));
 		this->battleUnitStateUI->ShowAPIReasonUI();
 		this->battleUnitStateUI->SetAPIReason(reason);
@@ -214,7 +206,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	}
 	
 	// 1. 이동 처리
-	if (Action.move_to.Num() == 2)
+	if (action.move_to.Num() == 2)
 	{
 		// enemy actionmode 업데이트
 		if (auto* enemy = Cast<ABaseEnemy>(this))
@@ -230,8 +222,8 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 			}
 		}
 
-		int32 targetX = Action.move_to[0];
-		int32 targetY = Action.move_to[1];
+		int32 targetX = action.move_to[0];
+		int32 targetY = action.move_to[1];
 
 		// GridTileManager 통해 목표 타일 찾기
 		if (gridTileManager)
@@ -256,16 +248,16 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	}
 
 	// 2. 스킬 처리 (예: 타격이면 공격)
-	if (Action.skill == TEXT("타격"))
+	if (action.skill == TEXT("타격"))
 	{
-		attackTarget = FindUnitById(Action.target_character_id);
+		attackTarget = FindUnitById(action.target_character_id);
 		bWantsToAttack = true;
 		bStartMontage = true;
 	}
 
 	
 	// 3. 이동/행동력 소진 후 턴 종료
-	if (Action.remaining_ap <= 0 && Action.remaining_mov <= 0)
+	if (action.remaining_ap <= 0 && action.remaining_mov <= 0)
 	{
 		FTimerHandle timerHandle;
 		GetWorld()->GetTimerManager().SetTimer(timerHandle,FTimerDelegate::CreateLambda([=, this]()
