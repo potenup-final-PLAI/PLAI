@@ -118,7 +118,7 @@ struct FActionRequest
 	FString current_character_id = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FBattleAction> actions = {};
+	FBattleAction action = {};
 };
 
 // 캐릭터 스텟

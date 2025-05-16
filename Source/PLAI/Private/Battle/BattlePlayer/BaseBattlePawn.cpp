@@ -154,20 +154,19 @@ void ABaseBattlePawn::OnTurnStart()
 	// Enemy라면
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
-		// 턴 시작 시 AP 증가
 		if (!enemybattleState)
 		{
-			UE_LOG(LogTemp, Error,
-			       TEXT("enemybattleState is null on OnTurnStart"));
+			UE_LOG(LogTemp, Error, TEXT("enemybattleState is null on OnTurnStart"));
 			return;
 		}
 		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnTurnStart"));
 
-		enemybattleState->curAP += enemybattleState->GetAP(
-			enemybattleState->curAP);
-		UE_LOG(LogTemp, Warning, TEXT("Current AP: %d"),
-		       enemybattleState->curAP);
+		// 턴 시작 시 AP 증가
+		enemybattleState->curAP += enemybattleState->GetAP(enemybattleState->curAP);
+		UE_LOG(LogTemp, Warning, TEXT("Current AP: %d"),enemybattleState->curAP);
 
+		enemy->SeeMoveRange(enemy->enemybattleState->move_Range);
+		
 		ABaseBattlePawn* CapturedUnit = this;
 
 		FTimerHandle battleAPIHandle;
@@ -227,8 +226,7 @@ void ABaseBattlePawn::OnMouseLeftClick()
 	FHitResult hitInfo;
 	FCollisionQueryParams params;
 
-	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(
-		start, dir);
+	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(start, dir);
 	end = start + dir * 10000;
 
 	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,
@@ -1888,7 +1886,7 @@ void ABaseBattlePawn::InitTraits()
 		for (const FString trait : enemyTraits)
 		{
 			int32 seletTrait = FMath::RandRange(0, 19);
-			if (seletTrait <= 3)
+			if (seletTrait <= 3 && !enemy->enemybattleState->traits.Contains(trait))
 			{
 				enemy->enemybattleState->traits.Add(trait);
 			}

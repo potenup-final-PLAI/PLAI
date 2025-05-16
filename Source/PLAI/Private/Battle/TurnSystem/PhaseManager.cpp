@@ -9,7 +9,6 @@
 #include "Battle/Http/BattleHttpActor.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
-#include "Battle/UI/BattlePlayerInfoUI.h"
 #include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/CycleAndTurn.h"
 #include "Battle/UI/MainBattleUI.h"
@@ -152,7 +151,7 @@ void AUPhaseManager::SetUnitQueue()
 					continue;
 				}
 
-				enemy->speed = enemy->enemybattleState->enemyStatus.speed;
+				enemy->speed = enemy->speed;
 				aliveEnemies++;
 			}
 
@@ -757,7 +756,7 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			player->battlePlayerState->playerStatus.critical_Rate = gi->UserFullInfoGiStat.character_info.stats.critical_rate;
 			player->battlePlayerState->playerStatus.critical_Damage = gi->UserFullInfoGiStat.character_info.stats.critical_damage;
 			player->battlePlayerState->playerStatus.speed = gi->UserFullInfoGiStat.character_info.stats.speed;
-
+			
 			for (const FString trait : gi->UserFullInfoGiStat.character_info.traits)
 			{
 				player->battlePlayerState->playerStatus.traits.Add(trait);

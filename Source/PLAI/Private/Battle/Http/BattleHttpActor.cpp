@@ -58,14 +58,14 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,
 	{
 		// 요청 URL - 서버가 알려줌
 		httpRequest->SetURL(TEXT(
-			"https://919e-221-148-189-129.ngrok-free.app/service1/battle/start"));
+			"https://0b55-221-148-189-129.ngrok-free.app/service1/battle/start"));
 	}
 	// Action API 일때
 	else if (bHasTurn)
 	{
 		// 요청 URL - 서버가 알려줌
 		httpRequest->SetURL(TEXT(
-			"https://919e-221-148-189-129.ngrok-free.app/service1/battle/action"));
+			"https://0b55-221-148-189-129.ngrok-free.app/service1/battle/action"));
 	}
 	// 요청 방식
 	httpRequest->SetVerb(TEXT("POST"));
@@ -137,7 +137,7 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,
 						UE_LOG(LogTemp, Warning,
 						       TEXT("Success Response Json To Struct"));
 
-						if (ParsedRequest.actions.IsEmpty())
+						if (ParsedRequest.action.target_character_id == "")
 						{
 							UE_LOG(LogTemp, Error,TEXT("Parsed ActionRequest has empty actions array"));
 							if (auto* enemy = Cast<ABaseEnemy>(unit))
