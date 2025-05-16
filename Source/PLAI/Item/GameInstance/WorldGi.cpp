@@ -28,8 +28,6 @@ void UWorldGi::EquipActor(AActor* MyActor)
 							Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_rSocket"));
 							Item->AddActorWorldOffset(FVector(30, 5, -10));
 							Item->AddActorLocalRotation(FRotator(-165, 10, 100));
-							
-							// Item->AddActorWorldRotation(FRotator(0, 105, 0));
 						}
 						else if (ItemStructTable->ItemIndex == 1)
 						{
@@ -56,29 +54,6 @@ void UWorldGi::EquipActor(AActor* MyActor)
 							Item->AddActorLocalRotation(FRotator(0, 100, 0));
 						}
 						Item->StaticMesh->SetMaterial(0,ItemStructTable->Material);
-
-
-						// Item->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
-						// if (ItemStructTable->ItemIndex == 0)
-						// {
-						// 	Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorRightVector() * 100);
-						// }
-						// else if (ItemStructTable->ItemIndex == 1)
-						// {
-						// 	Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorForwardVector() * 100);
-						// 	Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 180, 0));
-						// }
-						// else if (ItemStructTable->ItemIndex == 2)
-						// {
-						// 	Item->SetActorLocation(MyActor->GetActorLocation() +FVector(0, 0, 125));
-						// } 
-						// else if (ItemStructTable->ItemIndex == 3)
-						// {
-						// 	Item->SetActorLocation(MyActor->GetActorLocation() + MyActor->GetActorForwardVector() * -100);
-						// 	Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 180, 0));
-						// }
-						// Item->AttachToActor(MyActor,FAttachmentTransformRules::KeepWorldTransform);
-						// Item->StaticMesh->SetMaterial(0,ItemStructTable->Material);
 					}
 				}
 			}

@@ -11,12 +11,40 @@
 /**
  * 
  */
+
+USTRUCT(BlueprintType)
+struct FUserShield
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	FString UserName = FString("UserName");
+
+	UPROPERTY(EditAnywhere)
+	int32 UserShield = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FUserShields
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<FUserShield>UserShields;
+};
+
 UCLASS(Blueprintable,Blueprintable)
 class PLAI_API UWorldGi : public UGameInstance
 {
 	GENERATED_BODY()
 
 public:
+	
+	UPROPERTY(EditAnywhere)
+	FUserShields UserShields;
+	
+	// UPROPERTY(EditAnywhere)
+	// FUserShield UserShield;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	TArray<int32>bWorldSpawnInt;
@@ -46,4 +74,6 @@ public:
 	bool bLoginMe = false;
 
 	void EquipActor(AActor* MyActor);
+
+	
 };

@@ -8,6 +8,7 @@
 #include "Components/TextBlock.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
+#include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/UI/Main/UiMain.h"
 
 
@@ -58,7 +59,8 @@ void ANpcNet::OpenQuest()
 void ANpcNet::NetPost(FString String)
 {
 	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
-	HttpRequest->SetURL("https://919e-221-148-189-129.ngrok-free.app/service1/npc/chat");
+	FNgrok Ngrok;
+	HttpRequest->SetURL(Ngrok.Ngrok + TEXT("/npc/chat"));
 	HttpRequest->SetVerb("POST");
 	HttpRequest->SetHeader("Content-Type", "application/json");
 
