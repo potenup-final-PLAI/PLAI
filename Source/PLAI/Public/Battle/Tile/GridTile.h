@@ -25,10 +25,17 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	class UBoxComponent* boxComp;
+	UPROPERTY(VisibleAnywhere)
+	class UStaticMeshComponent* meshComp;
+	
+	UPROPERTY(VisibleAnywhere)
+	class UMaterialInstanceDynamic* dynDecalInstance;
 
 	UPROPERTY(VisibleAnywhere)
 	FIntPoint gridCoord;
 
+
+	void InitDecal();
 	void SetGridCoord(FIntPoint coord);
 
 	//--------------------Move System------------------------
@@ -38,7 +45,6 @@ public:
 	float tCostValue = 0;
 	UPROPERTY(EditAnywhere)
 	AGridTile* parentTile;
-	
+
 	void SetCost(AGridTile* s, AGridTile* g);
-	
 };

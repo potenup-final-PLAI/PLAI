@@ -46,5 +46,15 @@ public:
 
 	// 받은 데이터로 enemy 움직임
 	void ProcessAction(const FActionRequest& actionRequest);
+
+	// enemy 스킬리스트
+	TMap<FString, EActionMode> ActionMap;
+
+	void InitActionMap();
+	void EnemyActionList(const FString& actionName);
+	// ID 찾기
 	ABaseBattlePawn* FindUnitById(const FString& Id);
+
+	// 현재 AP로 사용 가능한지 체크
+	bool TryConsumeAP(int32 amount);
 };
