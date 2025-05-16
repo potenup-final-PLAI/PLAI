@@ -20,13 +20,16 @@
 #include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/Npc/NpcStore.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Character/UiChaLevelUp.h"
 #include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Slot/SlotEquip.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/InputUi/InputUi.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
+#include "PLAI/Item/UI/Main/UiChaView.h"
 #include "PLAI/Item/UI/Slot/SlotCre.h"
 
 
@@ -59,6 +62,8 @@ void UInvenComp::BeginPlay()
 			MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
+			MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
+			MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
 			// TurnReward();
 			WorldGi->bBattleReward = false;
 		}
@@ -71,41 +76,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     // 데이터테이블 템 먹기
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
-
-    //임시함수임
-	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::P)){ SetGold(500);}
-	
-	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
-	{   UE_LOG(LogTemp, Warning, TEXT("몬스터 트리거 Q키 !"));
-
-		TArray<FOverlapResult> Hits;
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(TestPlayer);
-
-		DrawDebugSphere(GetWorld(),TestPlayer->GetActorLocation()+TestPlayer->GetActorForwardVector() * 50,100,
-			20,FColor::Red,false,2)
-;		bool bHit = GetWorld()->OverlapMultiByChannel(Hits,TestPlayer->GetActorLocation()+TestPlayer->GetActorForwardVector() * 50,
-	FQuat::Identity, ECC_Visibility,FCollisionShape::MakeSphere(100),Params);
-		
-		if (bHit)
-		{
-			for (FOverlapResult Hit: Hits)
-			{
-				if (AMonWorld* MonWorld = Cast<AMonWorld>(Hit.GetActor()))
-				{
-					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 맞노"))
-					if (UWorldGi* Gi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-					{
-						UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
-					};
-				}
-				else
-				{
-					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 아니야"))
-				}
-			}
-		}
-	}
 	
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
@@ -597,6 +567,11 @@ void UInvenComp::TurnReward()
 	UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
 	UiTurnReward->AddToViewport();
 
+	int32 Exp = FMath::RandRange(7300,8000);
+	TestPlayer->InvenComp->GetExp(Exp);
+
+    UiTurnReward->RewardExp->SetText(FText::AsNumber(Exp));
+	
 	int32 RandGold = FMath::RandRange(1000,5000);
     UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
 	SetGold(RandGold);
@@ -631,6 +606,74 @@ void UInvenComp::TurnReward()
 		}
 	},2.5f,false);
 	
+}
+
+void UInvenComp::GetExp(int32 Exp)
+{
+	TestPlayer->LoginComp->UserFullInfo.character_info.current_exp += Exp;
+	MenuInven->Wbp_ChaView->SetUiChaView(TestPlayer->LoginComp->UserFullInfo);
+
+	GetLevel();
+}
+
+void UInvenComp::GetLevel()
+{
+	TArray<int32>LevelCounts;
+	TArray<FName>Levels = TestPlayer->LoginComp->LevelTable->GetRowNames();
+	for (FName Level : Levels)
+	{
+		FName NextLevelName = FName(*FString::FromInt(TestPlayer->LoginComp->UserFullInfo.character_info.level+1));
+		
+		FLevelInfo* LevelStruct = TestPlayer->LoginComp->LevelTable->FindRow<FLevelInfo>(Level,TEXT("InvenComp"));
+		FLevelInfo* NextLevelStruct = TestPlayer->LoginComp->LevelTable->FindRow<FLevelInfo>(NextLevelName,TEXT("InvenComp"));
+
+		UE_LOG(LogTemp,Warning,TEXT("InvenComp 레벨업 경치 들어오는중? 테이블 도는중 레벨은? [%d]"),LevelStruct->level)
+
+		if (TestPlayer->LoginComp->UserFullInfo.character_info.current_exp < LevelStruct->Exp)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp GetLevel에서 넘기는 레벨 배열 크기는? [%d]"),Levels.Num())
+			UiGetLevel(LevelCounts);
+			return;
+		}
+		if (TestPlayer->LoginComp->UserFullInfo.character_info.level == LevelStruct->level &&
+			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp >= LevelStruct->Exp)
+		{
+			LevelCounts.Add(LevelStruct->level);
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp GetLevel에서 레벨스에 담기는 LevelStruct->level 값은? [%d]"),LevelStruct->level)
+			TestPlayer->LoginComp->UserFullInfo.character_info.current_exp -= LevelStruct->Exp;
+			TestPlayer->LoginComp->UserFullInfo.character_info.max_exp = NextLevelStruct->Exp;
+			
+			TestPlayer->LoginComp->UserFullInfo.character_info.level += 1;
+			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->SetUiChaView(TestPlayer->LoginComp->UserFullInfo);
+			TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
+		}
+	}
+	GetLevel();
+}
+
+void UInvenComp::UiGetLevel(TArray<int32>Levels)
+{
+	float Time = 0.f;
+	MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Visible);
+	UE_LOG(LogTemp,Warning,TEXT("InvenComp 레벨업 UI 떠야하는디 타이머 전에서 Levels 배열갯수는? [%d]"),Levels.Num())
+	
+	GetWorld()->GetTimerManager().SetTimer(LevelTimerHandle,[this, Time, Levels]()mutable{
+		Time += 0.04f;
+		MenuInven->Wbp_UiChaLevelUp->SetOpacity(Time);
+		if (Time >= 1.f)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("InvenComp 레벨업 UI 떠야하는디 Levels 배열갯수는? [%d]"),Levels.Num())
+			if (Levels.Num() == 0)
+			{
+				GetWorld()->GetTimerManager().ClearTimer(LevelTimerHandle);
+				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
+				return;
+			}
+			MenuInven->Wbp_UiChaLevelUp->LevelUpCount->SetText(FText::AsNumber(Levels[0]));
+			Levels.RemoveAt(0);
+			Time -= 1.f;
+		}
+	},0.02f,true);
 }
 
 void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -708,3 +751,36 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 // 	EnumKey = EEnumKey::Equip;
 // 	ItemInvenTory(EnumKey, MenuInven->WBP_EquipInven); }
 
+// 몬스터 트리거
+
+// 	if (PC && PC->IsLocalController() && PC->WasInputKeyJustPressed(EKeys::Q))
+// 	{   UE_LOG(LogTemp, Warning, TEXT("몬스터 트리거 Q키 !"));
+//
+// 		TArray<FOverlapResult> Hits;
+// 		FCollisionQueryParams Params;
+// 		Params.AddIgnoredActor(TestPlayer);
+//
+// 		DrawDebugSphere(GetWorld(),TestPlayer->GetActorLocation()+TestPlayer->GetActorForwardVector() * 50,100,
+// 			20,FColor::Red,false,2)
+// ;		bool bHit = GetWorld()->OverlapMultiByChannel(Hits,TestPlayer->GetActorLocation()+TestPlayer->GetActorForwardVector() * 50,
+// 	FQuat::Identity, ECC_Visibility,FCollisionShape::MakeSphere(100),Params);
+// 		
+// 		if (bHit)
+// 		{
+// 			for (FOverlapResult Hit: Hits)
+// 			{
+// 				if (AMonWorld* MonWorld = Cast<AMonWorld>(Hit.GetActor()))
+// 				{
+// 					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 맞노"))
+// 					if (UWorldGi* Gi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 					{
+// 						UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
+// 					};
+// 				}
+// 				else
+// 				{
+// 					UE_LOG(LogTemp,Warning,TEXT("InvenComp 몬월드 아니야"))
+// 				}
+// 			}
+// 		}
+// 	}

@@ -25,6 +25,7 @@ void UUiMonWorld::OnButtonYes()
 		{
 			TestPlayer->LogItemComp->GetInvenInfo();
 			TestPlayer->LogItemComp->GetEquipInfo();
+			TestPlayer->LogItemComp->GetUserLevel();
 
 			WorldGi->UserFullInfoGi = TestPlayer->LoginComp->UserFullInfo;
 			WorldGi->bGameStart = true;

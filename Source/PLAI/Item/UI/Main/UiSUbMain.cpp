@@ -26,7 +26,7 @@ void UUiSUbMain::NativeConstruct()
 void UUiSUbMain::OnButtonSingle()
 {
 	UGameplayStatics::SetGamePaused(GetWorld(),false);
-	// UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport();
+	
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_QuickInven->SetVisibility(ESlateVisibility::Visible);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SetVisibility(ESlateVisibility::Visible);
 	

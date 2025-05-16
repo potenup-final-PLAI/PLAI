@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "PLAI/Item/Login/UserStruct.h"
 #include "UiChaView.generated.h"
 
 /**
@@ -20,4 +21,18 @@ public:
 
 	UPROPERTY(meta = (BindWidget = "Widget"))
 	class UTextBlock* JobCha;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UTextBlock* LevCha;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UTextBlock* ExpCha;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UTextBlock* MaxExpCha;
+
+	UPROPERTY(meta = (BindWidget = "Widget"))
+	class UProgressBar* ExpBar;
+
+	void SetUiChaView(FUserFullInfo UserFullInfo);
 };

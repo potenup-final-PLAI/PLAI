@@ -8,6 +8,8 @@
 #include "InputComp.generated.h"
 
 
+struct FInputActionValue;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PLAI_API UInputComp : public UActorComponent
 {
@@ -74,4 +76,11 @@ public:
 	UInputAction* IE_MouseWheel;
 	UFUNCTION()
 	void On_MouseWheelTriggered(const FInputActionValue& Value);
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* IE_RotateView;
+	UPROPERTY(EditAnywhere)
+	bool bRotateView = false;
+	UFUNCTION()
+	void On_RoatateView();
 };

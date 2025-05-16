@@ -41,7 +41,7 @@ public:
 	class ULogItemComp* LogItemComp;
 
 	UPROPERTY(EditAnywhere)
-	class UInputComp* InputTestComp;
+	class UInputComp* TestpInputComp;
 	
 	UPROPERTY(EditAnywhere)
 	class UCreComp* CreComp;

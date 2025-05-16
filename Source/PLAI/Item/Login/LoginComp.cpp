@@ -64,7 +64,9 @@ void ULoginComp::BeginPlay()
 				
 				FTimerHandle TimerHandle;
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-				{ TestPlayer->InvenComp->TurnReward(); },1.0,false);
+				{
+					TestPlayer->InvenComp->TurnReward();
+				},1.0,false);
 			}
 		}
 	}
@@ -128,29 +130,8 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			    		bQuest = true;
 			    	}
 			    }
-		    	else
-		    	{
-		    		// UE_LOG(LogTemp, Error, TEXT("LoginComp NpcNet 없네"));
-		    	}
 		    }
 		};
-	}
-
-	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{
-		if (PC->WasInputKeyJustPressed(EKeys::P))
-		{
-			float CurrentDistance = TestPlayer->CameraBoom->TargetArmLength;
-			TestPlayer->CameraBoom->TargetArmLength = CurrentDistance + 300;
-		}
-	}
-	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{
-		if (PC->WasInputKeyJustPressed(EKeys::O))
-		{
-			float CurrentDistance = TestPlayer->CameraBoom->TargetArmLength;
-			TestPlayer->CameraBoom->TargetArmLength = CurrentDistance - 300;
-		}
 	}
 }
 
@@ -329,6 +310,12 @@ void ULoginComp::HttpMePost()
 			(FText::FromString(UserFullInfo.character_info.character_name));
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->JobCha->SetText
 			(FText::FromString(UserFullInfo.character_info.job));
+			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->LevCha->SetText
+			(FText::AsNumber(UserFullInfo.character_info.level));
+			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->ExpCha->SetText
+			(FText::AsNumber(UserFullInfo.character_info.current_exp));
+			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->MaxExpCha->SetText
+			(FText::AsNumber(UserFullInfo.character_info.max_exp));
 		}
 	});
 	httpRequest->ProcessRequest();
@@ -364,7 +351,8 @@ void ULoginComp::LoadInvenItem()
 {
 	if (!TestPlayer -> IsLocallyControlled()){return;}
 	
-	TestPlayer->InvenComp->SetGold(UserFullInfo.inventory_info.gold);
+	// TestPlayer->InvenComp->SetGold(UserFullInfo.inventory_info.gold);
+	TestPlayer->InvenComp->SetGold(0);
 	if (USlot* Slot = Cast<USlot>(TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetChildAt(0)))
 	{
 		TArray<FName>RawNames = Slot->ItemTable->GetRowNames();

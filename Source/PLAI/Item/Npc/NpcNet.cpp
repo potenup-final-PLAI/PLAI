@@ -22,7 +22,10 @@ ANpcNet::ANpcNet()
 void ANpcNet::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	NpcNameString = TEXT("바스 (Guide)");
+
+	
 }
 
 // Called every frame
