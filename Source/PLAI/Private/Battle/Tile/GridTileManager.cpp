@@ -7,6 +7,8 @@
 #include "GridTile.h"
 #include "Algo/RandomShuffle.h"
 #include "Enemy/BaseEnemy.h"
+#include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/Monster/MonWorld/MonBossPawn.h"
 #include "Player/BattlePlayer.h"
 
 // Sets default values
@@ -31,6 +33,7 @@ void AGridTileManager::Tick(float DeltaTime)
 
 void AGridTileManager::InitGridTile()
 {
+	
 	TArray<FIntPoint> allCoords;
 	allCoords.Reserve(625);
 	// allCoords.Reserve(49);
@@ -55,6 +58,8 @@ void AGridTileManager::InitGridTile()
 				spawnTile->SetGridCoord(Coord);
 				// 전체적인 타일 관리할 Map에 추가
 				map.Add(Coord, spawnTile);
+				// 타일에 대한 좌표 저장
+				tileToCoordMap.Add(spawnTile, Coord);
 				FString s = map.FindRef(FIntPoint(X, Y))->GetActorNameOrLabel();
 				// UE_LOG(LogTemp, Warning, TEXT("X = %d, Y = %d, TileName = %s"),
 				//        X, Y, *s);
@@ -64,11 +69,12 @@ void AGridTileManager::InitGridTile()
 		}
 	}
 
+	// 좌표 섞기
 	Algo::RandomShuffle(allCoords);
 
 	// player 좌표 뽑기
 	TArray<FIntPoint> playerCoords;
-	for (int32 i = 0; i < 4 && i < allCoords.Num(); ++i)
+	for (int32 i = 0; i < 2 && i < allCoords.Num(); ++i)
 	{
 		playerCoords.Add(allCoords[i]);
 	}
@@ -78,14 +84,28 @@ void AGridTileManager::InitGridTile()
 	{
 		allCoords.Remove(Coord);
 	}
-
-	// 그 다음 적 좌표 뽑기
+	
 	TArray<FIntPoint> enemyCoords;
-	for (int32 i = 0; i < 4 && i < allCoords.Num(); ++i)
+	
+	FString levelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	// Level이 보스 레벨이라면
+	if (levelName == "MK_BossMap")
 	{
-		enemyCoords.Add(allCoords[i]);
+		// 그 다음 적 좌표 뽑기
+		for (int32 i = 0; i < 1 && i < allCoords.Num(); ++i)
+		{
+			enemyCoords.Add(allCoords[i]);
+		}
 	}
-
+	else
+	{
+		// 그 다음 적 좌표 뽑기
+		for (int32 i = 0; i < 4 && i < allCoords.Num(); ++i)
+		{
+			enemyCoords.Add(allCoords[i]);
+		}
+	}
+	
 	// 플레이어 유닛 스폰
 	for (const FIntPoint& coord : playerCoords)
 	{
@@ -108,14 +128,27 @@ void AGridTileManager::InitGridTile()
 	{
 		if (AGridTile* gridTile = map.FindRef(coord))
 		{
-			FVector spawnLoc = gridTile->GetActorLocation() + FVector(
-				0.f, 0.f, 80.f);
-			if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(
-				enemyFactory, spawnLoc, FRotator::ZeroRotator))
+			// 보스 레벨이라면 보스 몬스터 스폰
+			if (levelName == "MK_BossMap")
 			{
-				enemy->speed = FMath::RandRange(1, 10);
-				enemy->currentTile = gridTile;
-				unitArray.Add(enemy);
+				FVector spawnLoc = gridTile->GetActorLocation() + FVector(
+				0.f, 0.f, 80.f);
+				if (auto* enemy = GetWorld()->SpawnActor<AMonBossPawn>(bossFactory, spawnLoc, FRotator::ZeroRotator))
+				{
+					enemy->speed = FMath::RandRange(1, 10);
+					enemy->currentTile = gridTile;
+					unitArray.Add(enemy);
+				}
+			}
+			else
+			{
+				FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
+				if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(enemyFactory, spawnLoc, FRotator::ZeroRotator))
+				{
+					enemy->speed = FMath::RandRange(1, 10);
+					enemy->currentTile = gridTile;
+					unitArray.Add(enemy);
+				}
 			}
 		}
 	}
@@ -133,4 +166,48 @@ AGridTile* AGridTileManager::FindCurrentTile(FVector worldLoc)
 AGridTile* AGridTileManager::GetTile(int32 x, int32 y)
 {
 	return map.FindRef(FIntPoint(x, y));
+}
+
+FIntPoint AGridTileManager::GetTileLoc(AGridTile* targetTile)
+{
+	if (targetTile && tileToCoordMap.Contains(targetTile))
+	{
+		// UE_LOG(LogTemp, Warning, TEXT("%s의 좌표 : (%d, %d)"), *tile->GetActorNameOrLabel(), coord.X, coord.Y);
+		return tileToCoordMap[targetTile];
+	}
+
+	// 타일이 없다면
+	UE_LOG(LogTemp, Warning, TEXT("no have tileToCoordMap[Tile] Coord"));
+	return FIntPoint(-1, -1);
+}
+
+bool AGridTileManager::IsValidTile(FIntPoint num)
+{
+	// 좌표를 받아서 그 위치에 타일이 있는지 없는지 체크
+	if (map.Contains(num))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void AGridTileManager::SetTileColor(AGridTile* targetTile,  bool bHighlight)
+{
+	if (!targetTile || !targetTile->dynDecalInstance)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetTileColor : !targetTile || !targetTile->dynDecalInstance"));
+		return;
+	}
+
+	if (bHighlight)
+	{
+		//그 위치 타일 색 변경
+		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.1f);
+	}
+	else
+	{
+		//그 위치 타일 색 변경
+		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
+	}
 }
