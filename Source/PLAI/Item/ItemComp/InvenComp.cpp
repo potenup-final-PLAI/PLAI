@@ -214,7 +214,6 @@ void UInvenComp::Server_SpawnOneItem_Implementation()
     		ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
     	}
     }
-	
 }
 
 void UInvenComp::Server_UnEquip_Implementation(EquipSlotType SlotType)
@@ -313,41 +312,6 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = GetOwner();
-
-	// Item->StaticMesh->SetStaticMesh(ItemStructTable->StaticMesh);
-	// if (ItemStructTable->ItemIndex == 0)
-	// {
-	// 	Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_rSocket"));
-	// 	Item->AddActorWorldOffset(FVector(30, 5, -10));
-	// 	Item->AddActorLocalRotation(FRotator(-165, 10, 100));
-	// 						
-	// 	// Item->AddActorWorldRotation(FRotator(0, 105, 0));
-	// }
-	// else if (ItemStructTable->ItemIndex == 1)
-	// {
-	// 	Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Chest"));
-	// 	Item->AddActorWorldOffset(FVector(-20, 0, -80));
-	// 	Item->SetActorRotation(Item->GetActorRotation() + FRotator(0, 90, 0));
-	// 	Item->SetActorScale3D(FVector(1.05, 1.05, 1.05));
-	// }
-	// else if (ItemStructTable->ItemIndex == 2)
-	// {
-	// 	Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("headSocket"));
-	//
-	// 	Item->AddActorWorldOffset(FVector(-0, 0, 10));
-	// 						
-	// 	Item->AddActorLocalRotation(FRotator(0, -90, 90));
-	// 						
-	// 	Item->SetActorScale3D(FVector(0.8,0.8,0.8));
-	// } 
-	// else if (ItemStructTable->ItemIndex == 3)
-	// {
-	// 	Item->AttachToComponent(Player->meshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("FX_Ult_Passive"));
-	//
-	// 	Item->AddActorWorldOffset(FVector(-0, 0, -130));
-	// 	Item->AddActorLocalRotation(FRotator(0, 100, 0));
-	// }
-	// Item->StaticMesh->SetMaterial(0,ItemStructTable->Material);
 	
 	if (SlotType == EquipSlotType::Weapon)
 	{
@@ -359,11 +323,8 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemWeapon->ItemStructTable = ItemStructTable;
 		ItemWeapon->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
-		// ItemWeapon->AddActorWorldOffset(FVector(30, 5, -10));
-		// ItemWeapon->AddActorLocalRotation(FRotator(-165, 10, 100));
-		// ItemWeapon->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_rSocket"));
-		ItemWeapon->AddActorWorldOffset(FVector(30, 5, -10));
 		
+		ItemWeapon->AddActorWorldOffset(FVector(35, 7, -8));
 		ItemWeapon->AddActorLocalRotation(FRotator(-165, 10, 100));
 
 		if (ItemStructTable.Material)
@@ -371,17 +332,14 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	}
 	else if (SlotType == EquipSlotType::Armor)
 	{
-		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),
-		FRotator(0,0,0),SpawnParams);
-		// ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("spine_02Socket"));
+		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
 		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Chest"));
 		ItemArmor->ItemStructTable = ItemStructTable;
 		ItemArmor->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
-		// ItemArmor->SetActorLocation(ItemArmor->GetActorLocation() + FVector(0,0,45));
 		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 
-	    ItemArmor->AddActorWorldOffset(FVector(-20, 0, -80));
-	    ItemArmor->SetActorRotation(ItemWeapon->GetActorRotation() + FRotator(0, 90, 0));
+	    ItemArmor->AddActorLocalOffset(FVector(-20, 0, -80));
+		ItemArmor->AddActorLocalRotation(FRotator(0, 90, 0));
 	    ItemArmor->SetActorScale3D(FVector(1.05, 1.05, 1.05));
 		
 		if (ItemStructTable.Material)
@@ -394,10 +352,8 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemHelmet->ItemStructTable = ItemStructTable;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemHelmet->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
-		// ItemHelmet->StaticMesh->SetRelativeRotation(FRotator(0,90,-90));
-		// ItemHelmet->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("headSocket"));
 		
-		ItemHelmet->AddActorWorldOffset(FVector(-0, 0, 10));
+		ItemHelmet->AddActorWorldOffset(FVector(5, 0, 10));
 		ItemHelmet->AddActorLocalRotation(FRotator(0, -90, 90));
 		ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
 
@@ -410,7 +366,6 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemGlove->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,("HeadSocket"));
 		ItemGlove->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemGlove->ItemStructTable = ItemStructTable;
-		// ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
 		ItemGlove->SetActorRelativeRotation(FRotator(-90,0,0));
 		ItemGlove->AddActorLocalOffset(FVector(0,0,-150));
 		ItemGlove->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
@@ -421,7 +376,6 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	else if (SlotType == EquipSlotType::Boots)
 	{
 		Itemboots = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(75,75,75),FRotator(0,0,0));
-		// Itemboots->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
 		Itemboots->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("FX_Ult_Passive"));
 		Itemboots->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		Itemboots->ItemStructTable = ItemStructTable;
@@ -429,10 +383,6 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		
 		Itemboots->AddActorWorldOffset(FVector(-0, 0, -130));
 		Itemboots->AddActorLocalRotation(FRotator(0, 100, 0));
- 
-		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
-		// Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
-		// Itemboots->SetActorRelativeLocation(FVector(75,75,75));
 		
 		if (ItemStructTable.Material)
 		{ Itemboots->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
