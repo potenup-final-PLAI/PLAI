@@ -757,6 +757,13 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			player->battlePlayerState->playerStatus.critical_Rate = gi->UserFullInfoGiStat.character_info.stats.critical_rate;
 			player->battlePlayerState->playerStatus.critical_Damage = gi->UserFullInfoGiStat.character_info.stats.critical_damage;
 			player->battlePlayerState->playerStatus.speed = gi->UserFullInfoGiStat.character_info.stats.speed;
+
+			for (const FString trait : gi->UserFullInfoGiStat.character_info.traits)
+			{
+				player->battlePlayerState->playerStatus.traits.Add(trait);
+				UE_LOG(LogTemp, Warning, TEXT("player state traits : %s"), *trait);
+			}
+			
 			UE_LOG(LogTemp, Warning, TEXT("!!! After setting PlayerStatus"));
 		}
 		else
@@ -813,10 +820,7 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		enemy->enemybattleState->enemyLifeState = ELifeState::Alive;
 		UE_LOG(LogTemp, Warning, TEXT("!!! After setting PlayerStatus"));
 
-		UE_LOG(LogTemp, Warning,
-		       TEXT(
-			       "Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "
-			       ", crit : %f, crit_Damge : %f, spd : %d"),
+		UE_LOG(LogTemp, Warning,TEXT("Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "", crit : %f, crit_Damge : %f, spd : %d"),
 		       enemy->enemybattleState->enemyStatus.hp,
 		       enemy->enemybattleState->enemyStatus.attack,
 		       enemy->enemybattleState->enemyStatus.defense,
@@ -826,9 +830,7 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		       enemy->enemybattleState->enemyStatus.critical_Damage,
 		       enemy->enemybattleState->enemyStatus.speed);
 
-		UE_LOG(LogTemp, Warning, TEXT("state : %s"),
-		       *UEnum::GetValueAsString(enemy->enemybattleState->enemyLifeState
-		       ));
+		UE_LOG(LogTemp, Warning, TEXT("state : %s"),*UEnum::GetValueAsString(enemy->enemybattleState->enemyLifeState));
 	}
 	else
 	{

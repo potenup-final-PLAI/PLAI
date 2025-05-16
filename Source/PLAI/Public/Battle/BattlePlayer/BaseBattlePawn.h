@@ -205,8 +205,32 @@ public:
 		TEXT("전투의 외침")
 	};
 	// Enemy State Set
+	// Enemy 성격 세팅
+	TArray<FString> enemyTraits = {
+		TEXT("강인함"),
+		TEXT("잔잔함"),
+		TEXT("호전적"),
+		TEXT("충동적"),
+		TEXT("수비적"),
+		TEXT("신중함"),
+		TEXT("관찰꾼"),
+		TEXT("잔인함"),
+		TEXT("겁쟁이"),
+		TEXT("허세꾼"),
+		TEXT("교란꾼"),
+		TEXT("파괴적"),
+		TEXT("협동적"),
+		TEXT("용감함"),
+		TEXT("조화적"),
+		TEXT("고립적"),
+		TEXT("지능적"),
+		TEXT("냉정함"),
+		TEXT("원한꾼"),
+		TEXT("민첩함")
+	};
 	void InitEnemyState();
-
+	void InitTraits();
+	void ApplyTraitModifiers(UEnemyBattleState* state);
 	// 마우스 클릭 했을 때 처리 하는 부분
 	void OnMouseLeftClick();
 	void AddOpenByOffset(FIntPoint offset);

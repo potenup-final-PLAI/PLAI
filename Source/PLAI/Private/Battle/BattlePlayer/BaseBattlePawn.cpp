@@ -1818,39 +1818,183 @@ void ABaseBattlePawn::InitEnemyState()
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
 		// 처음 값 세팅
-		enemybattleState = NewObject<UEnemyBattleState>(this);
-		enemybattleState->hp = 80;
+		enemy->enemybattleState = NewObject<UEnemyBattleState>(this);
 
-		enemybattleState->attack = 9;
-		enemybattleState->defense = 6;
-		enemybattleState->resistance = 3;
-		enemybattleState->move_Range = 5;
-		enemybattleState->critical_Rate = 0.04f;
-		enemybattleState->critical_Damage = 1.5f;
-		enemybattleState->speed = 4;
+		// 애너미 랜덤 성격 세팅
+		InitTraits();
+
+		// 성격에 따른 값 추가 세팅
+		ApplyTraitModifiers(enemy->enemybattleState);
+
+		for (const FString trait : enemy->enemybattleState->traits)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Trait : %s"), *trait);
+		}
+		enemy->enemybattleState->hp = enemybattleState->hp;
+		enemy->enemybattleState->attack = enemybattleState->attack;;
+		enemy->enemybattleState->defense = enemybattleState->defense;
+		enemy->enemybattleState->resistance = enemybattleState->resistance;
+		enemy->enemybattleState->move_Range = enemybattleState->move_Range;
+		enemy->enemybattleState->critical_Rate = enemybattleState->critical_Rate;
+		enemy->enemybattleState->critical_Damage = enemybattleState->critical_Damage;
+		enemy->enemybattleState->speed = enemybattleState->speed;;
 
 		// enemy에 moveRange 세팅 작업
-		enemy->moveRange = enemy->enemybattleState->move_Range;
+		enemy->moveRange = FMath::Max(1, enemy->enemybattleState->move_Range);
 
 		// 전송용 구조체에 값 세팅
-		enemybattleState->enemyStatus.hp = enemybattleState->hp;
-		enemybattleState->enemyStatus.attack = enemybattleState->attack;
-		enemybattleState->enemyStatus.defense = enemybattleState->defense;
-		enemybattleState->enemyStatus.resistance = enemybattleState->resistance;
-		enemybattleState->enemyStatus.move_Range = enemybattleState->move_Range;
-		enemybattleState->enemyStatus.critical_Rate = enemybattleState->
-			critical_Rate;
-		enemybattleState->enemyStatus.critical_Damage = enemybattleState->
-			critical_Damage;
-		enemybattleState->enemyStatus.speed = enemybattleState->speed;
+		enemy->enemybattleState->enemyStatus.hp = enemybattleState->hp;
+		enemy->enemybattleState->enemyStatus.attack = enemybattleState->attack;
+		enemy->enemybattleState->enemyStatus.defense = enemybattleState->defense;
+		enemy->enemybattleState->enemyStatus.resistance = enemybattleState->resistance;
+		enemy->enemybattleState->enemyStatus.move_Range = enemybattleState->move_Range;
+		enemy->enemybattleState->enemyStatus.critical_Rate = enemybattleState->critical_Rate;
+		enemy->enemybattleState->enemyStatus.critical_Damage = enemybattleState->critical_Damage;
+		enemy->enemybattleState->enemyStatus.speed = enemybattleState->speed;
 
 		FString name = "";
-		name = FString::Printf(
-			TEXT("Enemy%d"), phaseManager->unitEnemyNameindex);
+		name = FString::Printf(TEXT("Enemy%d"), phaseManager->unitEnemyNameindex);
 		phaseManager->unitEnemyNameindex++;
 
-		battleUnitStateUI->SetUnitName(name);
-		battleUnitStateUI->SetHPUI(enemy);
+		enemy->battleUnitStateUI->SetUnitName(name);
+		enemy->battleUnitStateUI->SetHPUI(enemy);
+	}
+}
+
+void ABaseBattlePawn::InitTraits()
+{
+	if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		for (const FString trait : enemyTraits)
+		{
+			int32 seletTrait = FMath::RandRange(0, 19);
+			if (seletTrait <= 3)
+			{
+				enemy->enemybattleState->traits.Add(trait);
+			}
+			// 성격 개수가 3개라면 return
+			if (enemy->enemybattleState->traits.Num() >= 3) return;
+		}
+		// 개수가 3개보다 작으면 다시 Init을 실행
+		if (enemy->enemybattleState->traits.Num() < 3)
+		{
+			InitTraits();
+		}
+	}
+}
+
+void ABaseBattlePawn::ApplyTraitModifiers(UEnemyBattleState* state)
+{
+	for (const FString& trait : state->traits)
+	{
+		if (trait == TEXT("강인함"))
+		{
+			state->hp *= 1.3f;
+			state->attack *= 0.9f;
+		}
+		else if (trait == TEXT("잔잔함"))
+		{
+			state->hp *= 1.3f;
+			state->move_Range -= 1;
+		}
+		else if (trait == TEXT("호전적"))
+		{
+			state->attack *= 1.2f;
+			state->critical_Rate *= 0.85f;
+		}
+		else if (trait == TEXT("충동적"))
+		{
+			state->attack *= 1.2f;
+			state->defense *= 0.9f;
+		}
+		else if (trait == TEXT("수비적"))
+		{
+			state->defense *= 1.2f;
+			state->speed *= 0.9f;
+		}
+		else if (trait == TEXT("신중함"))
+		{
+			state->defense *= 1.2f;
+			state->critical_Rate *= 0.85f;
+		}
+		else if (trait == TEXT("관찰꾼"))
+		{
+			state->critical_Rate *= 1.3f;
+			state->attack *= 0.9f;
+		}
+		else if (trait == TEXT("잔인함"))
+		{
+			state->critical_Rate *= 1.3f;
+			state->speed *= 0.9f;
+		}
+		else if (trait == TEXT("겁쟁이"))
+		{
+			state->move_Range += 2;
+			state->attack *= 0.9f;
+		}
+		else if (trait == TEXT("허세꾼"))
+		{
+			state->move_Range += 2;
+			state->defense *= 0.9f;
+		}
+		else if (trait == TEXT("교란꾼"))
+		{
+			state->speed *= 1.2f;
+			state->attack *= 0.9f;
+		}
+		else if (trait == TEXT("파괴적"))
+		{
+			state->speed *= 1.2f;
+			state->defense *= 0.9f;
+		}
+		else if (trait == TEXT("협동적"))
+		{
+			state->hp *= 1.15f;
+			state->defense *= 1.1f;
+			state->speed *= 0.9f;
+		}
+		else if (trait == TEXT("용감함"))
+		{
+			state->attack *= 1.1f;
+			state->defense *= 1.1f;
+			state->critical_Rate *= 0.85f;
+		}
+		else if (trait == TEXT("조화적"))
+		{
+			state->attack *= 1.1f;
+			state->defense *= 1.1f;
+			state->speed *= 0.9f;
+		}
+		else if (trait == TEXT("고립적"))
+		{
+			state->attack *= 1.1f;
+			state->speed *= 1.1f;
+			state->defense *= 0.9f;
+		}
+		else if (trait == TEXT("지능적"))
+		{
+			state->defense *= 1.1f;
+			state->critical_Rate *= 1.15f;
+			state->move_Range -= 1;
+		}
+		else if (trait == TEXT("냉정함"))
+		{
+			state->defense *= 1.1f;
+			state->critical_Rate *= 1.15f;
+			state->speed *= 0.9f;
+		}
+		else if (trait == TEXT("원한꾼"))
+		{
+			state->critical_Rate *= 1.15f;
+			state->speed *= 1.1f;
+			state->defense *= 0.9f;
+		}
+		else if (trait == TEXT("민첩함"))
+		{
+			state->move_Range += 1;
+			state->speed *= 1.1f;
+			state->defense *= 0.9f;
+		}
 	}
 }
 
