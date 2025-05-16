@@ -152,7 +152,7 @@ void AUPhaseManager::SetUnitQueue()
 					continue;
 				}
 
-				enemy->speed = enemy->enemybattleState->enemyStatus.speed;
+				enemy->speed = enemy->speed;
 				aliveEnemies++;
 			}
 

@@ -1888,7 +1888,7 @@ void ABaseBattlePawn::InitTraits()
 		for (const FString trait : enemyTraits)
 		{
 			int32 seletTrait = FMath::RandRange(0, 19);
-			if (seletTrait <= 3)
+			if (seletTrait <= 3 && !enemy->enemybattleState->traits.Contains(trait))
 			{
 				enemy->enemybattleState->traits.Add(trait);
 			}
