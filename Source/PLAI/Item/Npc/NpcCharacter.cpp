@@ -16,7 +16,7 @@ ANpcCharacter::ANpcCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	WidgetComp = CreateDefaultSubobject<UWidgetComponent>("Widget");
 	WidgetComp->SetupAttachment(RootComponent);
-	// WidgetComp->SetMobility(EComponentMobility::Movable);
+	WidgetComp->SetMobility(EComponentMobility::Movable);
 }
 
 // Called when the game starts or when spawned
@@ -28,10 +28,10 @@ void ANpcCharacter::BeginPlay()
     WidgetComp->SetWidget(UiNpc);
 	WidgetComp->SetVisibility(true);
 	WidgetComp->SetRelativeLocation(FVector(0,0,150));
+	WidgetComp->SetDrawSize(FVector2D(300.0f,120.0f));
 	WidgetComp->SetWidgetSpace(EWidgetSpace::World);
-	
-	WidgetComp->SetDrawSize(FVector2D(300.0f,45.0f));
-	WidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
+
+	// WidgetComp->SetRelativeRotation(FRotator(-90.0f,90.0f,0.0f));
 	
 	TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	if (TestPlayer)
@@ -50,7 +50,7 @@ void ANpcCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector mCameraVec = -TestPlayer->TopDownCameraComponent->GetComponentLocation(); 
+	FVector mCameraVec = -TestPlayer->TopDownCameraComponent->GetForwardVector(); 
 	WidgetComp->SetWorldRotation(mCameraVec.Rotation());
 }
 
