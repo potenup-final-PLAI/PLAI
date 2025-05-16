@@ -36,7 +36,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABaseEnemy> enemyFactory;
-
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AMonBossPawn> bossFactory;
 	void InitGridTile();
 
 	//------------Test--------------------------

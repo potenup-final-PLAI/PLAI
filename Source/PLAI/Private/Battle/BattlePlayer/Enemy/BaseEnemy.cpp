@@ -20,24 +20,9 @@ ABaseEnemy::ABaseEnemy()
 
 	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("meshComp"));
 	meshComp->SetupAttachment(RootComponent);
-	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100),
-	                                         FRotator(0, -90, 0));
+	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100),FRotator(0, -90, 0));
 	meshComp->bReceivesDecals = false;
-	// Mesh Setting
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(
-		TEXT(
-			"'/Game/Wood_Monster/CharacterParts/Meshes/SK_wood_giant_01_a.SK_wood_giant_01_a'"));
-	if (tempMesh.Succeeded())
-	{
-		meshComp->SetSkeletalMesh(tempMesh.Object);
-	}
-
-	// Animation Instance 세팅
-	// ConstructorHelpers::FClassFinder<UAnimInstance> tempAnimInstance(TEXT("'/Game/JS/Blueprints/Animation/ABP_BattleEnemy.ABP_BattleEnemy_C'"));
-	// if (tempAnimInstance.Succeeded())
-	// {
-	// 	meshComp->SetAnimInstanceClass(tempAnimInstance.Class);
-	// }
+	
 }
 
 // Called when the game starts or when spawned
@@ -401,9 +386,7 @@ void ABaseEnemy::EnemyActionList(const FString& actionName)
 ABaseBattlePawn* ABaseEnemy::FindUnitById(const FString& Id)
 {
 	TArray<AActor*> FoundUnits;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(),
-	                                      ABaseBattlePawn::StaticClass(),
-	                                      FoundUnits);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ABaseBattlePawn::StaticClass(),FoundUnits);
 
 	for (AActor* Actor : FoundUnits)
 	{

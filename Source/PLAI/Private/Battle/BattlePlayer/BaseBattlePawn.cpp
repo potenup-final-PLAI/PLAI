@@ -431,6 +431,7 @@ void ABaseBattlePawn::PlayerParalysis(FHitResult& hitInfo)
 
 void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 {
+	UE_LOG(LogTemp, Warning, TEXT("PlayerPoison In"));
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
@@ -438,7 +439,9 @@ void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 		{
 			enemy->enemyAnim->actionMode = currentActionMode;
 		}
-		EnemyApplyAttack(enemy, EActionMode::Poison);
+		UE_LOG(LogTemp, Warning, TEXT("Cast Enemy In"));
+		PlayerApplyAttack(enemy, EActionMode::Poison);
+		
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
@@ -447,7 +450,7 @@ void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 		{
 			player->playerAnim->actionMode = currentActionMode;
 		}
-		PlayerApplyAttack(player, EActionMode::Poison);
+		EnemyApplyAttack(player, EActionMode::Poison);
 	}
 }
 
@@ -700,144 +703,6 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 		}
 	}
 }
-
-void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit,
-                                       EActionMode attackType)
-{
-	auto* player = Cast<ABattlePlayer>(targetUnit);
-	auto* enemy = Cast<ABaseEnemy>(this);
-	if (!player || !enemy)
-	{
-		return;
-	}
-
-	UE_LOG(LogTemp, Warning,
-	       TEXT("[EnemyApplyAttack] Enemy %s attacking Player %s"),
-	       *enemy->GetName(), *player->GetName());
-
-	int32 atk = enemybattleState->attack;
-	int32 weapon = 2;
-	float critical = enemybattleState->critical_Rate;
-	float criticalDamage = enemybattleState->critical_Damage;
-	int32 personality = 0;
-	int32 status_effect = 0;
-	float skillMultiplier = 1.0f;
-
-	switch (attackType)
-	{
-	case EActionMode::Paralysis:
-		if (!enemy->TryConsumeAP(1))
-		{
-			return;
-		}
-		skillMultiplier = 0.8f;
-		player->AddStatusEffect(EStatusEffect::Weakening, 2);
-		break;
-
-	case EActionMode::Poison:
-		if (!enemy->TryConsumeAP(1))
-		{
-			return;
-		}
-		player->AddStatusEffect(EStatusEffect::Poison, 3);
-		break;
-
-	case EActionMode::Vulnerable:
-		if (!enemy->TryConsumeAP(1))
-		{
-			return;
-		}
-		player->AddStatusEffect(EStatusEffect::Vulnerable, 2);
-		break;
-
-	case EActionMode::Weakening:
-		if (!enemy->TryConsumeAP(1))
-		{
-			return;
-		}
-		player->AddStatusEffect(EStatusEffect::Weakening, 2);
-		break;
-
-	case EActionMode::Fatal:
-		if (!enemy->TryConsumeAP(2))
-		{
-			return;
-		}
-		skillMultiplier = 1.5f;
-		player->AddStatusEffect(EStatusEffect::Bleeding, 2);
-		break;
-
-	case EActionMode::Rupture:
-		if (!enemy->TryConsumeAP(2))
-		{
-			return;
-		}
-		skillMultiplier = 1.5f;
-		player->AddStatusEffect(EStatusEffect::Vulnerable, 1);
-		break;
-
-	case EActionMode::Roar:
-		if (!enemy->TryConsumeAP(1))
-		{
-			return;
-		}
-		player->AddStatusEffect(EStatusEffect::Weakening, 2);
-		return;
-
-	case EActionMode::BattleCry:
-		if (!enemy->TryConsumeAP(1))
-		{
-			return;
-		}
-		enemy->AddStatusEffect(EStatusEffect::Angry, 1);
-		return;
-
-	default:
-		// EnemySkillList에서 고유 스킬 처리
-		// HandleEnemyUniqueSkill(enemy, player, attackType);
-		break;
-	}
-
-	// 대미지 처리
-	CalculateAndApplyDamage(player, atk, weapon, skillMultiplier, critical,
-	                        criticalDamage, personality, status_effect);
-
-	// 대미지를 줬다면 None으로 변경
-	currentActionMode = EActionMode::None;
-	if (enemy->enemyAnim)
-	{
-		enemy->enemyAnim->actionMode = currentActionMode;
-	}
-}
-
-void ABaseBattlePawn::CalculateAndApplyDamage(ABaseBattlePawn* target,
-                                              int32 atk, int32 weapon,
-                                              float skillMultiplier,
-                                              float criticalRate,
-                                              float criticalDamage,
-                                              int32 personality,
-                                              int32 status_effect)
-{
-	int32 damage = 0;
-	int32 chance = FMath::RoundToInt(criticalRate * 100.0f);
-	int32 roll = FMath::RandRange(1, 100);
-
-	if (bool bIsCrit = roll <= chance)
-	{
-		damage = ((atk + weapon) * skillMultiplier * (1 + (personality +
-			status_effect))) * criticalDamage;
-		UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
-	}
-	else
-	{
-		damage = (atk + weapon) * skillMultiplier * (1 + (personality +
-			status_effect));
-		UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
-	}
-
-	GetDamage(target, damage);
-}
-
 void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
                                         EActionMode attackType)
 {
@@ -850,7 +715,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 
 	UE_LOG(LogTemp, Warning, TEXT("Player Attack Enemy"));
 	int32 atk = player->battlePlayerState->playerStatus.attack;
-	int32 weapon = 2;
+	int32 weapon = 0;
 	float critical = player->battlePlayerState->playerStatus.critical_Rate;
 	float criticalDamage = player->battlePlayerState->playerStatus.
 	                               critical_Damage;
@@ -866,7 +731,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 	case EActionMode::Paralysis:
 		// 현재 Ap가 cost보다 크다면 실행
 		UE_LOG(LogTemp, Warning, TEXT("In Paralysis"));
-		if (!enemy->enemybattleState->CanConsumeAP(1))
+		if (!player->CanConsumeAP(1))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
@@ -876,7 +741,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 		player->AddStatusEffect(EStatusEffect::Weakening, 2);
 		break;
 	case EActionMode::Poison:
-		if (!enemy->enemybattleState->CanConsumeAP(1))
+		if (!player->CanConsumeAP(1))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
@@ -884,7 +749,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 		player->AddStatusEffect(EStatusEffect::Poison, 3);
 		break;
 	case EActionMode::Vulnerable:
-		if (!enemy->enemybattleState->CanConsumeAP(1))
+		if (!player->CanConsumeAP(1))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
@@ -892,7 +757,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 		player->AddStatusEffect(EStatusEffect::Vulnerable, 2);
 		break;
 	case EActionMode::Weakening:
-		if (!enemy->enemybattleState->CanConsumeAP(1))
+		if (!player->CanConsumeAP(1))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
@@ -900,7 +765,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 		player->AddStatusEffect(EStatusEffect::Weakening, 2);
 		break;
 	case EActionMode::Fatal:
-		if (!enemy->enemybattleState->CanConsumeAP(2))
+		if (!player->CanConsumeAP(2))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
@@ -909,7 +774,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 		player->AddStatusEffect(EStatusEffect::Bleeding, 2);
 		break;
 	case EActionMode::Rupture:
-		if (!enemy->enemybattleState->CanConsumeAP(2))
+		if (!player->CanConsumeAP(2))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
@@ -918,7 +783,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 		player->AddStatusEffect(EStatusEffect::Vulnerable, 1);
 		break;
 	case EActionMode::Roar:
-		if (!enemy->enemybattleState->CanConsumeAP(1))
+		if (!player->CanConsumeAP(1))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
@@ -926,7 +791,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 		player->AddStatusEffect(EStatusEffect::Weakening, 2);
 		break;
 	case EActionMode::BattleCry:
-		if (!enemy->enemybattleState->CanConsumeAP(1))
+		if (!player->CanConsumeAP(1))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
@@ -934,7 +799,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 	// 자신과 동료들에게 버프 부여
 	// 주위 동료들에게 피해 증가 버프 부여
 	// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
-		enemy->AddStatusEffect(EStatusEffect::Angry, 1);
+		player->AddStatusEffect(EStatusEffect::Angry, 1);
 		break;
 	default:
 		// 기본 타격 스킬 배율
@@ -953,9 +818,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 	}
 
 
-	CalculateAndApplyDamage(
-		enemy, player->battlePlayerState->playerStatus.attack, weapon,
-		skillMultiplier, critical, criticalDamage, personality, status_effect);
+	CalculateAndApplyDamage(enemy, atk, weapon, skillMultiplier, critical, criticalDamage, personality, status_effect);
 
 	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
 	currentActionMode = EActionMode::None;
@@ -964,7 +827,142 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 		player->playerAnim->actionMode = currentActionMode;
 	}
 }
+void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit,
+                                       EActionMode attackType)
+{
+	auto* player = Cast<ABattlePlayer>(targetUnit);
+	auto* enemy = Cast<ABaseEnemy>(this);
+	if (!player || !enemy)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("!player || !enemy"));
+		return;
+	}
 
+	UE_LOG(LogTemp, Warning,
+	       TEXT("[EnemyApplyAttack] Enemy %s attacking Player %s"),
+	       *enemy->GetName(), *player->GetName());
+
+	int32 atk = enemybattleState->attack;
+	int32 weapon = 0;
+	float critical = enemybattleState->critical_Rate;
+	float criticalDamage = enemybattleState->critical_Damage;
+	int32 personality = 0;
+	int32 status_effect = 0;
+	float skillMultiplier = 1.0f;
+
+	switch (attackType)
+	{
+	case EActionMode::Paralysis:
+		if (!enemy->TryConsumeAP(1))
+		{
+			return;
+		}
+		skillMultiplier = 0.8f;
+		enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
+		break;
+
+	case EActionMode::Poison:
+		if (!enemy->TryConsumeAP(1))
+		{
+			return;
+		}
+		UE_LOG(LogTemp, Warning, TEXT("In Poison"));
+		enemy->AddStatusEffect(EStatusEffect::Poison, 3);
+		break;
+
+	case EActionMode::Vulnerable:
+		if (!enemy->TryConsumeAP(1))
+		{
+			return;
+		}
+		enemy->AddStatusEffect(EStatusEffect::Vulnerable, 2);
+		break;
+
+	case EActionMode::Weakening:
+		if (!enemy->TryConsumeAP(1))
+		{
+			return;
+		}
+		enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
+		break;
+
+	case EActionMode::Fatal:
+		if (!enemy->TryConsumeAP(2))
+		{
+			return;
+		}
+		skillMultiplier = 1.5f;
+		enemy->AddStatusEffect(EStatusEffect::Bleeding, 2);
+		break;
+
+	case EActionMode::Rupture:
+		if (!enemy->TryConsumeAP(2))
+		{
+			return;
+		}
+		skillMultiplier = 1.5f;
+		enemy->AddStatusEffect(EStatusEffect::Vulnerable, 1);
+		break;
+
+	case EActionMode::Roar:
+		if (!enemy->TryConsumeAP(1))
+		{
+			return;
+		}
+		enemy->AddStatusEffect(EStatusEffect::Weakening, 2);
+		return;
+
+	case EActionMode::BattleCry:
+		if (!enemy->TryConsumeAP(1))
+		{
+			return;
+		}
+		enemy->AddStatusEffect(EStatusEffect::Angry, 1);
+		return;
+
+	default:
+		// EnemySkillList에서 고유 스킬 처리
+		// HandleEnemyUniqueSkill(enemy, player, attackType);
+		break;
+	}
+
+	// 대미지 처리
+	CalculateAndApplyDamage(player, atk, weapon, skillMultiplier, critical, criticalDamage, personality, status_effect);
+
+	// 대미지를 줬다면 None으로 변경
+	currentActionMode = EActionMode::None;
+	if (enemy->enemyAnim)
+	{
+		enemy->enemyAnim->actionMode = currentActionMode;
+	}
+}
+
+void ABaseBattlePawn::CalculateAndApplyDamage(ABaseBattlePawn* target,
+                                              int32 atk, int32 weapon,
+                                              float skillMultiplier,
+                                              float criticalRate,
+                                              float criticalDamage,
+                                              int32 personality,
+                                              int32 status_effect)
+{
+	UE_LOG(LogTemp, Warning, TEXT("In Calculate"));
+	int32 damage = 0;
+	int32 chance = FMath::RoundToInt(criticalRate * 100.0f);
+	int32 roll = FMath::RandRange(1, 100);
+
+	if (bool bIsCrit = roll <= chance)
+	{
+		damage = ((atk + weapon) * skillMultiplier * (1 + (personality + status_effect))) * criticalDamage;
+		UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
+	}
+	else
+	{
+		damage = (atk + weapon) * skillMultiplier * (1 + (personality + status_effect));
+		UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
+	}
+
+	GetDamage(target, damage);
+}
 
 void ABaseBattlePawn::AddStatusEffect(EStatusEffect newEffect, int32 duration)
 {
@@ -1822,26 +1820,28 @@ void ABaseBattlePawn::InitEnemyState()
 
 		// 애너미 랜덤 성격 세팅
 		InitTraits();
-
-		// 성격에 따른 값 추가 세팅
-		ApplyTraitModifiers(enemy->enemybattleState);
-
+		
 		for (const FString trait : enemy->enemybattleState->traits)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Trait : %s"), *trait);
 		}
-		enemy->enemybattleState->hp = enemybattleState->hp;
-		enemy->enemybattleState->attack = enemybattleState->attack;;
-		enemy->enemybattleState->defense = enemybattleState->defense;
-		enemy->enemybattleState->resistance = enemybattleState->resistance;
-		enemy->enemybattleState->move_Range = enemybattleState->move_Range;
-		enemy->enemybattleState->critical_Rate = enemybattleState->critical_Rate;
-		enemy->enemybattleState->critical_Damage = enemybattleState->critical_Damage;
-		enemy->enemybattleState->speed = enemybattleState->speed;;
+		// 기본 스텟 설정(일단 오우거로)
+		enemy->enemybattleState->hp = 90;
+		enemy->enemybattleState->attack = 10;
+		enemy->enemybattleState->defense = 5;
+		enemy->enemybattleState->resistance = 2;
+		enemy->enemybattleState->move_Range = 3;
+		enemy->enemybattleState->critical_Rate = 1.0f;
+		enemy->enemybattleState->critical_Damage = 1.5f;
+		enemy->enemybattleState->speed = 3;
 
+		// 성격에 따른 값 추가 세팅
+		ApplyTraitModifiers(enemy->enemybattleState);
+		
 		// enemy에 moveRange 세팅 작업
 		enemy->moveRange = FMath::Max(1, enemy->enemybattleState->move_Range);
 
+		
 		// 전송용 구조체에 값 세팅
 		enemy->enemybattleState->enemyStatus.hp = enemybattleState->hp;
 		enemy->enemybattleState->enemyStatus.attack = enemybattleState->attack;
@@ -1852,6 +1852,26 @@ void ABaseBattlePawn::InitEnemyState()
 		enemy->enemybattleState->enemyStatus.critical_Damage = enemybattleState->critical_Damage;
 		enemy->enemybattleState->enemyStatus.speed = enemybattleState->speed;
 
+		
+		UE_LOG(LogTemp, Warning,TEXT("Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "", crit : %f, crit_Damge : %f, spd : %d"),
+			   enemy->enemybattleState->hp,
+			   enemy->enemybattleState->attack,
+			   enemy->enemybattleState->defense,
+			   enemy->enemybattleState->resistance,
+			   enemy->enemybattleState->move_Range,
+			   enemy->enemybattleState->critical_Rate,
+			   enemy->enemybattleState->critical_Damage,
+			   enemy->enemybattleState->speed);
+		UE_LOG(LogTemp, Warning,TEXT("API Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "", crit : %f, crit_Damge : %f, spd : %d"),
+				enemy->enemybattleState->enemyStatus.hp,
+				enemy->enemybattleState->enemyStatus.attack,
+				enemy->enemybattleState->enemyStatus.defense,
+				enemy->enemybattleState->enemyStatus.resistance,
+				enemy->enemybattleState->enemyStatus.move_Range,
+				enemy->enemybattleState->enemyStatus.critical_Rate,
+				enemy->enemybattleState->enemyStatus.critical_Damage,
+				enemy->enemybattleState->enemyStatus.speed);
+		
 		FString name = "";
 		name = FString::Printf(TEXT("Enemy%d"), phaseManager->unitEnemyNameindex);
 		phaseManager->unitEnemyNameindex++;

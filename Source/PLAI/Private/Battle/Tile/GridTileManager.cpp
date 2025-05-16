@@ -7,6 +7,8 @@
 #include "GridTile.h"
 #include "Algo/RandomShuffle.h"
 #include "Enemy/BaseEnemy.h"
+#include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/Monster/MonWorld/MonBossPawn.h"
 #include "Player/BattlePlayer.h"
 
 // Sets default values
@@ -31,6 +33,7 @@ void AGridTileManager::Tick(float DeltaTime)
 
 void AGridTileManager::InitGridTile()
 {
+	
 	TArray<FIntPoint> allCoords;
 	allCoords.Reserve(625);
 	// allCoords.Reserve(49);
@@ -66,11 +69,12 @@ void AGridTileManager::InitGridTile()
 		}
 	}
 
+	// 좌표 섞기
 	Algo::RandomShuffle(allCoords);
 
 	// player 좌표 뽑기
 	TArray<FIntPoint> playerCoords;
-	for (int32 i = 0; i < 4 && i < allCoords.Num(); ++i)
+	for (int32 i = 0; i < 2 && i < allCoords.Num(); ++i)
 	{
 		playerCoords.Add(allCoords[i]);
 	}
@@ -80,14 +84,28 @@ void AGridTileManager::InitGridTile()
 	{
 		allCoords.Remove(Coord);
 	}
-
-	// 그 다음 적 좌표 뽑기
+	
 	TArray<FIntPoint> enemyCoords;
-	for (int32 i = 0; i < 4 && i < allCoords.Num(); ++i)
+	
+	FString levelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	// Level이 보스 레벨이라면
+	if (levelName == "MK_BossMap")
 	{
-		enemyCoords.Add(allCoords[i]);
+		// 그 다음 적 좌표 뽑기
+		for (int32 i = 0; i < 1 && i < allCoords.Num(); ++i)
+		{
+			enemyCoords.Add(allCoords[i]);
+		}
 	}
-
+	else
+	{
+		// 그 다음 적 좌표 뽑기
+		for (int32 i = 0; i < 4 && i < allCoords.Num(); ++i)
+		{
+			enemyCoords.Add(allCoords[i]);
+		}
+	}
+	
 	// 플레이어 유닛 스폰
 	for (const FIntPoint& coord : playerCoords)
 	{
@@ -110,14 +128,27 @@ void AGridTileManager::InitGridTile()
 	{
 		if (AGridTile* gridTile = map.FindRef(coord))
 		{
-			FVector spawnLoc = gridTile->GetActorLocation() + FVector(
-				0.f, 0.f, 80.f);
-			if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(
-				enemyFactory, spawnLoc, FRotator::ZeroRotator))
+			// 보스 레벨이라면 보스 몬스터 스폰
+			if (levelName == "MK_BossMap")
 			{
-				enemy->speed = FMath::RandRange(1, 10);
-				enemy->currentTile = gridTile;
-				unitArray.Add(enemy);
+				FVector spawnLoc = gridTile->GetActorLocation() + FVector(
+				0.f, 0.f, 80.f);
+				if (auto* enemy = GetWorld()->SpawnActor<AMonBossPawn>(bossFactory, spawnLoc, FRotator::ZeroRotator))
+				{
+					enemy->speed = FMath::RandRange(1, 10);
+					enemy->currentTile = gridTile;
+					unitArray.Add(enemy);
+				}
+			}
+			else
+			{
+				FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
+				if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(enemyFactory, spawnLoc, FRotator::ZeroRotator))
+				{
+					enemy->speed = FMath::RandRange(1, 10);
+					enemy->currentTile = gridTile;
+					unitArray.Add(enemy);
+				}
 			}
 		}
 	}
