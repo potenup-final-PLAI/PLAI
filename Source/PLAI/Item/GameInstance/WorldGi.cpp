@@ -36,7 +36,6 @@ void UWorldGi::CreateSession(FString displayName, int32 playerCount)
 
 	SessionInterface->CreateSession(0, FName(displayName), SessionSettings);
 }
-
 void UWorldGi::OnCreateSessionComplete(FName sessionName, bool success)
 {
 	if (success)

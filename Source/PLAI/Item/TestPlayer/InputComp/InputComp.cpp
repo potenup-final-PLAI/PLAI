@@ -39,7 +39,9 @@ void UInputComp::BeginPlay()
 
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
-	
+
+	if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp, Error, TEXT(
+		"InputComp TestPlayer is locallyControlled 없음 서버니 클라니? %s"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")); return;}
 	if (ULocalPlayer* LP = Pc->GetLocalPlayer())
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
@@ -47,6 +49,7 @@ void UInputComp::BeginPlay()
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
+	
 	if (UEnhancedInputComponent* InputComp = Cast<UEnhancedInputComponent>(TestPlayer->InputComponent))
 	{
 		InputComp->BindAction(IE_Equip, ETriggerEvent::Started, this, &UInputComp::On_Equip);

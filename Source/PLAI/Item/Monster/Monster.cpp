@@ -37,10 +37,6 @@ void AMonster::BeginPlay()
 	Super::BeginPlay();
 
 	TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-	if (TestPlayer)
-	{ UE_LOG(LogTemp, Warning, TEXT("몬스터 TestPlayer 있음")); }
-	else
-	{ UE_LOG(LogTemp, Warning, TEXT("몬스터 TestPlayer 없음")); }
 
 	MonsterParent = MonsterFactory->GetDefaultObject<AMonster>();
 	MonUi = CreateWidget<UMonUi>(GetWorld(),MonsterParent->MonUiFactory);

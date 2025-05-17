@@ -47,13 +47,13 @@ void ANpcNet::OpenQuest()
 	UIPost->AddToViewport();
 	UIPost->OnNetPost.BindUObject(this,&ANpcNet::NetPost);
 	NpcUiMaster = Cast<UUserWidget>(UIPost);
-	if (!NpcUiMaster){
-		UE_LOG(LogTemp,Error,TEXT("NpcNet NpcUiMaster 생성 실패"));
-	}
-	else
-	{
-		UE_LOG(LogTemp,Error,TEXT("NpcNet NpcUiMaster 생성 성공"));
-	};
+	// if (!NpcUiMaster){
+	// 	UE_LOG(LogTemp,Error,TEXT("NpcNet NpcUiMaster 생성 실패"));
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp,Error,TEXT("NpcNet NpcUiMaster 생성 성공"));
+	// };
 }
 
 void ANpcNet::NetPost(FString String)
@@ -64,7 +64,7 @@ void ANpcNet::NetPost(FString String)
 	HttpRequest->SetVerb("POST");
 	HttpRequest->SetHeader("Content-Type", "application/json");
 
-	UE_LOG(LogTemp,Warning,TEXT("NpcNet String받은값 무엇%s"),*String)
+	// UE_LOG(LogTemp,Warning,TEXT("NpcNet String받은값 무엇%s"),*String)
 	FString JsonString;
 	FNpcStructPost NpcStruct;
 	NpcStruct.question = String;
@@ -78,7 +78,7 @@ void ANpcNet::NetPost(FString String)
 			FNpcStructGet NpcStruct;
 			FString JsonString = HttpResponse->GetContentAsString();
 			FJsonObjectConverter::JsonObjectStringToUStruct(JsonString,&NpcStruct);
-			UE_LOG(LogTemp, Warning, TEXT("ANpcNet::NetPost 성공함 JsonString은? [%s] 서버코드 %d"),*JsonString,HttpResponse->GetResponseCode());
+			// UE_LOG(LogTemp, Warning, TEXT("ANpcNet::NetPost 성공함 JsonString은? [%s] 서버코드 %d"),*JsonString,HttpResponse->GetResponseCode());
 			UIPost->TextGet->SetText(FText::FromString(NpcStruct.response));
 		}
 	});

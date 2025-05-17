@@ -44,7 +44,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CreateSession(FString displayName, int32 playerCount);
 	void OnCreateSessionComplete(FName sessionName, bool success);
-	
+
 	IOnlineSessionPtr SessionInterface;
 	
 	virtual void Init() override;

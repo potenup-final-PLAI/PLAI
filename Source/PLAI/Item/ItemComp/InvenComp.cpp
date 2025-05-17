@@ -76,11 +76,21 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     // 데이터테이블 템 먹기
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
+
+	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::One))
+	{
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+		{
+			WorldGi->CreateSession(FString("Wanted"),0);
+		}
+	}
 	
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
 		Server_SpawnOneItem();
 	}
+
+	
 	// 소환수 크리처 소환하기 임시
 	if (TestPlayer->HasAuthority() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Five))
 	{
@@ -428,8 +438,8 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		
 		for (int32 i = 0; i < TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Num(); i++)
 		{
-			UE_LOG(LogTemp,Warning,TEXT("InvenCOmp 497번쨰줄 SetUiChaStat에 들어가는 장비정보 [%s]"),
-				*TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list[i].item_name);
+			// UE_LOG(LogTemp,Warning,TEXT("InvenCOmp 497번쨰줄 SetUiChaStat에 들어가는 장비정보 [%s]"),
+			// 	*TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list[i].item_name);
 		}
 		
 	},1,false);

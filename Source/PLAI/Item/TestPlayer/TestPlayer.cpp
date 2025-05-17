@@ -38,9 +38,11 @@ ATestPlayer::ATestPlayer()
 void ATestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-    
-	StoreComp->StoreInven->AddToViewport();
-	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
+    if (IsLocallyControlled())
+    {
+    	StoreComp->StoreInven->AddToViewport();
+    	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
+    }
 }
 
 // Called every frame
