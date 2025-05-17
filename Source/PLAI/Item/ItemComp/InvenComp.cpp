@@ -76,12 +76,20 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     // 데이터테이블 템 먹기
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
-
+    // 스팀 세션 만들기
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::One))
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
 			WorldGi->CreateSession(FString("Wanted"),0);
+		}
+	}
+	// 스팀 세션 찾기
+	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Two))
+	{
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+		{
+			WorldGi->FindOtherSession();
 		}
 	}
 	
@@ -702,7 +710,7 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 
 
 
-// if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::RightMouseButton))
+// if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys:: MouseButton))
 // {
 // 	FHitResult Hit;
 // 	PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);

@@ -77,31 +77,6 @@ void ULoginComp::BeginPlay()
 void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	// { if (PC->WasInputKeyJustPressed(EKeys::M)) // M 캐릭터 생성 내 정보 요청
-	// {   UE_LOG(LogTemp,Display,TEXT("Input M 내 정보 주셈 Key JustPressed"));
-	// 	HttpMePost();
-	// }
-	// }
-
-	// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	// { if (PC->WasInputKeyJustPressed(EKeys::N)) // N 내아이템 주셈
-	// 	{   UE_LOG(LogTemp,Display,TEXT("Input N 장비아이템 붙이기 테스트"));
-	// 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-	// 	{
-	// 		WorldGi->EquipActor(TestPlayer);
-	// 	}
-	// 	}
-	// }
-
-	// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	// { if (PC->WasInputKeyJustPressed(EKeys::B)) // B 웹소켓연걸
-	// {
-	// 	ConnectWebSocket();
-	// 	UE_LOG(LogTemp,Display,TEXT("Input B 웹소켓 연결 Key JustPressed"));
-	// }
-	// }
 	
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
@@ -486,3 +461,28 @@ void ULoginComp::OnWebSocketClosed(int32 StatusCode, const FString& Reason, bool
 // FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
 // 				              "LoginComp 나의 CharacterId [%s]"),*UserFullInfo.user_id, *UserFullInfo.character_info.character_id),
 // 				  nullptr,FColor::Red,0.f,false);
+
+// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+// { if (PC->WasInputKeyJustPressed(EKeys::M)) // M 캐릭터 생성 내 정보 요청
+// {   UE_LOG(LogTemp,Display,TEXT("Input M 내 정보 주셈 Key JustPressed"));
+// 	HttpMePost();
+// }
+// }
+
+// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+// { if (PC->WasInputKeyJustPressed(EKeys::N)) // N 내아이템 주셈
+// 	{   UE_LOG(LogTemp,Display,TEXT("Input N 장비아이템 붙이기 테스트"));
+// 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		WorldGi->EquipActor(TestPlayer);
+// 	}
+// 	}
+// }
+
+// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+// { if (PC->WasInputKeyJustPressed(EKeys::B)) // B 웹소켓연걸
+// {
+// 	ConnectWebSocket();
+// 	UE_LOG(LogTemp,Display,TEXT("Input B 웹소켓 연결 Key JustPressed"));
+// }
+// }

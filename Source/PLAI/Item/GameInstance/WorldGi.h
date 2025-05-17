@@ -41,11 +41,23 @@ class PLAI_API UWorldGi : public UGameInstance
 
 public:
 
+	// 세션 생성
 	UFUNCTION(BlueprintCallable)
 	void CreateSession(FString displayName, int32 playerCount);
 	void OnCreateSessionComplete(FName sessionName, bool success);
 
+	// 세션 조회
+	UFUNCTION()
+	void FindOtherSession();
+	void OnFindSessionComplete(bool success);
+
+public:
 	IOnlineSessionPtr SessionInterface;
+
+	// 세션 검색할 때 쓰는 객체
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
+
+	
 	
 	virtual void Init() override;
 	

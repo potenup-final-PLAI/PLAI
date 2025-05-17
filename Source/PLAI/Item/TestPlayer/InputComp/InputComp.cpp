@@ -39,12 +39,6 @@ void UInputComp::BeginPlay()
 
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
-
-	if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp, Error, TEXT(
-		"InputComp  서버니 클라니? [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")); return;}
-	else
-	{ UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is locallyControlled 있음 서버니 클라니? %s"),
-			TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")) }
 	
 	if (ULocalPlayer* LP = Pc->GetLocalPlayer())
 	{
@@ -274,3 +268,9 @@ void UInputComp::OnPawnPossesed(AController* Controller)
 {
 	
 }
+
+// if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp, Error, TEXT(
+// 	"InputComp  서버니 클라니? [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")); return;}
+// else
+// { UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is locallyControlled 있음 서버니 클라니? %s"),
+// 		TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")) }
