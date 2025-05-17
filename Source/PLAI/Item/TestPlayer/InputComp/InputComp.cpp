@@ -41,12 +41,20 @@ void UInputComp::BeginPlay()
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
 
 	if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp, Error, TEXT(
-		"InputComp TestPlayer is locallyControlled 없음 서버니 클라니? %s"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")); return;}
+		"InputComp TestPlayer is locallyControlled 없음 서버니 클라니? [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")); return;}
+	else
+	{ UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is locallyControlled 있음 서버니 클라니? %s"),
+			TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")) }
+	
 	if (ULocalPlayer* LP = Pc->GetLocalPlayer())
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
 		{
-			Subsystem->AddMappingContext(InputMappingContext, 0);
+			Subsystem->AddMappingContext(InputMappingContext, 2);
+			{
+				UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is AddMapping [있음] 서버니 클라니? %s"),
+				TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
+			}
 		}
 	}
 	
@@ -73,7 +81,7 @@ void UInputComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 void UInputComp::On_Equip()
 {
 	if (!Pc->IsLocalController()) return;
-	
+	UE_LOG(LogTemp,Warning,TEXT("InputComp 장비창 실행 [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
 	if (TestPlayer->InvenComp->MenuInven->WBP_EquipInven->GetVisibility() == ESlateVisibility::Hidden)
 	{ TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Visible); }
 	else
@@ -83,7 +91,7 @@ void UInputComp::On_Equip()
 void UInputComp::On_Inven()
 {
 	if (!Pc->IsLocalController()) return;
-	
+	UE_LOG(LogTemp,Warning,TEXT("InputComp 인벤창 실행 [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
 	if (TestPlayer->InvenComp->MenuInven->WBP_ItemInven->GetVisibility() == ESlateVisibility::Hidden) 
 	{ TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Visible);}
 	else
@@ -93,7 +101,7 @@ void UInputComp::On_Inven()
 void UInputComp::On_Stat()
 {
 	if (!Pc->IsLocalController()) return;
-	
+	UE_LOG(LogTemp,Warning,TEXT("InputComp 스텟창 실행 [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
 	if (TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->GetVisibility() == ESlateVisibility::Hidden) 
 	{ TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Visible);}
 	else
@@ -102,9 +110,11 @@ void UInputComp::On_Stat()
 
 void UInputComp::On_LeftMouseStart()
 {
-	if (!Pc->IsLocalController()) return;
-	bLeftMouse = true;
+	// if (!Pc->IsLocalController()) return;
 
+	UE_LOG(LogTemp,Warning,TEXT("InputComp 왼쪽마우스 클릭 [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
+
+	bLeftMouse = true;
 	FHitResult Hit;
 	Pc->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 
@@ -211,4 +221,19 @@ void UInputComp::On_RoatateView()
 		TestPlayer->InvenComp->MenuInven->WBP_InputUi->RotateViewText->SetText(FText::FromString(TEXT("자유 시점 모드")));
 		bRotateView = true;
 	}
+}
+
+void UInputComp::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	if (APawn* Pawn = Cast<APawn>(GetOwner()))
+	{
+		Pawn->ReceivePossessed(Pc);
+	}
+}
+
+void UInputComp::OnPawnPossesed(AController* Controller)
+{
+	
 }

@@ -83,4 +83,8 @@ public:
 	bool bRotateView = false;
 	UFUNCTION()
 	void On_RoatateView();
+
+	virtual void InitializeComponent() override;
+	
+	void OnPawnPossesed(AController* Controller);
 };
