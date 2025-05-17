@@ -12,6 +12,8 @@
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -63,6 +65,12 @@ void APLAIPlayerController::SetupInputComponent()
 void APLAIPlayerController::OnInputStarted()
 {
 	StopMovement();
+	
+	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	{
+		TestPlayer->TestInputComp->SetMappingContext();
+		TestPlayer->TestInputComp->BindInputActions();
+	}
 }
 
 // Triggered every frame when the input is held down

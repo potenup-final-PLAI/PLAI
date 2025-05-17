@@ -87,4 +87,7 @@ public:
 	virtual void InitializeComponent() override;
 	
 	void OnPawnPossesed(AController* Controller);
+
+	void BindInputActions();
+	void SetMappingContext();
 };

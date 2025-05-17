@@ -28,7 +28,7 @@ ATestPlayer::ATestPlayer()
 	LoginComp = CreateDefaultSubobject<ULoginComp>(TEXT("LoginComp"));
 	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("CreComp"));
 	LogItemComp = CreateDefaultSubobject<ULogItemComp>(TEXT("ItemComp"));
-	TestpInputComp = CreateDefaultSubobject<UInputComp>(TEXT("TestpInputComp"));
+	TestInputComp = CreateDefaultSubobject<UInputComp>(TEXT("TestpInputComp"));
 
 	CaptureComp = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureComp"));
 	CaptureComp->SetupAttachment(RootComponent);
@@ -42,6 +42,9 @@ void ATestPlayer::BeginPlay()
     {
     	StoreComp->StoreInven->AddToViewport();
     	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
+
+    	// TestInputComp->SetMappingContext();
+    	// TestInputComp->BindInputActions();
     }
 }
 
@@ -55,7 +58,5 @@ void ATestPlayer::Tick(float DeltaTime)
 void ATestPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	
 }
 

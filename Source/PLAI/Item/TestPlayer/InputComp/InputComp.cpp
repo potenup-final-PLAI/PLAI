@@ -41,7 +41,7 @@ void UInputComp::BeginPlay()
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
 
 	if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp, Error, TEXT(
-		"InputComp TestPlayer is locallyControlled 없음 서버니 클라니? [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")); return;}
+		"InputComp  서버니 클라니? [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")); return;}
 	else
 	{ UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is locallyControlled 있음 서버니 클라니? %s"),
 			TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")) }
@@ -50,7 +50,7 @@ void UInputComp::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
 		{
-			Subsystem->AddMappingContext(InputMappingContext, 2);
+			Subsystem->AddMappingContext(InputMappingContext, 0);
 			{
 				UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is AddMapping [있음] 서버니 클라니? %s"),
 				TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
@@ -70,9 +70,46 @@ void UInputComp::BeginPlay()
 		InputComp->BindAction(IE_RotateView, ETriggerEvent::Started, this, &UInputComp::On_RoatateView);
 	}
 }
-// ...
 
-// Called every frame
+
+
+void UInputComp::BindInputActions()
+{
+	if (UEnhancedInputComponent* InputComp = Cast<UEnhancedInputComponent>(TestPlayer->InputComponent))
+	{
+		InputComp->BindAction(IE_Equip, ETriggerEvent::Started, this, &UInputComp::On_Equip);
+		InputComp->BindAction(IE_Inven, ETriggerEvent::Started, this, &UInputComp::On_Inven);
+		InputComp->BindAction(IE_Stat, ETriggerEvent::Started, this, &UInputComp::On_Stat);
+		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Started, this, &UInputComp::On_LeftMouseStart);
+		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Triggered, this, &UInputComp::On_LeftMouseTriggered);
+		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Completed, this, &UInputComp::On_LeftMouseComplete);
+		InputComp->BindAction(IE_MouseWheel, ETriggerEvent::Triggered, this, &UInputComp::On_MouseWheelTriggered);
+		InputComp->BindAction(IE_RotateView, ETriggerEvent::Started, this, &UInputComp::On_RoatateView);
+	}
+		
+}
+
+void UInputComp::SetMappingContext()
+{
+	if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp, Error, TEXT(
+	"InputComp  서버니 클라니? [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")); return;}
+	else
+	{ UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is locallyControlled 있음 서버니 클라니? %s"),
+			TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")) }
+	
+	if (ULocalPlayer* LP = Pc->GetLocalPlayer())
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			Subsystem->AddMappingContext(InputMappingContext, 0);
+			{
+				UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is AddMapping [있음] 서버니 클라니? %s"),
+				TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
+			}
+		}
+	}
+}
+
 void UInputComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
