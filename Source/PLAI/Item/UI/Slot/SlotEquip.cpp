@@ -27,9 +27,9 @@ FReply USlotEquip::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FP
 {
 	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item id %s"),*ItemStructTable.Item_Id)
-		UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Attack%d"),ItemStructTable.ItemStructStat.item_ATK)
-		UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Defense%d"),ItemStructTable.ItemStructStat.item_DEF)
+		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item id %s"),*ItemStructTable.Item_Id)
+		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Attack%d"),ItemStructTable.ItemStructStat.item_ATK)
+		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Defense%d"),ItemStructTable.ItemStructStat.item_DEF)
 		APlayerController* Pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 		if (Pc->GetPawn()->IsLocallyControlled())
 		{

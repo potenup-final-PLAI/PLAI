@@ -56,8 +56,8 @@ void UUiMonWorld::OnButtonYes()
 			{
 				UGameplayStatics::OpenLevel(TestPlayer,FName("Mk_BossMap"));
 			}
-			UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
-				*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);
+			// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
+			// 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);
 		}
 		// UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
 	}

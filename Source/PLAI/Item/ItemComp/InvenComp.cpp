@@ -517,7 +517,7 @@ void UInvenComp::SaveItemInventory()
 	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Inventory.tst"));
 	FFileHelper::SaveStringToFile(JsonValue,*path);
 	
-	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 저장"))
+	// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 저장"))
 }
 
 void UInvenComp::LoadItemInventory()
@@ -535,7 +535,7 @@ void UInvenComp::LoadItemInventory()
 		Slot->ItemStructTable = ItemStructTables.ItemStructTables[i];
 		Slot->SlotImageUpdate();
 	}
-	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 로드"))
+	// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 로드"))
 }
 
 void UInvenComp::SaveEquipInventory()
@@ -549,7 +549,7 @@ void UInvenComp::SaveEquipInventory()
 	}
 	FString JsonString;
 	FJsonObjectConverter::UStructToJsonObjectString(ItemStructTables,JsonString);
-	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 저장"))
+	// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 저장"))
 	
 	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Equip.tst"));
 	FFileHelper::SaveStringToFile(JsonString, *path);

@@ -10,7 +10,7 @@ void UInputUi::InputUiHidden()
 	{
 		SignDegree += 3.6f;
 		float Rad = FMath::DegreesToRadians(SignDegree);
-		UE_LOG(LogTemp, Display, TEXT("InputUi::InputUiHidden() SignDegree [%f] sin(SignDegree) [%f]"),SignDegree, FMath::Sin(Rad));
+		// UE_LOG(LogTemp, Display, TEXT("InputUi::InputUiHidden() SignDegree [%f] sin(SignDegree) [%f]"),SignDegree, FMath::Sin(Rad));
 		
 		CurrentOpacity -= 0.02f;
 		
