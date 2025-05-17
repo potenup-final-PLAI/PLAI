@@ -61,6 +61,8 @@ ABaseBattlePawn::ABaseBattlePawn()
 	{
 		battleUnitStateComp->SetWidgetClass(tempBattleUnitStateUI.Class);
 	}
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -210,12 +212,12 @@ void ABaseBattlePawn::OnTurnEnd()
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 	{
 		// PlayerPhaseEnd
-		phaseManager->EndPlayerPhase();
+		phaseManager->ServerRPC_EndPlayerPhase();
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
 		// EnemyPhaseEnd
-		phaseManager->EndEnemyPhase();
+		phaseManager->ServerRPC_EndEnemyPhase();
 	}
 }
 

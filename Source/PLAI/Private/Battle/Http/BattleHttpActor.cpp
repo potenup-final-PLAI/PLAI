@@ -16,6 +16,7 @@ ABattleHttpActor::ABattleHttpActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -93,7 +94,7 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,
 		// 현재 페이즈가 None이라면
 		if (phaseManager->currentPhase == EBattlePhase::None)
 		{
-			phaseManager->SetPhase(EBattlePhase::BattleStart);
+			phaseManager->ServerRPC_SetPhase(EBattlePhase::BattleStart);
 		}
 	}
 	httpRequest->SetContentAsString(jsonString);
@@ -114,14 +115,14 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,
 					// 최초 데이터를 보내면 Success 값이 잘 들어오는지만 판단
 					FString jsonData = Response->GetContentAsString();
 					UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
-					
+
 					if (auto* phaseManager = Cast<AUPhaseManager>(
-					GetWorld()->GetGameState()))
+						GetWorld()->GetGameState()))
 					{
 						// 현재 페이즈가 None이라면
 						if (phaseManager->currentPhase == EBattlePhase::None)
 						{
-							phaseManager->SetPhase(EBattlePhase::BattleStart);
+							phaseManager->ServerRPC_SetPhase(EBattlePhase::BattleStart);
 						}
 					}
 				}
@@ -139,7 +140,10 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,
 
 						if (ParsedRequest.action.target_character_id == "")
 						{
-							UE_LOG(LogTemp, Error,TEXT("Parsed ActionRequest has empty actions array"));
+							UE_LOG(LogTemp, Error,
+							       TEXT(
+								       "Parsed ActionRequest has empty actions array"
+							       ));
 							if (auto* enemy = Cast<ABaseEnemy>(unit))
 							{
 								enemy->OnTurnEnd();

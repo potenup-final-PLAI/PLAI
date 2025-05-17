@@ -16,6 +16,8 @@ AGridTileManager::AGridTileManager()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -33,7 +35,12 @@ void AGridTileManager::Tick(float DeltaTime)
 
 void AGridTileManager::InitGridTile()
 {
-	
+	if (!HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("서버가 아닙니다."));
+		return;
+	}
+
 	TArray<FIntPoint> allCoords;
 	allCoords.Reserve(625);
 	// allCoords.Reserve(49);
@@ -84,9 +91,9 @@ void AGridTileManager::InitGridTile()
 	{
 		allCoords.Remove(Coord);
 	}
-	
+
 	TArray<FIntPoint> enemyCoords;
-	
+
 	FString levelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 	// Level이 보스 레벨이라면
 	if (levelName == "MK_BossMap")
@@ -105,7 +112,7 @@ void AGridTileManager::InitGridTile()
 			enemyCoords.Add(allCoords[i]);
 		}
 	}
-	
+
 	// 플레이어 유닛 스폰
 	for (const FIntPoint& coord : playerCoords)
 	{
@@ -132,8 +139,9 @@ void AGridTileManager::InitGridTile()
 			if (levelName == "MK_BossMap")
 			{
 				FVector spawnLoc = gridTile->GetActorLocation() + FVector(
-				0.f, 0.f, 80.f);
-				if (auto* enemy = GetWorld()->SpawnActor<AMonBossPawn>(bossFactory, spawnLoc, FRotator::ZeroRotator))
+					0.f, 0.f, 80.f);
+				if (auto* enemy = GetWorld()->SpawnActor<AMonBossPawn>(
+					bossFactory, spawnLoc, FRotator::ZeroRotator))
 				{
 					enemy->speed = FMath::RandRange(1, 10);
 					enemy->currentTile = gridTile;
@@ -142,8 +150,10 @@ void AGridTileManager::InitGridTile()
 			}
 			else
 			{
-				FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
-				if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(enemyFactory, spawnLoc, FRotator::ZeroRotator))
+				FVector spawnLoc = gridTile->GetActorLocation() + FVector(
+					0.f, 0.f, 80.f);
+				if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(
+					enemyFactory, spawnLoc, FRotator::ZeroRotator))
 				{
 					enemy->speed = FMath::RandRange(1, 10);
 					enemy->currentTile = gridTile;
@@ -192,22 +202,27 @@ bool AGridTileManager::IsValidTile(FIntPoint num)
 	return false;
 }
 
-void AGridTileManager::SetTileColor(AGridTile* targetTile,  bool bHighlight)
+void AGridTileManager::SetTileColor(AGridTile* targetTile, bool bHighlight)
 {
 	if (!targetTile || !targetTile->dynDecalInstance)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SetTileColor : !targetTile || !targetTile->dynDecalInstance"));
+		UE_LOG(LogTemp, Warning,
+		       TEXT(
+			       "SetTileColor : !targetTile || !targetTile->dynDecalInstance"
+		       ));
 		return;
 	}
 
 	if (bHighlight)
 	{
 		//그 위치 타일 색 변경
-		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.1f);
+		targetTile->dynDecalInstance->SetScalarParameterValue(
+			TEXT("TileOpacity"), 0.1f);
 	}
 	else
 	{
 		//그 위치 타일 색 변경
-		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
+		targetTile->dynDecalInstance->SetScalarParameterValue(
+			TEXT("TileOpacity"), 0.0f);
 	}
 }

@@ -25,6 +25,7 @@ AGridTile::AGridTile()
 	tCostValue = 0;
 	parentTile = nullptr;
 	gridCoord = FIntPoint(0, 0);
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -48,7 +49,8 @@ void AGridTile::InitDecal()
 	{
 		if (dynDecalInstance)
 		{
-			dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
+			dynDecalInstance->
+				SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
 		}
 	}
 }

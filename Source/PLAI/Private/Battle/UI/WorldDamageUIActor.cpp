@@ -16,8 +16,10 @@ AWorldDamageUIActor::AWorldDamageUIActor()
 	damageUIComp = CreateDefaultSubobject<UWidgetComponent>("damageUIComp");
 	SetRootComponent(damageUIComp);
 	damageUIComp->SetGenerateOverlapEvents(false); // 충돌 막기
-	damageUIComp->SetVisibility(false); 
+	damageUIComp->SetVisibility(false);
 	damageUIComp->SetCastShadow(false);
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -30,7 +32,6 @@ void AWorldDamageUIActor::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("WorldDamageUIActor: damageUI is null!"));
 	}
-	
 }
 
 // Called every frame
@@ -38,7 +39,7 @@ void AWorldDamageUIActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+
 	if (bShowUI)
 	{
 		elapsed += DeltaTime;
