@@ -92,6 +92,17 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			WorldGi->FindOtherSession();
 		}
 	}
+
+	// 스팀 세션 참여하기 
+	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Three))
+	{
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+		{
+			WorldGi->JoinOtherSession();
+		}
+	}
+
+	
 	
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{

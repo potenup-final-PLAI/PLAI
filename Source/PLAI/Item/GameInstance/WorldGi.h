@@ -42,14 +42,19 @@ class PLAI_API UWorldGi : public UGameInstance
 public:
 
 	// 세션 생성
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void CreateSession(FString displayName, int32 playerCount);
 	void OnCreateSessionComplete(FName sessionName, bool success);
 
 	// 세션 조회
 	UFUNCTION()
 	void FindOtherSession();
-	void OnFindSessionComplete(bool success);
+	void OnFindSessionComplete(bool bWasSuccessful);
+
+	// 세션 참여
+	UFUNCTION()
+	void JoinOtherSession();
+	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
 
 public:
 	IOnlineSessionPtr SessionInterface;

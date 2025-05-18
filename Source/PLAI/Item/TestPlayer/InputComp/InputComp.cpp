@@ -39,6 +39,8 @@ void UInputComp::BeginPlay()
 
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
+
+    if (!Pc) return;
 	
 	if (ULocalPlayer* LP = Pc->GetLocalPlayer())
 	{
