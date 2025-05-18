@@ -59,12 +59,14 @@ void ULoginComp::BeginPlay()
 			}
 			else
 			{
-				if (WorldGi->bBattleReward == true)
+				if (WorldGi->bBattleReward == true || WorldGi->bGameStart == true)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("LoginComp 이미 접속한 캐릭터 Gi UserFullInfo 불러오기"));
 					UserFullInfo = WorldGi->UserFullInfoGi;
 					HttpMePost();
-				
+
+					if (WorldGi->bBattleReward == false){UE_LOG(LogTemp,Warning,TEXT("LoginComp 전투 X 보상 X")) return;}
+					
 					FTimerHandle TimerHandle;
 					GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 					{
