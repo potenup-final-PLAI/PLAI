@@ -5,10 +5,16 @@
 
 #include "MonWorld.h"
 #include "Components/Button.h"
+#include "Components/VerticalBox.h"
+#include "Components/WrapBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
+#include "PLAI/Item/UI/Slot/SlotEquip.h"
 
 void UUiMonWorld::NativeConstruct()
 {
@@ -27,6 +33,17 @@ void UUiMonWorld::OnButtonYes()
 			TestPlayer->LogItemComp->GetEquipInfo();
 			TestPlayer->LogItemComp->GetUserLevel();
 
+			FUserShield UserShield;
+			UserShield.UserName = TestPlayer->LoginComp->UserFullInfo.character_info.character_name;
+			if (USlotEquip* SlotEquip = Cast<USlotEquip>(TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetChildAt(3)))
+			{
+				if (SlotEquip->ItemStructTable.ItemTop != -1)
+				{
+					UserShield.UserShield = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
+				}
+			}
+			WorldGi->UserShields.UserShields.Add(UserShield);
+			
 			WorldGi->UserFullInfoGi = TestPlayer->LoginComp->UserFullInfo;
 			WorldGi->bGameStart = true;
 			WorldGi->bBattleReward = true;
@@ -39,6 +56,8 @@ void UUiMonWorld::OnButtonYes()
 			{
 				UGameplayStatics::OpenLevel(TestPlayer,FName("Mk_BossMap"));
 			}
+			// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
+			// 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);
 		}
 		// UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
 	}

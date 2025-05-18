@@ -28,7 +28,7 @@ ATestPlayer::ATestPlayer()
 	LoginComp = CreateDefaultSubobject<ULoginComp>(TEXT("LoginComp"));
 	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("CreComp"));
 	LogItemComp = CreateDefaultSubobject<ULogItemComp>(TEXT("ItemComp"));
-	TestpInputComp = CreateDefaultSubobject<UInputComp>(TEXT("TestpInputComp"));
+	TestInputComp = CreateDefaultSubobject<UInputComp>(TEXT("TestpInputComp"));
 
 	CaptureComp = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureComp"));
 	CaptureComp->SetupAttachment(RootComponent);
@@ -38,18 +38,14 @@ ATestPlayer::ATestPlayer()
 void ATestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-    
-	StoreComp->StoreInven->AddToViewport();
-	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
-    
-	
-	// if (APlayerController* Pc = Cast<APlayerController>(GetController()))
-	// {
-	// 	TopDownCameraComponent->SetActive(false);
-	// 	Pc->SetViewTarget(this);
-	// }
-	// //카메라붐 카메라 회전값적용
-	// CameraBoom->bUsePawnControlRotation = true;
+    if (IsLocallyControlled())
+    {
+    	StoreComp->StoreInven->AddToViewport();
+    	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
+
+    	// TestInputComp->SetMappingContext();
+    	// TestInputComp->BindInputActions();
+    }
 }
 
 // Called every frame
@@ -62,7 +58,5 @@ void ATestPlayer::Tick(float DeltaTime)
 void ATestPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	
 }
 

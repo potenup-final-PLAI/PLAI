@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/GameInstance.h"
+#include "OnlineSubsystem.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Login/UserStruct.h"
 #include "WorldGi.generated.h"
@@ -11,12 +12,60 @@
 /**
  * 
  */
+
+USTRUCT(BlueprintType)
+struct FUserShield
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	FString UserName = FString("UserName");
+
+	UPROPERTY(EditAnywhere)
+	int32 UserShield = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FUserShields
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	TArray<FUserShield>UserShields;
+};
+
 UCLASS(Blueprintable,Blueprintable)
 class PLAI_API UWorldGi : public UGameInstance
 {
 	GENERATED_BODY()
 
 public:
+
+	// 세션 생성
+	UFUNCTION(BlueprintCallable)
+	void CreateSession(FString displayName, int32 playerCount);
+	void OnCreateSessionComplete(FName sessionName, bool success);
+
+	// 세션 조회
+	UFUNCTION()
+	void FindOtherSession();
+	void OnFindSessionComplete(bool success);
+
+public:
+	IOnlineSessionPtr SessionInterface;
+
+	// 세션 검색할 때 쓰는 객체
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
+
+	
+	
+	virtual void Init() override;
+	
+	UPROPERTY(EditAnywhere)
+	FUserShields UserShields;
+	
+	// UPROPERTY(EditAnywhere)
+	// FUserShield UserShield;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	TArray<int32>bWorldSpawnInt;
@@ -46,4 +95,7 @@ public:
 	bool bLoginMe = false;
 
 	void EquipActor(AActor* MyActor);
+
+	
+	
 };

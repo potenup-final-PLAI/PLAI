@@ -27,7 +27,7 @@ void UStoreComp::BeginPlay()
 	if (StoreInvenFactory)
 	{
 		StoreInven = CreateWidget<UStoreInven>(GetWorld(),StoreInvenFactory);
-		StoreInven->AddToViewport();
+		StoreInven->AddToViewport(0);
 		StoreInven->SetVisibility(ESlateVisibility::Hidden);
 	}
 	else

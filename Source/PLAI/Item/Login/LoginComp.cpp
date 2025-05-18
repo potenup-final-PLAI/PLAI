@@ -77,38 +77,6 @@ void ULoginComp::BeginPlay()
 void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{ if (PC->WasInputKeyJustPressed(EKeys::One)) // 1 캐릭터 생성 요청
-	{   UE_LOG(LogTemp,Display,TEXT("로그인 컴프 1키 User 구조체 UserId 정보조회 %s"),*UserFullInfo.user_id);
-		UE_LOG(LogTemp,Display,TEXT("로그인 컴프 1키 User Character Id 정보조회 %s"),*character_id);
-	}
-	}
-
-	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{ if (PC->WasInputKeyJustPressed(EKeys::M)) // M 캐릭터 생성 내 정보 요청
-	{   UE_LOG(LogTemp,Display,TEXT("Input M 내 정보 주셈 Key JustPressed"));
-		HttpMePost();
-	}
-	}
-
-	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{ if (PC->WasInputKeyJustPressed(EKeys::N)) // N 내아이템 주셈
-		{   UE_LOG(LogTemp,Display,TEXT("Input N 장비아이템 붙이기 테스트"));
-		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-		{
-			WorldGi->EquipActor(TestPlayer);
-		}
-		}
-	}
-
-	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{ if (PC->WasInputKeyJustPressed(EKeys::B)) // B 웹소켓연걸
-	{
-		ConnectWebSocket();
-		UE_LOG(LogTemp,Display,TEXT("Input B 웹소켓 연결 Key JustPressed"));
-	}
-	}
 	
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
 	{ if (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
@@ -289,14 +257,14 @@ void ULoginComp::HttpMePost()
 				TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&UserFullInfo);
 				FUserFullInfo InitUserFullInfo;
 				
-				if (InitUserFullInfo.character_info.character_name != UserFullInfo.character_info.character_name)
-				{
-					UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성된 캐릭터 닉넴은? %s"),*UserFullInfo.character_info.character_name);
-					UiMain->Wbp_UiInitMain->RemoveFromParent();
-				}else
-				{
-					UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성되지 않은 캐릭터 입니다? %s"),*UserFullInfo.character_info.character_name);
-				}
+				// if (InitUserFullInfo.character_info.character_name != UserFullInfo.character_info.character_name)
+				// {
+				// 	UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성된 캐릭터 닉넴은? %s"),*UserFullInfo.character_info.character_name);
+				// 	UiMain->Wbp_UiInitMain->RemoveFromParent();
+				// }else
+				// {
+				// 	UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성되지 않은 캐릭터 입니다? %s"),*UserFullInfo.character_info.character_name);
+				// }
 			}
 			else
 			{
@@ -316,6 +284,16 @@ void ULoginComp::HttpMePost()
 			(FText::AsNumber(UserFullInfo.character_info.current_exp));
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->MaxExpCha->SetText
 			(FText::AsNumber(UserFullInfo.character_info.max_exp));
+
+			if (TestPlayer && UserFullInfo.character_info.position.x != 0)
+			{
+				TestPlayer->SetActorLocation(FVector(UserFullInfo.character_info.position.x,
+					UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z));
+			}
+			else
+			{
+				UE_LOG(LogTemp,Warning,TEXT("LoginComp 캐릭터 위치 불러오려다 TestPlayer 또는 X 좌표 0임"))
+			}
 		}
 	});
 	httpRequest->ProcessRequest();
@@ -483,3 +461,28 @@ void ULoginComp::OnWebSocketClosed(int32 StatusCode, const FString& Reason, bool
 // FString::Printf(TEXT("LoginComp 나의 UserId [%s] \n "
 // 				              "LoginComp 나의 CharacterId [%s]"),*UserFullInfo.user_id, *UserFullInfo.character_info.character_id),
 // 				  nullptr,FColor::Red,0.f,false);
+
+// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+// { if (PC->WasInputKeyJustPressed(EKeys::M)) // M 캐릭터 생성 내 정보 요청
+// {   UE_LOG(LogTemp,Display,TEXT("Input M 내 정보 주셈 Key JustPressed"));
+// 	HttpMePost();
+// }
+// }
+
+// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+// { if (PC->WasInputKeyJustPressed(EKeys::N)) // N 내아이템 주셈
+// 	{   UE_LOG(LogTemp,Display,TEXT("Input N 장비아이템 붙이기 테스트"));
+// 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		WorldGi->EquipActor(TestPlayer);
+// 	}
+// 	}
+// }
+
+// if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
+// { if (PC->WasInputKeyJustPressed(EKeys::B)) // B 웹소켓연걸
+// {
+// 	ConnectWebSocket();
+// 	UE_LOG(LogTemp,Display,TEXT("Input B 웹소켓 연결 Key JustPressed"));
+// }
+// }

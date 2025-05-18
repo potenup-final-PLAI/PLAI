@@ -111,8 +111,8 @@ void ULogItemComp::GetEquipInfo()
 void ULogItemComp::HttpEquipPost(FString JsonString)
 {
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
-	
-	httpRequest->SetURL(TEXT("https://919e-221-148-189-129.ngrok-free.app/service1/items/upsert/equipment"));
+	FNgrok Ngrok;
+	httpRequest->SetURL(Ngrok.Ngrok + TEXT("/items/upsert/equipment"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	httpRequest->SetContentAsString(JsonString);
@@ -181,7 +181,7 @@ void ULogItemComp::HttpInvenPost(FString JsonString)
 	UE_LOG(LogTemp,Warning,TEXT("LogItemComp, 아이템 정보 넘기기 "))
     FNgrok Ngrok;
 	FHttpRequestRef httpRequest = FHttpModule::Get().CreateRequest();
-	httpRequest->SetURL("https://919e-221-148-189-129.ngrok-free.app/service1/items/upsert/inventory");
+	httpRequest->SetURL(Ngrok.Ngrok + TEXT("/items/upsert/inventory"));
 	httpRequest->SetVerb("POST");
 	httpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
@@ -210,7 +210,11 @@ void ULogItemComp::GetUserLevel()
 	PutUserLevel.max_exp = TestPlayer->LoginComp->UserFullInfo.character_info.max_exp;
 	PutUserLevel.position = TestPlayer->LoginComp->UserFullInfo.character_info.position;
 	PutUserLevel.traits = TestPlayer->LoginComp->UserFullInfo.character_info.traits;
-
+	
+	PutUserLevel.position.x = TestPlayer->GetActorLocation().X;
+	PutUserLevel.position.y = TestPlayer->GetActorLocation().Y;
+	PutUserLevel.position.z = TestPlayer->GetActorLocation().Z;
+	
 	FString JsonString;
 	FJsonObjectConverter::UStructToJsonObjectString(PutUserLevel,JsonString);
 	HttpUserLevelPut(JsonString);

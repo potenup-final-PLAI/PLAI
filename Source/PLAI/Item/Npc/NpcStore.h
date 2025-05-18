@@ -41,9 +41,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UStoreInven* StoreInven;
 
-	UPROPERTY(EditAnywhere)
-	class ATestPlayer* TestPlayer;
-
 	void SetStoreInven();
 
 	// Called to bind functionality to input
