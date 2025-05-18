@@ -70,29 +70,26 @@ void UUiPortal::WarpCotnroller(EMonSpawnType SpawnType)
 
 void UUiPortal::OnButton_Village()
 {
-	if (APlayerController* PcController = GetWorld()->GetFirstPlayerController())
-	{
-		if (APLAIPlayerController* pc = Cast<APLAIPlayerController>(PcController))
-		{
-			pc->Server_WarpPlayer(EMonSpawnType::Village);
-		}
-	}
-
+	WarpCotnroller(EMonSpawnType::Village);
+	// WarpTestPlayer(EMonSpawnType::Village);
 }
 
 void UUiPortal::OnButton_Mountain()
 {
-	WarpTestPlayer(EMonSpawnType::Mountain);
+	WarpCotnroller(EMonSpawnType::Mountain);
+	// WarpTestPlayer(EMonSpawnType::Mountain);
 }
 
 void UUiPortal::OnButton_Dessert()
 {
-	WarpTestPlayer(EMonSpawnType::Desert);
+	WarpCotnroller(EMonSpawnType::Desert);
+	// WarpTestPlayer(EMonSpawnType::Desert);
 }
 
 void UUiPortal::OnButton_Cave()
 {
-	WarpTestPlayer(EMonSpawnType::Dungeon);
+	WarpCotnroller(EMonSpawnType::Dungeon);
+	// WarpTestPlayer(EMonSpawnType::Dungeon);
 }
 
 void UUiPortal::OnButton_OpenMap()
