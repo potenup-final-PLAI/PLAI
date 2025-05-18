@@ -27,6 +27,7 @@ void UUiSteamLobby::NativeConstruct()
 void UUiSteamLobby::AddScrollBox()
 {
 	SteamLobbyScrollRoom = CreateWidget<UUISteamLobbyScrollRoom>(GetWorld(),ScrollRoomFactory);
+	SteamLobbyScrollRoom->UiMain = UiMain;
 	ScrollBox->AddChild(SteamLobbyScrollRoom);
 }
 
@@ -60,10 +61,6 @@ void UUiSteamLobby::OnJoinRoom()
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
 		WorldGi->JoinOtherSession();
-		
-		// UiMain->LoginComp->TestPlayer->LogItemComp->GetInvenInfo();
-		// UiMain->LoginComp->TestPlayer->LogItemComp->GetEquipInfo();
-		// UiMain->LoginComp->TestPlayer->LogItemComp->GetUserLevel();
 			
 		WorldGi->UserFullInfoGi = UiMain->LoginComp->TestPlayer->LoginComp->UserFullInfo;
 		WorldGi->bGameStart = true;

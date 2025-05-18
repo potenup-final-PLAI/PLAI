@@ -13,5 +13,16 @@ UCLASS()
 class PLAI_API UUISteamLobbyScrollRoom : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Button_JoinRoom;
 	
+	UPROPERTY(EditAnywhere)
+	class UUiMain* UiMain;
+
+	UFUNCTION()
+	void OnJoinRoom();
+
+	virtual void NativeConstruct() override;
 };
