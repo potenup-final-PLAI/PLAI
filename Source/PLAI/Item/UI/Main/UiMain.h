@@ -77,6 +77,9 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UUIinitMain* Wbp_UiInitMain;
+
+	UPROPERTY(meta = (BindWidget))
+	class UUiSteamLobby* Wbp_UiSteamLobby;
 	
 	// Init 클래스
     UPROPERTY(meta = (BindWidget))

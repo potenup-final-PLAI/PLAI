@@ -38,7 +38,7 @@ UCLASS(Blueprintable,Blueprintable)
 class PLAI_API UWorldGi : public UGameInstance
 {
 	GENERATED_BODY()
-
+	
 public:
 
 	// 세션 생성
@@ -81,6 +81,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	bool bBattleReward = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
+	bool bMultiGameStart = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	FUserFullInfo UserFullInfoGi;

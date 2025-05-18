@@ -32,17 +32,6 @@ void UUiMonWorld::OnButtonYes()
 			TestPlayer->LogItemComp->GetInvenInfo();
 			TestPlayer->LogItemComp->GetEquipInfo();
 			TestPlayer->LogItemComp->GetUserLevel();
-
-			FUserShield UserShield;
-			UserShield.UserName = TestPlayer->LoginComp->UserFullInfo.character_info.character_name;
-			if (USlotEquip* SlotEquip = Cast<USlotEquip>(TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetChildAt(3)))
-			{
-				if (SlotEquip->ItemStructTable.ItemTop != -1)
-				{
-					UserShield.UserShield = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
-				}
-			}
-			WorldGi->UserShields.UserShields.Add(UserShield);
 			
 			WorldGi->UserFullInfoGi = TestPlayer->LoginComp->UserFullInfo;
 			WorldGi->bGameStart = true;
@@ -58,8 +47,18 @@ void UUiMonWorld::OnButtonYes()
 			}
 			// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
 			// 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);
+			
+			FUserShield UserShield;
+			UserShield.UserName = TestPlayer->LoginComp->UserFullInfo.character_info.character_name;
+			if (USlotEquip* SlotEquip = Cast<USlotEquip>(TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetChildAt(3)))
+			{
+				if (SlotEquip->ItemStructTable.ItemTop != -1)
+				{
+					UserShield.UserShield = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
+				}
+			}
+			WorldGi->UserShields.UserShields.Add(UserShield);
 		}
-		// UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
 	}
 }
 

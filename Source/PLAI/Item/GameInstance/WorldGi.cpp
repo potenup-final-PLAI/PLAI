@@ -40,10 +40,6 @@ void UWorldGi::CreateSession(FString displayName, int32 playerCount)
 	SessionSettings.bUsesPresence = true;
 	SessionSettings.bShouldAdvertise = true;
 	SessionSettings.NumPublicConnections = playerCount;
-
-	// SessionSettings.bAllowJoinViaPresence         = true;
-	// SessionSettings.bAllowJoinViaPresenceFriendsOnly = false;
-	// SessionSettings.bAllowInvites                  = true;
 	
 	// 커스텀 정보를 넣자
 	SessionSettings.Set(FName(TEXT("DP_NAME")), displayName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);

@@ -40,9 +40,9 @@ void ANpcCharacter::BeginPlay()
 	{ UE_LOG(LogTemp,Display,TEXT("ANpcCharacter::TestPlayer 없음")); }
 	
 	
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	{ UiNpc->NpcName->SetText(FText::FromString(NpcNameString));},0.5,false);
+	// FTimerHandle TimerHandle;
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	// { UiNpc->NpcName->SetText(FText::FromString(NpcNameString));},0.5,false);
 }
 
 // Called every frame

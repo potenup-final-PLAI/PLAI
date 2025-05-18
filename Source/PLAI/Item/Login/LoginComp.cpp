@@ -49,6 +49,7 @@ void ULoginComp::BeginPlay()
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
+			// 최초 게임 실행 했는지
 			if (WorldGi->bGameStart == false)
 			{
 				UiMain = CreateWidget<UUiMain>(GetWorld(),UiMainFactory);
