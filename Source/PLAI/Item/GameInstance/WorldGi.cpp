@@ -73,9 +73,7 @@ void UWorldGi::FindOtherSession()
 	
 	// 어떤 옵션을 기준으로 검색
 	SessionSearch->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
-
 	SessionSearch->MaxSearchResults = 100;
-	
 	SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 }
 
@@ -118,7 +116,6 @@ void UWorldGi::JoinOtherSession()
 	// SessionSettings 의 bUseLobbiesIfAvailable 와 bUsesPresence 의 값이 false 로 되어있다.
 	results[0].Session.SessionSettings.bUseLobbiesIfAvailable = true;
 	results[0].Session.SessionSettings.bUsesPresence = true;
-	
 	results[0].Session.SessionSettings.Get(FName(TEXT("DP_NAME")), displayName);
 
 	// 세션 참여

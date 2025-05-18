@@ -35,9 +35,14 @@ void UUiSteamLobby::OnCreateRoom()
 {
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
+		// UiMain->LoginComp->TestPlayer->LogItemComp->GetInvenInfo();
+		// UiMain->LoginComp->TestPlayer->LogItemComp->GetEquipInfo();
+		UiMain->LoginComp->TestPlayer->LogItemComp->GetUserLevel();
+		
 		WorldGi->CreateSession(FString("PLAI Game"),4);
-
 		WorldGi->UserFullInfoGi = UiMain->LoginComp->TestPlayer->LoginComp->UserFullInfo;
+		
+		WorldGi->bLoginMe = true;
 		WorldGi->bGameStart = true;
 		WorldGi->bBattleReward = false;
 	}
@@ -48,11 +53,6 @@ void UUiSteamLobby::OnFindRoom()
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
 		WorldGi->FindOtherSession();
-		
-		WorldGi->UserFullInfoGi = UiMain->LoginComp->TestPlayer->LoginComp->UserFullInfo;
-		WorldGi->bGameStart = true;
-		WorldGi->bBattleReward = false;
-		
 	}
 }
 
@@ -60,9 +60,15 @@ void UUiSteamLobby::OnJoinRoom()
 {
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
+		// UiMain->LoginComp->TestPlayer->LogItemComp->GetInvenInfo();
+		// UiMain->LoginComp->TestPlayer->LogItemComp->GetEquipInfo();
+		UiMain->LoginComp->TestPlayer->LogItemComp->GetUserLevel();
+		
 		WorldGi->JoinOtherSession();
 			
 		WorldGi->UserFullInfoGi = UiMain->LoginComp->TestPlayer->LoginComp->UserFullInfo;
+
+		WorldGi->bLoginMe = true;
 		WorldGi->bGameStart = true;
 		WorldGi->bBattleReward = false;
 	}
