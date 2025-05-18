@@ -39,6 +39,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AMonBossPawn> bossFactory;
 
+	FTimerHandle bindUnitHandle;
+	bool bSetBindUnit = false;
+	void BindUnit();
+	TArray<FIntPoint> RandomCoords(int32 count, TArray<FIntPoint> coords);
 	void InitGridTile();
 	//------------Test--------------------------
 	// 생성된 유닛들 담기

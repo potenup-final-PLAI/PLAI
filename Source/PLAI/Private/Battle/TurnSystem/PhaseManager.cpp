@@ -28,27 +28,9 @@ void AUPhaseManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	turnManager = Cast<ATurnManager>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
-
-	gridTileManager = Cast<AGridTileManager>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), girdTileManagerFactory));
-
+	InitOtherClass();
+	
 	GetWorld()->GetTimerManager().SetTimer(timerBattleStartHandle, this,&AUPhaseManager::SetBeforeBattle,0.2f, true);
-
-	gi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
-
-	// DamageUI Spawn
-	damageUIActor = GetWorld()->SpawnActor<AWorldDamageUIActor>(damageUIFactory);
-	if (damageUIActor)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DamageUIActor created"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Fail DamageUI Spawn"));
-	}
-
 }
 
 void AUPhaseManager::Tick(float DeltaTime)
@@ -69,17 +51,28 @@ void AUPhaseManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void AUPhaseManager::SetCycle()
 {
 	cycle = FMath::Min(6, cycle + 1);
-	if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
-	{
-		if (ABattleHUD* hud = Cast<ABattleHUD>(pc->GetHUD()))
-		{
-			if (hud->mainUI && hud->mainUI->WBP_CycleAndTurn)
-			{
-				hud->mainUI->WBP_CycleAndTurn->SetCycleText(cycle);
-			}
-		}
-	}
 	UE_LOG(LogTemp, Warning, TEXT("Cur Cycle = %d"), cycle);
+	if (HasAuthority())
+	{
+		UpdateCycleUI();
+	}
+}
+
+void AUPhaseManager::UpdateCycleUI()
+{
+	if (!pc || !hud || !hud->mainUI)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AUPhaseManager::UpdateCycleUI : !pc || !hud || !hud->mainUI"));
+		return;
+	}
+	
+	hud->mainUI->WBP_CycleAndTurn->SetCycleText(cycle);
+	
+}
+
+void AUPhaseManager::OnRep_UpdateCycleUI()
+{
+	UpdateCycleUI();
 }
 
 void AUPhaseManager::OnRep_CurrentPhase()
@@ -411,8 +404,9 @@ void AUPhaseManager::BattleEnd()
 
 void AUPhaseManager::SetBeforeBattle()
 {
+	if (!IsValid(gridTileManager)) return;
+	
 	// girdTile에 저장해둔 unit들 순서대로 Possess해서 PlayerState 세팅
-
 	if (gridTileManager->unitArray.Num() > 0)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(timerBattleStartHandle);
@@ -422,77 +416,72 @@ void AUPhaseManager::SetBeforeBattle()
 
 		for (auto& unit : baseUnits)
 		{
-			if (auto* pc = GetWorld()->GetFirstPlayerController())
+			if (!pc) continue;
+			
+			pc->Possess(unit);
+			// 유닛 스텟 세팅
+			ServerRPC_TryInitStatus(unit);
+			UE_LOG(LogTemp, Warning,
+			       TEXT("Set Before Battle : Possess!!!"));
+
+			// 가장 가까운 적 찾기
+			ABaseBattlePawn* closestTarget = nullptr;
+			float minDistSquared = TNumericLimits<float>::Max();
+
+			for (ABaseBattlePawn* other : baseUnits)
 			{
-				pc->Possess(unit);
-				// 유닛 스텟 세팅
-				ServerRPC_TryInitStatus(unit);
-				UE_LOG(LogTemp, Warning,
-				       TEXT("Set Before Battle : Possess!!!"));
-
-				// 가장 가까운 적 찾기
-				ABaseBattlePawn* closestTarget = nullptr;
-				float minDistSquared = TNumericLimits<float>::Max();
-
-				for (ABaseBattlePawn* other : baseUnits)
+				if (unit == other)
 				{
-					if (unit == other)
-					{
-						continue;
-					}
-
-					// 같은 팀이면 무시
-					const bool bothPlayer = unit->IsA<ABattlePlayer>() && other->IsA<ABattlePlayer>();
-					const bool bothEnemy = unit->IsA<ABaseEnemy>() && other->IsA<ABaseEnemy>();
-					
-					if (bothPlayer || bothEnemy)
-					{
-						continue;
-					}
-
-					float distSq = FVector::DistSquared(unit->GetActorLocation(), other->GetActorLocation());
-					if (distSq < minDistSquared)
-					{
-						minDistSquared = distSq;
-						closestTarget = other;
-					}
+					continue;
 				}
-				if (closestTarget)
+
+				// 같은 팀이면 무시
+				const bool bothPlayer = unit->IsA<ABattlePlayer>() && other->IsA<ABattlePlayer>();
+				const bool bothEnemy = unit->IsA<ABaseEnemy>() && other->IsA<ABaseEnemy>();
+				
+				if (bothPlayer || bothEnemy)
 				{
-					// 기본 회전 보정값
-					float yawOffset = -90.f;
-					
-					// 매쉬만 회전
-					if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
-					{
-						if (player->meshComp)
-						{
-							FVector dir = closestTarget->GetActorLocation() - player->GetActorLocation();
-							FRotator meshRot = dir.Rotation();
-							player->meshComp->SetRelativeRotation(FRotator(0, meshRot.Yaw + yawOffset, 0));
-						}
-					}
-					else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
-					{
-						if (enemy->meshComp)
-						{
-							FVector dir = closestTarget->GetActorLocation() - enemy->GetActorLocation();
-							FRotator meshRot = dir.Rotation();
-							enemy->meshComp->SetWorldRotation(FRotator(0, meshRot.Yaw+ yawOffset, 0));
-						}
-					}
-					else
-					{
-						// enemy 임시로 회전
-						FVector dir = closestTarget->GetActorLocation() - unit->GetActorLocation();
-						FRotator lookRot = dir.Rotation();
-						unit->SetActorRotation(FRotator(0, lookRot.Yaw, 0));
-					}
+					continue;
+				}
+
+				float distSq = FVector::DistSquared(unit->GetActorLocation(), other->GetActorLocation());
+				if (distSq < minDistSquared)
+				{
+					minDistSquared = distSq;
+					closestTarget = other;
 				}
 			}
-			else
+			if (closestTarget)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Fail PlayerController"));
+				// 기본 회전 보정값
+				float yawOffset = -90.f;
+				
+				// 매쉬만 회전
+				if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
+				{
+					if (player->meshComp)
+					{
+						FVector dir = closestTarget->GetActorLocation() - player->GetActorLocation();
+						FRotator meshRot = dir.Rotation();
+						player->meshComp->SetRelativeRotation(FRotator(0, meshRot.Yaw + yawOffset, 0));
+					}
+				}
+				else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
+				{
+					if (enemy->meshComp)
+					{
+						FVector dir = closestTarget->GetActorLocation() - enemy->GetActorLocation();
+						FRotator meshRot = dir.Rotation();
+						enemy->meshComp->SetWorldRotation(FRotator(0, meshRot.Yaw+ yawOffset, 0));
+					}
+				}
+				else
+				{
+					// enemy 임시로 회전
+					FVector dir = closestTarget->GetActorLocation() - unit->GetActorLocation();
+					FRotator lookRot = dir.Rotation();
+					unit->SetActorRotation(FRotator(0, lookRot.Yaw, 0));
+				}
 			}
 		}
 		// 유닛이 다 세팅되면 API 전송
@@ -790,7 +779,8 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			player->battlePlayerState->playerStatus.move_Range = 5;
 			player->battlePlayerState->playerStatus.critical_Rate = 0.05f;
 			player->battlePlayerState->playerStatus.critical_Damage = 1.5f;
-			player->battlePlayerState->playerStatus.speed = FMath::RandRange(1, 10);
+			// player->battlePlayerState->playerStatus.speed = FMath::RandRange(1, 10);
+			player->battlePlayerState->playerStatus.speed = 10;
 			UE_LOG(LogTemp, Warning, TEXT("not Set Eqirment"));
 		}
 		
@@ -866,5 +856,51 @@ FString AUPhaseManager::GetStatusEffectsString(EStatusEffect effect)
 	const FString* FoundName = StatusEffectNames.Find(effect);
 	return FoundName ? *FoundName : TEXT("알 수 없음");
 }
+void AUPhaseManager::InitOtherClass()
+{
+	// GI
+	gi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
+	if (gi)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Game Instance is already initialized"));
+	}
+	
+	// TurnManager
+	turnManager = Cast<ATurnManager>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
+	if (turnManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("turnManager is Set"));
+	}
+	
+	// PC
+	pc = GetWorld()->GetFirstPlayerController();
+	if (pc)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PC is Set"));
 
+		// hud 포인터 세팅
+		hud = Cast<ABattleHUD>(pc->GetHUD());
+		if (hud) UE_LOG(LogTemp, Warning, TEXT("hud is Set"));
+	}
+	
+	// girdTileManager
+	gridTileManager = Cast<AGridTileManager>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), girdTileManagerFactory));
+	if (gridTileManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("gridTileManager is Set"));
+	}
+
+	// DamageUI Spawn
+	damageUIActor = GetWorld()->SpawnActor<AWorldDamageUIActor>(damageUIFactory);
+	if (damageUIActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DamageUIActor created"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Fail DamageUI Spawn"));
+	}
+}
 

@@ -37,10 +37,13 @@ public:
 	//--------------------Data Init--------------------
 	void InitBattle();
 	//--------------------Cycle System--------------------
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Cycle")
+	UPROPERTY(ReplicatedUsing = OnRep_UpdateCycleUI, VisibleAnywhere, BlueprintReadOnly, Category = "Cycle")
 	int32 cycle = 0;
 
 	void SetCycle();
+	void UpdateCycleUI();
+	UFUNCTION()
+	void OnRep_UpdateCycleUI();
 	//--------------------Phase System--------------------
 	// 멀티로 변경 할 때 ReplicatedUsing을 활용하여 함수 호출 하자
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentPhase, VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
@@ -139,6 +142,7 @@ public:
 	//-----------Unit UI 이름 확인 쉽게 세팅할 변수------------
 	int8 unitPlayerNameindex = 0;
 	int8 unitEnemyNameindex = 0;
+	
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase")
@@ -149,5 +153,14 @@ public:
 	class AWorldDamageUIActor* damageUIActor;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DamageUI")
 	TSubclassOf<class AWorldDamageUIActor> damageUIFactory;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Phase")
+	class APlayerController* pc;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Phase")
+	class ABattleHUD* hud;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Phase")
+	class AGridTileManager* girdTileManager;
+	
+	void InitOtherClass();
 };
 

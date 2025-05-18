@@ -122,15 +122,6 @@ void ABaseBattlePawn::OnTurnStart()
 	turnManager->turnCount++;
 	UE_LOG(LogTemp, Warning, TEXT("Turn Count %d"), turnManager->turnCount);
 
-	// 턴 유닛 이름 UI에 세팅
-	if (pc && hud && hud->mainUI && hud->mainUI->WBP_CycleAndTurn)
-	{
-		FString s = Cast<ABattlePlayer>(turnManager->curUnit)
-			            ? TEXT("Player")
-			            : TEXT("Enemy");
-		hud->mainUI->WBP_CycleAndTurn->SetTurnText(s);
-	}
-
 	// BattlePlayerInfo UI 세팅
 	if (auto* player = Cast<ABattlePlayer>(this))
 	{

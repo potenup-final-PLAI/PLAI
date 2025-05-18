@@ -23,4 +23,7 @@ public:
 	//--------------------LifeState--------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
 	ELifeState playerLifeState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Battle")
+	APawn* battlePawn;
 };
