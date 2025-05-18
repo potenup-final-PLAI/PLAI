@@ -96,6 +96,9 @@ void UWorldGi::OnFindSessionComplete(bool bWasSuccessful)
 			FString displayName;
 			Results[i].Session.SessionSettings.Get(FName(TEXT("DP_NAME")),displayName);
 			UE_LOG(LogTemp, Error, TEXT("WorldGi = 세션 번째 [%d] 세션 이름 [%s]"),i,*displayName);
+
+			//UISteamLobby ScrollBox AddChild에 달아놓았음
+			OnFindSession.ExecuteIfBound();
 		}
 	}
 	else

@@ -9,6 +9,8 @@
 #include "PLAI/Item/Login/UserStruct.h"
 #include "WorldGi.generated.h"
 
+DECLARE_DELEGATE(FOnFindSession)
+
 /**
  * 
  */
@@ -40,6 +42,7 @@ class PLAI_API UWorldGi : public UGameInstance
 	GENERATED_BODY()
 	
 public:
+	FOnFindSession OnFindSession;
 
 	// 세션 생성
 	UFUNCTION()
@@ -81,9 +84,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	bool bBattleReward = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
-	bool bMultiGameStart = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	FUserFullInfo UserFullInfoGi;

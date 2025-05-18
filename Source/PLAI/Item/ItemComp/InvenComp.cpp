@@ -55,8 +55,9 @@ void UInvenComp::BeginPlay()
 	}
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
-		if (WorldGi->bBattleReward == true)
+		if (WorldGi->bBattleReward == true || WorldGi->bGameStart == true)
 		{
+			if (!MenuInven){MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);}
 			MenuInven->AddToViewport(1);
 			MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
@@ -64,7 +65,6 @@ void UInvenComp::BeginPlay()
 			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 			MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
-			
 			WorldGi->bBattleReward = false;
 		}
 	}

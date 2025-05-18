@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "UISteamLobbyScrollRoom/UISteamLobbyScrollRoom.h"
 #include "UiSteamLobby.generated.h"
 
 /**
@@ -15,6 +16,16 @@ class PLAI_API UUiSteamLobby : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUISteamLobbyScrollRoom> ScrollRoomFactory;
+	
+	UPROPERTY(EditAnywhere)
+	class UUISteamLobbyScrollRoom* SteamLobbyScrollRoom;
+
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* ScrollBox;
+	void AddScrollBox();
+	
 	UPROPERTY(EditAnywhere)
 	class UUiMain* UiMain;
 
