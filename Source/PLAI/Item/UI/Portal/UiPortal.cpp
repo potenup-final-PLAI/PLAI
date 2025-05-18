@@ -46,7 +46,6 @@ void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
 	
 	for (AActor* Actor : Actors)
 	{
-		// UE_LOG(LogTemp,Display,TEXT("UiPortal Portal 이름은? [%s]"),*Actor->GetName());
 		if (AWarp* MonSpawn = Cast<AWarp>(Actor))
 		{
 			if (MonSpawn->MonSpawnType ==  SpawnType)

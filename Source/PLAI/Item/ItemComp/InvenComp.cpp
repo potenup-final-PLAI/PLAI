@@ -65,7 +65,7 @@ void UInvenComp::BeginPlay()
 				MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
-				WorldGi->bBattleReward = false;
+				// WorldGi->bBattleReward = false;
 			}
 		}
 	}

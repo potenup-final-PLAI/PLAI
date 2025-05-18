@@ -27,7 +27,6 @@ AWarp::AWarp()
 	
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("BoxComponent");
 	NiagaraComp->SetupAttachment(GetRootComponent());
-
 	
 }
 

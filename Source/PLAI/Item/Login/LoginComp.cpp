@@ -65,11 +65,10 @@ void ULoginComp::BeginPlay()
 					UserFullInfo = WorldGi->UserFullInfoGi;
 					HttpMePost();
 
-					if (WorldGi->bBattleReward == false){UE_LOG(LogTemp,Warning,TEXT("LoginComp 전투 X 보상 X")) return;}
-					
 					FTimerHandle TimerHandle;
-					GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-					{ TestPlayer->InvenComp->TurnReward(); },1.0,false);
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,WorldGi]()
+					{ TestPlayer->InvenComp->TurnReward(); WorldGi->bBattleReward = false;},1.0,false);
+					// if (WorldGi->bBattleReward == true){UE_LOG(LogTemp,Warning,TEXT("LoginComp 전투 X 보상 X")) return;}
 				}
 			}
 		}
