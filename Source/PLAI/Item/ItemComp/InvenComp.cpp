@@ -81,7 +81,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
-			WorldGi->CreateSession(FString("Wanted"),0);
+			WorldGi->CreateSession(FString("Wanted"),4);
 		}
 	}
 	// 스팀 세션 찾기

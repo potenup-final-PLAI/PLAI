@@ -57,6 +57,7 @@ public:
 	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
 
 public:
+	// 세션 모든 처리를 진행
 	IOnlineSessionPtr SessionInterface;
 
 	// 세션 검색할 때 쓰는 객체

@@ -31,8 +31,8 @@ void UWorldGi::CreateSession(FString displayName, int32 playerCount)
 	
 	FName SubSysName = IOnlineSubsystem::Get()->GetSubsystemName();
 
-	SessionSettings.bIsLANMatch = true;
-	// SessionSettings.bIsLANMatch = SubSysName.IsEqual(FName(TEXT("NULL")));
+	// SessionSettings.bIsLANMatch = true;
+	SessionSettings.bIsLANMatch = SubSysName.IsEqual(FName(TEXT("NULL")));
 	
 	UE_LOG(LogTemp, Error, TEXT("WorldGi = Creating Session... 서브시스템 이름 [%s]"),*SubSysName.ToString());
 
@@ -41,9 +41,9 @@ void UWorldGi::CreateSession(FString displayName, int32 playerCount)
 	SessionSettings.bShouldAdvertise = true;
 	SessionSettings.NumPublicConnections = playerCount;
 
-	SessionSettings.bAllowJoinViaPresence         = true;
-	SessionSettings.bAllowJoinViaPresenceFriendsOnly = false;
-	SessionSettings.bAllowInvites                  = true;
+	// SessionSettings.bAllowJoinViaPresence         = true;
+	// SessionSettings.bAllowJoinViaPresenceFriendsOnly = false;
+	// SessionSettings.bAllowInvites                  = true;
 	
 	// 커스텀 정보를 넣자
 	SessionSettings.Set(FName(TEXT("DP_NAME")), displayName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
@@ -55,9 +55,7 @@ void UWorldGi::OnCreateSessionComplete(FName sessionName, bool bWasSuccessful)
 	if (bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Error, TEXT("WorldGi = OnCreateSessionComplete 세션성공 [%s]"),*sessionName.ToString());
-		// 서버가 멀티플레이 하는 Map 으로 이동!
-		// GetWorld()->ServerTravel(TEXT("/Game/ThirdPerson/Maps/ThirdPersonMap?listen"));
-		// GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_LevelVillage?listen"));
+	
 		GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
 	}
 	else
@@ -74,11 +72,9 @@ void UWorldGi::FindOtherSession()
 	SessionSearch = MakeShared<FOnlineSessionSearch>();
 	
 	FName SubSysName = IOnlineSubsystem::Get()->GetSubsystemName();
-
-	SessionSearch->bIsLanQuery = true;
-	// SessionSearch->bIsLanQuery = SubSysName.IsEqual(FName(TEXT("NULL")));
-	
 	UE_LOG(LogTemp, Warning, TEXT("WorldGi = Finding Session... 서브시스템 이름 [%s]"),*SubSysName.ToString());
+	SessionSearch->bIsLanQuery = SubSysName.IsEqual(FName(TEXT("NULL")));
+	
 	// 어떤 옵션을 기준으로 검색
 	SessionSearch->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
 
