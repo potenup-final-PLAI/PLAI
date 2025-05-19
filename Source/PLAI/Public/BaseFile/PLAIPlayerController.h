@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "PLAIPlayerController.generated.h"
 
+class ATestPlayer;
 /** Forward declaration to improve compiling times */
 class UNiagaraSystem;
 class UInputMappingContext;
@@ -61,6 +62,17 @@ protected:
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_WarpPlayer(EMonSpawnType SpawnType);
+
+	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere)
+	TArray<ATestPlayer*>TestPlayers;
+	
+	UPROPERTY(EditAnywhere)
+	float MiniMapTime = 0.0f;
+	
+	void TestPlayersAdd();
+	void MiniMapUpdate();
 
 private:
 	FVector CachedDestination;

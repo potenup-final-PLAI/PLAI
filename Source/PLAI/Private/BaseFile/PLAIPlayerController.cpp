@@ -13,10 +13,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Monster/Monster.h"
 #include "PLAI/Item/Portal/Warp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
+#include "PLAI/Item/UI/Inventory/Map/UiWorldMap.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -136,6 +138,34 @@ void APLAIPlayerController::OnTouchReleased()
 {
 	bIsTouch = false;
 	OnSetDestinationReleased();
+}
+
+void APLAIPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	MiniMapUpdate();
+}
+
+void APLAIPlayerController::TestPlayersAdd()
+{
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ATestPlayer::StaticClass(),Actors);
+	for (AActor*Actor : Actors)
+	{
+		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Actor))
+		{
+			TestPlayers.Add(TestPlayer);
+		}
+	}
+}
+
+void APLAIPlayerController::MiniMapUpdate()
+{
+	if (!TestPlayers.Num() == 0){UE_LOG(LogTemp,Warning,TEXT("PLAIController Testplayers 0명"))return;}
+	for (int i = 0; i < TestPlayers.Num(); i++)
+	{
+		TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWolrdMap->SetPlayerMinmapVector(TestPlayers[i]->GetActorLocation());
+	}
 }
 
 void APLAIPlayerController::Server_WarpPlayer_Implementation(EMonSpawnType SpawnType)
