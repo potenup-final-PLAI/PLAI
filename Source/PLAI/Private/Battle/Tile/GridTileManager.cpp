@@ -133,11 +133,6 @@ void AGridTileManager::InitGridTile()
 	// 좌표 섞기
 	Algo::RandomShuffle(allCoords);
 	
-	
-
-	// GI 접근
-	UWorldGi* gi = Cast<UWorldGi>(GetGameInstance());
-
 	// // Player 수만큼 좌표를 뽑는다
 	// TArray<FIntPoint> playerCoords;
 	// for (int32 i = 0; i < playerStates.Num() && i < allCoords.Num(); ++i)
@@ -179,15 +174,24 @@ void AGridTileManager::InitGridTile()
 	// 	unitArray.Add(player);
 	// }
 	// 플레이어 유닛 스폰
-	TArray<FIntPoint> playerCoords = RandomCoords(2, allCoords); // 단순 2명 랜덤 스폰
+	TArray<FIntPoint> playerCoords = RandomCoords(1, allCoords);
+	
 	for (const FIntPoint& coord : playerCoords)
 	{
 		AGridTile* gridTile = map.FindRef(coord);
-		if (!gridTile) continue;
+		if (!gridTile)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("InitGridTile : !gridTile"));
+			continue;
+		}
 
 		FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
 		ABattlePlayer* player = GetWorld()->SpawnActor<ABattlePlayer>(battlePlayerFactory, spawnLoc, FRotator::ZeroRotator);
-		if (!player) continue;
+		if (!player)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("InitGridTile : !player"));
+			continue;
+		}
 
 		player->currentTile = gridTile;
 		

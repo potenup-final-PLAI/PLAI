@@ -41,6 +41,7 @@ public:
 
 	FTimerHandle bindUnitHandle;
 	bool bSetBindUnit = false;
+	
 	void BindUnit();
 	TArray<FIntPoint> RandomCoords(int32 count, TArray<FIntPoint> coords);
 	void InitGridTile();

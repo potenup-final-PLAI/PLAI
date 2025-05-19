@@ -98,7 +98,7 @@ void ATurnManager::MulticastRPC_StartPlayerTurn_Implementation()
 		UE_LOG(LogTemp, Warning, TEXT("playerPawn is Player %s"),
 		       *playerPawn->GetActorNameOrLabel());
 
-		if (ABattlePlayerController* pc = Cast<ABattlePlayerController>(playerPawn->GetOwner()))
+		if (ABattlePlayerController* pc = Cast<ABattlePlayerController>(playerPawn->GetController()))
 		{
 			FTimerHandle possessHandle;
 			GetWorld()->GetTimerManager().ClearTimer(possessHandle);

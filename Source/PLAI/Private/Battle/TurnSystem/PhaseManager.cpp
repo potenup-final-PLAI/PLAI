@@ -405,6 +405,7 @@ void AUPhaseManager::BattleEnd()
 void AUPhaseManager::SetBeforeBattle()
 {
 	if (!IsValid(gridTileManager)) return;
+	if (!gridTileManager->bSetBindUnit) return;
 	
 	// girdTile에 저장해둔 unit들 순서대로 Possess해서 PlayerState 세팅
 	if (gridTileManager->unitArray.Num() > 0)
