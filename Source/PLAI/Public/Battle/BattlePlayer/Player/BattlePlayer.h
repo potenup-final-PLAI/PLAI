@@ -37,6 +37,9 @@ public:
 	//------------------Anim Instance--------------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim)
 	class UBattlePlayerAnimInstance* playerAnim;
+
+	//------------------Owning--------------------------
+	ABattlePlayerState* owningPlayerState;
 };
 
 
