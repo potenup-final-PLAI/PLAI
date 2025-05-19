@@ -3,16 +3,45 @@
 
 #include "UiWorldMap.h"
 
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Image.h"
 #include "Components/Overlay.h"
 #include "Components/SizeBox.h"
+#include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
 	:Super(FOI)
 {
 	bIsFocusable = true;
+}
+
+void UUiWorldMap::ExtendMap()
+{
+	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvas->Slot))
+	{
+		// 1) 최초 호출 시 원래 크기/위치 저장
+		if (bExtendMap == false)
+		{
+			CanvasSlot->SetSize(MiniMapSizeL);
+			CanvasSlot->SetAnchors(FAnchors(0.5,0.5));
+			CanvasSlot->SetPosition(FVector2D::ZeroVector);
+			CanvasSlot->SetAlignment(FVector2D(0.5,0.5));
+			MiniMapSize = MiniMapSizeL;
+			bExtendMap = true;
+		}
+		else
+		{
+			CanvasSlot->SetSize(MiniMapSizeS);
+			CanvasSlot->SetAnchors(FAnchors(1,1));
+			CanvasSlot->SetPosition(FVector2D(-25,-25));
+			CanvasSlot->SetAlignment(FVector2D(1,1));
+			MiniMapSize = MiniMapSizeS;;
+			bExtendMap = false;
+		}
+	}
 }
 
 void UUiWorldMap::SetPlayerMinmapVector(FVector PlayerLocation)
@@ -23,7 +52,7 @@ void UUiWorldMap::SetPlayerMinmapVector(FVector PlayerLocation)
 	U = FMath::Clamp(U, 0.f, 1.f);
 	V = FMath::Clamp(V, 0.f, 1.f);
 
-	FVector2D PixelPos = FVector2D(U * 250, V * 250);
+	FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
 	
 	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapOverlay->Slot))
 	{ CanvasSlot->SetPosition(PixelPos); }
@@ -63,6 +92,13 @@ void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		if (PC->WasInputKeyJustPressed(EKeys::M))
+		{
+			ExtendMap();
+		}
+	}
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{
 		SetPlayerMinmapVector(TestPlayer->GetActorLocation());

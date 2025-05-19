@@ -38,10 +38,22 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* PlayerRot;
 
+	UPROPERTY(EditAnywhere)
 	FVector2D WorldMinFevtor = FVector2D(-22700.0, -21260.0);
+	UPROPERTY(EditAnywhere)
 	FVector2D WorldMaxFevtor = FVector2D(27700.0, 29140.0);
-
+	UPROPERTY(EditAnywhere)
 	FVector2D MiniMapSize = FVector2D(250.0,250.0);
+	UPROPERTY(EditAnywhere)
+	FVector2D MiniMapSizeS = FVector2D(250.0,250.0);
+	UPROPERTY(EditAnywhere)
+	FVector2D MiniMapSizeL = FVector2D(750.0,750.0);
+	
+	UPROPERTY(EditAnywhere)
+	FVector2D OrigPosition;
+	UPROPERTY(EditAnywhere)
+	bool      bExtendMap = false;
+	void ExtendMap();
 
 	UPROPERTY(EditAnywhere)
 	float CurrentZoom = 0.5f; 
