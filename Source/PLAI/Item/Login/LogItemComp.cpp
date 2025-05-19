@@ -62,6 +62,8 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 
 void ULogItemComp::GetEquipInfo()
 {
+	if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp,Warning,TEXT("LogItemComp GetInvenInfo localplayer 아님 리턴")) return;}
+
 	// 장비 보낼떄 구조체
 	FPostEquipId PostEquipId;
 	Fequipment_info equipment_info;
@@ -134,6 +136,8 @@ void ULogItemComp::HttpEquipPost(FString JsonString)
 
 void ULogItemComp::GetInvenInfo()
 {
+	if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp,Warning,TEXT("LogItemComp GetInvenInfo localplayer 아님 리턴")) return;}
+	
 	FPostInvenId PostInvenId;
 	FInvenTory_Info InvenToryInfo;
 
@@ -203,6 +207,8 @@ void ULogItemComp::HttpInvenPost(FString JsonString)
 
 void ULogItemComp::GetUserLevel()
 {
+	if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp,Warning,TEXT("LogItemComp GetInvenInfo localplayer 아님 리턴")) return;}
+	
 	FPutUserLevel PutUserLevel;
 	PutUserLevel.character_id = TestPlayer->LoginComp->UserFullInfo.character_info.character_id;
 	PutUserLevel.current_exp = TestPlayer->LoginComp->UserFullInfo.character_info.current_exp;
