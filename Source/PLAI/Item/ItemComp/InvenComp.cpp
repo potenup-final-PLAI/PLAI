@@ -52,20 +52,21 @@ void UInvenComp::BeginPlay()
 	if (TestPlayer->IsLocallyControlled())
 	{
 		MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
-	}
-	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-	{
-		if (WorldGi->bBattleReward == true)
+		
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
-			MenuInven->AddToViewport();
-			MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
-			MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
-			MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
-			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
-			MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
-			MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
-			// TurnReward();
-			WorldGi->bBattleReward = false;
+			if (WorldGi->bBattleReward == true || WorldGi->bGameStart == true)
+			{
+				if (!MenuInven){MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);}
+				MenuInven->AddToViewport(1);
+				MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
+				// WorldGi->bBattleReward = false;
+			}
 		}
 	}
 }
@@ -76,11 +77,39 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     // 데이터테이블 템 먹기
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
+    // 스팀 세션 만들기
+	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::One))
+	{
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+		{
+			WorldGi->CreateSession(FString("Wanted"),4);
+		}
+	}
+	// 스팀 세션 찾기
+	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Two))
+	{
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+		{
+			WorldGi->FindOtherSession();
+		}
+	}
+
+	// 스팀 세션 참여하기 
+	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Three))
+	{
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+		{
+			WorldGi->JoinOtherSession();
+		}
+	}
+
 	
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
 		Server_SpawnOneItem();
 	}
+
+	
 	// 소환수 크리처 소환하기 임시
 	if (TestPlayer->HasAuthority() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Five))
 	{
@@ -97,18 +126,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		}
 	}
 	
-	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
-	{
-		LoadItemInventory();
-		LoadEquipInventory();
-	}
-	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Zero))
-	{
-		SaveItemInventory();
-		SaveEquipInventory();
-	}
 	
-
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
 	{
 		FHitResult Hit;
@@ -129,7 +147,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 						}
 					}
 				}
-				// Npc->NpcUiMaster->SetVisibility(ESlateVisibility::Visible);
 			}
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
@@ -215,7 +232,6 @@ void UInvenComp::Server_SpawnOneItem_Implementation()
     		ItemMaster->StaticMesh->SetStaticMesh(ItemMaster->ItemStructTable.StaticMesh);
     	}
     }
-	
 }
 
 void UInvenComp::Server_UnEquip_Implementation(EquipSlotType SlotType)
@@ -314,6 +330,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = GetOwner();
+	
 	if (SlotType == EquipSlotType::Weapon)
 	{
 		if (ItemWeapon != nullptr) return;
@@ -324,7 +341,8 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemWeapon->ItemStructTable = ItemStructTable;
 		ItemWeapon->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
-		ItemWeapon->AddActorWorldOffset(FVector(30, 5, -10));
+		
+		ItemWeapon->AddActorWorldOffset(FVector(35, 7, -8));
 		ItemWeapon->AddActorLocalRotation(FRotator(-165, 10, 100));
 
 		if (ItemStructTable.Material)
@@ -332,13 +350,15 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	}
 	else if (SlotType == EquipSlotType::Armor)
 	{
-		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(0,-100,0),
-		FRotator(0,0,0),SpawnParams);
-		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("spine_02Socket"));
+		ItemArmor = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory);
+		ItemArmor->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Chest"));
 		ItemArmor->ItemStructTable = ItemStructTable;
 		ItemArmor->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
-		ItemArmor->SetActorLocation(ItemArmor->GetActorLocation() + FVector(0,0,45));
 		ItemArmor->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
+
+	    ItemArmor->AddActorLocalOffset(FVector(-20, 0, -80));
+		ItemArmor->AddActorLocalRotation(FRotator(0, 90, 0));
+	    ItemArmor->SetActorScale3D(FVector(1.05, 1.05, 1.05));
 		
 		if (ItemStructTable.Material)
 		{ ItemArmor->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
@@ -350,7 +370,10 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemHelmet->ItemStructTable = ItemStructTable;
 		ItemHelmet->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemHelmet->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
-		ItemHelmet->StaticMesh->SetRelativeRotation(FRotator(0,90,-90));
+		
+		ItemHelmet->AddActorWorldOffset(FVector(5, 0, 10));
+		ItemHelmet->AddActorLocalRotation(FRotator(0, -90, 90));
+		ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
 
 		if (ItemStructTable.Material)
 		{ ItemHelmet->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
@@ -361,7 +384,6 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemGlove->AttachToComponent(TestPlayer->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,("HeadSocket"));
 		ItemGlove->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		ItemGlove->ItemStructTable = ItemStructTable;
-		// ItemGlove->SetActorRelativeScale3D(FVector(0.6,0.6,0.6));
 		ItemGlove->SetActorRelativeRotation(FRotator(-90,0,0));
 		ItemGlove->AddActorLocalOffset(FVector(0,0,-150));
 		ItemGlove->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
@@ -372,19 +394,20 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 	else if (SlotType == EquipSlotType::Boots)
 	{
 		Itemboots = GetWorld()->SpawnActor<AItemMaster>(ItemMasterFactory,TestPlayer->GetActorLocation() + FVector(75,75,75),FRotator(0,0,0));
-		Itemboots->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepWorldTransform);
+		Itemboots->AttachToComponent(TestPlayer->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("FX_Ult_Passive"));
 		Itemboots->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		Itemboots->ItemStructTable = ItemStructTable;
 		Itemboots->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
- 
-		// Itemboots->SetActorRelativeScale3D(FVector(0.5,0.5,0.5));
-		Itemboots->SetActorRelativeRotation(FRotator(0,-90,0));
-		Itemboots->SetActorRelativeLocation(FVector(75,75,75));
+		
+		Itemboots->AddActorWorldOffset(FVector(-0, 0, -130));
+		Itemboots->AddActorLocalRotation(FRotator(0, 100, 0));
 		
 		if (ItemStructTable.Material)
 		{ Itemboots->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 
+    
+	
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
 		if( WorldGi->bLoginMe == false)
@@ -392,6 +415,8 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 아직 로그인 안됨 bLoginMe머고 %d"),WorldGi->bLoginMe) return;
 		};
 	};
+
+	
 
 	if (!TestPlayer->IsLocallyControlled()) return;
 	FTimerHandle TimerHandle;
@@ -425,8 +450,8 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		
 		for (int32 i = 0; i < TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Num(); i++)
 		{
-			UE_LOG(LogTemp,Warning,TEXT("InvenCOmp 497번쨰줄 SetUiChaStat에 들어가는 장비정보 [%s]"),
-				*TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list[i].item_name);
+			// UE_LOG(LogTemp,Warning,TEXT("InvenCOmp 497번쨰줄 SetUiChaStat에 들어가는 장비정보 [%s]"),
+			// 	*TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list[i].item_name);
 		}
 		
 	},1,false);
@@ -504,7 +529,7 @@ void UInvenComp::SaveItemInventory()
 	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Inventory.tst"));
 	FFileHelper::SaveStringToFile(JsonValue,*path);
 	
-	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 저장"))
+	// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 저장"))
 }
 
 void UInvenComp::LoadItemInventory()
@@ -522,7 +547,7 @@ void UInvenComp::LoadItemInventory()
 		Slot->ItemStructTable = ItemStructTables.ItemStructTables[i];
 		Slot->SlotImageUpdate();
 	}
-	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 로드"))
+	// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 아이템창 구조체 제이슨 로드"))
 }
 
 void UInvenComp::SaveEquipInventory()
@@ -536,7 +561,7 @@ void UInvenComp::SaveEquipInventory()
 	}
 	FString JsonString;
 	FJsonObjectConverter::UStructToJsonObjectString(ItemStructTables,JsonString);
-	UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 저장"))
+	// UE_LOG(LogTemp,Warning,TEXT("인벤컴프 장비창 구조체 제이슨 저장"))
 	
 	FString path = FString::Printf(TEXT("%s%s"),*FPaths::ProjectDir(),TEXT("Equip.tst"));
 	FFileHelper::SaveStringToFile(JsonString, *path);
@@ -604,7 +629,7 @@ void UInvenComp::TurnReward()
 			UiTurnReward->RemoveFromParent();
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
 		}
-	},2.5f,false);
+	},1.5f,false);
 	
 }
 
@@ -632,6 +657,8 @@ void UInvenComp::GetLevel()
 		if (TestPlayer->LoginComp->UserFullInfo.character_info.current_exp < LevelStruct->Exp)
 		{
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp GetLevel에서 넘기는 레벨 배열 크기는? [%d]"),Levels.Num())
+			
+			LevelCounts.Add(LevelStruct->level);
 			UiGetLevel(LevelCounts);
 			return;
 		}
@@ -654,7 +681,6 @@ void UInvenComp::GetLevel()
 void UInvenComp::UiGetLevel(TArray<int32>Levels)
 {
 	float Time = 0.f;
-	MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Visible);
 	UE_LOG(LogTemp,Warning,TEXT("InvenComp 레벨업 UI 떠야하는디 타이머 전에서 Levels 배열갯수는? [%d]"),Levels.Num())
 	
 	GetWorld()->GetTimerManager().SetTimer(LevelTimerHandle,[this, Time, Levels]()mutable{
@@ -669,6 +695,8 @@ void UInvenComp::UiGetLevel(TArray<int32>Levels)
 				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
 				return;
 			}
+			if ( MenuInven->Wbp_UiChaLevelUp->GetVisibility() == ESlateVisibility::Hidden)
+			{ MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Visible); }
 			MenuInven->Wbp_UiChaLevelUp->LevelUpCount->SetText(FText::AsNumber(Levels[0]));
 			Levels.RemoveAt(0);
 			Time -= 1.f;
@@ -686,7 +714,7 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 
 
 
-// if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::RightMouseButton))
+// if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys:: MouseButton))
 // {
 // 	FHitResult Hit;
 // 	PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
@@ -784,3 +812,14 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 // 			}
 // 		}
 // 	}
+
+// if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
+// {
+// 	LoadItemInventory();
+// 	LoadEquipInventory();
+// }
+// if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Zero))
+// {
+// 	SaveItemInventory();
+// 	SaveEquipInventory();
+// }

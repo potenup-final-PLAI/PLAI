@@ -28,4 +28,7 @@ public:
 
 	UFUNCTION()
 	void OnButtonSingle();
+
+	UFUNCTION()
+	void OnButtonMulti();
 };

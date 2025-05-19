@@ -11,3 +11,9 @@ void ABattlePlayerController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 	
 }
+
+void ABattlePlayerController::ClientRPC_SetViewTargetMyPawn_Implementation(APawn* myPawn)
+{
+	// 빠르게 갔다가 천천히 도착 하는 느낌
+	SetViewTargetWithBlend(myPawn, 1.0f, VTBlend_EaseInOut, 4.0f, true);
+}

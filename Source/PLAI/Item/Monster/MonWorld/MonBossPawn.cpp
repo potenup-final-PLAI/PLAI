@@ -15,7 +15,6 @@ AMonBossPawn::AMonBossPawn()
 void AMonBossPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

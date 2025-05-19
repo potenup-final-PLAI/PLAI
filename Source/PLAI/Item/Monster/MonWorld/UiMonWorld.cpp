@@ -5,10 +5,16 @@
 
 #include "MonWorld.h"
 #include "Components/Button.h"
+#include "Components/VerticalBox.h"
+#include "Components/WrapBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
+#include "PLAI/Item/UI/Slot/SlotEquip.h"
 
 void UUiMonWorld::NativeConstruct()
 {
@@ -19,6 +25,7 @@ void UUiMonWorld::NativeConstruct()
 
 void UUiMonWorld::OnButtonYes()
 {
+	if (!TestPlayer->HasAuthority()){UE_LOG(LogTemp,Warning,TEXT("UiMonWorld OnButtonYes TestPlayer 서버가 아님")) return;}
 	if (TestPlayer)
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
@@ -26,21 +33,41 @@ void UUiMonWorld::OnButtonYes()
 			TestPlayer->LogItemComp->GetInvenInfo();
 			TestPlayer->LogItemComp->GetEquipInfo();
 			TestPlayer->LogItemComp->GetUserLevel();
-
+			
 			WorldGi->UserFullInfoGi = TestPlayer->LoginComp->UserFullInfo;
 			WorldGi->bGameStart = true;
 			WorldGi->bBattleReward = true;
 
 			if (MonWorld && MonWorld->MonsterType == EMonsterType::Monster)
 			{
-				UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
+				// UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
+				// GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
+
+				GetWorld()->ServerTravel(TEXT("/Game/JS/Maps/TestMap?listen"));
+				
+
 			}
 			else if (MonWorld && MonWorld->MonsterType == EMonsterType::Boss)
 			{
-				UGameplayStatics::OpenLevel(TestPlayer,FName("Mk_BossMap"));
+				// UGameplayStatics::OpenLevel(TestPlayer,FName("Mk_BossMap"));
+				GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/MK_BossMap?listen"));
 			}
+			// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
+			// 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);
+			
+			if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp,Warning,TEXT("UiMonWorld OnButtonYes 아이템 쉴드 넣기전 LocalPlayer 아님")) return;}
+
+			FUserShield UserShield;
+			UserShield.UserName = TestPlayer->LoginComp->UserFullInfo.character_info.character_name;
+			if (USlotEquip* SlotEquip = Cast<USlotEquip>(TestPlayer->InvenComp->MenuInven->WBP_EquipInven->LeftBox->GetChildAt(3)))
+			{
+				if (SlotEquip->ItemStructTable.ItemTop != -1)
+				{
+					UserShield.UserShield = SlotEquip->ItemStructTable.ItemStructStat.item_SHI;
+				}
+			}
+			WorldGi->UserShields.UserShields.Add(UserShield);
 		}
-		// UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
 	}
 }
 

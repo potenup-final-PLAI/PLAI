@@ -7,6 +7,8 @@
 #include "PLAI/Item/UI/Npc/UiNpc.h"
 #include "NpcCharacter.generated.h"
 
+class ATestPlayer;
+
 UCLASS()
 class PLAI_API ANpcCharacter : public ACharacter
 {
@@ -41,4 +43,7 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UWidgetComponent* WidgetComp;
+
+	UPROPERTY(EditAnywhere)
+	class ATestPlayer* TestPlayer;
 };

@@ -5,6 +5,7 @@
 
 #include "UiChaView.h"
 #include "UiMain.h"
+#include "UiSteamLobby.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
@@ -21,6 +22,7 @@ void UUiSUbMain::NativeConstruct()
 	Super::NativeConstruct();
 
 	ButtonSingle->OnClicked.AddDynamic(this,&UUiSUbMain::OnButtonSingle);
+	ButtonMulti->OnClicked.AddDynamic(this,&UUiSUbMain::OnButtonMulti);
 }
 
 void UUiSUbMain::OnButtonSingle()
@@ -35,7 +37,16 @@ void UUiSUbMain::OnButtonSingle()
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->SetVisibility(ESlateVisibility::Visible);
 	
 	RemoveFromParent();
+	UiMain->Wbp_UiSteamLobby->RemoveFromParent();
 
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{ WorldGi->bLoginMe = true; UE_LOG(LogTemp,Warning,TEXT("UiSubMain bLoginMe 바꼈냐 [%d]"),WorldGi->bLoginMe); }
+}
+
+void UUiSUbMain::OnButtonMulti()
+{
+	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+	{
+		RemoveFromParent();
+	}
 }

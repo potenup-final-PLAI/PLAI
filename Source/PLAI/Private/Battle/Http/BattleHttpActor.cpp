@@ -16,6 +16,7 @@ ABattleHttpActor::ABattleHttpActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -93,95 +94,98 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,
 		// 현재 페이즈가 None이라면
 		if (phaseManager->currentPhase == EBattlePhase::None)
 		{
-			phaseManager->SetPhase(EBattlePhase::BattleStart);
+			phaseManager->ServerRPC_SetPhase(EBattlePhase::BattleStart);
 		}
 	}
-	httpRequest->SetContentAsString(jsonString);
-
-	// 서버에게 요청을 한 후 응답이오면 호출되는 함수 등록
-	httpRequest->OnProcessRequestComplete().BindLambda(
-		[=, this](FHttpRequestPtr Request, FHttpResponsePtr Response,
-		          bool bProcessedSuccessfully)
-		{
-			//GetResponseCode : 200 - 성공, 400번대, 500번대 - 오류
-			// 응답이 오면 실행
-			// 성공
-			if (bProcessedSuccessfully && EHttpResponseCodes::IsOk(
-				Response->GetResponseCode()))
-			{
-				if (bHasEnv)
-				{
-					// 최초 데이터를 보내면 Success 값이 잘 들어오는지만 판단
-					FString jsonData = Response->GetContentAsString();
-					UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
-					
-					if (auto* phaseManager = Cast<AUPhaseManager>(
-					GetWorld()->GetGameState()))
-					{
-						// 현재 페이즈가 None이라면
-						if (phaseManager->currentPhase == EBattlePhase::None)
-						{
-							phaseManager->SetPhase(EBattlePhase::BattleStart);
-						}
-					}
-				}
-				if (bHasTurn)
-				{
-					FString jsonData = Response->GetContentAsString();
-					UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
-
-					FActionRequest ParsedRequest;
-					if (FJsonObjectConverter::JsonObjectStringToUStruct(
-						jsonData, &ParsedRequest, 0, 0))
-					{
-						UE_LOG(LogTemp, Warning,
-						       TEXT("Success Response Json To Struct"));
-
-						if (ParsedRequest.action.target_character_id == "")
-						{
-							UE_LOG(LogTemp, Error,TEXT("Parsed ActionRequest has empty actions array"));
-							if (auto* enemy = Cast<ABaseEnemy>(unit))
-							{
-								enemy->OnTurnEnd();
-							}
-							return;
-						}
-
-						if (auto* phaseManager = Cast<AUPhaseManager>(
-							GetWorld()->GetGameState()))
-						{
-							if (phaseManager->currentPhase ==
-								EBattlePhase::TurnProcessing)
-							{
-								if (unit && unit->GetName() == ParsedRequest.
-									current_character_id)
-								{
-									if (ABaseEnemy* enemy = Cast<ABaseEnemy>(
-										unit))
-									{
-										enemy->ProcessAction(ParsedRequest);
-									}
-								}
-							}
-						}
-					}
-					else
-					{
-						UE_LOG(LogTemp, Error,
-						       TEXT("Failed to parse ActionRequest JSON"));
-					}
-				}
-			}
-			// 실패
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("통신 실패 : %d"),
-				       Response->GetResponseCode());
-			}
-		});
-
-	// 요청을 보내자.
-	httpRequest->ProcessRequest();
+	// httpRequest->SetContentAsString(jsonString);
+	//
+	// // 서버에게 요청을 한 후 응답이오면 호출되는 함수 등록
+	// httpRequest->OnProcessRequestComplete().BindLambda(
+	// 	[=, this](FHttpRequestPtr Request, FHttpResponsePtr Response,
+	// 	          bool bProcessedSuccessfully)
+	// 	{
+	// 		//GetResponseCode : 200 - 성공, 400번대, 500번대 - 오류
+	// 		// 응답이 오면 실행
+	// 		// 성공
+	// 		if (bProcessedSuccessfully && EHttpResponseCodes::IsOk(
+	// 			Response->GetResponseCode()))
+	// 		{
+	// 			if (bHasEnv)
+	// 			{
+	// 				// 최초 데이터를 보내면 Success 값이 잘 들어오는지만 판단
+	// 				FString jsonData = Response->GetContentAsString();
+	// 				UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
+	//
+	// 				if (auto* phaseManager = Cast<AUPhaseManager>(
+	// 					GetWorld()->GetGameState()))
+	// 				{
+	// 					// 현재 페이즈가 None이라면
+	// 					if (phaseManager->currentPhase == EBattlePhase::None)
+	// 					{
+	// 						phaseManager->ServerRPC_SetPhase(EBattlePhase::BattleStart);
+	// 					}
+	// 				}
+	// 			}
+	// 			if (bHasTurn)
+	// 			{
+	// 				FString jsonData = Response->GetContentAsString();
+	// 				UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
+	//
+	// 				FActionRequest ParsedRequest;
+	// 				if (FJsonObjectConverter::JsonObjectStringToUStruct(
+	// 					jsonData, &ParsedRequest, 0, 0))
+	// 				{
+	// 					UE_LOG(LogTemp, Warning,
+	// 					       TEXT("Success Response Json To Struct"));
+	//
+	// 					if (ParsedRequest.action.target_character_id == "")
+	// 					{
+	// 						UE_LOG(LogTemp, Error,
+	// 						       TEXT(
+	// 							       "Parsed ActionRequest has empty actions array"
+	// 						       ));
+	// 						if (auto* enemy = Cast<ABaseEnemy>(unit))
+	// 						{
+	// 							enemy->OnTurnEnd();
+	// 						}
+	// 						return;
+	// 					}
+	//
+	// 					if (auto* phaseManager = Cast<AUPhaseManager>(
+	// 						GetWorld()->GetGameState()))
+	// 					{
+	// 						if (phaseManager->currentPhase ==
+	// 							EBattlePhase::TurnProcessing)
+	// 						{
+	// 							if (unit && unit->GetName() == ParsedRequest.
+	// 								current_character_id)
+	// 							{
+	// 								if (ABaseEnemy* enemy = Cast<ABaseEnemy>(
+	// 									unit))
+	// 								{
+	// 									enemy->ProcessAction(ParsedRequest);
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 				else
+	// 				{
+	// 					UE_LOG(LogTemp, Error,
+	// 					       TEXT("Failed to parse ActionRequest JSON"));
+	// 				}
+	// 			}
+	// 		}
+	// 		// 실패
+	// 		else
+	// 		{
+	// 			UE_LOG(LogTemp, Warning, TEXT("통신 실패 : %d"),
+	// 			       Response->GetResponseCode());
+	// 		}
+	// 	});
+	//
+	// // 요청을 보내자.
+	// httpRequest->ProcessRequest();
 }
 
 bool ABattleHttpActor::IsEmptyEnvironmentState(const FEnvironmentState& state)
