@@ -95,8 +95,7 @@ void ATurnManager::MulticastRPC_StartPlayerTurn_Implementation()
 
 	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("playerPawn is Player %s"),
-		       *playerPawn->GetActorNameOrLabel());
+		UE_LOG(LogTemp, Warning, TEXT("playerPawn is Player %s"), *playerPawn->GetActorNameOrLabel());
 
 		if (ABattlePlayerController* pc = Cast<ABattlePlayerController>(playerPawn->GetController()))
 		{
