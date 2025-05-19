@@ -399,7 +399,7 @@ void AUPhaseManager::BattleEnd()
 {
 	turnManager->SetTurnState(ETurnState::None);
 	UE_LOG(LogTemp, Warning, TEXT("End Battle"));
-	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Mk_LevelVillage"));
+	GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
 }
 
 void AUPhaseManager::SetBeforeBattle()

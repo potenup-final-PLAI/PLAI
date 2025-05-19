@@ -6,6 +6,7 @@
 #include "BaseBattlePawn.h"
 #include "GridTile.h"
 #include "Algo/RandomShuffle.h"
+#include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Enemy/BaseEnemy.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -44,10 +45,12 @@ void AGridTileManager::BindUnit()
 	// GameState에서 모든 PlayerState 가져오기
 	const TArray<APlayerState*>& playerStates = GetWorld()->GetGameState()->PlayerArray;
 
+	UE_LOG(LogTemp, Warning, TEXT("PlayerState %d"), playerStates.Num());
+	
 	for (int32 i = 0; i < playerStates.Num(); ++i)
 	{
 		APlayerState* ps = playerStates[i];
-		APlayerController* pc = Cast<APlayerController>(ps->GetOwner());
+		ABattlePlayerController* pc = Cast<ABattlePlayerController>(ps->GetOwner());
 
 		if (!unitArray.IsValidIndex(i)) continue;
 
