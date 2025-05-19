@@ -15,6 +15,7 @@ class PLAI_API UUiWorldMap : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	UUiWorldMap(const FObjectInitializer& FOI);
 
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* MaterialMapInterface;
@@ -24,6 +25,9 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* MiniMapCanvas;
+
+	UPROPERTY(meta = (BindWidget))
+	class UOverlay* MiniMapOverlay;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* MiniMap;
@@ -31,14 +35,23 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* PlayerIcon;
 
+	UPROPERTY(meta = (BindWidget))
+	class UImage* PlayerRot;
+
 	FVector2D WorldMinFevtor = FVector2D(-22700.0, -21260.0);
 	FVector2D WorldMaxFevtor = FVector2D(27700.0, 29140.0);
 
 	FVector2D MiniMapSize = FVector2D(250.0,250.0);
+
+	UPROPERTY(EditAnywhere)
+	float CurrentZoom = 0.5f; 
 
 	void SetPlayerMinmapVector(FVector PlayerLocation);
 
 	virtual void NativeConstruct() override;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+	
+	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 };
