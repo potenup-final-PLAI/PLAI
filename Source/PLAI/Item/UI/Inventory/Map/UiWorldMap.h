@@ -23,7 +23,22 @@ public:
 	UMaterialInstanceDynamic* MaterialMapDynamic;
 
 	UPROPERTY(meta = (BindWidget))
+	class USizeBox* MiniMapSizeBox;
+	
+	UPROPERTY(meta = (BindWidget))
 	class UImage* MiniMap;
 
+	UPROPERTY(meta = (BindWidget))
+	class UImage* PlayerIcon;
+
+	FVector2D WorldMinFevtor = FVector2D(-22700.0, -21260.0);
+	FVector2D WorldMaxFevtor = FVector2D(22700.0, 21260.0);
+
+	FVector2D MiniMapSize = FVector2D(250.0,250.0);
+
+	void SetPlayerMinmapVector(FVector PlayerLocation);
+
 	virtual void NativeConstruct() override;
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 };
