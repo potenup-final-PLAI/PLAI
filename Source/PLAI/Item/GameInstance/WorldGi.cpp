@@ -81,7 +81,6 @@ void UWorldGi::OnFindSessionComplete(bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
-		
 		int32 Rand = FMath::RandRange(10,100);
 		UE_LOG(LogTemp,Warning,TEXT("WorldGI 세션 검색 성공 랜덤값[%d]"),Rand)
 
