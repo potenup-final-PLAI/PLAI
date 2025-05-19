@@ -16,9 +16,14 @@ void UUiWorldMap::SetPlayerMinmapVector(FVector PlayerLocation)
 	U = FMath::Clamp(U, 0.f, 1.f);
 	V = FMath::Clamp(V, 0.f, 1.f);
 
-	FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
-
-	PlayerIcon->SetRenderTranslation(PixelPos);
+	FVector2D PixelPos = FVector2D(U * 250, V * 250);
+	
+	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(PlayerIcon->Slot))
+	{ CanvasSlot->SetPosition(PixelPos); }
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error"));
+	}
 	
 	// if (UCanvasPanelSlot* IconSlot = Cast<UCanvasPanelSlot>(PlayerIcon->Slot))
 	// {
@@ -38,9 +43,9 @@ void UUiWorldMap::NativeConstruct()
 	MaterialMapDynamic = UMaterialInstanceDynamic::Create(MaterialMapInterface,this);
 
 	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
-
-	MaterialMapDynamic->SetScalarParameterValue("ZoomFactor", 1.0f);
-	MaterialMapDynamic->SetVectorParameterValue("CenterOffset", FVector4(0.5f,0.5f,0,0));
+	
+	// MaterialMapDynamic->SetScalarParameterValue("ZoomFactor", 1.0f);
+	// MaterialMapDynamic->SetVectorParameterValue("CenterOffset", FVector4(0.5f,0.5f,0,0));
 	
 }
 

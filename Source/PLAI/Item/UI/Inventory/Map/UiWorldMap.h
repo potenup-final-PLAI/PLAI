@@ -23,7 +23,7 @@ public:
 	UMaterialInstanceDynamic* MaterialMapDynamic;
 
 	UPROPERTY(meta = (BindWidget))
-	class USizeBox* MiniMapSizeBox;
+	class UCanvasPanel* MiniMapCanvas;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* MiniMap;
@@ -32,7 +32,7 @@ public:
 	class UImage* PlayerIcon;
 
 	FVector2D WorldMinFevtor = FVector2D(-22700.0, -21260.0);
-	FVector2D WorldMaxFevtor = FVector2D(22700.0, 21260.0);
+	FVector2D WorldMaxFevtor = FVector2D(27700.0, 29140.0);
 
 	FVector2D MiniMapSize = FVector2D(250.0,250.0);
 
