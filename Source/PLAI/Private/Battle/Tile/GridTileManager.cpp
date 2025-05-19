@@ -7,6 +7,7 @@
 #include "GridTile.h"
 #include "Algo/RandomShuffle.h"
 #include "Battle/TurnSystem/BattlePlayerController.h"
+#include "Battle/TurnSystem/PhaseManager.h"
 #include "Enemy/BaseEnemy.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -28,67 +29,14 @@ void AGridTileManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+
 	InitGridTile();
-	GetWorld()->GetTimerManager().SetTimer(bindUnitHandle, this, &AGridTileManager::BindUnit, 0.2f, false);
 }
 
 // Called every frame
 void AGridTileManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-}
-
-void AGridTileManager::BindUnit()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Binding Unit Owners..."));
-	// GameState에서 모든 PlayerState 가져오기
-	const TArray<APlayerState*>& playerStates = GetWorld()->GetGameState()->PlayerArray;
-
-	UE_LOG(LogTemp, Warning, TEXT("PlayerState %d"), playerStates.Num());
-	
-	for (int32 i = 0; i < playerStates.Num(); ++i)
-	{
-		APlayerState* ps = playerStates[i];
-		ABattlePlayerController* pc = Cast<ABattlePlayerController>(ps->GetOwner());
-
-		if (!unitArray.IsValidIndex(i)) continue;
-
-		ABattlePlayer* unit = Cast<ABattlePlayer>(unitArray[i]);
-		if (!unit || !pc) continue;
-
-		unit->SetOwner(pc);
-		unit->ForceNetUpdate();
-
-		if (auto* myPS = Cast<ABattlePlayerState>(ps))
-		{
-			myPS->battlePawn = unit;
-			unit->owningPlayerState = myPS;
-		} 
-
-		UE_LOG(LogTemp, Warning, TEXT("Set owner of unit %s to %s"), *unit->GetName(), *pc->GetName());
-	}
-
-	bSetBindUnit = true;
-}
-
-TArray<FIntPoint> AGridTileManager::RandomCoords(int32 count, TArray<FIntPoint> coords)
-{
-	TArray<FIntPoint> result;
-
-	// allCoords는 전체 타일 좌표 리스트
-	TArray<FIntPoint> shuffledCoords = coords;
-	shuffledCoords.Sort([](const FIntPoint& A, const FIntPoint& B)
-	{
-		return FMath::RandBool(); // 랜덤 셔플
-	});
-
-	for (int32 i = 0; i < count && i < shuffledCoords.Num(); ++i)
-	{
-		result.Add(shuffledCoords[i]);
-	}
-
-	return result;
 }
 
 void AGridTileManager::InitGridTile()
@@ -98,12 +46,11 @@ void AGridTileManager::InitGridTile()
 		UE_LOG(LogTemp, Warning, TEXT("서버가 아닙니다."));
 		return;
 	}
-
-	
 	TArray<FIntPoint> allCoords;
 	allCoords.Reserve(625);
 	// allCoords.Reserve(49);
 
+	// Tile 스폰 작업
 	for (int32 Y = 0; Y < 25; ++Y)
 	{
 		for (int32 X = 0; X < 25; ++X)
@@ -135,89 +82,97 @@ void AGridTileManager::InitGridTile()
 
 	// 좌표 섞기
 	Algo::RandomShuffle(allCoords);
-	
-	// // Player 수만큼 좌표를 뽑는다
-	// TArray<FIntPoint> playerCoords;
-	// for (int32 i = 0; i < playerStates.Num() && i < allCoords.Num(); ++i)
-	// {
-	// 	playerCoords.Add(allCoords[i]);
-	// }
+
+	// // 2개의 플레이어 유닛 스폰
+	// TArray<FIntPoint> playerCoords = RandomCoords(2, allCoords);
 	//
-	// // 좌표 제거
+	// // Player 현재 좌표 저장
 	// for (const FIntPoint& coord : playerCoords)
 	// {
+	// 	AGridTile* gridTile = map.FindRef(coord);
+	// 	if (!gridTile)
+	// 	{
+	// 		UE_LOG(LogTemp, Warning, TEXT("InitGridTile : !gridTile"));
+	// 		continue;
+	// 	}
+	//
+	// 	// Player 스폰
+	// 	FVector spawnLoc = gridTile->GetActorLocation() + FVector(
+	// 		0.f, 0.f, 80.f);
+	// 	ABattlePlayer* player = GetWorld()->SpawnActor<ABattlePlayer>(
+	// 		battlePlayerFactory, spawnLoc, FRotator::ZeroRotator);
+	// 	if (!player)
+	// 	{
+	// 		UE_LOG(LogTemp, Warning, TEXT("InitGridTile : !player"));
+	// 		continue;
+	// 	}
+	// 	for (APlayerState* ps : GetWorld()->GetGameState()->PlayerArray)
+	// 	{
+	// 		auto* battlePlayerState = Cast<ABattlePlayerState>(ps);
+	// 		if (battlePlayerState) battlePlayerState->battlePawn = player;
+	// 		
+	// 	}
+	// 	// currentTile Goal타일로 설정
+	// 	player->currentTile = gridTile;
+	// 	
+	// 	// unitArray에 player 추가
+	// 	unitArray.Add(player);
+	// 	// 해당 좌표 제거
 	// 	allCoords.Remove(coord);
 	// }
-
-	// // 플레이어 유닛 스폰
-	// for (int32 i = 0; i < playerStates.Num(); ++i)
-	// {
-	// 	APlayerState* ps = playerStates[i];
-	// 	APlayerController* pc = Cast<APlayerController>(ps->GetOwner());
-	//
-	// 	// ps, pc, playerCoords 수가 0보다 크고 Array사이즈보다 작은지 체크해서 아니면 반복문 다시 돌기 
-	// 	if (!ps || !pc || !playerCoords.IsValidIndex(i)) continue;
-	//
-	// 	const FIntPoint& coord = playerCoords[i];
-	// 	AGridTile* gridTile = map.FindRef(coord);
-	//
-	// 	if (!gridTile) continue;
-	//
-	// 	FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
-	//
-	// 	// 유닛 생성
-	// 	ABattlePlayer* player = GetWorld()->SpawnActor<ABattlePlayer>(battlePlayerFactory, spawnLoc, FRotator::ZeroRotator);
-	// 	if (!player) continue;
-	// 	
-	// 	// 현재 타일 세팅
-	// 	player->currentTile = gridTile;
-	// 	// GI에서 가져온 스탯 적용
-	//
-	// 	// 저장
-	// 	unitArray.Add(player);
-	// }
-	// 플레이어 유닛 스폰
-	TArray<FIntPoint> playerCoords = RandomCoords(1, allCoords);
 	
-	for (const FIntPoint& coord : playerCoords)
-	{
-		AGridTile* gridTile = map.FindRef(coord);
-		if (!gridTile)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("InitGridTile : !gridTile"));
-			continue;
-		}
+	// PlayerController 수만큼 좌표 확보
+	TArray<APlayerState*> playerStates = GetWorld()->GetGameState()->PlayerArray;
+	TArray<FIntPoint> playerCoords = RandomCoords(playerStates.Num(), allCoords);
 
+	for (int32 i = 0; i < playerStates.Num(); ++i)
+	{
+		const FIntPoint& coord = playerCoords[i];
+		AGridTile* gridTile = map.FindRef(coord);
+		if (!gridTile) continue;
+
+		// 유닛 스폰
 		FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
 		ABattlePlayer* player = GetWorld()->SpawnActor<ABattlePlayer>(battlePlayerFactory, spawnLoc, FRotator::ZeroRotator);
-		if (!player)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("InitGridTile : !player"));
-			continue;
-		}
+		if (!player) continue;
 
 		player->currentTile = gridTile;
-		
+
+		// 매칭된 PlayerController를 찾아 SetOwner
+		APlayerState* ps = playerStates[i];
+		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetOwner());
+		if (battlePC)
+		{
+			player->SetOwner(battlePC);
+			player->ForceNetUpdate(); // 복제 보장
+		}
+
+		// PlayerState에도 battlePawn 연결
+		if (auto* battlePS = Cast<ABattlePlayerState>(ps))
+		{
+			battlePS->battlePawn = player;
+			player->owningPlayerState = battlePS;
+		}
+
 		unitArray.Add(player);
 		allCoords.Remove(coord);
 	}
-	
+	// Enemy 스폰 작업
 	TArray<FIntPoint> enemyCoords;
 
+	// 어떤 레벨인제 체크해서 분기
 	FString levelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+
 	// Level이 보스 레벨이라면
 	if (levelName == "MK_BossMap")
 	{
 		// 그 다음 적 좌표 뽑기
-		for (int32 i = 0; i < 1 && i < allCoords.Num(); ++i)
-		{
-			enemyCoords.Add(allCoords[i]);
-		}
+		enemyCoords.Add(allCoords[0]);
 	}
 	else
 	{
 		// 그 다음 적 좌표 뽑기
-		for (int32 i = 0; i < 4 && i < allCoords.Num(); ++i)
+		for (int32 i = 0; i < 4; ++i)
 		{
 			enemyCoords.Add(allCoords[i]);
 		}
@@ -233,11 +188,15 @@ void AGridTileManager::InitGridTile()
 			{
 				FVector spawnLoc = gridTile->GetActorLocation() + FVector(
 					0.f, 0.f, 80.f);
+				// Enemy 스폰
 				if (auto* enemy = GetWorld()->SpawnActor<AMonBossPawn>(
 					bossFactory, spawnLoc, FRotator::ZeroRotator))
 				{
+					// enemy 스피드 설정
 					enemy->speed = FMath::RandRange(1, 10);
+					// 현재 타일 설정
 					enemy->currentTile = gridTile;
+					// Array에 추가
 					unitArray.Add(enemy);
 				}
 			}
@@ -248,6 +207,7 @@ void AGridTileManager::InitGridTile()
 				if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(
 					enemyFactory, spawnLoc, FRotator::ZeroRotator))
 				{
+					// 위 내용과 동일
 					enemy->speed = FMath::RandRange(1, 10);
 					enemy->currentTile = gridTile;
 					unitArray.Add(enemy);
@@ -255,6 +215,28 @@ void AGridTileManager::InitGridTile()
 			}
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("InitGridTile : gridTile Complete"));
+}
+
+
+TArray<FIntPoint> AGridTileManager::RandomCoords(
+	int32 count, TArray<FIntPoint> coords)
+{
+	TArray<FIntPoint> result;
+
+	// allCoords는 전체 타일 좌표 리스트
+	TArray<FIntPoint> shuffledCoords = coords;
+	shuffledCoords.Sort([](const FIntPoint& A, const FIntPoint& B)
+	{
+		return FMath::RandBool(); // 랜덤 셔플
+	});
+
+	for (int32 i = 0; i < count && i < shuffledCoords.Num(); ++i)
+	{
+		result.Add(shuffledCoords[i]);
+	}
+
+	return result;
 }
 
 AGridTile* AGridTileManager::FindCurrentTile(FVector worldLoc)

@@ -94,11 +94,9 @@ public:
 	int32 turnCount = 0;
 	//--------------Player Turn---------------------
 	// 플레이어 첫 유닛 실행
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPC_StartPlayerTurn();
+	void StartPlayerTurn();
 
 	//--------------Enemy Turn---------------------
 	// 적 첫 유닛 실행
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPC_StartEnemyTurn();
+	void StartEnemyTurn();
 };

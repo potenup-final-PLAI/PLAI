@@ -26,4 +26,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Battle")
 	APawn* battlePawn;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Battle")
+	ABattlePlayerState* ownPS;
 };

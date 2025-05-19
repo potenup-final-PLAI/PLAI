@@ -40,9 +40,7 @@ public:
 	TSubclassOf<class AMonBossPawn> bossFactory;
 
 	FTimerHandle bindUnitHandle;
-	bool bSetBindUnit = false;
 	
-	void BindUnit();
 	TArray<FIntPoint> RandomCoords(int32 count, TArray<FIntPoint> coords);
 	void InitGridTile();
 	//------------Test--------------------------
@@ -59,4 +57,5 @@ public:
 	bool IsValidTile(FIntPoint num);
 	// 타일 색 변경
 	void SetTileColor(AGridTile* targetTile, bool bHighlight);
+	
 };

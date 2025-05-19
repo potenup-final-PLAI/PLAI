@@ -162,5 +162,12 @@ public:
 	class AGridTileManager* girdTileManager;
 	
 	void InitOtherClass();
+
+
+	//----------------Player Ready Check------------------
+	UPROPERTY(EditAnywhere)
+	int32 readyCount = 2;
+	
+	void PlayerReady(APlayerController* playerControl);
 };
 

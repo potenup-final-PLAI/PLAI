@@ -83,65 +83,60 @@ void ATurnManager::OnRep_UpdateWhoTurn()
 	UpdateWhoTurn();
 }
 
-void ATurnManager::MulticastRPC_StartPlayerTurn_Implementation()
+void ATurnManager::StartPlayerTurn()
 {
-	if (curTurnState != ETurnState::None)
-	{
+	if (!HasAuthority() || curTurnState != ETurnState::None)
 		return;
-	}
+
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Player Turn"));
-	// Player 턴 시작
 	SetTurnState(ETurnState::PlayerTurn);
 
 	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("playerPawn is Player %s"), *playerPawn->GetActorNameOrLabel());
+		if (!playerPawn->owningPlayerState)
+		{
+			UE_LOG(LogTemp, Error, TEXT("playerPawn->owningPlayerState is nullptr"));
+			return;
+		}
 
-		if (ABattlePlayerController* pc = Cast<ABattlePlayerController>(playerPawn->GetController()))
+		APlayerController* pc = Cast<APlayerController>(playerPawn->owningPlayerState->GetOwner());
+		if (!pc)
+		{
+			UE_LOG(LogTemp, Error, TEXT("owningPlayerState->GetOwner() is nullptr"));
+			return;
+		}
+
+		if (ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(pc))
 		{
 			FTimerHandle possessHandle;
 			GetWorld()->GetTimerManager().ClearTimer(possessHandle);
 
-			// 이후에 값이 변경 및 삭제 될 수 있기 때문에 값 복사로 가져와서 람다 내에서 사용
-			GetWorld()->GetTimerManager().SetTimer(
-				possessHandle, FTimerDelegate::CreateLambda([=, this]()
+			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
+			{
+				if (battlePC && playerPawn)
 				{
-					if (pc && playerPawn)
+					battlePC->Possess(playerPawn);
+					if (curUnit->IsValidLowLevelFast())
 					{
-						pc->Possess(playerPawn);
-						if (curUnit->IsValidLowLevelFast())
-						{
-							UE_LOG(LogTemp, Warning, TEXT("Safe to call OnTurnStart on %s"), *curUnit->GetName());
-							// 누구턴인지 UI 업데이트
-							if (HasAuthority()) UpdateWhoTurn();
-							
-							curUnit->OnTurnStart();
-							// Client RPC로 시점 전환
-							if (ABattlePlayerController* myPC = Cast<ABattlePlayerController>(pc))
-							{
-								myPC->ClientRPC_SetViewTargetMyPawn(playerPawn);
-							}
-						}
-						else
-						{
-							UE_LOG(LogTemp, Warning, TEXT("Not Safe to call OnTurnStart"));
-						}
+						UE_LOG(LogTemp, Warning, TEXT("Safe to call OnTurnStart on %s"), *curUnit->GetName());
+						UpdateWhoTurn();
+						auto* playerCamera = battlePC->GetPawnOrSpectator();
+						curUnit->OnTurnStart();
+						battlePC->SetViewTargetMyPawn(playerCamera);
+						battlePC->ClientRPC_SetViewTargetMyPawn(playerCamera);
 					}
-					else
-					{
-						UE_LOG(LogTemp, Warning, TEXT("haven't pc or playerPawn"));
-					}
-				}), 1.0f, false);
+				}
+			}), 1.0f, false);
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("can't find playerPawn"));
-		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can't find playerPawn"));
 	}
 }
 
 
-void ATurnManager::MulticastRPC_StartEnemyTurn_Implementation()
+void ATurnManager::StartEnemyTurn()
 {
 	if (curTurnState != ETurnState::None)
 	{
