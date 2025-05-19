@@ -58,6 +58,10 @@ protected:
 	void OnTouchTriggered();
 	void OnTouchReleased();
 
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_WarpPlayer(EMonSpawnType SpawnType);
+
 private:
 	FVector CachedDestination;
 

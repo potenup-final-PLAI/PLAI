@@ -12,6 +12,9 @@
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/Monster/Monster.h"
+#include "PLAI/Item/Portal/Warp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
 
@@ -133,4 +136,38 @@ void APLAIPlayerController::OnTouchReleased()
 {
 	bIsTouch = false;
 	OnSetDestinationReleased();
+}
+
+void APLAIPlayerController::Server_WarpPlayer_Implementation(EMonSpawnType SpawnType)
+{
+	TArray<AActor*> Mons;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMonster::StaticClass(), Mons);
+
+	for (AActor* Mon : Mons)
+	{
+		if (AMonster* Monster = Cast<AMonster>(Mon))
+		{
+			Monster->Destroy();
+			break;
+		}
+	}
+	
+	UE_LOG(LogTemp,Warning,TEXT("UiPortal 어디소환중? [%s]"),*UEnum::GetValueAsString(SpawnType))
+	
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWarp::StaticClass(), Actors);
+	
+	if (Actors.Num() == 0){UE_LOG(LogTemp,Warning,TEXT("UiPortal 없냐? %d"),Actors.Num())return;}
+	
+	for (AActor* Actor : Actors)
+	{
+		if (AWarp* MonSpawn = Cast<AWarp>(Actor))
+		{
+			if (MonSpawn->MonSpawnType ==  SpawnType)
+			{
+				GetPawn()->SetActorLocation(MonSpawn->GetActorLocation() + FVector(250,0,1000));
+			}
+		}
+	}
+	// GetPawn()->SetActorLocation(GetPawn()->GetActorLocation() + FVector(0, 0, 2000));
 }

@@ -8,6 +8,7 @@
 #include "UIChaMain.h"
 #include "UIinitMain.h"
 #include "UiSign.h"
+#include "UiSteamLobby.h"
 #include "UiSUbMain.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
@@ -34,6 +35,7 @@ void UUiMain::NativeConstruct()
     Wbp_UIChaMain->UiMain = this;
 	Wbp_UiSubMain->UiMain = this;
 	Wbp_UiInitMain->UiMain = this;
+	Wbp_UiSteamLobby->UiMain = this;
 	
 	if (APlayerController* pc = Cast<APlayerController>(GetOwningPlayer()))
 		

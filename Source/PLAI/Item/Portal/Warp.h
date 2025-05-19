@@ -10,6 +10,8 @@
 #include "PLAI/Item/Monster/MonSpawn/MonSpawn.h"
 #include "Warp.generated.h"
 
+class ATestPlayer;
+
 UCLASS()
 class PLAI_API AWarp : public AActor
 {
@@ -66,6 +68,9 @@ public:
 	UFUNCTION()
 	void OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION(Server, Reliable)
+	void Server_WarpPlayer(ATestPlayer* TestPlayer);
 
 	// UFUNCTION()
 	// void HandleOldLevelLoaded();

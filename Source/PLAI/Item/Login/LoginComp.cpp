@@ -49,6 +49,7 @@ void ULoginComp::BeginPlay()
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
+			// 최초 게임 실행 했는지
 			if (WorldGi->bGameStart == false)
 			{
 				UiMain = CreateWidget<UUiMain>(GetWorld(),UiMainFactory);
@@ -58,15 +59,17 @@ void ULoginComp::BeginPlay()
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("LoginComp 이미 접속한 캐릭터 Gi UserFullInfo 불러오기"));
-				UserFullInfo = WorldGi->UserFullInfoGi;
-				HttpMePost();
-				
-				FTimerHandle TimerHandle;
-				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+				if (WorldGi->bBattleReward == true || WorldGi->bGameStart == true)
 				{
-					TestPlayer->InvenComp->TurnReward();
-				},1.0,false);
+					UE_LOG(LogTemp, Warning, TEXT("LoginComp 이미 접속한 캐릭터 Gi UserFullInfo 불러오기"));
+					UserFullInfo = WorldGi->UserFullInfoGi;
+					HttpMePost();
+
+					FTimerHandle TimerHandle;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,WorldGi]()
+					{ TestPlayer->InvenComp->TurnReward(); WorldGi->bBattleReward = false;},1.0,false);
+					// if (WorldGi->bBattleReward == true){UE_LOG(LogTemp,Warning,TEXT("LoginComp 전투 X 보상 X")) return;}
+				}
 			}
 		}
 	}
@@ -174,16 +177,10 @@ void ULoginComp::HttpSignPost()
 			{
 				UiMain->WbpUiSign->SignCompleteBox->SetVisibility(ESlateVisibility::Visible);
 				if (HttpResponse->GetResponseCode() == 200)
-				{
-					// UiMain->WbpUiSign->SignCompleteBox->SetVisibility(ESlateVisibility::Visible);
-					UiMain->WbpUiSign->bSingComplete->SetText(FText::FromString(TEXT("가입 완료")));
-				}
+				{ UiMain->WbpUiSign->bSingComplete->SetText(FText::FromString(TEXT("가입 완료"))); }
 				else
-				{
-					// UiMain->WbpUiSign->SignCompleteBox->SetVisibility(ESlateVisibility::Visible);
-					UiMain->WbpUiSign->bSingComplete->SetText(FText::FromString(TEXT("가입 실패")));
-					UiMain->WbpUiSign->bSingCompleteDetail->SetText(FText::FromString(JsonString));
-				}
+				{ UiMain->WbpUiSign->bSingComplete->SetText(FText::FromString(TEXT("가입 실패")));
+					UiMain->WbpUiSign->bSingCompleteDetail->SetText(FText::FromString(JsonString)); }
 			}
 		}
 		else
@@ -195,14 +192,10 @@ void ULoginComp::HttpSignPost()
 }
 
 void ULoginComp::Server_HttpMePost_Implementation()
-{
-	Client_HttpMePost();
-}
+{ Client_HttpMePost(); }
 
 void ULoginComp::Client_HttpMePost_Implementation()
-{
-	HttpMePost();
-}
+{ HttpMePost(); }
 
 void ULoginComp::HttpMePost()
 {
@@ -256,15 +249,6 @@ void ULoginComp::HttpMePost()
 				UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
 				TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&UserFullInfo);
 				FUserFullInfo InitUserFullInfo;
-				
-				// if (InitUserFullInfo.character_info.character_name != UserFullInfo.character_info.character_name)
-				// {
-				// 	UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성된 캐릭터 닉넴은? %s"),*UserFullInfo.character_info.character_name);
-				// 	UiMain->Wbp_UiInitMain->RemoveFromParent();
-				// }else
-				// {
-				// 	UE_LOG(LogTemp,Warning,TEXT("LoginComp 생성되지 않은 캐릭터 입니다? %s"),*UserFullInfo.character_info.character_name);
-				// }
 			}
 			else
 			{
@@ -291,9 +275,7 @@ void ULoginComp::HttpMePost()
 					UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z));
 			}
 			else
-			{
-				UE_LOG(LogTemp,Warning,TEXT("LoginComp 캐릭터 위치 불러오려다 TestPlayer 또는 X 좌표 0임"))
-			}
+			{ UE_LOG(LogTemp,Warning,TEXT("LoginComp 캐릭터 위치 불러오려다 TestPlayer 또는 X 좌표 0임")) }
 		}
 	});
 	httpRequest->ProcessRequest();

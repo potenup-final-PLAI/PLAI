@@ -51,6 +51,8 @@ public:
 
 	void WarpTestPlayer(EMonSpawnType SpawnType);
 
+	void WarpCotnroller(EMonSpawnType SpawnType);
+
 	UFUNCTION()
 	void OnButton_Village();
 

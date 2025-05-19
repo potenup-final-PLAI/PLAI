@@ -52,20 +52,21 @@ void UInvenComp::BeginPlay()
 	if (TestPlayer->IsLocallyControlled())
 	{
 		MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
-	}
-	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-	{
-		if (WorldGi->bBattleReward == true)
+		
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
-			MenuInven->AddToViewport(1);
-			MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
-			MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
-			MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
-			MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
-			MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
-			MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
-			
-			WorldGi->bBattleReward = false;
+			if (WorldGi->bBattleReward == true || WorldGi->bGameStart == true)
+			{
+				if (!MenuInven){MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);}
+				MenuInven->AddToViewport(1);
+				MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
+				// WorldGi->bBattleReward = false;
+			}
 		}
 	}
 }
@@ -81,7 +82,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
-			WorldGi->CreateSession(FString("Wanted"),0);
+			WorldGi->CreateSession(FString("Wanted"),4);
 		}
 	}
 	// 스팀 세션 찾기
@@ -92,6 +93,16 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			WorldGi->FindOtherSession();
 		}
 	}
+
+	// 스팀 세션 참여하기 
+	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Three))
+	{
+		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+		{
+			WorldGi->JoinOtherSession();
+		}
+	}
+
 	
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
@@ -115,18 +126,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		}
 	}
 	
-	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
-	{
-		LoadItemInventory();
-		LoadEquipInventory();
-	}
-	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Zero))
-	{
-		SaveItemInventory();
-		SaveEquipInventory();
-	}
 	
-
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
 	{
 		FHitResult Hit;
@@ -406,6 +406,8 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		{ Itemboots->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
 
+    
+	
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
 		if( WorldGi->bLoginMe == false)
@@ -413,6 +415,8 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 아직 로그인 안됨 bLoginMe머고 %d"),WorldGi->bLoginMe) return;
 		};
 	};
+
+	
 
 	if (!TestPlayer->IsLocallyControlled()) return;
 	FTimerHandle TimerHandle;
@@ -808,3 +812,14 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 // 			}
 // 		}
 // 	}
+
+// if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Nine))
+// {
+// 	LoadItemInventory();
+// 	LoadEquipInventory();
+// }
+// if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::Zero))
+// {
+// 	SaveItemInventory();
+// 	SaveEquipInventory();
+// }

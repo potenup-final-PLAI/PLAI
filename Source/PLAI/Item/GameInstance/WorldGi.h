@@ -9,6 +9,8 @@
 #include "PLAI/Item/Login/UserStruct.h"
 #include "WorldGi.generated.h"
 
+DECLARE_DELEGATE(FOnFindSession)
+
 /**
  * 
  */
@@ -38,20 +40,27 @@ UCLASS(Blueprintable,Blueprintable)
 class PLAI_API UWorldGi : public UGameInstance
 {
 	GENERATED_BODY()
-
+	
 public:
+	FOnFindSession OnFindSession;
 
 	// 세션 생성
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void CreateSession(FString displayName, int32 playerCount);
 	void OnCreateSessionComplete(FName sessionName, bool success);
 
 	// 세션 조회
 	UFUNCTION()
 	void FindOtherSession();
-	void OnFindSessionComplete(bool success);
+	void OnFindSessionComplete(bool bWasSuccessful);
+
+	// 세션 참여
+	UFUNCTION()
+	void JoinOtherSession();
+	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
 
 public:
+	// 세션 모든 처리를 진행
 	IOnlineSessionPtr SessionInterface;
 
 	// 세션 검색할 때 쓰는 객체
