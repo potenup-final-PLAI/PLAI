@@ -39,11 +39,13 @@ void UUiMonWorld::OnButtonYes()
 
 			if (MonWorld && MonWorld->MonsterType == EMonsterType::Monster)
 			{
-				UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
+				// UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
+				GetWorld()->ServerTravel(TEXT("'/Game/JS/Maps/TestMap.TestMap'?listen"));
 			}
 			else if (MonWorld && MonWorld->MonsterType == EMonsterType::Boss)
 			{
-				UGameplayStatics::OpenLevel(TestPlayer,FName("Mk_BossMap"));
+				// UGameplayStatics::OpenLevel(TestPlayer,FName("Mk_BossMap"));
+				GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/MK_BossMap.MK_BossMap'?listen"));
 			}
 			// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
 			// 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);
