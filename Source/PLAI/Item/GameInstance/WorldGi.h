@@ -65,8 +65,6 @@ public:
 
 	// 세션 검색할 때 쓰는 객체
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
-
-	
 	
 	virtual void Init() override;
 	
@@ -85,6 +83,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	bool bBattleReward = false;
 
+	UPROPERTY(EditAnywhere)
+	bool bLoginMe = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	FUserFullInfo UserFullInfoGi;
 
@@ -99,9 +100,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UDataTable* ItemDataTable;
-	
-	UPROPERTY(EditAnywhere)
-	bool bLoginMe = false;
 
 	void EquipActor(AActor* MyActor);
 
