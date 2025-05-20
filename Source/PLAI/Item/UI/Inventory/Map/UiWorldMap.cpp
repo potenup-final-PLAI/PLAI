@@ -64,11 +64,6 @@ void UUiWorldMap::SetRefreshPlayerList()
 
 void UUiWorldMap::SetPlayerIconMinimap()
 {
-	if (TestPlayers.Num() == 0 || MiniMapCanvasIcon->GetAllChildren().Num() == 0)
-	{
-		SetRefreshPlayerList();
-		UE_LOG(LogTemp,Warning,TEXT("UiWorldMap SetRefresh하고난후 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;
-	}
 	for (int i = 0; i < TestPlayers.Num(); i++)
 	{
 		if (!TestPlayers[i])
