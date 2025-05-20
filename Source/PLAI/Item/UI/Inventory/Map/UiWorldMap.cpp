@@ -8,6 +8,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Image.h"
 #include "Components/Overlay.h"
+#include "PLAI/Item/UI/Inventory/Map/UiWorldPlayerIcon.h"
 #include "Components/SizeBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -16,6 +17,30 @@ UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
 	:Super(FOI)
 {
 	bIsFocusable = true;
+}
+
+void UUiWorldMap::AddPlayerIcon()
+{
+	UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
+	MiniMapCanvas->AddChild(UIWorldPlayerIcon);
+	UIWorldPlayerIcons.Add(UIWorldPlayerIcon);
+}
+
+void UUiWorldMap::SetPlayerIconMinimap()
+{
+	for (int i = 0; i < UIWorldPlayerIcons.Num(); i++)
+	{
+		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+	
+		U = FMath::Clamp(U, 0.f, 1.f);
+		V = FMath::Clamp(V, 0.f, 1.f);
+	
+		FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
+	
+		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapOverlay->Slot))
+		{ CanvasSlot->SetPosition(PixelPos); }
+	}
 }
 
 void UUiWorldMap::ExtendMap()
@@ -101,22 +126,18 @@ void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{
-		SetPlayerMinmapVector(TestPlayer->GetActorLocation());
-		// 2-2) 플레이어 Yaw(헤딩) 가져오기
+		// SetPlayerMinmapVector(TestPlayer->GetActorLocation());
 		float Yaw = TestPlayer->GetActorRotation().Yaw;
-		// (필요하면 -Yaw 로 반대로 돌리기도 함)
-		// 2-3) 각도 적용
+		
 		PlayerRot->SetRenderTransformPivot(FVector2D(0.5f, 0.f));
 		PlayerRot->SetRenderTransformAngle(Yaw - 90);
-
+	
 		float U = (TestPlayer->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
 		float V = (TestPlayer->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
 		
 		U = FMath::Clamp(U, 0.f, 1.f);
 		V = FMath::Clamp(V, 0.f, 1.f);
 		
-		// 2-3) CenterOffset에 해당 UV값 전달
-		//    (Material에서 CenterOffset은 VectorParameter)
 		MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
 	}
 }

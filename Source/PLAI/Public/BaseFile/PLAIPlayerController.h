@@ -65,7 +65,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,Replicated)
 	TArray<ATestPlayer*>TestPlayers;
 	
 	UPROPERTY(EditAnywhere)
@@ -79,6 +79,8 @@ private:
 
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };
 
 

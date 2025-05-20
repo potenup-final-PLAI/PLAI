@@ -53,13 +53,8 @@ void UInvenComp::BeginPlay()
 
 	// 위험한 코드다
 	if (APLAIPlayerController* Controller = Cast<APLAIPlayerController>(PC))
-	{
-		Controller->TestPlayersAdd();
-		// if (!Controller->TestPlayers.Contains(TestPlayer))
-		// {
-		// 	Controller->TestPlayers.Add(TestPlayer);
-		// }
-	}
+	{ if (!Controller->TestPlayers.Contains(TestPlayer)){ Controller->TestPlayersAdd();}}
+	else {UE_LOG(LogTemp, Error, TEXT("UInvenComp::BeginPlay() PC 캐스팅 실패"));}
 	
 	if (TestPlayer->IsLocallyControlled())
 	{

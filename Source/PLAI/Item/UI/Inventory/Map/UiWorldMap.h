@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UiWorldPlayerIcon.h"
 #include "Blueprint/UserWidget.h"
 #include "UiWorldMap.generated.h"
 
@@ -37,6 +38,21 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UImage* PlayerRot;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUiWorldPlayerIcon>UiWorldPlayerIconFactory;
+
+	UPROPERTY(EditAnywhere)
+	class UUiWorldPlayerIcon* UIWorldPlayerIcon;
+	
+	UPROPERTY(EditAnywhere)
+	TArray<class UUiWorldPlayerIcon*>UIWorldPlayerIcons;
+
+	UPROPERTY(EditAnywhere)
+	TArray<class ATestPlayer*>TestPlayers;
+	
+	void AddPlayerIcon();
+	void SetPlayerIconMinimap();
 
 	UPROPERTY(EditAnywhere)
 	FVector2D WorldMinFevtor = FVector2D(-22700.0, -21260.0);
