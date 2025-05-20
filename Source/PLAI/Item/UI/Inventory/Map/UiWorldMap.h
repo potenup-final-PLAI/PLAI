@@ -29,18 +29,9 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* MiniMapCanvasIcon;
-
-	UPROPERTY(meta = (BindWidget))
-	class UOverlay* MiniMapOverlay;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* MiniMap;
-
-	UPROPERTY(meta = (BindWidget))
-	class UImage* PlayerIcon;
-
-	UPROPERTY(meta = (BindWidget))
-	class UImage* PlayerRot;
 
 	UPROPERTY(EditAnywhere)
 	class UMenuInven* MenuInven;
@@ -83,7 +74,14 @@ public:
 	virtual void NativeConstruct() override;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
 	
 	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 };
+
+
+// UPROPERTY(meta = (BindWidget))
+// class UImage* PlayerIcon;
+// UPROPERTY(meta = (BindWidget))
+// class UImage* PlayerRot;
+// UPROPERTY(meta = (BindWidget))
+// class UOverlay* MiniMapOverlay;

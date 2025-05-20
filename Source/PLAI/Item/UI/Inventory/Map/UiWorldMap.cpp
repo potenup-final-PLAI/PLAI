@@ -27,25 +27,6 @@ void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
 	{ if (PC->WasInputKeyJustPressed(EKeys::M)) { ExtendMap(); } }
 	SetPlayerIconMinimap();
-
-	// if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
-	// {
-	// 	if (!TestPlayer){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
-	// 	float Yaw = TestPlayer->GetActorRotation().Yaw;
-	// 	
-	// 	PlayerRot->SetRenderTransformPivot(FVector2D(0.5f, 0.f));
-	// 	PlayerRot->SetRenderTransformAngle(Yaw - 90);
-	//
-	// 	float U = (TestPlayer->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-	// 	float V = (TestPlayer->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-	// 	
-	// 	U = FMath::Clamp(U, 0.f, 1.f);
-	// 	V = FMath::Clamp(V, 0.f, 1.f);
-	// 	
-	// 	MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
-	// }
-
-	// SetPlayerMinmapVector(TestPlayer->GetActorLocation());
 }
 
 void UUiWorldMap::NativeConstruct()
@@ -87,8 +68,7 @@ void UUiWorldMap::SetPlayerIconMinimap()
 		"UiWorldMap 플레이어 미니맵아이콘 없음")) return;}
 	for (int i = 0; i < TestPlayers.Num(); i++)
 	{
-		// 아이콘 위치 갱신
-		if (!TestPlayers[i]){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
+		// if (!TestPlayers[i]){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
 		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
 		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
 
@@ -132,22 +112,6 @@ void UUiWorldMap::ExtendMap()
 	}
 }
 
-void UUiWorldMap::SetPlayerMinmapVector(FVector PlayerLocation)
-{
-	float U = (PlayerLocation.X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-	float V = (PlayerLocation.Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-
-	U = FMath::Clamp(U, 0.f, 1.f);
-	V = FMath::Clamp(V, 0.f, 1.f);
-
-	FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
-	
-	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapOverlay->Slot))
-	{ CanvasSlot->SetPosition(PixelPos); }
-	else
-	{ UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
-}
-
 FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	if (InGeometry.IsUnderLocation(InMouseEvent.GetScreenSpacePosition()))
@@ -165,11 +129,45 @@ FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPoint
 }
 
 
-
-
 // if (MiniMapSizeBox)
 // {
 // 	FGeometry ChildGeo = MiniMap->GetCachedGeometry();
 // 	FVector2D ChildSize = ChildGeo.GetLocalSize();
 // 	UE_LOG(LogTemp, Log, TEXT("MiniMapSizeBox 크기: %s"), *ChildSize.ToString());
 // }
+
+
+// void UUiWorldMap::SetPlayerMinmapVector(FVector PlayerLocation)
+// {
+// 	float U = (PlayerLocation.X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+// 	float V = (PlayerLocation.Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+//
+// 	U = FMath::Clamp(U, 0.f, 1.f);
+// 	V = FMath::Clamp(V, 0.f, 1.f);
+//
+// 	FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
+// 	
+// 	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapOverlay->Slot))
+// 	{ CanvasSlot->SetPosition(PixelPos); }
+// 	else
+// 	{ UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
+// }
+
+// if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+// {
+// 	if (!TestPlayer){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
+// 	float Yaw = TestPlayer->GetActorRotation().Yaw;
+// 	
+// 	PlayerRot->SetRenderTransformPivot(FVector2D(0.5f, 0.f));
+// 	PlayerRot->SetRenderTransformAngle(Yaw - 90);
+//
+// 	float U = (TestPlayer->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+// 	float V = (TestPlayer->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+// 	
+// 	U = FMath::Clamp(U, 0.f, 1.f);
+// 	V = FMath::Clamp(V, 0.f, 1.f);
+// 	
+// 	MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+// }
+
+// SetPlayerMinmapVector(TestPlayer->GetActorLocation());
