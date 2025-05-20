@@ -25,32 +25,27 @@ void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
 	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
-	{
-		if (PC->WasInputKeyJustPressed(EKeys::M))
-		{
-			ExtendMap();
-		}
-	}
-	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
-	{
-		SetPlayerIconMinimap();
-		
-		// SetPlayerMinmapVector(TestPlayer->GetActorLocation());
-		
-		if (!TestPlayer){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
-		float Yaw = TestPlayer->GetActorRotation().Yaw;
-		
-		PlayerRot->SetRenderTransformPivot(FVector2D(0.5f, 0.f));
-		PlayerRot->SetRenderTransformAngle(Yaw - 90);
-	
-		float U = (TestPlayer->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-		float V = (TestPlayer->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-		
-		U = FMath::Clamp(U, 0.f, 1.f);
-		V = FMath::Clamp(V, 0.f, 1.f);
-		
-		MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
-	}
+	{ if (PC->WasInputKeyJustPressed(EKeys::M)) { ExtendMap(); } }
+	SetPlayerIconMinimap();
+
+	// if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	// {
+	// 	if (!TestPlayer){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
+	// 	float Yaw = TestPlayer->GetActorRotation().Yaw;
+	// 	
+	// 	PlayerRot->SetRenderTransformPivot(FVector2D(0.5f, 0.f));
+	// 	PlayerRot->SetRenderTransformAngle(Yaw - 90);
+	//
+	// 	float U = (TestPlayer->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+	// 	float V = (TestPlayer->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+	// 	
+	// 	U = FMath::Clamp(U, 0.f, 1.f);
+	// 	V = FMath::Clamp(V, 0.f, 1.f);
+	// 	
+	// 	MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+	// }
+
+	// SetPlayerMinmapVector(TestPlayer->GetActorLocation());
 }
 
 void UUiWorldMap::NativeConstruct()
@@ -76,7 +71,9 @@ void UUiWorldMap::SetRefreshPlayerList()
 				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
 				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
 				if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon->Slot))
-				{ Icon->SetSize(FVector2d(30,30));}
+				{
+					Icon->SetSize(FVector2d(60,60));
+				}
 				TestPlayers.Add(TP);
 				UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetRefreshPlayerList() 플레이어 갯수[%i]"),TestPlayers.Num());
 			}
@@ -103,7 +100,7 @@ void UUiWorldMap::SetPlayerIconMinimap()
 	
 		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
 		{
-			// MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
+			MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
 			CanvasSlot->SetPosition(PixelPos);
 		}
 		else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
