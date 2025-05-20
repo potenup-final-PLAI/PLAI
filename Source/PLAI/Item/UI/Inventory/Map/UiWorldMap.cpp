@@ -68,7 +68,7 @@ void UUiWorldMap::SetPlayerIconMinimap()
 		"UiWorldMap 플레이어 미니맵아이콘 없음")) return;}
 	for (int i = 0; i < TestPlayers.Num(); i++)
 	{
-		// if (!TestPlayers[i]){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
+		if (!TestPlayers[i]){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
 		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
 		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
 

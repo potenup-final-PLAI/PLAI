@@ -119,8 +119,15 @@ public:
 	
 	UFUNCTION(Server,Reliable) // NetMulticast는 안써도됨 = 아이템이 자동으로 동기화중
  	void Server_EquipItem(const FItemStructTable& ItemStructTable, EquipSlotType SlotType);
-
+	
 	void EquipItem(const FItemStructTable& ItemStructTable, EquipSlotType SlotType);
+
+	UFUNCTION(Server,Reliable)
+	void Server_SpawnCreature();
+
+	UFUNCTION(Client,Reliable)
+	void Client_GetCreature();
+	
 
 	UFUNCTION()
 	void NpcItem(const FItemStructTables ItemStructTables);
