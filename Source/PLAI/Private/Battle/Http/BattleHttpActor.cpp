@@ -37,9 +37,7 @@ void ABattleHttpActor::Tick(float DeltaTime)
 	// }
 }
 
-void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,
-                                FBattleTurnState battleTurnState,
-                                ABaseBattlePawn* unit)
+void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnState battleTurnState,ABaseBattlePawn* unit)
 {
 	if (IsEmptyEnvironmentState(environmentState) && IsEmptyBattleTurnState(
 		battleTurnState))

@@ -83,47 +83,8 @@ void AGridTileManager::InitGridTile()
 	// 좌표 섞기
 	Algo::RandomShuffle(allCoords);
 
-	// // 2개의 플레이어 유닛 스폰
-	// TArray<FIntPoint> playerCoords = RandomCoords(2, allCoords);
-	//
-	// // Player 현재 좌표 저장
-	// for (const FIntPoint& coord : playerCoords)
-	// {
-	// 	AGridTile* gridTile = map.FindRef(coord);
-	// 	if (!gridTile)
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("InitGridTile : !gridTile"));
-	// 		continue;
-	// 	}
-	//
-	// 	// Player 스폰
-	// 	FVector spawnLoc = gridTile->GetActorLocation() + FVector(
-	// 		0.f, 0.f, 80.f);
-	// 	ABattlePlayer* player = GetWorld()->SpawnActor<ABattlePlayer>(
-	// 		battlePlayerFactory, spawnLoc, FRotator::ZeroRotator);
-	// 	if (!player)
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("InitGridTile : !player"));
-	// 		continue;
-	// 	}
-	// 	for (APlayerState* ps : GetWorld()->GetGameState()->PlayerArray)
-	// 	{
-	// 		auto* battlePlayerState = Cast<ABattlePlayerState>(ps);
-	// 		if (battlePlayerState) battlePlayerState->battlePawn = player;
-	// 		
-	// 	}
-	// 	// currentTile Goal타일로 설정
-	// 	player->currentTile = gridTile;
-	// 	
-	// 	// unitArray에 player 추가
-	// 	unitArray.Add(player);
-	// 	// 해당 좌표 제거
-	// 	allCoords.Remove(coord);
-	// }
-
 	// PlayerController 수만큼 좌표 확보
-	TArray<APlayerState*> playerStates = GetWorld()->GetGameState()->
-		PlayerArray;
+	TArray<APlayerState*> playerStates = GetWorld()->GetGameState()->PlayerArray;
 	UE_LOG(LogTemp, Warning, TEXT("playerStates : %d"), playerStates.Num());
 
 	TArray<FIntPoint> playerCoords =
@@ -159,13 +120,6 @@ void AGridTileManager::InitGridTile()
 			player->SetOwner(battlePC);
 			player->ForceNetUpdate(); // 복제 보장
 			playerControllers.Add(battlePC);
-		}
-
-		// PlayerState에도 battlePawn 연결
-		if (auto* battlePS = Cast<ABattlePlayerState>(ps))
-		{
-			battlePS->battlePawn = player;
-			player->owningPlayerState = battlePS;
 		}
 
 		unitArray.Add(player);

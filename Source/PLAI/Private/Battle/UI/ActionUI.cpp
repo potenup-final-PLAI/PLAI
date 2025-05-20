@@ -80,10 +80,8 @@ void UActionUI::OnClickedMove()
 	turnManager->curUnit->currentActionMode = EActionMode::Move;
 	turnManager->curUnit->bIsMoveMode = true;
 	// 범위 보이게 설정
-	turnManager->curUnit->SeeMoveRange(
-		turnManager->curUnit->battlePlayerState->playerStatus.move_Range);
-	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"),
-	       turnManager->curUnit->battlePlayerState->playerStatus.move_Range)
+	turnManager->curUnit->SeeMoveRange(turnManager->curUnit->moveRange);
+	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"), turnManager->curUnit->moveRange);
 }
 
 void UActionUI::OnClickedBaseAttack()

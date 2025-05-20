@@ -34,8 +34,7 @@ void ABattlePlayerController::ServerRPC_NotifyReady_Implementation()
 		GetWorld()->GetGameState()))
 	{
 		phaseManager->PlayerReady(this);
-		UE_LOG(LogTemp, Warning, TEXT("Player ready %s"),
-		       *this->GetActorNameOrLabel());
+		UE_LOG(LogTemp, Warning, TEXT("Player ready %s"), *this->GetActorNameOrLabel());
 	}
 }
 

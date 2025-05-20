@@ -4,7 +4,6 @@
 #include "Battle/TurnSystem/TurnManager.h"
 
 #include "BaseBattlePawn.h"
-#include "GridTileManager.h"
 #include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Battle/UI/BattleHUD.h"
@@ -102,8 +101,7 @@ void ATurnManager::StartPlayerTurn()
 			return;
 		}
 
-		APlayerController* pc = Cast<APlayerController>(
-			playerPawn->owningPlayerState->GetOwner());
+		APlayerController* pc = Cast<APlayerController>(playerPawn->owningPlayerState->GetOwner());
 		if (!pc)
 		{
 			UE_LOG(LogTemp, Error,TEXT("owningPlayerState->GetOwner() is nullptr"));

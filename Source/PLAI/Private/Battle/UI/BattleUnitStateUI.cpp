@@ -41,12 +41,9 @@ void UBattleUnitStateUI::SetHPUI(ABaseBattlePawn* unit)
 	UE_LOG(LogTemp, Warning, TEXT("NetMode: %s"), *GetNetModeString(GetWorld()));
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
-		if (player->battlePlayerState)
-		{
-			maxHP = player->battlePlayerState->playerStatus.hp;
-			txt_HP->SetText(FText::AsNumber(maxHP));
-			UE_LOG(LogTemp, Warning, TEXT("SetHPUI Player maxHP = %d"), maxHP);
-		}
+		maxHP = player->hp;
+		txt_HP->SetText(FText::AsNumber(maxHP));
+		UE_LOG(LogTemp, Warning, TEXT("SetHPUI Player maxHP = %d"), maxHP);
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 	{

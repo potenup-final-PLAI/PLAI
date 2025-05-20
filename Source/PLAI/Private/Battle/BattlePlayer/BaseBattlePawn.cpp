@@ -28,7 +28,6 @@
 #include "PLAI/Item/GameInstance/WorldGi.h"
 #include "Player/BattlePlayer.h"
 #include "Player/BattlePlayerAnimInstance.h"
-#include "Player/BattlePlayerState.h"
 
 // Sets default values
 ABaseBattlePawn::ABaseBattlePawn()
@@ -588,51 +587,39 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
 		// 피를 깎는다.
-		player->battlePlayerState->playerStatus.hp = FMath::Max(
-			0, player->battlePlayerState->playerStatus.hp - damage);
-		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage,
-		       player->battlePlayerState->playerStatus.hp);
+		player->hp = FMath::Max(0, player->hp - damage);
+		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage, player->hp);
 
 		// HP를 UI에 업데이트
 		if (!(battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->
 			WBP_Player && phaseManager && player->playerAnim))
 		{
-			UE_LOG(LogTemp, Warning,
-			       TEXT(
-				       "GetDamage(Player) : !(battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->WBP_Player)"
-			       ));
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Player) : !(battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->WBP_Player)"));
 			return;
 		}
 
 		// BattlePlayerInfo HP 업데이트
-		player->battleUnitStateUI->UpdateHP(
-			player->battlePlayerState->playerStatus.hp);
-		player->hud->mainUI->WBP_Player->PlayerUpdateHP(
-			player, player->battlePlayerState->playerStatus.hp);
+		player->battleUnitStateUI->UpdateHP(player->hp);
+		player->hud->mainUI->WBP_Player->PlayerUpdateHP(player, player->hp);
 
-		player->playerAnim->
-		        PlayHitMotionAnimation(TEXT("StartPlayerHitMotion"));
+		player->playerAnim->PlayHitMotionAnimation(TEXT("StartPlayerHitMotion"));
 		UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
 
 		// Actor 위치 옮기고 UI Actor 보이게
-		FVector loc = FVector(player->GetActorLocation().X,
-		                      player->GetActorLocation().Y,
-		                      player->GetActorLocation().Z + 250);
+		FVector loc = FVector(player->GetActorLocation().X,player->GetActorLocation().Y,player->GetActorLocation().Z + 250);
 		phaseManager->damageUIActor->SetActorLocation(loc);
 		phaseManager->damageUIActor->ShowDamageUI();
 		// 대미지 텍스트 변경
 		phaseManager->damageUIActor->damageUI->SetDamageText(damage);
 
 		// hp가 0보다 작으면 사망
-		if (player->battlePlayerState->playerStatus.hp <= 0)
+		if (player->hp <= 0)
 		{
 			// player에 세팅
-			player->battlePlayerState->playerLifeState = ELifeState::Dead;
+			player->playerLifeState = ELifeState::Dead;
 			// playerAnim에 세팅
 			player->playerAnim->lifeState = ELifeState::Dead;
-			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),
-			       *UEnum::GetValueAsString(player->battlePlayerState->
-				       playerLifeState));
+			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(player->playerLifeState));
 		}
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
@@ -708,11 +695,10 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Player Attack Enemy"));
-	int32 atk = player->battlePlayerState->playerStatus.attack;
+	int32 atk = player->attack;
 	int32 weapon = 0;
-	float critical = player->battlePlayerState->playerStatus.critical_Rate;
-	float criticalDamage = player->battlePlayerState->playerStatus.
-	                               critical_Damage;
+	float critical = player->critical_Rate;
+	float criticalDamage = player->critical_Damage;
 	int32 personality = 0;
 	int32 status_effect = 0;
 	int32 damage = 0;
@@ -1019,10 +1005,7 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 	if (!(battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->
 		WBP_Player))
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT(
-			       "HandleStatus : !battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->WBP_Player"
-		       ));
+		UE_LOG(LogTemp, Warning,TEXT("HandleStatus : !battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->WBP_Player"));
 		return;
 	}
 	switch (effect)
@@ -1030,9 +1013,8 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 	case EStatusEffect::Poison:
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			player->battlePlayerState->playerStatus.hp -= 5;
-			battleUnitStateUI->UpdateHP(
-				player->battlePlayerState->playerStatus.hp);
+			player->hp -= 5;
+			battleUnitStateUI->UpdateHP(player->hp);
 			// BattlePlayerInfo UI 세팅
 			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
 		}
@@ -1045,7 +1027,7 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 	case EStatusEffect::Vulnerable:
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			VulnerableProcess(player->battlePlayerState);
+			VulnerableProcess();
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
@@ -1055,7 +1037,7 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 	case EStatusEffect::Weakening:
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			WeakeningProcess(player->battlePlayerState);
+			WeakeningProcess();
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
@@ -1065,7 +1047,7 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 	case EStatusEffect::Angry:
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			AngryProcess(player->battlePlayerState);
+			AngryProcess();
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
@@ -1075,14 +1057,13 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 	case EStatusEffect::Bleeding:
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			player->battlePlayerState->playerStatus.hp -= 5;
-			battleUnitStateUI->UpdateHP(
-				player->battlePlayerState->playerStatus.hp);
+			player->hp -= 5;
+			battleUnitStateUI->UpdateHP(player->hp);
 
 			// BattlePlayerInfo UI 세팅
 			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
 			// 출혈로 인한 스텟 상태 변경 로직 
-			BleedingProcess(player->battlePlayerState);
+			BleedingProcess();
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
@@ -1096,12 +1077,12 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 	}
 }
 
-void ABaseBattlePawn::WeakeningProcess(ABattlePlayerState* playerState)
+void ABaseBattlePawn::WeakeningProcess()
 {
 	// 약화 상태이상 처리 프로세스
 	// 공격력과 방어력 스탯 감소
-	int32& atk = playerState->playerStatus.attack;
-	int32& def = playerState->playerStatus.defense;
+	int32& atk = attack;
+	int32& def = defense;
 	// 반올림 처리
 	int32 decreaseAtkAmount = FMath::RoundToInt(atk * 0.2f);
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.2f);
@@ -1112,28 +1093,28 @@ void ABaseBattlePawn::WeakeningProcess(ABattlePlayerState* playerState)
 	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), def);
 }
 
-void ABaseBattlePawn::VulnerableProcess(ABattlePlayerState* playerState)
+void ABaseBattlePawn::VulnerableProcess()
 {
 	// 방어력 감소 처리
-	int32& def = playerState->playerStatus.defense;
+	int32& def = defense;
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.5f);
 	def = FMath::Max(0, def - decreaseDefAmount);
 	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
 }
 
-void ABaseBattlePawn::AngryProcess(ABattlePlayerState* playerState)
+void ABaseBattlePawn::AngryProcess()
 {
 	// 공격력 증가 처리
-	int32& atk = playerState->playerStatus.attack;
+	int32& atk = attack;
 	int32 decreaseAtkAmount = FMath::RoundToInt(atk * 0.5f);
 	atk = FMath::Max(0, atk - decreaseAtkAmount);
 	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
 }
 
-void ABaseBattlePawn::BleedingProcess(ABattlePlayerState* playerState)
+void ABaseBattlePawn::BleedingProcess()
 {
 	// 방어력 감소 처리
-	int32& def = playerState->playerStatus.defense;
+	int32& def = defense;
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.2f);
 	def = FMath::Max(0, def - decreaseDefAmount);
 	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
@@ -1774,8 +1755,7 @@ void ABaseBattlePawn::InitEnemyState()
 {
 	if (!(battleUnitStateUI && phaseManager))
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("InitEnemyState : !(battleUnitStateUI && phaseManager"));
+		UE_LOG(LogTemp, Warning, TEXT("InitEnemyState : !(battleUnitStateUI && phaseManager"));
 		return;
 	}
 

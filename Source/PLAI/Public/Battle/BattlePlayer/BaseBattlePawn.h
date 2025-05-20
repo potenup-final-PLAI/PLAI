@@ -40,7 +40,7 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
 	float critical_Damage = 0.0f;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
-	int32 move_Range = 0;
+	int32 moveRange = 0;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
 	int32 speed = 0;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
@@ -51,7 +51,7 @@ public:
 	TArray<FString> skills = {};
 
 	// Player가 죽었는지 살았는지 상태 체크
-	ELifeState lifeState;
+	ELifeState playerLifeState;
 	//-------------------기본 콜리전 세팅----------------------
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* boxComp;
@@ -173,10 +173,10 @@ public:
 
 	// 약화 상태이상 처리 함수
 	// player 상태 처리
-	void WeakeningProcess(ABattlePlayerState* playerState);
-	void VulnerableProcess(ABattlePlayerState* playerState);
-	void AngryProcess(ABattlePlayerState* playerState);
-	void BleedingProcess(ABattlePlayerState* playerState);
+	void WeakeningProcess();
+	void VulnerableProcess();
+	void AngryProcess();
+	void BleedingProcess();
 	// enemy 상태 처리
 	void WeakeningEnemyProcess(UEnemyBattleState* enemyState);
 	void VulnerableEnemyProcess(UEnemyBattleState* enemyState);
@@ -190,10 +190,6 @@ public:
 	class AGridTile* targetTile;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
 	TSubclassOf<class AGridTileManager> TileManagerFactory;
-
-	// PlayerState 부분
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Test)
-	class ABattlePlayerState* battlePlayerState;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
 	TArray<FString> playerSkills = {
@@ -322,11 +318,7 @@ public:
 	// 이동 속도
 	UPROPERTY(EditAnywhere)
 	float moveSpeed = 300.0f;
-
-	// 이동력 테스트 코드
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 moveRange = 0;
-
+	
 	// 골 위치를 클릭 했을 때 그쪽으로 이동
 	void OnMoveEnd();
 	void InitValues();
