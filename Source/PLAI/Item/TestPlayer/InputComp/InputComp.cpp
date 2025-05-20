@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "JsonObjectConverter.h"
 #include "AI/NavigationSystemBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/TextBlock.h"
@@ -13,6 +14,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/Npc/NpcCharacter.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Character/UIChaStat.h"
@@ -110,6 +112,10 @@ void UInputComp::SetMappingContext()
 void UInputComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	// if (TestPlayer->IsLocallyControlled() && Pc->WasInputKeyJustPressed(EKeys::T))
+	// { FString JsonString;
+	// 	FJsonObjectConverter::UStructToJsonObjectString(TestPlayer->LoginComp->UserFullInfo,JsonString);
+	// 	UE_LOG(LogTemp,Warning,TEXT("InputComp TKey JsonString [%s]"),*JsonString) }
 }
 
 void UInputComp::On_Equip()
@@ -199,9 +205,9 @@ void UInputComp::On_LeftMouseTriggered()
 		FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
 
 	if (Dot > 0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-1.5,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-1,0)); }
 	else if (Dot < -0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+1.5,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+1,0)); }
 	
 	else if (FMath::Abs(Dot) > 0.6)
 	{

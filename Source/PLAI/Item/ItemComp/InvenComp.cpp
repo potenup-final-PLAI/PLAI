@@ -80,21 +80,9 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		Server_SpawnOneItem();
 	}
 	
-	// 소환수 크리처 소환하기 임시
 	if (TestPlayer->IsLocallyControlled() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Five))
 	{
 		Server_SpawnCreature();
-		// TArray<FName> RawNames = ItemDataTable->GetRowNames();
-		// if (RawNames.IsValidIndex(33))
-		// {
-		// 	UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
-		// 	FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
-  //           TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable);
-		// }
-		// else
-		// {
-		// 	UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?"))
-		// }
 	}
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
@@ -253,8 +241,6 @@ void UInvenComp::Server_UnEquip_Implementation(EquipSlotType SlotType)
 		ItemWeapon = nullptr;
 	}
 }
-
-
 
 void UInvenComp::Server_GetItem_Implementation(const FItemStructTable& ItemStructTable)
 {

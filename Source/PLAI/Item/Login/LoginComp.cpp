@@ -248,16 +248,12 @@ void ULoginComp::HttpMePost()
 			// UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
 
 			if (UiMain)
-			{
-				UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
-				TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&UserFullInfo);
-				FUserFullInfo InitUserFullInfo;
-			}
+			{ UiMain->Wbp_UIChaMain->SetUiChaStat(&UserFullInfo);
+				FUserFullInfo InitUserFullInfo; }
 			else
-			{
-				UE_LOG(LogTemp,Warning,TEXT("LoginComp 턴제후 넘어오면 UiMain이 없어요"));
-			}
+			{ UE_LOG(LogTemp,Warning,TEXT("LoginComp 턴제후 넘어오면 UiMain이 없어요")); }
 			
+			TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&UserFullInfo);
 			LoadEquipItem();
 			LoadInvenItem();
 			
