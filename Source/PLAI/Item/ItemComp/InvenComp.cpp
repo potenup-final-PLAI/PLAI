@@ -4,6 +4,7 @@
 #include "InvenComp.h"
 #include "JsonObjectConverter.h"
 #include "StoreComp.h"
+#include "BaseFile/PLAIPlayerController.h"
 #include "Components/BoxComponent.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -49,10 +50,15 @@ void UInvenComp::BeginPlay()
 	Super::BeginPlay();
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
+
+	// 위험한 코드다
+	if (APLAIPlayerController* Controller = Cast<APLAIPlayerController>(PC))
+	{ if (!Controller->TestPlayers.Contains(TestPlayer)){ Controller->TestPlayersAdd();}}
+	else {UE_LOG(LogTemp, Error, TEXT("UInvenComp::BeginPlay() PC 캐스팅 실패"));}
+	
 	if (TestPlayer->IsLocallyControlled())
 	{
 		MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
-		
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
 			if (WorldGi->bBattleReward == true || WorldGi->bGameStart == true)
@@ -65,7 +71,6 @@ void UInvenComp::BeginPlay()
 				MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
-				// WorldGi->bBattleReward = false;
 			}
 		}
 	}

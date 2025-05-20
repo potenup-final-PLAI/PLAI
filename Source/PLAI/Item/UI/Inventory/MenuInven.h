@@ -48,5 +48,8 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UUiChaLevelUp* Wbp_UiChaLevelUp;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UUiWorldMap* Wbp_UiWolrdMap;
+
 	virtual void NativeConstruct() override;
 };

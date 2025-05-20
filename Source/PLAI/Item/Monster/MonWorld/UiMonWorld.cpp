@@ -37,15 +37,11 @@ void UUiMonWorld::OnButtonYes()
 			WorldGi->UserFullInfoGi = TestPlayer->LoginComp->UserFullInfo;
 			WorldGi->bGameStart = true;
 			WorldGi->bBattleReward = true;
-
+			
 			if (MonWorld && MonWorld->MonsterType == EMonsterType::Monster)
 			{
 				// UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
-				// GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
-
 				GetWorld()->ServerTravel(TEXT("/Game/JS/Maps/TestMap?listen"));
-				
-
 			}
 			else if (MonWorld && MonWorld->MonsterType == EMonsterType::Boss)
 			{
@@ -55,7 +51,7 @@ void UUiMonWorld::OnButtonYes()
 			// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
 			// 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);
 			
-			if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp,Warning,TEXT("UiMonWorld OnButtonYes 아이템 쉴드 넣기전 LocalPlayer 아님")) return;}
+			if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp,Warning,TEXT("UiMonWorld OnButtonYes 아이템 쉴드 넣기전 IsLocalPlayer 아님")) return;}
 
 			FUserShield UserShield;
 			UserShield.UserName = TestPlayer->LoginComp->UserFullInfo.character_info.character_name;
