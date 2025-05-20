@@ -81,6 +81,7 @@ void UInputComp::BindInputActions()
 		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Completed, this, &UInputComp::On_LeftMouseComplete);
 		InputComp->BindAction(IE_MouseWheel, ETriggerEvent::Triggered, this, &UInputComp::On_MouseWheelTriggered);
 		InputComp->BindAction(IE_RotateView, ETriggerEvent::Started, this, &UInputComp::On_RoatateView);
+		InputComp->BindAction(IE_Map, ETriggerEvent::Started, this, &UInputComp::On_Map);
 	}
 		
 }
@@ -141,9 +142,15 @@ void UInputComp::On_Stat()
 	{ TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);}
 }
 
+void UInputComp::On_Map()
+{
+	UE_LOG(LogTemp,Warning,TEXT("InputComp 키누르고 OnMap 딜리게이트 실행되냐?"))
+	OnInputMap.ExecuteIfBound();
+}
+
 void UInputComp::On_LeftMouseStart()
 {
-	// if (!Pc->IsLocalController()) return;
+	if (!Pc->IsLocalController()) return;
 
 	UE_LOG(LogTemp,Warning,TEXT("InputComp 왼쪽마우스 클릭 [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
 
@@ -263,11 +270,6 @@ void UInputComp::InitializeComponent()
 	{
 		Pawn->ReceivePossessed(Pc);
 	}
-}
-
-void UInputComp::OnPawnPossesed(AController* Controller)
-{
-	
 }
 
 // if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp, Error, TEXT(

@@ -12,6 +12,7 @@
 #include "GameFramework/PlayerState.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
 
 UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
 	:Super(FOI)
@@ -23,9 +24,7 @@ UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
 void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-
-	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
-	{ if (PC->WasInputKeyJustPressed(EKeys::M)) { ExtendMap(); } }
+	
 	SetPlayerIconMinimap();
 }
 
@@ -36,6 +35,10 @@ void UUiWorldMap::NativeConstruct()
 	MaterialMapDynamic = UMaterialInstanceDynamic::Create(MaterialMapInterface,this);
 	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
     SetRefreshPlayerList();
+	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	{
+		TestPlayer->TestInputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap);
+	}
 }
 
 void UUiWorldMap::SetRefreshPlayerList()
