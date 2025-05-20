@@ -97,6 +97,8 @@ void UUiWorldMap::SetPlayerIconMinimap()
 
 void UUiWorldMap::ExtendMap()
  {
+	SetRefreshPlayerList();
+	
 	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MenuInven->Wbp_UiWorldMap->Slot))
 	{
 		UE_LOG(LogTemp,Warning,TEXT("UUiWorldMap::NativeConstruct 미니맵사이즈 [%s]"),*CanvasSlot->GetSize().ToString());

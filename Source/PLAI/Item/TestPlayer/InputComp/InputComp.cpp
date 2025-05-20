@@ -85,7 +85,6 @@ void UInputComp::BindInputActions()
 		InputComp->BindAction(IE_RotateView, ETriggerEvent::Started, this, &UInputComp::On_RoatateView);
 		InputComp->BindAction(IE_Map, ETriggerEvent::Started, this, &UInputComp::On_Map);
 	}
-		
 }
 
 void UInputComp::SetMappingContext()
