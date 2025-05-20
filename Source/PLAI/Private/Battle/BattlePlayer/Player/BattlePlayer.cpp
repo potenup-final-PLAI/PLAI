@@ -46,10 +46,12 @@ void ABattlePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(
-		EKeys::SpaceBar))
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::SpaceBar))
 	{
-		UGameplayStatics::OpenLevel(GetWorld(), TEXT("Mk_WorldPartition"));
+		if (HasAuthority())
+		{
+			GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
+		}
 	}
 }
 

@@ -411,8 +411,7 @@ void AUPhaseManager::BattleEnd()
 	UE_LOG(LogTemp, Warning, TEXT("End Battle"));
 	if (HasAuthority())
 	{
-		GetWorld()->
-			ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
+		GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
 	}
 }
 
