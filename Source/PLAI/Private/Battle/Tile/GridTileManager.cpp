@@ -120,31 +120,45 @@ void AGridTileManager::InitGridTile()
 	// 	// 해당 좌표 제거
 	// 	allCoords.Remove(coord);
 	// }
-	
+
 	// PlayerController 수만큼 좌표 확보
-	TArray<APlayerState*> playerStates = GetWorld()->GetGameState()->PlayerArray;
-	TArray<FIntPoint> playerCoords = RandomCoords(playerStates.Num(), allCoords);
+	TArray<APlayerState*> playerStates = GetWorld()->GetGameState()->
+		PlayerArray;
+	UE_LOG(LogTemp, Warning, TEXT("playerStates : %d"), playerStates.Num());
+
+	TArray<FIntPoint> playerCoords =
+		RandomCoords(playerStates.Num(), allCoords);
 
 	for (int32 i = 0; i < playerStates.Num(); ++i)
 	{
 		const FIntPoint& coord = playerCoords[i];
 		AGridTile* gridTile = map.FindRef(coord);
-		if (!gridTile) continue;
+		if (!gridTile)
+		{
+			continue;
+		}
 
 		// 유닛 스폰
-		FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
-		ABattlePlayer* player = GetWorld()->SpawnActor<ABattlePlayer>(battlePlayerFactory, spawnLoc, FRotator::ZeroRotator);
-		if (!player) continue;
+		FVector spawnLoc = gridTile->GetActorLocation() + FVector(
+			0.f, 0.f, 80.f);
+		ABattlePlayer* player = GetWorld()->SpawnActor<ABattlePlayer>(
+			battlePlayerFactory, spawnLoc, FRotator::ZeroRotator);
+		if (!player)
+		{
+			continue;
+		}
 
 		player->currentTile = gridTile;
 
 		// 매칭된 PlayerController를 찾아 SetOwner
 		APlayerState* ps = playerStates[i];
-		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetOwner());
+		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(
+			ps->GetOwner());
 		if (battlePC)
 		{
 			player->SetOwner(battlePC);
 			player->ForceNetUpdate(); // 복제 보장
+			playerControllers.Add(battlePC);
 		}
 
 		// PlayerState에도 battlePawn 연결

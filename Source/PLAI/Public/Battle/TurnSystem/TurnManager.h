@@ -76,15 +76,16 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
 	class AUPhaseManager* phaseManager;
 
-	UPROPERTY(ReplicatedUsing = OnRep_UpdateWhoTurn, VisibleDefaultsOnly, BlueprintReadOnly,
+	UPROPERTY(ReplicatedUsing = OnRep_UpdateWhoTurn, VisibleDefaultsOnly,
+		BlueprintReadOnly,
 		Category = "Turn")
 	ABaseBattlePawn* curUnit;
 	//------------누구 턴인지 나타내는 UI --------
-	
+
 	void UpdateWhoTurn();
 	UFUNCTION()
 	void OnRep_UpdateWhoTurn();
-	
+
 	// 유닛들의 턴 순서를 저장하는 배열
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
 	TArray<ABaseBattlePawn*> enemyQueue;
@@ -96,7 +97,12 @@ public:
 	// 플레이어 첫 유닛 실행
 	void StartPlayerTurn();
 
+
 	//--------------Enemy Turn---------------------
 	// 적 첫 유닛 실행
 	void StartEnemyTurn();
+
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_CameraChange(class APawn* target);
 };

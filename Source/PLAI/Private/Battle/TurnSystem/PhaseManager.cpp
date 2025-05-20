@@ -86,7 +86,7 @@ void AUPhaseManager::OnRep_CurrentPhase()
 	       *UEnum::GetValueAsString(currentPhase));
 }
 
-void AUPhaseManager::ServerRPC_SetPhase_Implementation(EBattlePhase phase)
+void AUPhaseManager::SetPhase(EBattlePhase phase)
 {
 	currentPhase = phase;
 
@@ -117,7 +117,7 @@ void AUPhaseManager::ServerRPC_SetPhase_Implementation(EBattlePhase phase)
 		UE_LOG(LogTemp, Warning,
 		       TEXT("PhaseManager : RoundEnd State Turn CNT : %d"),
 		       turnManager->turnCount);
-		ServerRPC_SetPhase(EBattlePhase::RoundStart);
+		SetPhase(EBattlePhase::RoundStart);
 		break;
 	case EBattlePhase::BattleEnd:
 		// 끝났을 때 결과에 대한 UI 보여주면 될듯함.
@@ -132,7 +132,7 @@ void AUPhaseManager::InitBattle()
 {
 	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : InitBattle"));
 	// 사이클 시작
-	ServerRPC_SetPhase(EBattlePhase::RoundStart);
+	SetPhase(EBattlePhase::RoundStart);
 }
 
 void AUPhaseManager::SetUnitQueue()
@@ -140,7 +140,7 @@ void AUPhaseManager::SetUnitQueue()
 	// TArray<AActor*> unitArr;
 	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), unitFactory, unitArr);
 
-	 
+
 	unitQueue.Empty();
 	httpUnitQueue.Empty();
 
@@ -185,7 +185,7 @@ void AUPhaseManager::SetUnitQueue()
 	{
 		UE_LOG(LogTemp, Warning,
 		       TEXT("One side has no alive units — Ending battle"));
-		ServerRPC_SetPhase(EBattlePhase::BattleEnd);
+		SetPhase(EBattlePhase::BattleEnd);
 		return;
 	}
 
@@ -264,17 +264,15 @@ ABaseBattlePawn* AUPhaseManager::PopNextAliveUnit()
 
 void AUPhaseManager::StartBattle()
 {
-	// SetUnitQueue();
-
 	ABaseBattlePawn* tempUnit = PopNextAliveUnit();
 	if (!tempUnit)
 	{
-		ServerRPC_SetPhase(EBattlePhase::BattleEnd); // 또는 RoundEnd
+		SetPhase(EBattlePhase::BattleEnd); // 또는 RoundEnd
 		return;
 	}
 	turnManager->curUnit = tempUnit;
 
-	ServerRPC_SetPhase(EBattlePhase::TurnProcessing);
+	SetPhase(EBattlePhase::TurnProcessing);
 }
 
 void AUPhaseManager::TurnPorcessing(ABaseBattlePawn* unit)
@@ -301,7 +299,7 @@ void AUPhaseManager::StartPlayerPhase()
 	if (cycle > 5)
 	{
 		// 전투를 끝낸다.
-		ServerRPC_SetPhase(EBattlePhase::BattleEnd);
+		SetPhase(EBattlePhase::BattleEnd);
 		return;
 	}
 
@@ -324,14 +322,14 @@ void AUPhaseManager::ServerRPC_EndPlayerPhase_Implementation()
 	if (!tempUnit)
 	{
 		// 유닛이 큐에 없다면 Round 종료
-		ServerRPC_SetPhase(EBattlePhase::RoundEnd);
+		SetPhase(EBattlePhase::RoundEnd);
 		return;
 	}
 	turnManager->curUnit = tempUnit;
 
 	UE_LOG(LogTemp, Warning, TEXT("End Player Phase"));
 
-	ServerRPC_SetPhase(EBattlePhase::TurnProcessing);
+	SetPhase(EBattlePhase::TurnProcessing);
 
 	SortUnitTurnEnd();
 	// Casting을 통해 현재 유닛이 player 또는 enemy라면 그쪽 함수 실행
@@ -357,7 +355,7 @@ void AUPhaseManager::StartEnemyPhase()
 	if (cycle > 5)
 	{
 		// 전투를 끝낸다.
-		ServerRPC_SetPhase(EBattlePhase::BattleEnd);
+		SetPhase(EBattlePhase::BattleEnd);
 		return;
 	}
 
@@ -384,13 +382,13 @@ void AUPhaseManager::ServerRPC_EndEnemyPhase_Implementation()
 	ABaseBattlePawn* nextUnit = PopNextAliveUnit();
 	if (!nextUnit)
 	{
-		ServerRPC_SetPhase(EBattlePhase::RoundEnd);
+		SetPhase(EBattlePhase::RoundEnd);
 		return;
 	}
 	turnManager->curUnit = nextUnit;
 
 
-	ServerRPC_SetPhase(EBattlePhase::TurnProcessing);
+	SetPhase(EBattlePhase::TurnProcessing);
 	UE_LOG(LogTemp, Warning, TEXT("End Enemy Phase"));
 
 	SortUnitTurnEnd();
@@ -420,6 +418,12 @@ void AUPhaseManager::BattleEnd()
 
 void AUPhaseManager::SetBeforeBattle()
 {
+	// 서버가 아니면 return
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	// girdTile에 저장해둔 unit들 순서대로 Possess해서 PlayerState 세팅
 	if (gridTileManager->unitArray.Num() > 0)
 	{
@@ -436,9 +440,9 @@ void AUPhaseManager::SetBeforeBattle()
 			}
 
 			pc->Possess(unit);
-			// 유닛 스텟 세팅
-			ServerRPC_TryInitStatus(unit);
 			UE_LOG(LogTemp, Warning, TEXT("Set Before Battle : Possess!!!"));
+			// 유닛 스텟 세팅
+			TryInitStatus(unit);
 
 			// 가장 가까운 적 찾기
 			ABaseBattlePawn* closestTarget = nullptr;
@@ -730,7 +734,7 @@ bool AUPhaseManager::AreAllUnitsInitialized() const
 }
 
 //--------------------State Setting---------------------------------
-void AUPhaseManager::ServerRPC_TryInitStatus_Implementation(
+void AUPhaseManager::TryInitStatus(
 	ABaseBattlePawn* unit)
 {
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
@@ -948,8 +952,10 @@ void AUPhaseManager::InitOtherClass()
 
 void AUPhaseManager::PlayerReady(APlayerController* playerControl)
 {
-	UE_LOG(LogTemp, Warning, TEXT("PlayerArray Num : %d"), GetWorld()->GetGameState()->PlayerArray.Num());
-	if (GetWorld()->GetGameState()->PlayerArray.Num() == readyCount)
+	readyCount += 1;
+	UE_LOG(LogTemp, Warning, TEXT("PlayerArray Num : %d readyCount : %d"),
+	       GetWorld()->GetGameState()->PlayerArray.Num(), readyCount);
+	if (GetWorld()->GetGameState()->PlayerArray.Num() <= readyCount)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("모든 플레이어 준비 완료 → 전투 시작"));
 

@@ -29,6 +29,4 @@ public:
 	void Client_StopReadyTimer();
 	
 	void SetViewTargetMyPawn(APawn* myPawn);
-	UFUNCTION(Client, Reliable)
-	void ClientRPC_SetViewTargetMyPawn(APawn* myPawn);
 };
