@@ -13,6 +13,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
@@ -34,11 +35,10 @@ void UUiWorldMap::SetRefreshPlayerList()
 			{
 				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
 				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
-				if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon))
-				{
-					Icon->SetSize(FVector2d(30,30));
-				}
+				if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon->Slot))
+				{ Icon->SetSize(FVector2d(30,30));}
 				TestPlayers.Add(TP);
+				
 				UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetRefreshPlayerList() 플레이어 갯수[%i]"),TestPlayers.Num());
 			}
 		}
@@ -71,7 +71,6 @@ void UUiWorldMap::ExtendMap()
 {
 	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvas->Slot))
 	{
-		// 1) 최초 호출 시 원래 크기/위치 저장
 		if (bExtendMap == false)
 		{
 			CanvasSlot->SetSize(MiniMapSizeL);
