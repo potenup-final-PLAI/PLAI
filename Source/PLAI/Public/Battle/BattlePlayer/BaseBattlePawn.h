@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InputActionValue.h"
 #include "Enemy/EnemyBattleState.h"
 #include "GameFramework/Pawn.h"
 #include "Player/BattlePlayerState.h"
@@ -21,11 +20,38 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//------------------Player Status------------------------
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 hp = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 attack = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 defense = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 resistance = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	float critical_Rate = 0.0f;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	float critical_Damage = 0.0f;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 move_Range = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 speed = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 points = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	TArray<FString> traits = {};
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	TArray<FString> skills = {};
+
+	// Player가 죽었는지 살았는지 상태 체크
+	ELifeState lifeState;
 	//-------------------기본 콜리전 세팅----------------------
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* boxComp;
@@ -41,6 +67,8 @@ public:
 	class APlayerController* pc;
 	UPROPERTY(EditAnywhere)
 	class AGridTileManager* gridTileManager;
+	UPROPERTY(EditAnywhere)
+	class UWorldGi* gi;
 	// UI
 	UPROPERTY(EditAnywhere)
 	class UBattleUnitStateUI* battleUnitStateUI;
@@ -57,6 +85,9 @@ public:
 	int32 curAP = 0;
 
 	void InitAPUI();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_InitAPUI();
+	
 	// Player AP 세팅
 	void SetAP()
 	{
@@ -92,15 +123,15 @@ public:
 		// 처리된 ap를 다시 호출한 대상 AP에 업데이트
 		return true;
 	}
-
-	//----------Speed State-------------
-	int32 speed = 0;
-
+	
 	//------------Turn System-----------------
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
 
 	void OnTurnStart();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_SetBattlePlayerInfoUI();
 	void OnTurnEnd();
 
 	//------------Skill System-----------------
@@ -163,7 +194,7 @@ public:
 	// PlayerState 부분
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Test)
 	class ABattlePlayerState* battlePlayerState;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
 	TArray<FString> playerSkills = {
 		TEXT("타격"),
@@ -276,6 +307,8 @@ public:
 	//--------------이동 및 공격------------------
 	
 	void UnitMoveRotateAttack();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UnitMoveRotateAttack();
 	//--------------Unit Move-------------------
 	// 이동 경로 저장 Array
 	UPROPERTY(EditAnywhere)

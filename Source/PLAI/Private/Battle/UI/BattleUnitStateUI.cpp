@@ -4,6 +4,7 @@
 #include "Battle/UI/BattleUnitStateUI.h"
 
 #include "BaseBattlePawn.h"
+#include "Battle/TurnSystem/TurnManager.h"
 #include "Components/MultiLineEditableTextBox.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -11,6 +12,7 @@
 #include "Components/WidgetSwitcher.h"
 #include "Enemy/BaseEnemy.h"
 #include "Player/BattlePlayer.h"
+#include "Engine/NetDriver.h"
 
 void UBattleUnitStateUI::NativeConstruct()
 {
@@ -36,6 +38,7 @@ void UBattleUnitStateUI::ShowHoverUI()
 
 void UBattleUnitStateUI::SetHPUI(ABaseBattlePawn* unit)
 {
+	UE_LOG(LogTemp, Warning, TEXT("NetMode: %s"), *GetNetModeString(GetWorld()));
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
 		if (player->battlePlayerState)
@@ -98,4 +101,29 @@ void UBattleUnitStateUI::ShowAPIReasonUI()
 void UBattleUnitStateUI::SetAPIReason(const FString& reason)
 {
 	TB_APIReason->SetText(FText::FromString(reason));
+}
+
+FString UBattleUnitStateUI::GetNetModeString(UWorld* World)
+{
+	switch (World->GetNetMode())
+	{
+	case NM_Standalone: return TEXT("Standalone");
+	case NM_Client: return TEXT("Client");
+	case NM_ListenServer: return TEXT("ListenServer");
+	case NM_DedicatedServer: return TEXT("DedicatedServer");
+	default: return TEXT("Unknown");
+	}
+}
+
+void UBattleUnitStateUI::UpdatePlayerHPUI(int32 hp)
+{
+	
+	txt_HP->SetText(FText::AsNumber(hp));
+	UE_LOG(LogTemp, Warning, TEXT("SetHPUI Player maxHP = %d"), hp);
+}
+
+void UBattleUnitStateUI::UpdateEnemyHPUI(int32 hp)
+{
+	
+	txt_HP->SetText(FText::AsNumber(hp));
 }

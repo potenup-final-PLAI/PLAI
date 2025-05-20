@@ -5,7 +5,6 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayerAnimInstance.h"
 
 ABattlePlayer::ABattlePlayer()
@@ -33,13 +32,14 @@ ABattlePlayer::ABattlePlayer()
 	{
 		meshComp->SetAnimInstanceClass(tempAnimInstance.Class);
 	}
+
+	bReplicates = true;
 }
 
 void ABattlePlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABaseBattlePawn::TryInitStatus, 0.1f, true);
+	
 }
 
 void ABattlePlayer::Tick(float DeltaTime)
@@ -58,29 +58,27 @@ void ABattlePlayer::Tick(float DeltaTime)
 void ABattlePlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
+	
 	if (pc)
 	{
 		//그 객체를 이용해서 EnhanceInputLocalPlayerSubSystem을 가져온다.
-		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<
-			UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
 		if (subSys)
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
 	}
+	
 	playerAnim = Cast<UBattlePlayerAnimInstance>(meshComp->GetAnimInstance());
 }
 
-void ABattlePlayer::SetupPlayerInputComponent(
-	UInputComponent* PlayerInputComponent)
+void ABattlePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (UEnhancedInputComponent* pi = Cast<UEnhancedInputComponent>(
 		PlayerInputComponent))
 	{
-		pi->BindAction(IA_Move, ETriggerEvent::Completed, this,
-		               &ABaseBattlePawn::OnMouseLeftClick);
+		pi->BindAction(IA_Move, ETriggerEvent::Completed, this,&ABaseBattlePawn::OnMouseLeftClick);
 	}
 }

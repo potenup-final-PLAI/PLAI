@@ -44,7 +44,7 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* txt_HP;
 	int32 maxHP = 0;
-
+	
 	void ShowHoverUI();
 	void SetHPUI(class ABaseBattlePawn* unit);
 	void UpdateHP(int32 hp);
@@ -62,6 +62,12 @@ public:
 
 	void ShowAPIReasonUI();
 	void SetAPIReason(const FString& reason);
+
+	FString GetNetModeString(UWorld* World);
+
+
+	void UpdatePlayerHPUI(int32 hp);
+	void UpdateEnemyHPUI(int32 hp);
 };
 
 

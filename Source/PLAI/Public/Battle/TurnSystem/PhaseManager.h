@@ -140,6 +140,8 @@ public:
 	void TryInitStatus(ABaseBattlePawn* unit);
 	void SetStatus(ABaseBattlePawn* unit);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_UpdatePlayerNameHP(class ABattlePlayer* player);
 	//------------Status 이름 변경--------------------
 	FString GetStatusEffectsString(EStatusEffect effect);
 

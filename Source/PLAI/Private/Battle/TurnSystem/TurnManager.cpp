@@ -98,8 +98,7 @@ void ATurnManager::StartPlayerTurn()
 	{
 		if (!playerPawn->owningPlayerState)
 		{
-			UE_LOG(LogTemp, Error,
-			       TEXT("playerPawn->owningPlayerState is nullptr"));
+			UE_LOG(LogTemp, Error,TEXT("playerPawn->owningPlayerState is nullptr"));
 			return;
 		}
 
@@ -107,38 +106,10 @@ void ATurnManager::StartPlayerTurn()
 			playerPawn->owningPlayerState->GetOwner());
 		if (!pc)
 		{
-			UE_LOG(LogTemp, Error,
-			       TEXT("owningPlayerState->GetOwner() is nullptr"));
+			UE_LOG(LogTemp, Error,TEXT("owningPlayerState->GetOwner() is nullptr"));
 			return;
 		}
-
-		// for (ABattlePlayerController* battlePC : phaseManager->gridTileManager->playerControllers)
-		// {
-		// 	UE_LOG(LogTemp, Warning, TEXT("PlayerController %s PlayerControllers Count : %d"), *battlePC->GetActorNameOrLabel(), phaseManager->gridTileManager->playerControllers.Num());
-		// 	
-		// 	FTimerHandle possessHandle;
-		// 	GetWorld()->GetTimerManager().ClearTimer(possessHandle);
-		//
-		// 	GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
-		// 	{
-		// 		if (battlePC)
-		// 		{
-		// 			auto* playerCamera = battlePC->GetPawnOrSpectator();
-		//
-		// 			battlePC->Possess(playerPawn);
-		// 			if (curUnit->IsValidLowLevelFast())
-		// 			{
-		// 				UE_LOG(LogTemp, Warning, TEXT("Safe to call OnTurnStart on %s"), *curUnit->GetName());
-		// 				UpdateWhoTurn();
-		// 				
-		// 				curUnit->OnTurnStart();
-		// 				battlePC->SetViewTargetMyPawn(playerCamera);
-		// 				// battlePC->ClientRPC_SetViewTargetMyPawn(playerCamera);
-		// 			}
-		// 			
-		// 		}
-		// 	}), 1.0f, false);
-		// }
+		
 		if (ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(pc))
 		{
 			FTimerHandle possessHandle;
@@ -180,17 +151,12 @@ void ATurnManager::StartEnemyTurn()
 
 	if (ABaseEnemy* pawn = Cast<ABaseEnemy>(curUnit))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("pawn is Enemy %s "),
-		       *pawn->GetActorNameOrLabel());
+		UE_LOG(LogTemp, Warning, TEXT("pawn is Enemy %s "), *pawn->GetActorNameOrLabel());
 		// FSM 활성화
 		if (curUnit)
 		{
 			if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
 			{
-				// 빠르게 갔다가 천천히 도착 하는 느낌
-				pc->SetViewTargetWithBlend(curUnit, 1.0f, VTBlend_EaseInOut,
-				                           4.0f, true);
-
 				FTimerHandle possessHandle;
 				GetWorld()->GetTimerManager().ClearTimer(possessHandle);
 				// 이후에 값이 변경 및 삭제 될 수 있기 때문에 값 복사로 가져와서 람다 내에서 사용
@@ -200,9 +166,10 @@ void ATurnManager::StartEnemyTurn()
 						if (pc && curUnit)
 						{
 							pc->Possess(curUnit);
+							auto* playerCamera = pc->GetPawnOrSpectator();
 							curUnit->OnTurnStart();
-							UE_LOG(LogTemp, Warning, TEXT("possess unit %s"),
-							       *curUnit->GetActorNameOrLabel());
+							MulticastRPC_CameraChange(curUnit);
+							UE_LOG(LogTemp, Warning, TEXT("possess unit %s"),*curUnit->GetActorNameOrLabel());
 						}
 					}), 1.0f, false);
 			}

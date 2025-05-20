@@ -24,6 +24,8 @@
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "Player/BattlePlayer.h"
 #include "Player/BattlePlayerAnimInstance.h"
 #include "Player/BattlePlayerState.h"
@@ -40,23 +42,18 @@ ABaseBattlePawn::ABaseBattlePawn()
 
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("cameraComp"));
 	cameraComp->SetupAttachment(RootComponent);
-	cameraComp->SetRelativeLocationAndRotation(FVector(-600, 0, 1000),
-	                                           FRotator(-60, 0, 0));
+	cameraComp->SetRelativeLocationAndRotation(FVector(-600, 0, 1000),FRotator(-60, 0, 0));
 
 	// 이름, HP, Armor 설정 컴포넌트
-	battleUnitStateComp = CreateDefaultSubobject<UWidgetComponent>(
-		"BattleUnitStateComp");
+	battleUnitStateComp = CreateDefaultSubobject<UWidgetComponent>("BattleUnitStateComp");
 	battleUnitStateComp->SetupAttachment(RootComponent);
 	battleUnitStateComp->SetDrawSize(FVector2D((0)));
-	battleUnitStateComp->SetRelativeLocationAndRotation(
-		FVector(0, 0, 170), FRotator(0));
+	battleUnitStateComp->SetRelativeLocationAndRotation(FVector(0, 0, 170), FRotator(0));
 	battleUnitStateComp->SetGenerateOverlapEvents(false); // 충돌 막기
 	battleUnitStateComp->SetVisibility(true);
 	battleUnitStateComp->SetCastShadow(false);
 
-	ConstructorHelpers::FClassFinder<UBattleUnitStateUI> tempBattleUnitStateUI(
-		TEXT(
-			"/Script/UMGEditor.WidgetBlueprint'/Game/JS/UI/WBP_BattleUnitState.WBP_BattleUnitState_C'"));
+	ConstructorHelpers::FClassFinder<UBattleUnitStateUI> tempBattleUnitStateUI(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/JS/UI/WBP_BattleUnitState.WBP_BattleUnitState_C'"));
 	if (tempBattleUnitStateUI.Succeeded())
 	{
 		battleUnitStateComp->SetWidgetClass(tempBattleUnitStateUI.Class);
@@ -90,10 +87,18 @@ void ABaseBattlePawn::BeginPlay()
 	SetAP();
 }
 
+void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABaseBattlePawn, hp);
+}
+
 // Called every frame
 void ABaseBattlePawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
 
 	// Hover UI 띄우기 위한 함수
 	OnMouseHover();
@@ -103,6 +108,7 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
+	
 }
 
 void ABaseBattlePawn::OnTurnStart()
@@ -112,26 +118,17 @@ void ABaseBattlePawn::OnTurnStart()
 		UE_LOG(LogTemp, Warning, TEXT("turnManager is Not Set"));
 		return;
 	}
+	
 	// 턴 종료 초기화
 	bTurnEnded = false;
-
 	// 기본 공격 초기화
 	bBaseAttack = true;
-
+	
 	// 턴이 시작됐으면 턴 카운트 1 증가
 	turnManager->turnCount++;
 	UE_LOG(LogTemp, Warning, TEXT("Turn Count %d"), turnManager->turnCount);
 
-	// BattlePlayerInfo UI 세팅
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (pc && hud && hud->mainUI && hud->mainUI->WBP_Player)
-		{
-			FString name = player->GetActorNameOrLabel();
-			hud->mainUI->WBP_Player->SetPlayerName(name);
-			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
-		}
-	}
+	MultiCastRPC_SetBattlePlayerInfoUI();
 
 	// 상태이상이 있다면 대미지 및 버프, 디버프 처리하기
 	ApplyStatusEffect();
@@ -140,9 +137,8 @@ void ABaseBattlePawn::OnTurnStart()
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 	{
 		player->GetAP();
-		InitAPUI();
-		UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(),
-		       player->curAP);
+		MultiCastRPC_InitAPUI();
+		UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(),player->curAP);
 	}
 	// Enemy라면
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
@@ -158,7 +154,7 @@ void ABaseBattlePawn::OnTurnStart()
 		enemybattleState->curAP += enemybattleState->GetAP(enemybattleState->curAP);
 		UE_LOG(LogTemp, Warning, TEXT("Current AP: %d"),enemybattleState->curAP);
 
-		enemy->SeeMoveRange(enemy->enemybattleState->move_Range);
+		enemy->SeeMoveRange(enemy->moveRange);
 		
 		ABaseBattlePawn* CapturedUnit = this;
 
@@ -174,6 +170,20 @@ void ABaseBattlePawn::OnTurnStart()
 		}), 1.0f, false);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
+}
+
+void ABaseBattlePawn::MultiCastRPC_SetBattlePlayerInfoUI_Implementation()
+{
+	// BattlePlayerInfo UI 세팅
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (pc && hud && hud->mainUI && hud->mainUI->WBP_Player)
+		{
+			FString name = player->GetActorNameOrLabel();
+			hud->mainUI->WBP_Player->SetPlayerName(name);
+			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
+		}
+	}
 }
 
 void ABaseBattlePawn::OnTurnEnd()
@@ -215,6 +225,9 @@ void ABaseBattlePawn::OnTurnEnd()
 
 void ABaseBattlePawn::OnMouseLeftClick()
 {
+	// pawn에 이름이 Player1이 가지고 있던 이름인지 Player2가 가지고 있던 이름인지 판별해서 맞다면 그 Player가 움직일 수 있게
+	if (!IsLocallyControlled()) return;
+	
 	FVector start, end, dir;
 	FHitResult hitInfo;
 	FCollisionQueryParams params;
@@ -222,18 +235,8 @@ void ABaseBattlePawn::OnMouseLeftClick()
 	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(start, dir);
 	end = start + dir * 10000;
 
-	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,
-	                                         ECC_Visibility, params))
+	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,ECC_Visibility, params))
 	{
-		// // 상대와 거리 측정
-		// float dist = FVector::Dist(GetActorLocation(),hitInfo.GetActor()->GetActorLocation());
-		//
-		// // 자신의 moveRange * 100 보다 작거나 같을 때
-		// if (dist > (this->battlePlayerState->playerStatus.move_Range * 100))
-		// {
-		// 	UE_LOG(LogTemp, Warning, TEXT("Test Click : Dist too be far"));
-		// 	return;
-		// }
 		if (AGridTile* clickedTile = Cast<AGridTile>(hitInfo.GetActor()))
 		{
 			if (!highlightedTiles.Contains(clickedTile))
@@ -244,10 +247,11 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		}
 		
 		EActionMode curSkillState = currentActionMode;
-		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),
-		       *UEnum::GetValueAsString(curSkillState));
+		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),*UEnum::GetValueAsString(curSkillState));
+
 		// UI에 띄울 스킬 이름 저장 
 		SkillNameJudgment(curSkillState);
+		
 		switch (curSkillState)
 		{
 		case EActionMode::None:
@@ -325,8 +329,7 @@ void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 		FCollisionQueryParams params;
 		params.AddIgnoredActor(this);
 
-		if (GetWorld()->LineTraceSingleByChannel(
-			startHit, start, end, ECC_Visibility, params))
+		if (GetWorld()->LineTraceSingleByChannel(startHit, start, end, ECC_Visibility, params))
 		{
 			startTile = Cast<AGridTile>(startHit.GetActor());
 			if (startTile)
@@ -1181,11 +1184,8 @@ void ABaseBattlePawn::BleedingEnemyProcess(UEnemyBattleState* enemyState)
 
 void ABaseBattlePawn::PathFind()
 {
-	UE_LOG(LogTemp, Warning,
-	       TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),
-	       pathArray.Num(), moveRange);
-	UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),
-	       bIsMoving ? TEXT("true") : TEXT("false"));
+	UE_LOG(LogTemp, Warning, TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"), pathArray.Num(), moveRange);
+	UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"), bIsMoving ? TEXT("true") : TEXT("false"));
 	if (openArray.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("OpenArray is empty"));
@@ -1197,11 +1197,8 @@ void ABaseBattlePawn::PathFind()
 
 	while (openArray.Num() > 0 && safetyCounter++ < maxSafetyCount)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),
-		       pathArray.Num(), moveRange);
-		UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),
-		       bIsMoving ? TEXT("true") : TEXT("false"));
+		UE_LOG(LogTemp, Warning,TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),pathArray.Num(), moveRange);
+		UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),bIsMoving ? TEXT("true") : TEXT("false"));
 		if (safetyCounter > maxSafetyCount)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Path Safe Break"));
@@ -1212,14 +1209,12 @@ void ABaseBattlePawn::PathFind()
 
 		if (!IsValid(currentTile))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s currentTile PathFind Error"),
-			       *GetName());
+			UE_LOG(LogTemp, Warning, TEXT("%s currentTile PathFind Error"),*GetName());
 			return;
 		}
 		if (!IsValid(goalTile))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s goalTile PathFind Error"),
-			       *GetName());
+			UE_LOG(LogTemp, Warning, TEXT("%s goalTile PathFind Error"),*GetName());
 			return;
 		}
 		// 목표 도달했으면 종료
@@ -1246,19 +1241,14 @@ void ABaseBattlePawn::PathFind()
 void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 {
 	FIntPoint nextCoord = currentTile->gridCoord + offset;
-	AGridTileManager* tileManger = Cast<AGridTileManager>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
-
-	if (AGridTile* tile = tileManger->map.FindRef(nextCoord))
+	// AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
+	
+	if (AGridTile* tile = gridTileManager->map.FindRef(nextCoord))
 	{
 		float previousCost = tile->tCostValue;
 		tile->SetCost(currentTile, goalTile);
-
-		// if (!tile->parentTile || tile->tCostValue < previousCost)
-		// {
-		// 	tile->parentTile = currentTile;
-		if (tile != currentTile && (!tile->parentTile || tile->tCostValue <
-			previousCost))
+		
+		if (tile != currentTile && (!tile->parentTile || tile->tCostValue < previousCost))
 		{
 			tile->parentTile = currentTile;
 
@@ -1282,8 +1272,7 @@ void ABaseBattlePawn::BuildPath()
 	// goalTile 또는 goalTile->parentTile 자체가 nullptr일 수 있다.
 	if (!goalTile || !goalTile->parentTile)
 	{
-		UE_LOG(LogTemp, Error,
-		       TEXT("BuildPath aborted: goalTile or parent is null"));
+		UE_LOG(LogTemp, Error,TEXT("BuildPath aborted: goalTile or parent is null"));
 		OnMoveEnd();
 		return;
 	}
@@ -1302,8 +1291,7 @@ void ABaseBattlePawn::BuildPath()
 	{
 		if (visitePathTiles.Contains(temp) || temp == temp->parentTile)
 		{
-			UE_LOG(LogTemp, Warning,
-			       TEXT(" Infinite loop detected in BuildPath"));
+			UE_LOG(LogTemp, Warning,TEXT(" Infinite loop detected in BuildPath"));
 			break;
 		}
 
@@ -1389,16 +1377,6 @@ void ABaseBattlePawn::SeeMoveRange(int32 move_Range)
 	{
 		for (int x = startX - move_Range; x <= startX + move_Range; x++)
 		{
-			// 더 넓은 정사각형 모양으로 머티리얼 수정
-			// FIntPoint checkCoord(x, y);
-			// // 타일이 있는지 체크
-			// if (gridTileManager->IsValidTile(checkCoord))
-			// {
-			// 	// 있다면 그 타일에 생상 변경
-			// 	AGridTile* tempTile = gridTileManager->GetTile(x, y);
-			// 	gridTileManager->SetTileColor(gridTileManager->GetTile(x, y), true);
-			// 	highlightedTiles.Add(tempTile);
-			// }
 			int dx = FMath::Abs(x - startX);
 			int dy = FMath::Abs(y - startY);
 
@@ -1512,8 +1490,7 @@ void ABaseBattlePawn::OnMouseHover()
 
 	ABaseBattlePawn* currentHovered = nullptr;
 
-	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,
-	                                         ECC_Visibility, params))
+	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,ECC_Visibility, params))
 	{
 		currentHovered = Cast<ABaseBattlePawn>(hitInfo.GetActor());
 	}
@@ -1524,15 +1501,13 @@ void ABaseBattlePawn::OnMouseHover()
 		if (lastHoveredPawn && lastHoveredPawn->battleUnitStateUI)
 		{
 			lastHoveredPawn->battleUnitStateUI->ShowBaseUI();
-			lastHoveredPawn->battleUnitStateComp->
-			                 SetDrawSize(FVector2D(50, 10));
+			lastHoveredPawn->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
 		}
 
 		if (currentHovered && currentHovered->battleUnitStateUI)
 		{
 			currentHovered->battleUnitStateUI->ShowHoverUI();
-			currentHovered->battleUnitStateComp->SetDrawSize(
-				FVector2D(150, 130));
+			currentHovered->battleUnitStateComp->SetDrawSize(FVector2D(150, 130));
 		}
 
 		lastHoveredPawn = currentHovered;
@@ -1580,11 +1555,15 @@ void ABaseBattlePawn::SkillNameJudgment(const EActionMode curAction)
 
 void ABaseBattlePawn::UnitMoveRotateAttack()
 {
+	MultiCastRPC_UnitMoveRotateAttack();
+}
+
+void ABaseBattlePawn::MultiCastRPC_UnitMoveRotateAttack_Implementation()
+{
 	// AStar로 나온 방향으로 이동
 	if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
 	{
-		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() +
-			FVector(0, 0, 80);
+		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() + FVector(0, 0, 80);
 		FVector currentLoc = GetActorLocation();
 		FVector direction = (targetLoc - currentLoc).GetSafeNormal();
 
@@ -1599,9 +1578,7 @@ void ABaseBattlePawn::UnitMoveRotateAttack()
 			{
 				FRotator currentRot = player->meshComp->GetRelativeRotation();
 				FRotator desiredRot(0.f, targetRot.Yaw + yawOffset, 0.f);
-				FRotator smoothRot = FMath::RInterpTo(
-					currentRot, desiredRot, GetWorld()->GetDeltaSeconds(),
-					interpSpeed);
+				FRotator smoothRot = FMath::RInterpTo(currentRot, desiredRot, GetWorld()->GetDeltaSeconds(), interpSpeed);
 				player->meshComp->SetRelativeRotation(smoothRot);
 			}
 		}
@@ -1611,9 +1588,7 @@ void ABaseBattlePawn::UnitMoveRotateAttack()
 			{
 				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
 				FRotator desiredRot(0.f, targetRot.Yaw + yawOffset, 0.f);
-				FRotator smoothRot = FMath::RInterpTo(
-					currentRot, desiredRot, GetWorld()->GetDeltaSeconds(),
-					interpSpeed);
+				FRotator smoothRot = FMath::RInterpTo(currentRot, desiredRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
 				enemy->meshComp->SetRelativeRotation(smoothRot);
 			}
 		}
@@ -1868,7 +1843,8 @@ void ABaseBattlePawn::InitEnemyState()
 		phaseManager->unitEnemyNameindex++;
 
 		enemy->battleUnitStateUI->SetUnitName(name);
-		enemy->battleUnitStateUI->SetHPUI(enemy);
+		enemy->battleUnitStateUI->UpdateEnemyHPUI(enemy->enemybattleState->enemyStatus.hp);
+		// enemy->battleUnitStateUI->SetHPUI(enemy);
 	}
 }
 
@@ -2011,6 +1987,11 @@ void ABaseBattlePawn::ApplyTraitModifiers(UEnemyBattleState* state)
 
 void ABaseBattlePawn::InitOtherClassPointer()
 {
+	gi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
+	if (gi)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GI is Set"));
+	}
 	// PhaseManager
 	phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
 	if (phaseManager)
@@ -2042,10 +2023,8 @@ void ABaseBattlePawn::InitOtherClassPointer()
 		UE_LOG(LogTemp, Warning, TEXT("gridTileManager is Set"));
 	}
 	// BaseHP UI 보여주기
-	battleUnitStateUI = Cast<UBattleUnitStateUI>(
-		this->battleUnitStateComp->GetWidget());
-	if (battleUnitStateUI) UE_LOG(LogTemp, Warning,
-	                              TEXT("battleUnitStateUI is Set"));
+	battleUnitStateUI = Cast<UBattleUnitStateUI>(this->battleUnitStateComp->GetWidget());
+	if (battleUnitStateUI) UE_LOG(LogTemp, Warning,TEXT("battleUnitStateUI is Set"));
 }
 
 void ABaseBattlePawn::InitAPUI()
@@ -2070,4 +2049,9 @@ void ABaseBattlePawn::InitAPUI()
 			hud->mainUI->AddAP(); // AP UI 하나씩 추가
 		}
 	}
+}
+
+void ABaseBattlePawn::MultiCastRPC_InitAPUI_Implementation()
+{
+	InitAPUI();
 }
