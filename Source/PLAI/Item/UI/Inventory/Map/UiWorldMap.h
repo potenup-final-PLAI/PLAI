@@ -43,6 +43,9 @@ public:
 	class UImage* PlayerRot;
 
 	UPROPERTY(EditAnywhere)
+	class UMenuInven* MenuInven;
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUiWorldPlayerIcon>UiWorldPlayerIconFactory;
 
 	UPROPERTY(EditAnywhere)
@@ -54,9 +57,7 @@ public:
 	void SetRefreshPlayerList();
 	
 	void SetPlayerIconMinimap();
-
-	void SetPlayerAdd();
-
+	
 	UPROPERTY(EditAnywhere)
 	FVector2D WorldMinFevtor = FVector2D(-22700.0, -21260.0);
 	UPROPERTY(EditAnywhere)

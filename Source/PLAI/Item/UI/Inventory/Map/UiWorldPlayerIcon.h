@@ -15,5 +15,6 @@ class PLAI_API UUiWorldPlayerIcon : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Rot;
 };

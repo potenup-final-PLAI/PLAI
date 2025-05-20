@@ -37,6 +37,7 @@ void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		
 		// SetPlayerMinmapVector(TestPlayer->GetActorLocation());
 		
+		if (!TestPlayer){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
 		float Yaw = TestPlayer->GetActorRotation().Yaw;
 		
 		PlayerRot->SetRenderTransformPivot(FVector2D(0.5f, 0.f));
@@ -58,10 +59,8 @@ void UUiWorldMap::NativeConstruct()
 	
 	MaterialMapDynamic = UMaterialInstanceDynamic::Create(MaterialMapInterface,this);
 	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
-
-	SetPlayerAdd();
+    SetRefreshPlayerList();
 }
-
 
 void UUiWorldMap::SetRefreshPlayerList()
 {
@@ -85,31 +84,14 @@ void UUiWorldMap::SetRefreshPlayerList()
 	}
 }
 
-void UUiWorldMap::SetPlayerAdd()
-{
-	// SetRefreshPlayerList();
-	if (AGameStateBase* GS = GetWorld()->GetGameState())
-	{
-		for (APlayerState* PS : GS->PlayerArray)
-		{
-			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
-			{
-				if (!TP->InvenComp || !TP->InvenComp->MenuInven || !TP->InvenComp || !TP->InvenComp->MenuInven->Wbp_UiWolrdMap)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetPlayerAdd 인벤컴프 메뉴인벤 월드맵 Ui 없음" )) return;
-				}
-				TP->InvenComp->MenuInven->Wbp_UiWolrdMap->SetRefreshPlayerList();
-			}
-		}
-	}
-}
-
 void UUiWorldMap::SetPlayerIconMinimap()
 {
 	if (TestPlayers.Num() == 0 || MiniMapCanvasIcon->GetAllChildren().Num() == 0){UE_LOG(LogTemp,Warning,TEXT(
 		"UiWorldMap 플레이어 미니맵아이콘 없음")) return;}
 	for (int i = 0; i < TestPlayers.Num(); i++)
 	{
+		// 아이콘 위치 갱신
+		if (!TestPlayers[i]){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
 		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
 		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
 
@@ -117,13 +99,14 @@ void UUiWorldMap::SetPlayerIconMinimap()
 		V = FMath::Clamp(V, 0.f, 1.f);
 
 		FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
+		float Yaw = TestPlayers[i]->GetActorRotation().Yaw;
 	
 		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
 		{
+			// MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
 			CanvasSlot->SetPosition(PixelPos);
 		}
-		else
-		{ UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
+		else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 	}
 }
 
