@@ -49,17 +49,6 @@ void ATestPlayer::BeginPlay()
     {
     	StoreComp->StoreInven->AddToViewport();
     	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
-
-    	// if (AGameStateBase* GS = GetWorld()->GetGameState())
-    	// {
-    	// 	for (APlayerState* PS : GS->PlayerArray)
-    	// 	{
-    	// 		if (ATestPlayer* Player = Cast<ATestPlayer>(PS->GetPawn()))
-    	// 		{
-    	// 			Player->InvenComp->MenuInven->Wbp_UiWolrdMap->SetRefreshPlayerList();
-    	// 		}
-    	// 	}
-    	// }
     }
 }
 

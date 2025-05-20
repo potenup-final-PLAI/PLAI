@@ -123,7 +123,6 @@ void UUiMain::HttpLoginMe()
 			{
 				Wbp_UiInitMain->RemoveFromParent();
 			}
-			
 			// FString GetJson;
 			// FJsonObjectConverter::UStructToJsonObjectString(&LoginComp->UserFullInfo,GetJson);
 			// UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);

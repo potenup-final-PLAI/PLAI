@@ -10,6 +10,7 @@
 #include "PLAI/Item/UI/Inventory/Map/UiWorldPlayerIcon.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
@@ -33,6 +34,7 @@ void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{
 		SetPlayerIconMinimap();
+		
 		// SetPlayerMinmapVector(TestPlayer->GetActorLocation());
 		
 		float Yaw = TestPlayer->GetActorRotation().Yaw;
@@ -56,7 +58,8 @@ void UUiWorldMap::NativeConstruct()
 	
 	MaterialMapDynamic = UMaterialInstanceDynamic::Create(MaterialMapInterface,this);
 	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
-	SetRefreshPlayerList();
+
+	SetPlayerAdd();
 }
 
 
@@ -76,8 +79,26 @@ void UUiWorldMap::SetRefreshPlayerList()
 				if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon->Slot))
 				{ Icon->SetSize(FVector2d(30,30));}
 				TestPlayers.Add(TP);
-				
 				UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetRefreshPlayerList() 플레이어 갯수[%i]"),TestPlayers.Num());
+			}
+		}
+	}
+}
+
+void UUiWorldMap::SetPlayerAdd()
+{
+	// SetRefreshPlayerList();
+	if (AGameStateBase* GS = GetWorld()->GetGameState())
+	{
+		for (APlayerState* PS : GS->PlayerArray)
+		{
+			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
+			{
+				if (!TP->InvenComp || !TP->InvenComp->MenuInven || !TP->InvenComp || !TP->InvenComp->MenuInven->Wbp_UiWolrdMap)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetPlayerAdd 인벤컴프 메뉴인벤 월드맵 Ui 없음" )) return;
+				}
+				TP->InvenComp->MenuInven->Wbp_UiWolrdMap->SetRefreshPlayerList();
 			}
 		}
 	}
@@ -87,7 +108,6 @@ void UUiWorldMap::SetPlayerIconMinimap()
 {
 	if (TestPlayers.Num() == 0 || MiniMapCanvasIcon->GetAllChildren().Num() == 0){UE_LOG(LogTemp,Warning,TEXT(
 		"UiWorldMap 플레이어 미니맵아이콘 없음")) return;}
-	
 	for (int i = 0; i < TestPlayers.Num(); i++)
 	{
 		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
