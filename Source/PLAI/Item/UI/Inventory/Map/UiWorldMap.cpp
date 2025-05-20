@@ -50,13 +50,13 @@ void UUiWorldMap::SetRefreshPlayerList()
 			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
 			{
 				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
+
 				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
 				TestPlayers.Add(TP);
 				if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon->Slot))
 				{
+					Icon->SetAlignment(FVector2D(0.5,0.5));
 					Icon->SetSize(FVector2d(60,60));
-					// Icon->SetAnchors(FAnchors(0.5,0.5));
-					// Icon->SetAlignment(FVector2D(0.5,0.5));
 				}
 				UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetRefreshPlayerList() 플레이어 갯수[%i]"),TestPlayers.Num());
 			}
@@ -110,7 +110,7 @@ void UUiWorldMap::ExtendMap()
 		{
 			CanvasSlot->SetSize(MiniMapSizeS);
 			CanvasSlot->SetAnchors(FAnchors(1,1));
-			// CanvasSlot->SetPosition(FVector2D(-25,-25));
+			CanvasSlot->SetPosition(FVector2D(-25,-25));
 			CanvasSlot->SetAlignment(FVector2D(1,1));
 			MiniMapSize = MiniMapSizeS;;
 			bExtendMap = false;
