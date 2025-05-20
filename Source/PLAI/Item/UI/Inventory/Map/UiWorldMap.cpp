@@ -51,11 +51,11 @@ void UUiWorldMap::SetRefreshPlayerList()
 			{
 				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
 				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
+				TestPlayers.Add(TP);
 				if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon->Slot))
 				{
 					Icon->SetSize(FVector2d(60,60));
 				}
-				TestPlayers.Add(TP);
 				UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetRefreshPlayerList() 플레이어 갯수[%i]"),TestPlayers.Num());
 			}
 		}
@@ -64,11 +64,18 @@ void UUiWorldMap::SetRefreshPlayerList()
 
 void UUiWorldMap::SetPlayerIconMinimap()
 {
-	if (TestPlayers.Num() == 0 || MiniMapCanvasIcon->GetAllChildren().Num() == 0){UE_LOG(LogTemp,Warning,TEXT(
-		"UiWorldMap 플레이어 미니맵아이콘 없음")) return;}
+	if (TestPlayers.Num() == 0 || MiniMapCanvasIcon->GetAllChildren().Num() == 0)
+	{
+		SetRefreshPlayerList();
+		UE_LOG(LogTemp,Warning,TEXT("UiWorldMap SetRefresh하고난후 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;
+	}
 	for (int i = 0; i < TestPlayers.Num(); i++)
 	{
-		if (!TestPlayers[i]){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
+		if (!TestPlayers[i])
+		{
+			SetRefreshPlayerList();
+			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap SetRefresh하고 한번더 체크 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;
+		}
 		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
 		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
 
@@ -81,6 +88,7 @@ void UUiWorldMap::SetPlayerIconMinimap()
 		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
 		{
 			MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
+			MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
 			CanvasSlot->SetPosition(PixelPos);
 		}
 		else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
@@ -117,7 +125,7 @@ FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPoint
 	if (InGeometry.IsUnderLocation(InMouseEvent.GetScreenSpacePosition()))
 	{
 		float Delta = -InMouseEvent.GetWheelDelta();  // +1 or -1
-		CurrentZoom = FMath::Clamp(CurrentZoom + Delta * 0.1, 0, 2);
+		CurrentZoom = FMath::Clamp(CurrentZoom + Delta * 0.1, 0, 1);
 
 		if (MaterialMapDynamic)
 		{
@@ -128,6 +136,7 @@ FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPoint
 	return Super::NativeOnMouseWheel(InGeometry, InMouseEvent);
 }
 
+// if (!TestPlayers[i]){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;}
 
 // if (MiniMapSizeBox)
 // {

@@ -192,10 +192,9 @@ void UInputComp::On_LeftMouseTriggered()
 		FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
 
 	if (Dot > 0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-1,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-2,0)); }
 	else if (Dot < -0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+1,0)); }
-
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+2,0)); }
 	
 	else if (FMath::Abs(Dot) > 0.6)
 	{

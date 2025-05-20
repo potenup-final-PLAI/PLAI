@@ -85,7 +85,7 @@ void APLAIPlayerController::OnSetDestinationTriggered()
 	// We flag that the input is being pressed
 	FollowTime += GetWorld()->GetDeltaSeconds();
 
-	UE_LOG(LogTemp,Warning,TEXT("PLAIPLayerController 오른쪽 마우스 트리거중 %f"), FollowTime);
+	// UE_LOG(LogTemp,Warning,TEXT("PLAIPLayerController 오른쪽 마우스 트리거중 %f"), FollowTime);
 	
 	// We look for the location in the world where the player has pressed the input
 	FHitResult Hit;

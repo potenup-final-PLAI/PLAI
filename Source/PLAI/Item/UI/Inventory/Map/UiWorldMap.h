@@ -68,9 +68,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float CurrentZoom = 0.5f; 
-
-	void SetPlayerMinmapVector(FVector PlayerLocation);
-
+	
 	virtual void NativeConstruct() override;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
