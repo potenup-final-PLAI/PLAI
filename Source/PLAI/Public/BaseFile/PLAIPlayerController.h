@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "PLAIPlayerController.generated.h"
 
+class ATestPlayer;
 /** Forward declaration to improve compiling times */
 class UNiagaraSystem;
 class UInputMappingContext;
@@ -62,11 +63,22 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_WarpPlayer(EMonSpawnType SpawnType);
 
+	UPROPERTY(EditAnywhere,Replicated)
+	TArray<ATestPlayer*>TestPlayers;
+	
+	UPROPERTY(EditAnywhere)
+	float MiniMapTime = 0.0f;
+	
+	void TestPlayersAdd();
+	void MiniMapUpdate();
+
 private:
 	FVector CachedDestination;
 
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };
 
 

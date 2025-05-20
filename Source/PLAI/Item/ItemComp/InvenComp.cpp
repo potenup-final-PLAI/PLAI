@@ -9,14 +9,12 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
-#include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/Creture/Creature.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Login/LoginComp.h"
-#include "PLAI/Item/Monster/MonWorld/MonWorld.h"
 #include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/Npc/NpcStore.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -49,10 +47,10 @@ void UInvenComp::BeginPlay()
 	Super::BeginPlay();
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
+	
 	if (TestPlayer->IsLocallyControlled())
 	{
 		MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);
-		
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
 			if (WorldGi->bBattleReward == true || WorldGi->bGameStart == true)
@@ -65,7 +63,6 @@ void UInvenComp::BeginPlay()
 				MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
-				// WorldGi->bBattleReward = false;
 			}
 		}
 	}
@@ -77,55 +74,28 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     // 데이터테이블 템 먹기
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
-    // 스팀 세션 만들기
-	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::One))
-	{
-		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-		{
-			WorldGi->CreateSession(FString("Wanted"),4);
-		}
-	}
-	// 스팀 세션 찾기
-	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Two))
-	{
-		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-		{
-			WorldGi->FindOtherSession();
-		}
-	}
-
-	// 스팀 세션 참여하기 
-	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Three))
-	{
-		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-		{
-			WorldGi->JoinOtherSession();
-		}
-	}
-
 	
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
 		Server_SpawnOneItem();
 	}
-
 	
 	// 소환수 크리처 소환하기 임시
-	if (TestPlayer->HasAuthority() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Five))
+	if (TestPlayer->IsLocallyControlled() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Five))
 	{
-		TArray<FName> RawNames = ItemDataTable->GetRowNames();
-		if (RawNames.IsValidIndex(33))
-		{
-			UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
-			FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
-            TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable);
-		}
-		else
-		{
-			UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?"))
-		}
+		Server_SpawnCreature();
+		// TArray<FName> RawNames = ItemDataTable->GetRowNames();
+		// if (RawNames.IsValidIndex(33))
+		// {
+		// 	UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
+		// 	FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
+  //           TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable);
+		// }
+		// else
+		// {
+		// 	UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?"))
+		// }
 	}
-	
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
 	{
@@ -204,6 +174,22 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			}
 		}
 	}
+}
+
+void UInvenComp::Server_SpawnCreature_Implementation()
+{
+	Client_GetCreature();
+}
+
+void UInvenComp::Client_GetCreature_Implementation()
+{
+	TArray<FName> RawNames = ItemDataTable->GetRowNames();
+	if (RawNames.IsValidIndex(33))
+	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
+		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
+		TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable); }
+	else
+	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?")) }
 }
 
 void UInvenComp::SetGold(int32 Getgold)
@@ -405,8 +391,6 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		if (ItemStructTable.Material)
 		{ Itemboots->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
-
-    
 	
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
@@ -415,8 +399,6 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 아직 로그인 안됨 bLoginMe머고 %d"),WorldGi->bLoginMe) return;
 		};
 	};
-
-	
 
 	if (!TestPlayer->IsLocallyControlled()) return;
 	FTimerHandle TimerHandle;
@@ -449,12 +431,9 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
 		
 		for (int32 i = 0; i < TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Num(); i++)
-		{
-			// UE_LOG(LogTemp,Warning,TEXT("InvenCOmp 497번쨰줄 SetUiChaStat에 들어가는 장비정보 [%s]"),
+		{ // UE_LOG(LogTemp,Warning,TEXT("InvenCOmp 497번쨰줄 SetUiChaStat에 들어가는 장비정보 [%s]"),
 			// 	*TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list[i].item_name);
-		}
-		
-	},1,false);
+		} },1,false);
 }
 
 void UInvenComp::NpcItem(const FItemStructTables ItemStructTables)
@@ -822,4 +801,30 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 // {
 // 	SaveItemInventory();
 // 	SaveEquipInventory();
+// }
+
+//    // 스팀 세션 만들기
+// if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::One))
+// {
+// 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		WorldGi->CreateSession(FString("Wanted"),4);
+// 	}
+// }
+// // 스팀 세션 찾기
+// if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Two))
+// {
+// 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		WorldGi->FindOtherSession();
+// 	}
+// }
+//
+// // 스팀 세션 참여하기 
+// if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Three))
+// {
+// 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		WorldGi->JoinOtherSession();
+// 	}
 // }

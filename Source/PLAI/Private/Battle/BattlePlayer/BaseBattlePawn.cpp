@@ -61,6 +61,8 @@ ABaseBattlePawn::ABaseBattlePawn()
 	{
 		battleUnitStateComp->SetWidgetClass(tempBattleUnitStateUI.Class);
 	}
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -119,15 +121,6 @@ void ABaseBattlePawn::OnTurnStart()
 	// 턴이 시작됐으면 턴 카운트 1 증가
 	turnManager->turnCount++;
 	UE_LOG(LogTemp, Warning, TEXT("Turn Count %d"), turnManager->turnCount);
-
-	// 턴 유닛 이름 UI에 세팅
-	if (pc && hud && hud->mainUI && hud->mainUI->WBP_CycleAndTurn)
-	{
-		FString s = Cast<ABattlePlayer>(turnManager->curUnit)
-			            ? TEXT("Player")
-			            : TEXT("Enemy");
-		hud->mainUI->WBP_CycleAndTurn->SetTurnText(s);
-	}
 
 	// BattlePlayerInfo UI 세팅
 	if (auto* player = Cast<ABattlePlayer>(this))
@@ -210,12 +203,12 @@ void ABaseBattlePawn::OnTurnEnd()
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 	{
 		// PlayerPhaseEnd
-		phaseManager->EndPlayerPhase();
+		phaseManager->ServerRPC_EndPlayerPhase();
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
 		// EnemyPhaseEnd
-		phaseManager->EndEnemyPhase();
+		phaseManager->ServerRPC_EndEnemyPhase();
 	}
 }
 

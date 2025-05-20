@@ -3,14 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
-#include "UiWolrdMap.generated.h"
+#include "GameFramework/GameState.h"
+#include "GameStateOpen.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PLAI_API UUiWolrdMap : public UUserWidget
+class PLAI_API AGameStateOpen : public AGameState
 {
 	GENERATED_BODY()
+public:
+	
 };

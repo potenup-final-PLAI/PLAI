@@ -123,7 +123,6 @@ void UUiMain::HttpLoginMe()
 			{
 				Wbp_UiInitMain->RemoveFromParent();
 			}
-			
 			// FString GetJson;
 			// FJsonObjectConverter::UStructToJsonObjectString(&LoginComp->UserFullInfo,GetJson);
 			// UE_LOG(LogTemp,Warning,TEXT("로그인컴프 나의정보 조회 Json변환 %s"),*GetJson);
@@ -143,8 +142,7 @@ void UUiMain::OnButtonStart()
 	LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 	LoginComp->TestPlayer->InvenComp->MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 	LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
-
-
+	
 	RemoveFromParent();
 }
 

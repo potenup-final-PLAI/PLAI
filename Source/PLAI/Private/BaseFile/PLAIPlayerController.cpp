@@ -13,10 +13,13 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Monster/Monster.h"
 #include "PLAI/Item/Portal/Warp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
+#include "PLAI/Item/UI/Inventory/Map/UiWorldMap.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -82,7 +85,7 @@ void APLAIPlayerController::OnSetDestinationTriggered()
 	// We flag that the input is being pressed
 	FollowTime += GetWorld()->GetDeltaSeconds();
 
-	UE_LOG(LogTemp,Warning,TEXT("PLAIPLayerController 오른쪽 마우스 트리거중 %f"), FollowTime);
+	// UE_LOG(LogTemp,Warning,TEXT("PLAIPLayerController 오른쪽 마우스 트리거중 %f"), FollowTime);
 	
 	// We look for the location in the world where the player has pressed the input
 	FHitResult Hit;
@@ -137,6 +140,33 @@ void APLAIPlayerController::OnTouchReleased()
 	bIsTouch = false;
 	OnSetDestinationReleased();
 }
+
+void APLAIPlayerController::TestPlayersAdd()
+{
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ATestPlayer::StaticClass(),Actors);
+	for (AActor*Actor : Actors)
+	{
+		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Actor))
+		{
+			TestPlayers.Add(TestPlayer);
+		}
+	}
+	if (TestPlayers.Num() > 0){UE_LOG(LogTemp,Warning,TEXT("PLAIController Testplayers 몇명? [%d]명"),TestPlayers.Num())}
+}
+
+void APLAIPlayerController::MiniMapUpdate()
+{
+	UE_LOG(LogTemp,Warning,TEXT("PLAIController MiniMapUpdate 실행"))
+}
+
+void APLAIPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(APLAIPlayerController, TestPlayers);
+}
+
+
 
 void APLAIPlayerController::Server_WarpPlayer_Implementation(EMonSpawnType SpawnType)
 {

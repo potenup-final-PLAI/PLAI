@@ -19,4 +19,6 @@ protected:
 	
 public:
 
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_SetViewTargetMyPawn(APawn* myPawn);
 };
