@@ -4,8 +4,11 @@
 #include "TestPlayer.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/GameState.h"
+#include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputComp/InputComp.h"
 #include "PLAI/Item/ItemComp/CreComp.h"
@@ -14,6 +17,7 @@
 #include "PLAI/Item/ItemComp/StoreComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/Login/LogItemComp.h"
+#include "PLAI/Item/UI/Inventory/Map/UiWorldMap.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 
 
@@ -46,8 +50,16 @@ void ATestPlayer::BeginPlay()
     	StoreComp->StoreInven->AddToViewport();
     	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
 
-    	// TestInputComp->SetMappingContext();
-    	// TestInputComp->BindInputActions();
+    	// if (AGameStateBase* GS = GetWorld()->GetGameState())
+    	// {
+    	// 	for (APlayerState* PS : GS->PlayerArray)
+    	// 	{
+    	// 		if (ATestPlayer* Player = Cast<ATestPlayer>(PS->GetPawn()))
+    	// 		{
+    	// 			Player->InvenComp->MenuInven->Wbp_UiWolrdMap->SetRefreshPlayerList();
+    	// 		}
+    	// 	}
+    	// }
     }
 }
 

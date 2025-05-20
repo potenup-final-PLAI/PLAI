@@ -143,8 +143,7 @@ void UUiMain::OnButtonStart()
 	LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 	LoginComp->TestPlayer->InvenComp->MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 	LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
-
-
+	
 	RemoveFromParent();
 }
 
