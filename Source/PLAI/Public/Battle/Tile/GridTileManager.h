@@ -40,15 +40,14 @@ public:
 	TSubclassOf<class AMonBossPawn> bossFactory;
 
 	FTimerHandle bindUnitHandle;
-	bool bSetBindUnit = false;
-	
-	void BindUnit();
-	TArray<FIntPoint> RandomCoords(int32 count, TArray<FIntPoint> coords);
+
+	TArray<class ABattlePlayerController*> playerControllers;
 	void InitGridTile();
+	TArray<FIntPoint> RandomCoords(int32 count, TArray<FIntPoint> coords);
 	//------------Test--------------------------
 	// 생성된 유닛들 담기
 	TArray<class ABaseBattlePawn*> unitArray;
-		
+
 	// 현재 타일 위치
 	AGridTile* FindCurrentTile(FVector worldLoc);
 	// 맵에서 x, y위치에 있는 타일 얻기
