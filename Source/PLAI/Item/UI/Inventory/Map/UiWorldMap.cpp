@@ -10,6 +10,8 @@
 #include "Components/Overlay.h"
 #include "PLAI/Item/UI/Inventory/Map/UiWorldPlayerIcon.h"
 #include "Components/SizeBox.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
@@ -19,27 +21,49 @@ UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
 	bIsFocusable = true;
 }
 
-void UUiWorldMap::AddPlayerIcon()
+void UUiWorldMap::SetRefreshPlayerList()
 {
-	UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
-	MiniMapCanvas->AddChild(UIWorldPlayerIcon);
-	UIWorldPlayerIcons.Add(UIWorldPlayerIcon);
+	TestPlayers.Empty();
+	MiniMapCanvasIcon->GetAllChildren().Empty();
+	
+	if (AGameStateBase* GS = GetWorld()->GetGameState())
+	{
+		for (APlayerState* PS : GS->PlayerArray)
+		{
+			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
+			{
+				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
+				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
+				if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon))
+				{
+					Icon->SetSize(FVector2d(30,30));
+				}
+				TestPlayers.Add(TP);
+				UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetRefreshPlayerList() 플레이어 갯수[%i]"),TestPlayers.Num());
+			}
+		}
+	}
 }
 
 void UUiWorldMap::SetPlayerIconMinimap()
 {
-	for (int i = 0; i < UIWorldPlayerIcons.Num(); i++)
+	if (TestPlayers.Num() == 0 || MiniMapCanvasIcon->GetAllChildren().Num() == 0){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 미니맵아이콘 없음")) return;}
+	for (int i = 0; i < TestPlayers.Num(); i++)
 	{
 		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
 		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-	
+
 		U = FMath::Clamp(U, 0.f, 1.f);
 		V = FMath::Clamp(V, 0.f, 1.f);
-	
+
 		FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
 	
-		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapOverlay->Slot))
-		{ CanvasSlot->SetPosition(PixelPos); }
+		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
+		{
+			CanvasSlot->SetPosition(PixelPos);
+		}
+		else
+		{ UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 	}
 }
 
@@ -82,9 +106,7 @@ void UUiWorldMap::SetPlayerMinmapVector(FVector PlayerLocation)
 	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapOverlay->Slot))
 	{ CanvasSlot->SetPosition(PixelPos); }
 	else
-	{
-		UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error"));
-	}
+	{ UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 }
 
 void UUiWorldMap::NativeConstruct()
@@ -92,8 +114,9 @@ void UUiWorldMap::NativeConstruct()
 	Super::NativeConstruct();
 	
 	MaterialMapDynamic = UMaterialInstanceDynamic::Create(MaterialMapInterface,this);
-
 	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
+
+	SetRefreshPlayerList();
 }
 
 FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -126,7 +149,9 @@ void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{
+		SetPlayerIconMinimap();
 		// SetPlayerMinmapVector(TestPlayer->GetActorLocation());
+		
 		float Yaw = TestPlayer->GetActorRotation().Yaw;
 		
 		PlayerRot->SetRenderTransformPivot(FVector2D(0.5f, 0.f));

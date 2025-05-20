@@ -63,8 +63,6 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_WarpPlayer(EMonSpawnType SpawnType);
 
-	virtual void Tick(float DeltaTime) override;
-
 	UPROPERTY(EditAnywhere,Replicated)
 	TArray<ATestPlayer*>TestPlayers;
 	

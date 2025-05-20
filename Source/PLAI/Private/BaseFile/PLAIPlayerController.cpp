@@ -141,14 +141,6 @@ void APLAIPlayerController::OnTouchReleased()
 	OnSetDestinationReleased();
 }
 
-void APLAIPlayerController::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
-	if (!IsLocalController()) return;
-	MiniMapUpdate();
-}
-
 void APLAIPlayerController::TestPlayersAdd()
 {
 	TArray<AActor*> Actors;
@@ -166,10 +158,6 @@ void APLAIPlayerController::TestPlayersAdd()
 void APLAIPlayerController::MiniMapUpdate()
 {
 	UE_LOG(LogTemp,Warning,TEXT("PLAIController MiniMapUpdate 실행"))
-	
-	// if (TestPlayers.Num() == 0){UE_LOG(LogTemp,Warning,TEXT("PLAIController Testplayers 0명"))return;}
-	// for (int i = 0; i < TestPlayers.Num(); i++)
-	// { TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWolrdMap->SetPlayerMinmapVector(TestPlayers[i]->GetActorLocation());}
 }
 
 void APLAIPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -177,6 +165,8 @@ void APLAIPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(APLAIPlayerController, TestPlayers);
 }
+
+
 
 void APLAIPlayerController::Server_WarpPlayer_Implementation(EMonSpawnType SpawnType)
 {

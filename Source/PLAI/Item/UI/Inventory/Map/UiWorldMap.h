@@ -28,6 +28,9 @@ public:
 	class UCanvasPanel* MiniMapCanvas;
 
 	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* MiniMapCanvasIcon;
+
+	UPROPERTY(meta = (BindWidget))
 	class UOverlay* MiniMapOverlay;
 	
 	UPROPERTY(meta = (BindWidget))
@@ -44,14 +47,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UUiWorldPlayerIcon* UIWorldPlayerIcon;
-	
-	UPROPERTY(EditAnywhere)
-	TArray<class UUiWorldPlayerIcon*>UIWorldPlayerIcons;
 
 	UPROPERTY(EditAnywhere)
 	TArray<class ATestPlayer*>TestPlayers;
 	
-	void AddPlayerIcon();
+	void SetRefreshPlayerList();
+	
 	void SetPlayerIconMinimap();
 
 	UPROPERTY(EditAnywhere)

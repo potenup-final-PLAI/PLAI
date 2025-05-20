@@ -50,11 +50,6 @@ void UInvenComp::BeginPlay()
 	Super::BeginPlay();
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
-
-	// 위험한 코드다
-	if (APLAIPlayerController* Controller = Cast<APLAIPlayerController>(PC))
-	{ if (!Controller->TestPlayers.Contains(TestPlayer)){ Controller->TestPlayersAdd();}}
-	else {UE_LOG(LogTemp, Error, TEXT("UInvenComp::BeginPlay() PC 캐스팅 실패"));}
 	
 	if (TestPlayer->IsLocallyControlled())
 	{
