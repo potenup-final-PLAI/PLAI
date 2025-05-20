@@ -68,9 +68,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float CurrentZoom = 0.5f; 
-	
-	virtual void NativeConstruct() override;
 
+	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
