@@ -7,6 +7,7 @@
 #include "GridTile.h"
 #include "GridTileManager.h"
 #include "Battle/Http/BattleHttpActor.h"
+#include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
 #include "Battle/UI/BattleUnitStateUI.h"
@@ -29,16 +30,17 @@ void AUPhaseManager::BeginPlay()
 	Super::BeginPlay();
 
 	InitOtherClass();
-	
-	GetWorld()->GetTimerManager().SetTimer(timerBattleStartHandle, this,&AUPhaseManager::SetBeforeBattle,0.2f, true);
+
+	// GetWorld()->GetTimerManager().SetTimer(timerBattleStartHandle, this,&AUPhaseManager::SetBeforeBattle,0.2f, true);
 }
 
 void AUPhaseManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
 }
-void AUPhaseManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+
+void AUPhaseManager::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -62,12 +64,14 @@ void AUPhaseManager::UpdateCycleUI()
 {
 	if (!pc || !hud || !hud->mainUI)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AUPhaseManager::UpdateCycleUI : !pc || !hud || !hud->mainUI"));
+		UE_LOG(LogTemp, Warning,
+		       TEXT(
+			       "AUPhaseManager::UpdateCycleUI : !pc || !hud || !hud->mainUI"
+		       ));
 		return;
 	}
-	
+
 	hud->mainUI->WBP_CycleAndTurn->SetCycleText(cycle);
-	
 }
 
 void AUPhaseManager::OnRep_UpdateCycleUI()
@@ -79,10 +83,10 @@ void AUPhaseManager::OnRep_CurrentPhase()
 {
 	// UI 상태 변경과 같은 클라이언트 처리가 필요할 때 사용
 	UE_LOG(LogTemp, Warning, TEXT("Phase changed to: %s"),
-		   *UEnum::GetValueAsString(currentPhase));
+	       *UEnum::GetValueAsString(currentPhase));
 }
 
-void AUPhaseManager::ServerRPC_SetPhase_Implementation(EBattlePhase phase)
+void AUPhaseManager::SetPhase(EBattlePhase phase)
 {
 	currentPhase = phase;
 
@@ -99,9 +103,9 @@ void AUPhaseManager::ServerRPC_SetPhase_Implementation(EBattlePhase phase)
 		// 속도를 기반으로 유닛 정렬 작업 및 다음 턴 시작
 		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundStart State"));
 		SetCycle();
-		// Unit Queue에 세팅
+	// Unit Queue에 세팅
 		SetUnitQueue();
-		// 전투 시작
+	// 전투 시작
 		StartBattle();
 		break;
 	case EBattlePhase::TurnProcessing:
@@ -113,7 +117,7 @@ void AUPhaseManager::ServerRPC_SetPhase_Implementation(EBattlePhase phase)
 		UE_LOG(LogTemp, Warning,
 		       TEXT("PhaseManager : RoundEnd State Turn CNT : %d"),
 		       turnManager->turnCount);
-		ServerRPC_SetPhase(EBattlePhase::RoundStart);
+		SetPhase(EBattlePhase::RoundStart);
 		break;
 	case EBattlePhase::BattleEnd:
 		// 끝났을 때 결과에 대한 UI 보여주면 될듯함.
@@ -128,27 +132,29 @@ void AUPhaseManager::InitBattle()
 {
 	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : InitBattle"));
 	// 사이클 시작
-	ServerRPC_SetPhase(EBattlePhase::RoundStart);
+	SetPhase(EBattlePhase::RoundStart);
 }
 
 void AUPhaseManager::SetUnitQueue()
 {
-	TArray<AActor*> unitArr;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), unitFactory, unitArr);
-	
+	// TArray<AActor*> unitArr;
+	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), unitFactory, unitArr);
+
+
 	unitQueue.Empty();
 	httpUnitQueue.Empty();
 
 	int32 alivePlayers = 0;
 	int32 aliveEnemies = 0;
 
-	for (AActor* unit : unitArr)
+	for (AActor* unit : gridTileManager->unitArray)
 	{
 		if (ABaseBattlePawn* pawn = Cast<ABaseBattlePawn>(unit))
 		{
 			if (ABattlePlayer* player = Cast<ABattlePlayer>(pawn))
 			{
-				if (!player->battlePlayerState || player->battlePlayerState->playerStatus.hp <= 0)
+				if (!player->battlePlayerState || player->battlePlayerState->
+					playerStatus.hp <= 0)
 				{
 					continue;
 				}
@@ -158,7 +164,8 @@ void AUPhaseManager::SetUnitQueue()
 			}
 			else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(pawn))
 			{
-				if (!enemy->enemybattleState || enemy->enemybattleState->hp <= 0)
+				if (!enemy->enemybattleState || enemy->enemybattleState->hp <=
+					0)
 				{
 					continue;
 				}
@@ -176,13 +183,14 @@ void AUPhaseManager::SetUnitQueue()
 	// 전멸 조건 처리
 	if (alivePlayers == 0 || aliveEnemies == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("One side has no alive units — Ending battle"));
-		ServerRPC_SetPhase(EBattlePhase::BattleEnd);
+		UE_LOG(LogTemp, Warning,
+		       TEXT("One side has no alive units — Ending battle"));
+		SetPhase(EBattlePhase::BattleEnd);
 		return;
 	}
 
 	SortUnitQueue();
-	
+
 	for (int i = 0; i < unitQueue.Num(); i++)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UnitName %s Unit Speed : %d"),
@@ -218,7 +226,9 @@ void AUPhaseManager::SortUnitTurnEnd()
 			{
 				unitQueue.RemoveAt(i);
 				httpUnitQueue.Remove(pawn);
-				UE_LOG(LogTemp, Warning, TEXT("Removed dead unit from future queue: %s"), *pawn->GetName());
+				UE_LOG(LogTemp, Warning,
+				       TEXT("Removed dead unit from future queue: %s"),
+				       *pawn->GetName());
 			}
 		}
 	}
@@ -233,14 +243,16 @@ ABaseBattlePawn* AUPhaseManager::PopNextAliveUnit()
 
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(candidate))
 		{
-			if (player->battlePlayerState && player->battlePlayerState->playerStatus.hp > 0)
+			if (player->battlePlayerState && player->battlePlayerState->
+				playerStatus.hp > 0)
 			{
 				return candidate;
 			}
 		}
 		else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(candidate))
 		{
-			if (enemy->enemybattleState && enemy->enemybattleState->enemyStatus.hp > 0)
+			if (enemy->enemybattleState && enemy->enemybattleState->enemyStatus.
+			                                      hp > 0)
 			{
 				return candidate;
 			}
@@ -252,17 +264,15 @@ ABaseBattlePawn* AUPhaseManager::PopNextAliveUnit()
 
 void AUPhaseManager::StartBattle()
 {
-	// SetUnitQueue();
-
 	ABaseBattlePawn* tempUnit = PopNextAliveUnit();
 	if (!tempUnit)
 	{
-		ServerRPC_SetPhase(EBattlePhase::BattleEnd); // 또는 RoundEnd
+		SetPhase(EBattlePhase::BattleEnd); // 또는 RoundEnd
 		return;
 	}
 	turnManager->curUnit = tempUnit;
-	
-	ServerRPC_SetPhase(EBattlePhase::TurnProcessing);
+
+	SetPhase(EBattlePhase::TurnProcessing);
 }
 
 void AUPhaseManager::TurnPorcessing(ABaseBattlePawn* unit)
@@ -289,13 +299,13 @@ void AUPhaseManager::StartPlayerPhase()
 	if (cycle > 5)
 	{
 		// 전투를 끝낸다.
-		ServerRPC_SetPhase(EBattlePhase::BattleEnd);
+		SetPhase(EBattlePhase::BattleEnd);
 		return;
 	}
-	
+
 	// PlayerTurn 시작
 	// 첫 번째 유닛 포제스
-	turnManager->MulticastRPC_StartPlayerTurn();
+	turnManager->StartPlayerTurn();
 }
 
 void AUPhaseManager::ServerRPC_EndPlayerPhase_Implementation()
@@ -312,15 +322,15 @@ void AUPhaseManager::ServerRPC_EndPlayerPhase_Implementation()
 	if (!tempUnit)
 	{
 		// 유닛이 큐에 없다면 Round 종료
-		ServerRPC_SetPhase(EBattlePhase::RoundEnd);
+		SetPhase(EBattlePhase::RoundEnd);
 		return;
 	}
 	turnManager->curUnit = tempUnit;
-	
+
 	UE_LOG(LogTemp, Warning, TEXT("End Player Phase"));
 
-	ServerRPC_SetPhase(EBattlePhase::TurnProcessing);
-	
+	SetPhase(EBattlePhase::TurnProcessing);
+
 	SortUnitTurnEnd();
 	// Casting을 통해 현재 유닛이 player 또는 enemy라면 그쪽 함수 실행
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
@@ -345,14 +355,14 @@ void AUPhaseManager::StartEnemyPhase()
 	if (cycle > 5)
 	{
 		// 전투를 끝낸다.
-		ServerRPC_SetPhase(EBattlePhase::BattleEnd);
+		SetPhase(EBattlePhase::BattleEnd);
 		return;
 	}
 
 	// 처음 시작할 적 유닛 턴 시작
 	if (turnManager)
 	{
-		turnManager->MulticastRPC_StartEnemyTurn();
+		turnManager->StartEnemyTurn();
 	}
 }
 
@@ -367,18 +377,18 @@ void AUPhaseManager::ServerRPC_EndEnemyPhase_Implementation()
 	turnManager->SetTurnState(ETurnState::TurnEnd);
 
 	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : EndEnemyPhase"));
-	
+
 	// 유닛이 있다면 처음 유닛을 현재 유닛으로 지정하고 큐에 저장된 유닛을 지운다.
 	ABaseBattlePawn* nextUnit = PopNextAliveUnit();
 	if (!nextUnit)
 	{
-		ServerRPC_SetPhase(EBattlePhase::RoundEnd);
+		SetPhase(EBattlePhase::RoundEnd);
 		return;
 	}
 	turnManager->curUnit = nextUnit;
 
 
-	ServerRPC_SetPhase(EBattlePhase::TurnProcessing);
+	SetPhase(EBattlePhase::TurnProcessing);
 	UE_LOG(LogTemp, Warning, TEXT("End Enemy Phase"));
 
 	SortUnitTurnEnd();
@@ -407,9 +417,12 @@ void AUPhaseManager::BattleEnd()
 
 void AUPhaseManager::SetBeforeBattle()
 {
-	if (!IsValid(gridTileManager)) return;
-	if (!gridTileManager->bSetBindUnit) return;
-	
+	// 서버가 아니면 return
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	// girdTile에 저장해둔 unit들 순서대로 Possess해서 PlayerState 세팅
 	if (gridTileManager->unitArray.Num() > 0)
 	{
@@ -420,13 +433,15 @@ void AUPhaseManager::SetBeforeBattle()
 
 		for (auto& unit : baseUnits)
 		{
-			if (!pc) continue;
-			
+			if (!pc)
+			{
+				continue;
+			}
+
 			pc->Possess(unit);
+			UE_LOG(LogTemp, Warning, TEXT("Set Before Battle : Possess!!!"));
 			// 유닛 스텟 세팅
-			ServerRPC_TryInitStatus(unit);
-			UE_LOG(LogTemp, Warning,
-			       TEXT("Set Before Battle : Possess!!!"));
+			TryInitStatus(unit);
 
 			// 가장 가까운 적 찾기
 			ABaseBattlePawn* closestTarget = nullptr;
@@ -440,15 +455,18 @@ void AUPhaseManager::SetBeforeBattle()
 				}
 
 				// 같은 팀이면 무시
-				const bool bothPlayer = unit->IsA<ABattlePlayer>() && other->IsA<ABattlePlayer>();
-				const bool bothEnemy = unit->IsA<ABaseEnemy>() && other->IsA<ABaseEnemy>();
-				
+				const bool bothPlayer = unit->IsA<ABattlePlayer>() && other->IsA
+					<ABattlePlayer>();
+				const bool bothEnemy = unit->IsA<ABaseEnemy>() && other->IsA<
+					ABaseEnemy>();
+
 				if (bothPlayer || bothEnemy)
 				{
 					continue;
 				}
 
-				float distSq = FVector::DistSquared(unit->GetActorLocation(), other->GetActorLocation());
+				float distSq = FVector::DistSquared(
+					unit->GetActorLocation(), other->GetActorLocation());
 				if (distSq < minDistSquared)
 				{
 					minDistSquared = distSq;
@@ -459,30 +477,35 @@ void AUPhaseManager::SetBeforeBattle()
 			{
 				// 기본 회전 보정값
 				float yawOffset = -90.f;
-				
+
 				// 매쉬만 회전
 				if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 				{
 					if (player->meshComp)
 					{
-						FVector dir = closestTarget->GetActorLocation() - player->GetActorLocation();
+						FVector dir = closestTarget->GetActorLocation() - player
+							->GetActorLocation();
 						FRotator meshRot = dir.Rotation();
-						player->meshComp->SetRelativeRotation(FRotator(0, meshRot.Yaw + yawOffset, 0));
+						player->meshComp->SetRelativeRotation(
+							FRotator(0, meshRot.Yaw + yawOffset, 0));
 					}
 				}
 				else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 				{
 					if (enemy->meshComp)
 					{
-						FVector dir = closestTarget->GetActorLocation() - enemy->GetActorLocation();
+						FVector dir = closestTarget->GetActorLocation() - enemy
+							->GetActorLocation();
 						FRotator meshRot = dir.Rotation();
-						enemy->meshComp->SetWorldRotation(FRotator(0, meshRot.Yaw+ yawOffset, 0));
+						enemy->meshComp->SetWorldRotation(
+							FRotator(0, meshRot.Yaw + yawOffset, 0));
 					}
 				}
 				else
 				{
 					// enemy 임시로 회전
-					FVector dir = closestTarget->GetActorLocation() - unit->GetActorLocation();
+					FVector dir = closestTarget->GetActorLocation() - unit->
+						GetActorLocation();
 					FRotator lookRot = dir.Rotation();
 					unit->SetActorRotation(FRotator(0, lookRot.Yaw, 0));
 				}
@@ -672,7 +695,7 @@ void AUPhaseManager::TrySendbattleState(ABaseBattlePawn* unit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AreAllUnitsInitizlized clear!! "));
 
-		
+
 		FBattleTurnState battleData = SetBattleProcessingAPI();
 
 		if (auto* httpActor = Cast<ABattleHttpActor>(
@@ -710,14 +733,15 @@ bool AUPhaseManager::AreAllUnitsInitialized() const
 }
 
 //--------------------State Setting---------------------------------
-void AUPhaseManager::ServerRPC_TryInitStatus_Implementation(ABaseBattlePawn* unit)
+void AUPhaseManager::TryInitStatus(
+	ABaseBattlePawn* unit)
 {
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
-		if (ABattlePlayerState* myState = Cast<ABattlePlayerState>(
+		if (auto* playerState = Cast<ABattlePlayerState>(
 			player->GetPlayerState()))
 		{
-			player->battlePlayerState = myState;
+			player->battlePlayerState = playerState;
 			SetStatus(player);
 			bIsInitialized = true;
 			UE_LOG(LogTemp, Warning,
@@ -751,27 +775,36 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		// 장비 장착 
 		if (gi && gi->UserFullInfoGiStat.character_info.stats.hp != 0)
 		{
-			
 			gi->EquipActor(player);
 			UE_LOG(LogTemp, Warning, TEXT("Eqirment"));
-			
+
 			// 스테이터스 세팅
 			UE_LOG(LogTemp, Warning, TEXT("!!! Before setting PlayerStatus"));
-			player->battlePlayerState->playerStatus.hp = gi->UserFullInfoGiStat.character_info.stats.hp;
-			player->battlePlayerState->playerStatus.attack = gi->UserFullInfoGiStat.character_info.stats.attack;
-			player->battlePlayerState->playerStatus.defense = gi->UserFullInfoGiStat.character_info.stats.defense;
-			player->battlePlayerState->playerStatus.resistance = gi->UserFullInfoGiStat.character_info.stats.resistance;
-			player->battlePlayerState->playerStatus.move_Range = gi->UserFullInfoGiStat.character_info.stats.move_range;
-			player->battlePlayerState->playerStatus.critical_Rate = gi->UserFullInfoGiStat.character_info.stats.critical_rate;
-			player->battlePlayerState->playerStatus.critical_Damage = gi->UserFullInfoGiStat.character_info.stats.critical_damage;
-			player->battlePlayerState->playerStatus.speed = gi->UserFullInfoGiStat.character_info.stats.speed;
-			
-			for (const FString trait : gi->UserFullInfoGiStat.character_info.traits)
+			player->battlePlayerState->playerStatus.hp = gi->UserFullInfoGiStat.
+				character_info.stats.hp;
+			player->battlePlayerState->playerStatus.attack = gi->
+				UserFullInfoGiStat.character_info.stats.attack;
+			player->battlePlayerState->playerStatus.defense = gi->
+				UserFullInfoGiStat.character_info.stats.defense;
+			player->battlePlayerState->playerStatus.resistance = gi->
+				UserFullInfoGiStat.character_info.stats.resistance;
+			player->battlePlayerState->playerStatus.move_Range = gi->
+				UserFullInfoGiStat.character_info.stats.move_range;
+			player->battlePlayerState->playerStatus.critical_Rate = gi->
+				UserFullInfoGiStat.character_info.stats.critical_rate;
+			player->battlePlayerState->playerStatus.critical_Damage = gi->
+				UserFullInfoGiStat.character_info.stats.critical_damage;
+			player->battlePlayerState->playerStatus.speed = gi->
+				UserFullInfoGiStat.character_info.stats.speed;
+
+			for (const FString trait : gi->UserFullInfoGiStat.character_info.
+			                               traits)
 			{
 				player->battlePlayerState->playerStatus.traits.Add(trait);
-				UE_LOG(LogTemp, Warning, TEXT("player state traits : %s"), *trait);
+				UE_LOG(LogTemp, Warning, TEXT("player state traits : %s"),
+				       *trait);
 			}
-			
+
 			UE_LOG(LogTemp, Warning, TEXT("!!! After setting PlayerStatus"));
 		}
 		else
@@ -787,12 +820,12 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			player->battlePlayerState->playerStatus.speed = 10;
 			UE_LOG(LogTemp, Warning, TEXT("not Set Eqirment"));
 		}
-		
+
 		// moveRange 세팅 작업 진행
 		player->moveRange = player->battlePlayerState->playerStatus.move_Range;
 
 		player->battlePlayerState->playerLifeState = ELifeState::Alive;
-		
+
 
 		UE_LOG(LogTemp, Warning,
 		       TEXT(
@@ -811,13 +844,14 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		       *UEnum::GetValueAsString(player->battlePlayerState->
 			       playerLifeState));
 
-		if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(player->battleUnitStateComp->GetWidget()))
+		if (UBattleUnitStateUI* ui = Cast<UBattleUnitStateUI>(
+			player->battleUnitStateComp->GetWidget()))
 		{
-			FString name = FString::Printf(TEXT("player%d"),unitPlayerNameindex);
+			FString name = FString::Printf(
+				TEXT("player%d"), unitPlayerNameindex);
 			ui->SetUnitName(name);
 			ui->SetHPUI(player);
 			++unitPlayerNameindex;
-			
 		}
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
@@ -829,7 +863,10 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		enemy->enemybattleState->enemyLifeState = ELifeState::Alive;
 		UE_LOG(LogTemp, Warning, TEXT("!!! After setting PlayerStatus"));
 
-		UE_LOG(LogTemp, Warning,TEXT("Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "", crit : %f, crit_Damge : %f, spd : %d"),
+		UE_LOG(LogTemp, Warning,
+		       TEXT(
+			       "Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "
+			       ", crit : %f, crit_Damge : %f, spd : %d"),
 		       enemy->enemybattleState->enemyStatus.hp,
 		       enemy->enemybattleState->enemyStatus.attack,
 		       enemy->enemybattleState->enemyStatus.defense,
@@ -839,7 +876,9 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		       enemy->enemybattleState->enemyStatus.critical_Damage,
 		       enemy->enemybattleState->enemyStatus.speed);
 
-		UE_LOG(LogTemp, Warning, TEXT("state : %s"),*UEnum::GetValueAsString(enemy->enemybattleState->enemyLifeState));
+		UE_LOG(LogTemp, Warning, TEXT("state : %s"),
+		       *UEnum::GetValueAsString(enemy->enemybattleState->enemyLifeState
+		       ));
 	}
 	else
 	{
@@ -860,6 +899,7 @@ FString AUPhaseManager::GetStatusEffectsString(EStatusEffect effect)
 	const FString* FoundName = StatusEffectNames.Find(effect);
 	return FoundName ? *FoundName : TEXT("알 수 없음");
 }
+
 void AUPhaseManager::InitOtherClass()
 {
 	// GI
@@ -868,7 +908,7 @@ void AUPhaseManager::InitOtherClass()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Game Instance is already initialized"));
 	}
-	
+
 	// TurnManager
 	turnManager = Cast<ATurnManager>(
 		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
@@ -876,7 +916,7 @@ void AUPhaseManager::InitOtherClass()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("turnManager is Set"));
 	}
-	
+
 	// PC
 	pc = GetWorld()->GetFirstPlayerController();
 	if (pc)
@@ -887,7 +927,7 @@ void AUPhaseManager::InitOtherClass()
 		hud = Cast<ABattleHUD>(pc->GetHUD());
 		if (hud) UE_LOG(LogTemp, Warning, TEXT("hud is Set"));
 	}
-	
+
 	// girdTileManager
 	gridTileManager = Cast<AGridTileManager>(
 		UGameplayStatics::GetActorOfClass(GetWorld(), girdTileManagerFactory));
@@ -896,8 +936,9 @@ void AUPhaseManager::InitOtherClass()
 		UE_LOG(LogTemp, Warning, TEXT("gridTileManager is Set"));
 	}
 
-	// DamageUI Spawn
-	damageUIActor = GetWorld()->SpawnActor<AWorldDamageUIActor>(damageUIFactory);
+	// DamageUI Spawn이 클라만큼 됨
+	damageUIActor = GetWorld()->SpawnActor<
+		AWorldDamageUIActor>(damageUIFactory);
 	if (damageUIActor)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DamageUIActor created"));
@@ -908,3 +949,25 @@ void AUPhaseManager::InitOtherClass()
 	}
 }
 
+void AUPhaseManager::PlayerReady(APlayerController* playerControl)
+{
+	readyCount += 1;
+	UE_LOG(LogTemp, Warning, TEXT("PlayerArray Num : %d readyCount : %d"),
+	       GetWorld()->GetGameState()->PlayerArray.Num(), readyCount);
+	if (GetWorld()->GetGameState()->PlayerArray.Num() <= readyCount)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("모든 플레이어 준비 완료 → 전투 시작"));
+
+		for (FConstPlayerControllerIterator it = GetWorld()->
+			     GetPlayerControllerIterator(); it; ++it)
+		{
+			if (ABattlePlayerController* battlePC = Cast<
+				ABattlePlayerController>(*it))
+			{
+				battlePC->Client_StopReadyTimer();
+			}
+		}
+
+		SetBeforeBattle();
+	}
+}

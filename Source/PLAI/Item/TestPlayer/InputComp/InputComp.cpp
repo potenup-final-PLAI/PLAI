@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "JsonObjectConverter.h"
 #include "AI/NavigationSystemBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/TextBlock.h"
@@ -13,6 +14,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/Npc/NpcCharacter.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Character/UIChaStat.h"
@@ -81,8 +83,8 @@ void UInputComp::BindInputActions()
 		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Completed, this, &UInputComp::On_LeftMouseComplete);
 		InputComp->BindAction(IE_MouseWheel, ETriggerEvent::Triggered, this, &UInputComp::On_MouseWheelTriggered);
 		InputComp->BindAction(IE_RotateView, ETriggerEvent::Started, this, &UInputComp::On_RoatateView);
+		InputComp->BindAction(IE_Map, ETriggerEvent::Started, this, &UInputComp::On_Map);
 	}
-		
 }
 
 void UInputComp::SetMappingContext()
@@ -109,6 +111,10 @@ void UInputComp::SetMappingContext()
 void UInputComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	// if (TestPlayer->IsLocallyControlled() && Pc->WasInputKeyJustPressed(EKeys::T))
+	// { FString JsonString;
+	// 	FJsonObjectConverter::UStructToJsonObjectString(TestPlayer->LoginComp->UserFullInfo,JsonString);
+	// 	UE_LOG(LogTemp,Warning,TEXT("InputComp TKey JsonString [%s]"),*JsonString) }
 }
 
 void UInputComp::On_Equip()
@@ -141,9 +147,15 @@ void UInputComp::On_Stat()
 	{ TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);}
 }
 
+void UInputComp::On_Map()
+{
+	UE_LOG(LogTemp,Warning,TEXT("InputComp 키누르고 OnMap 딜리게이트 실행되냐?"))
+	OnInputMap.ExecuteIfBound();
+}
+
 void UInputComp::On_LeftMouseStart()
 {
-	// if (!Pc->IsLocalController()) return;
+	if (!Pc->IsLocalController()) return;
 
 	UE_LOG(LogTemp,Warning,TEXT("InputComp 왼쪽마우스 클릭 [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
 
@@ -192,9 +204,9 @@ void UInputComp::On_LeftMouseTriggered()
 		FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
 
 	if (Dot > 0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-1.5,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-0.65,0)); }
 	else if (Dot < -0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+1.5,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+0.65,0)); }
 	
 	else if (FMath::Abs(Dot) > 0.6)
 	{
@@ -240,6 +252,8 @@ void UInputComp::On_MouseWheelTriggered(const FInputActionValue& Value)
 
 void UInputComp::On_RoatateView()
 {
+	if (!Pc->IsLocalController()) return;
+	
 	UE_LOG(LogTemp, Warning, TEXT("UInputComp::On_RoatateView Bool 값 %d"),bRotateView);
 	if (bRotateView == true)
 	{
@@ -263,11 +277,6 @@ void UInputComp::InitializeComponent()
 	{
 		Pawn->ReceivePossessed(Pc);
 	}
-}
-
-void UInputComp::OnPawnPossesed(AController* Controller)
-{
-	
 }
 
 // if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp, Error, TEXT(

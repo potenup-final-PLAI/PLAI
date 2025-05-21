@@ -94,7 +94,7 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,
 		// 현재 페이즈가 None이라면
 		if (phaseManager->currentPhase == EBattlePhase::None)
 		{
-			phaseManager->ServerRPC_SetPhase(EBattlePhase::BattleStart);
+			phaseManager->SetPhase(EBattlePhase::BattleStart);
 		}
 	}
 	// httpRequest->SetContentAsString(jsonString);

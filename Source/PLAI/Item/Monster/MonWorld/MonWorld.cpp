@@ -21,20 +21,27 @@ void AMonWorld::BeginPlay()
 	Super::BeginPlay();
 	InitLoc = GetActorLocation() + RandLocation();
 	FirstInitLoc = GetActorLocation();
+
+	if (MonsterType == EMonsterType::Boss)
+	{
+		
+	}
 }
 
 // Called every frame
 void AMonWorld::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	CurrentTimeTwo += DeltaTime;
 	if (CurrentTimeTwo > 1.0)
 	{
 		CurrentTimeTwo = 0;
 	}
-
-	MoveToLocation();
+	if (MonsterType == EMonsterType::Monster)
+	{
+		MoveToLocation();
+	}
 }
 
 // Called to bind functionality to input

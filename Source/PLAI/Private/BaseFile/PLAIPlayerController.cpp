@@ -44,7 +44,7 @@ void APLAIPlayerController::SetupInputComponent()
 	// Add Input Mapping Context
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
-		Subsystem->AddMappingContext(DefaultMappingContext, 1);
+		Subsystem->AddMappingContext(DefaultMappingContext,1);
 	}
 
 	// Set up action bindings
@@ -141,25 +141,6 @@ void APLAIPlayerController::OnTouchReleased()
 	OnSetDestinationReleased();
 }
 
-void APLAIPlayerController::TestPlayersAdd()
-{
-	TArray<AActor*> Actors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ATestPlayer::StaticClass(),Actors);
-	for (AActor*Actor : Actors)
-	{
-		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Actor))
-		{
-			TestPlayers.Add(TestPlayer);
-		}
-	}
-	if (TestPlayers.Num() > 0){UE_LOG(LogTemp,Warning,TEXT("PLAIController Testplayers 몇명? [%d]명"),TestPlayers.Num())}
-}
-
-void APLAIPlayerController::MiniMapUpdate()
-{
-	UE_LOG(LogTemp,Warning,TEXT("PLAIController MiniMapUpdate 실행"))
-}
-
 void APLAIPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -199,5 +180,4 @@ void APLAIPlayerController::Server_WarpPlayer_Implementation(EMonSpawnType Spawn
 			}
 		}
 	}
-	// GetPawn()->SetActorLocation(GetPawn()->GetActorLocation() + FVector(0, 0, 2000));
 }
