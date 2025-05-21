@@ -37,15 +37,14 @@ void UUiMonWorld::OnButtonYes()
 			WorldGi->UserFullInfoGi = TestPlayer->LoginComp->UserFullInfo;
 			WorldGi->bGameStart = true;
 			WorldGi->bBattleReward = true;
+            WorldGi->MonsterType = MonWorld->MonsterType;
 			
 			if (MonWorld && MonWorld->MonsterType == EMonsterType::Monster)
 			{
-				// UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
 				GetWorld()->ServerTravel(TEXT("/Game/JS/Maps/TestMap?listen"));
 			}
 			else if (MonWorld && MonWorld->MonsterType == EMonsterType::Boss)
 			{
-				// UGameplayStatics::OpenLevel(TestPlayer,FName("Mk_BossMap"));
 				GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/MK_BossMap?listen"));
 			}
 			// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
