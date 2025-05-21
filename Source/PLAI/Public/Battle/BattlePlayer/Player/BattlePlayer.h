@@ -37,14 +37,6 @@ public:
 	//------------------Anim Instance--------------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim)
 	class UBattlePlayerAnimInstance* playerAnim;
-
-
-	//--------------------Owner-------------------
-	UPROPERTY(EditAnywhere)
-	ABattlePlayerState* owningPlayerState;
-
-	UPROPERTY(EditAnywhere)
-	FTimerHandle battlesStateUITimerHandle;
 	
 };
 

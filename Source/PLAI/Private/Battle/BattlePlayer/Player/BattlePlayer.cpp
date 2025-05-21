@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Player/BattlePlayerAnimInstance.h"
 
 ABattlePlayer::ABattlePlayer()
@@ -59,6 +60,8 @@ void ABattlePlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	
+	UE_LOG(LogTemp, Warning,TEXT("NewController : %s"), *NewController->GetActorNameOrLabel());
+	
 	if (pc)
 	{
 		//그 객체를 이용해서 EnhanceInputLocalPlayerSubSystem을 가져온다.
@@ -68,6 +71,10 @@ void ABattlePlayer::PossessedBy(AController* NewController)
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PC is Nullptr"));
+	}
 	
 	playerAnim = Cast<UBattlePlayerAnimInstance>(meshComp->GetAnimInstance());
 }
@@ -76,9 +83,8 @@ void ABattlePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	if (UEnhancedInputComponent* pi = Cast<UEnhancedInputComponent>(
-		PlayerInputComponent))
+	if (UEnhancedInputComponent* pi = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		pi->BindAction(IA_Move, ETriggerEvent::Completed, this,&ABaseBattlePawn::OnMouseLeftClick);
+		pi->BindAction(IA_Move, ETriggerEvent::Completed, this, &ABaseBattlePawn::OnMouseLeftClick);
 	}
 }

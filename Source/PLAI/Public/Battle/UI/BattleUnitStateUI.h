@@ -65,7 +65,9 @@ public:
 
 	FString GetNetModeString(UWorld* World);
 
-
+	//-------------Update HP----------------------
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	int32 curHP = 0;
 	void UpdatePlayerHPUI(int32 hp);
 	void UpdateEnemyHPUI(int32 hp);
 };

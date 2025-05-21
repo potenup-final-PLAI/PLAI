@@ -11,6 +11,7 @@
 #include "Enemy/BaseEnemy.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/BattlePlayer.h"
 
 DEFINE_LOG_CATEGORY(TPS);
@@ -34,6 +35,9 @@ void ATurnManager::GetLifetimeReplicatedProps(
 	TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATurnManager, curTurnState);
+	DOREPLIFETIME(ATurnManager, curUnit);
 }
 
 // Called every frame
@@ -55,8 +59,10 @@ void ATurnManager::SetTurnState(ETurnState newTurnState)
 		break;
 	case ETurnState::PlayerTurn:
 		// Player AP 세팅
+		UE_LOG(LogTemp, Warning, TEXT("curTurnState = PlayerTurn"));
 		break;
 	case ETurnState::EnemyTurn:
+		UE_LOG(LogTemp, Warning, TEXT("curTurnState = PlayerTurn"));
 		break;
 	case ETurnState::TurnEnd:
 		break;
@@ -65,23 +71,15 @@ void ATurnManager::SetTurnState(ETurnState newTurnState)
 	}
 }
 
-void ATurnManager::UpdateWhoTurn()
+void ATurnManager::MutliCastRPC_UpdateWhoTurn_Implementation(const FString& turnUnitName)
 {
 	// 턴 유닛 이름 UI에 세팅
-	if (phaseManager->pc && phaseManager->hud && phaseManager->hud->mainUI &&
-		phaseManager->hud->mainUI->WBP_CycleAndTurn)
+	if (phaseManager->pc && phaseManager->hud && phaseManager->hud->mainUI && phaseManager->hud->mainUI->WBP_CycleAndTurn)
 	{
-		FString s = Cast<ABattlePlayer>(phaseManager->turnManager->curUnit)
-			            ? TEXT("Player")
-			            : TEXT("Enemy");
-		phaseManager->hud->mainUI->WBP_CycleAndTurn->SetTurnText(s);
+		phaseManager->hud->mainUI->WBP_CycleAndTurn->SetTurnText(turnUnitName);
 	}
 }
 
-void ATurnManager::OnRep_UpdateWhoTurn()
-{
-	UpdateWhoTurn();
-}
 
 void ATurnManager::StartPlayerTurn()
 {
@@ -91,43 +89,31 @@ void ATurnManager::StartPlayerTurn()
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Player Turn"));
+	// Player Turn으로 state Update
 	SetTurnState(ETurnState::PlayerTurn);
-
+	// Turn UI 업데이트
+	FString s = Cast<ABattlePlayer>(curUnit) ? TEXT("Player") : TEXT("Enemy");
+	
+	MutliCastRPC_UpdateWhoTurn(s);
+	
 	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
-		if (!playerPawn->owningPlayerState)
-		{
-			UE_LOG(LogTemp, Error,TEXT("playerPawn->owningPlayerState is nullptr"));
-			return;
-		}
-
-		APlayerController* pc = Cast<APlayerController>(playerPawn->owningPlayerState->GetOwner());
-		if (!pc)
-		{
-			UE_LOG(LogTemp, Error,TEXT("owningPlayerState->GetOwner() is nullptr"));
-			return;
-		}
-		
-		if (ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(pc))
+		if (ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(playerPawn->GetOwner()))
 		{
 			FTimerHandle possessHandle;
 			GetWorld()->GetTimerManager().ClearTimer(possessHandle);
 
 			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
+			{
+				battlePC->Possess(playerPawn);
+				if (curUnit->IsValidLowLevelFast())
 				{
-					if (battlePC && playerPawn)
-					{
-						battlePC->Possess(playerPawn);
-						if (curUnit->IsValidLowLevelFast())
-						{
-							UE_LOG(LogTemp, Warning,TEXT("Safe to call OnTurnStart on %s"),*curUnit->GetName());
-							UpdateWhoTurn();
-							auto* playerCamera = battlePC->GetPawnOrSpectator();
-							curUnit->OnTurnStart();
-							MulticastRPC_CameraChange(playerCamera);
-						}
-					}
-				}), 1.0f, false);
+					UE_LOG(LogTemp, Warning,TEXT("Safe to call OnTurnStart on %s"),*curUnit->GetName());
+					auto* playerCamera = battlePC->GetPawnOrSpectator();
+					curUnit->OnTurnStart();
+					MulticastRPC_CameraChange(playerCamera);
+				}
+			}), 1.0f, false);
 		}
 	}
 	else
@@ -144,9 +130,12 @@ void ATurnManager::StartEnemyTurn()
 		return;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Enemy Turn"));
+	// EnemyTurn으로 State 업데이트
 	SetTurnState(ETurnState::EnemyTurn);
-
-
+	FString s = Cast<ABaseEnemy>(curUnit) ? TEXT("Player") : TEXT("Enemy");
+	// Turn UI 업데이트 
+	MutliCastRPC_UpdateWhoTurn(s);
+	
 	if (ABaseEnemy* pawn = Cast<ABaseEnemy>(curUnit))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("pawn is Enemy %s "), *pawn->GetActorNameOrLabel());

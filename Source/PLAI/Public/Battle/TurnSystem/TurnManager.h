@@ -76,15 +76,11 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
 	class AUPhaseManager* phaseManager;
 
-	UPROPERTY(ReplicatedUsing = OnRep_UpdateWhoTurn, VisibleDefaultsOnly,
-		BlueprintReadOnly,
-		Category = "Turn")
+	UPROPERTY(Replicated, VisibleDefaultsOnly,BlueprintReadOnly,Category = "Turn")
 	ABaseBattlePawn* curUnit;
 	//------------누구 턴인지 나타내는 UI --------
-
-	void UpdateWhoTurn();
-	UFUNCTION()
-	void OnRep_UpdateWhoTurn();
+	UFUNCTION(NetMulticast, Reliable)
+	void MutliCastRPC_UpdateWhoTurn(const FString& turnUnitName);
 
 	// 유닛들의 턴 순서를 저장하는 배열
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")

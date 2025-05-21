@@ -49,8 +49,7 @@ void AGridTile::InitDecal()
 	{
 		if (dynDecalInstance)
 		{
-			dynDecalInstance->
-				SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
+			dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
 		}
 	}
 }

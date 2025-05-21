@@ -114,13 +114,16 @@ FString UBattleUnitStateUI::GetNetModeString(UWorld* World)
 
 void UBattleUnitStateUI::UpdatePlayerHPUI(int32 hp)
 {
-	
+	// HP가 같다면 return
+	if (curHP == hp) return;
+	// 아니라면 curHP 업데이트
+	curHP = hp;
+	// UI 변경
 	txt_HP->SetText(FText::AsNumber(hp));
 	UE_LOG(LogTemp, Warning, TEXT("SetHPUI Player maxHP = %d"), hp);
 }
 
 void UBattleUnitStateUI::UpdateEnemyHPUI(int32 hp)
 {
-	
 	txt_HP->SetText(FText::AsNumber(hp));
 }

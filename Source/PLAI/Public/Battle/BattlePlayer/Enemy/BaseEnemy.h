@@ -28,8 +28,15 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
+	
+	//--------------------Status API 전송용 구조체 변수--------------------
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
+	FBaseStatus enemyStatus;
 
-
+	//--------------------LifeState--------------------
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
+	ELifeState enemyLifeState;
+	
 	//-------------enemy Settings--------------------
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	class USkeletalMeshComponent* meshComp;

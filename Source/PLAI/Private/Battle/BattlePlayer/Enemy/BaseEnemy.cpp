@@ -402,3 +402,5 @@ bool ABaseEnemy::TryConsumeAP(int32 amount)
 	}
 	return true;
 }
+
+

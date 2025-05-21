@@ -11,7 +11,6 @@
 #include "Enemy/BaseEnemy.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/Monster/MonWorld/MonBossPawn.h"
 #include "Player/BattlePlayer.h"
 
@@ -28,9 +27,6 @@ AGridTileManager::AGridTileManager()
 void AGridTileManager::BeginPlay()
 {
 	Super::BeginPlay();
-
-
-	InitGridTile();
 }
 
 // Called every frame
@@ -55,14 +51,12 @@ void AGridTileManager::InitGridTile()
 	{
 		for (int32 X = 0; X < 25; ++X)
 		{
-			FVector spawnLoc = GetActorLocation() + FVector(
-				Y * 100, X * 100, 0.0f);
+			FVector spawnLoc = GetActorLocation() + FVector(Y * 100, X * 100, 0.0f);
 			FRotator spawnRot = FRotator::ZeroRotator;
 			FActorSpawnParameters spawnParams;
 
 
-			auto* spawnTile = GetWorld()->SpawnActor<AGridTile>(
-				tileFactory, spawnLoc, spawnRot, spawnParams);
+			auto* spawnTile = GetWorld()->SpawnActor<AGridTile>(tileFactory, spawnLoc, spawnRot, spawnParams);
 			if (spawnTile)
 			{
 				// X, Y번 째 좌표 기억 변수 생성
@@ -87,8 +81,7 @@ void AGridTileManager::InitGridTile()
 	TArray<APlayerState*> playerStates = GetWorld()->GetGameState()->PlayerArray;
 	UE_LOG(LogTemp, Warning, TEXT("playerStates : %d"), playerStates.Num());
 
-	TArray<FIntPoint> playerCoords =
-		RandomCoords(playerStates.Num(), allCoords);
+	TArray<FIntPoint> playerCoords = RandomCoords(playerStates.Num(), allCoords);
 
 	for (int32 i = 0; i < playerStates.Num(); ++i)
 	{
@@ -100,10 +93,8 @@ void AGridTileManager::InitGridTile()
 		}
 
 		// 유닛 스폰
-		FVector spawnLoc = gridTile->GetActorLocation() + FVector(
-			0.f, 0.f, 80.f);
-		ABattlePlayer* player = GetWorld()->SpawnActor<ABattlePlayer>(
-			battlePlayerFactory, spawnLoc, FRotator::ZeroRotator);
+		FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
+		ABattlePlayer* player = GetWorld()->SpawnActor<ABattlePlayer>(battlePlayerFactory, spawnLoc, FRotator::ZeroRotator);
 		if (!player)
 		{
 			continue;
@@ -113,11 +104,13 @@ void AGridTileManager::InitGridTile()
 
 		// 매칭된 PlayerController를 찾아 SetOwner
 		APlayerState* ps = playerStates[i];
-		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(
-			ps->GetOwner());
+		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetOwner());
 		if (battlePC)
 		{
+			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("Before player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
 			player->SetOwner(battlePC);
+			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("After player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
+
 			player->ForceNetUpdate(); // 복제 보장
 			playerControllers.Add(battlePC);
 		}
@@ -183,12 +176,15 @@ void AGridTileManager::InitGridTile()
 			}
 		}
 	}
+	if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
+	{
+		phaseManager->SetBeforeBattle();
+	}
 	UE_LOG(LogTemp, Warning, TEXT("InitGridTile : gridTile Complete"));
 }
 
 
-TArray<FIntPoint> AGridTileManager::RandomCoords(
-	int32 count, TArray<FIntPoint> coords)
+TArray<FIntPoint> AGridTileManager::RandomCoords(int32 count, TArray<FIntPoint> coords)
 {
 	TArray<FIntPoint> result;
 
@@ -249,23 +245,18 @@ void AGridTileManager::SetTileColor(AGridTile* targetTile, bool bHighlight)
 {
 	if (!targetTile || !targetTile->dynDecalInstance)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT(
-			       "SetTileColor : !targetTile || !targetTile->dynDecalInstance"
-		       ));
+		UE_LOG(LogTemp, Warning,TEXT("SetTileColor : !targetTile || !targetTile->dynDecalInstance"));
 		return;
 	}
 
 	if (bHighlight)
 	{
 		//그 위치 타일 색 변경
-		targetTile->dynDecalInstance->SetScalarParameterValue(
-			TEXT("TileOpacity"), 0.1f);
+		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.1f);
 	}
 	else
 	{
 		//그 위치 타일 색 변경
-		targetTile->dynDecalInstance->SetScalarParameterValue(
-			TEXT("TileOpacity"), 0.0f);
+		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
 	}
 }

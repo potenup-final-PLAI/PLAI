@@ -51,6 +51,7 @@ public:
 	TArray<FString> skills = {};
 
 	// Player가 죽었는지 살았는지 상태 체크
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
 	ELifeState playerLifeState;
 	//-------------------기본 콜리전 세팅----------------------
 	UPROPERTY(EditAnywhere)
@@ -70,7 +71,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UWorldGi* gi;
 	// UI
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	class UBattleUnitStateUI* battleUnitStateUI;
 	UPROPERTY(EditAnywhere)
 	class ABattleHUD* hud;
@@ -129,7 +130,6 @@ public:
 	TSubclassOf<class ATurnManager> turnManagerFactory;
 
 	void OnTurnStart();
-
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_SetBattlePlayerInfoUI();
 	void OnTurnEnd();
@@ -157,9 +157,9 @@ public:
 	void EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType);
 	// Damage 계산 함수
 	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk,
-	                             int32 weapon, float skillMultiplier,
-	                             float criticalRate, float criticalDamage,
-	                             int32 personality, int32 status_effect);
+	                             float skillMultiplier,
+	                             float criticalRate, float criticalDamage
+	                             );
 	void PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 	                       EActionMode attackType = EActionMode::None);
 
@@ -178,10 +178,10 @@ public:
 	void AngryProcess();
 	void BleedingProcess();
 	// enemy 상태 처리
-	void WeakeningEnemyProcess(UEnemyBattleState* enemyState);
-	void VulnerableEnemyProcess(UEnemyBattleState* enemyState);
-	void AngryEnemyProcess(UEnemyBattleState* enemyState);
-	void BleedingEnemyProcess(UEnemyBattleState* enemyState);
+	void WeakeningEnemyProcess(class ABaseEnemy* enemy);
+	void VulnerableEnemyProcess(class ABaseEnemy* enemy);
+	void AngryEnemyProcess(class ABaseEnemy* enemy);
+	void BleedingEnemyProcess(class ABaseEnemy* enemy);
 
 	//---------------TEST-------------------
 	// Player 움직임
@@ -213,7 +213,7 @@ public:
 		TEXT("타격"),
 		TEXT("마비의 일격"),
 		TEXT("몸통 박치기"),
-		TEXT("맹동 공격"),
+		TEXT("맹독 공격"),
 		TEXT("취약 타격"),
 		TEXT("약화의 일격"),
 		TEXT("치명 일격"),
@@ -255,9 +255,13 @@ public:
 		TEXT("원한꾼"),
 		TEXT("민첩함")
 	};
+	// Enemy 스텟 세팅
 	void InitEnemyState();
-	void InitTraits();
-	void ApplyTraitModifiers(UEnemyBattleState* state);
+	// Enemy 성격 세팅
+	void InitEnemyTraits();
+	// Enemy 기술 세팅
+	void InitEnemySkills();
+	void ApplyTraitModifiers(class ABaseEnemy* enemy);
 	// 마우스 클릭 했을 때 처리 하는 부분
 	void OnMouseLeftClick();
 	void AddOpenByOffset(FIntPoint offset);
@@ -328,7 +332,7 @@ public:
 	//-------------Unit 이름, HP, Armor 세팅------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
 	class UWidgetComponent* battleUnitStateComp;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = UI)
 	class ABaseBattlePawn* lastHoveredPawn;
 
 	void BillboardBattleUnitStateUI();
@@ -352,4 +356,9 @@ public:
 
 	//------------Enemy Turn 여러 번 호출 방지--------
 	bool bTurnEnded = false;
+
+	
+	//-------------Enemy Name----------------
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_SetEnemyName(class ABaseEnemy* enemy);
 };
