@@ -316,7 +316,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemWeapon->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		
-		ItemWeapon->AddActorWorldOffset(FVector(35, 7, -8));
+		ItemWeapon->AddActorLocalOffset(FVector(-20, -10, 60));
 		ItemWeapon->AddActorLocalRotation(FRotator(-165, 10, 100));
 
 		if (ItemStructTable.Material)
