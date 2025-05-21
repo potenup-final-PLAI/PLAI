@@ -56,7 +56,7 @@ void UInvenComp::BeginPlay()
 			if (WorldGi->bBattleReward == true || WorldGi->bGameStart == true)
 			{
 				if (!MenuInven){MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);}
-				MenuInven->AddToViewport(2);
+				MenuInven->AddToViewport(1);
 				MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);

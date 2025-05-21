@@ -32,7 +32,7 @@ void ANpcCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	UiNpc = CreateWidget<UUiNpc>(GetWorld(),UiNpcFactory);
-    WidgetComp->SetWidget(UiNpc);
+	WidgetComp->SetWidget(UiNpc);
 	WidgetComp->SetVisibility(true);
 	WidgetComp->SetRelativeLocation(FVector(0,0,150));
 	WidgetComp->SetDrawSize(FVector2D(300.0f,120.0f));
@@ -50,9 +50,16 @@ void ANpcCharacter::BeginPlay()
 	{ NiagaraComp->SetAsset(LoadedSystem); }
 	else
 	{ UE_LOG(LogTemp, Warning, TEXT("Niagara System 로드 실패! 경로 확인 필요")); }
+
+	if (!UiNpc) return;
+	UiNpc->NpcName->SetText(FText::FromString(NpcNameString));
+	// TWeakObjectPtr <UUiNpc> WeakUiNpc = UiNpc;
+	// FString NpcName = NpcNameString;  
 	// FTimerHandle TimerHandle;
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	// { UiNpc->NpcName->SetText(FText::FromString(NpcNameString));},0.5,false);
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,NpcName,WeakUiNpc]()
+	// {
+	// 	if (!IsValid(UiNpc)) return;
+	// 	WeakUiNpc->NpcName->SetText(FText::FromString(NpcName));},2.0,false);
 }
 
 // Called every frame

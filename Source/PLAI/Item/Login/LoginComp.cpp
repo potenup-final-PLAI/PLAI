@@ -50,9 +50,7 @@ void ULoginComp::BeginPlay()
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
-			if (WorldGi->Creature)
-			{ TestPlayer->InvenComp->Server_SpawnCreature();
-				WorldGi->Creature = nullptr; }
+			if (WorldGi->Creature) { TestPlayer->InvenComp->Server_SpawnCreature(); WorldGi->Creature = nullptr; }
 			// 최초 게임 실행 했는지
 			if (WorldGi->bGameStart == false)
 			{
@@ -279,7 +277,7 @@ void ULoginComp::HttpMePost()
 			if(TestPlayer && UserFullInfo.character_info.position.x != 0)
 			{
 				TestPlayer->SetActorLocation(FVector(UserFullInfo.character_info.position.x,
-				UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z + 750));
+				UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z + 1000));
 			}
 			FTimerHandle TimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,MoveComp]()

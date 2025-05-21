@@ -26,7 +26,6 @@ void UUiMonWorld::NativeConstruct()
 
 void UUiMonWorld::OnButtonYes()
 {
-	if (!TestPlayer->HasAuthority()){UE_LOG(LogTemp,Warning,TEXT("UiMonWorld OnButtonYes TestPlayer 서버가 아님")) return;}
 	if (TestPlayer)
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
@@ -41,7 +40,8 @@ void UUiMonWorld::OnButtonYes()
             WorldGi->MonsterType = MonWorld->MonsterType;
 			if (TestPlayer && TestPlayer->CreComp->Creature)
 			{ WorldGi->Creature = TestPlayer->CreComp->Creature; }
-			
+
+			if (!TestPlayer->HasAuthority()){UE_LOG(LogTemp,Warning,TEXT("UiMonWorld OnButtonYes TestPlayer 서버가 아님")) return;}
 			if (MonWorld && MonWorld->MonsterType == EMonsterType::Monster)
 			{
 				GetWorld()->ServerTravel(TEXT("/Game/JS/Maps/TestMap?listen"));
