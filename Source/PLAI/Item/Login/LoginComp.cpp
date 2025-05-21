@@ -68,6 +68,9 @@ void ULoginComp::BeginPlay()
 
 					if (WorldGi->bBattleReward == true)
 					{
+						if (WorldGi->Creature)
+						{ TestPlayer->InvenComp->Server_SpawnCreature();
+							WorldGi->Creature = nullptr; }
 						FTimerHandle TimerHandle;
 						GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,WorldGi]()
 						{ TestPlayer->InvenComp->TurnReward(); WorldGi->bBattleReward = false;},1.0,false);

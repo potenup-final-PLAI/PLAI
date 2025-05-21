@@ -9,6 +9,7 @@
 #include "Components/WrapBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
+#include "PLAI/Item/ItemComp/CreComp.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -38,7 +39,8 @@ void UUiMonWorld::OnButtonYes()
 			WorldGi->bGameStart = true;
 			WorldGi->bBattleReward = true;
             WorldGi->MonsterType = MonWorld->MonsterType;
-			
+			if (TestPlayer && TestPlayer->CreComp->Creature)
+			{ WorldGi->Creature = TestPlayer->CreComp->Creature; }
 			if (MonWorld && MonWorld->MonsterType == EMonsterType::Monster)
 			{
 				GetWorld()->ServerTravel(TEXT("/Game/JS/Maps/TestMap?listen"));

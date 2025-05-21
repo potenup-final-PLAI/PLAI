@@ -87,6 +87,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bLoginMe = false;
 
+	UPROPERTY(EditAnywhere)
+	class ACreature* Creature;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	FUserFullInfo UserFullInfoGi;
 
