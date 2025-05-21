@@ -213,9 +213,9 @@ void UInputComp::On_LeftMouseTriggered()
 		MouseTime += GetWorld()->GetDeltaSeconds();
 		{
 			if (Dot > 0.6)
-			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-FMath::Sin(90 * MouseTime) * 10,0)); }
+			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-FMath::Sin(90 * MouseTime) * 3.5,0)); }
 			else if (Dot < -0.6)
-			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,FMath::Sin(90 * MouseTime) * 10,0)); }
+			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,FMath::Sin(90 * MouseTime) * 3.5,0)); }
 		}
 		if (MouseTime > 1)
 		{
