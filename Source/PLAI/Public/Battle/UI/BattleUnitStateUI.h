@@ -48,7 +48,20 @@ public:
 	void ShowHoverUI();
 	void SetHPUI(class ABaseBattlePawn* unit);
 	void UpdateHP(int32 hp);
-	
+
+	//----------------PrintSkillName UI------------------------
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock* txt_PrintSkillName;
+
+	void ShowPrintSkillNameUI();
+	void SetPrintSkillName(const FString& skillName);
+
+	//----------------API Reason UI--------------------
+	UPROPERTY(meta=(BindWidget))
+	class UMultiLineEditableTextBox* TB_APIReason;
+
+	void ShowAPIReasonUI();
+	void SetAPIReason(const FString& reason);
 };
 
 

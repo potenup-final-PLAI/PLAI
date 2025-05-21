@@ -5,6 +5,8 @@
 
 #include "GridTile.h"
 #include "GridTileManager.h"
+#include "Battle/UI/BattleUnitStateUI.h"
+#include "Components/WidgetComponent.h"
 #include "Enemy/BattleEnemyAnimInstance.h"
 #include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
@@ -18,21 +20,8 @@ ABaseEnemy::ABaseEnemy()
 
 	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("meshComp"));
 	meshComp->SetupAttachment(RootComponent);
-	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100), FRotator(0, -90, 0));
-	
-	// Mesh Setting
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("'/Game/Wood_Monster/CharacterParts/Meshes/SK_wood_giant_01_a.SK_wood_giant_01_a'"));
-	if (tempMesh.Succeeded())
-	{
-		meshComp->SetSkeletalMesh(tempMesh.Object);
-	}
-	
-	// Animation Instance 세팅
-	// ConstructorHelpers::FClassFinder<UAnimInstance> tempAnimInstance(TEXT("'/Game/JS/Blueprints/Animation/ABP_BattleEnemy.ABP_BattleEnemy_C'"));
-	// if (tempAnimInstance.Succeeded())
-	// {
-	// 	meshComp->SetAnimInstanceClass(tempAnimInstance.Class);
-	// }
+	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100),FRotator(0, -90, 0));
+	meshComp->bReceivesDecals = false;
 	
 }
 
@@ -42,6 +31,7 @@ void ABaseEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	// GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABaseBattlePawn::TryInitStatus, 0.1f, true);
+	InitActionMap();
 }
 
 void ABaseEnemy::PossessedBy(AController* NewController)
@@ -83,12 +73,12 @@ void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
 		currentActionMode = EActionMode::None;
 		if (enemyAnim)
 		{
-				
 			enemyAnim->actionMode = currentActionMode;
-			UE_LOG(LogTemp, Warning, TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
+			UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"),*UEnum::GetValueAsString(enemyAnim->actionMode));
 		}
 		OnTurnEnd();
-		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
+		UE_LOG(LogTemp, Warning,
+		       TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
 		return;
 	}
 	InitValues();
@@ -166,7 +156,7 @@ void ABaseEnemy::FindAndAttackPlayer()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Detected Player"));
 			// 플레이어가 있다면 공격
-			this->ApplyAttack(detectedPlayer, EActionMode::Poison);
+			this->EnemyApplyAttack(detectedPlayer, EActionMode::Poison);
 			break;
 		}
 	}
@@ -186,43 +176,54 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	}
 
 	// 배열이 비어 있다면 return
-	if (actionRequest.actions.IsEmpty())
+	if (actionRequest.action.target_character_id == "")
 	{
 		UE_LOG(LogTemp, Error, TEXT("ProcessAction: actions array is empty"));
 		OnTurnEnd();
 		return;
 	}
-
-	const FBattleAction& Action = actionRequest.actions[0];
+	
+	const FBattleAction& action = actionRequest.action;
 	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"),
 	       *actionRequest.current_character_id);
-
-	if (actionRequest.actions.IsEmpty())
+	
+	
+	// 3. API 행동 이유 출력
+	if (action.reason != "")
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No actions provided"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("actions"));
-	}
+		FString reason = action.reason;
+		this->battleUnitStateComp->SetDrawSize(FVector2d(150, 100));
+		this->battleUnitStateUI->ShowAPIReasonUI();
+		this->battleUnitStateUI->SetAPIReason(reason);
 
+		FTimerHandle actionReasonTimerHandle;
+		GetWorld()->GetTimerManager().ClearTimer(actionReasonTimerHandle);
+		GetWorld()->GetTimerManager().SetTimer(actionReasonTimerHandle,FTimerDelegate::CreateLambda([this]()
+		{
+			this->battleUnitStateUI->ShowBaseUI();
+			this->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+		}), 3.0f, false);
+	}
+	
 	// 1. 이동 처리
-	if (Action.move_to.Num() == 2)
+	if (action.move_to.Num() == 2)
 	{
 		// enemy actionmode 업데이트
-		currentActionMode = EActionMode::Move;
 		if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
+			enemy->currentActionMode = EActionMode::Move;
+			if (enemybattleState->move_Range) SeeMoveRange(this->enemybattleState->move_Range);
+			else UE_LOG(LogTemp, Warning, TEXT("Enemybattle not State"));
+			
 			if (enemyAnim)
 			{
-				
 				enemyAnim->actionMode = currentActionMode;
-				UE_LOG(LogTemp, Warning, TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
+				UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
 			}
 		}
-		
-		int32 targetX = Action.move_to[0];
-		int32 targetY = Action.move_to[1];
+
+		int32 targetX = action.move_to[0];
+		int32 targetY = action.move_to[1];
 
 		// GridTileManager 통해 목표 타일 찾기
 		if (gridTileManager)
@@ -240,36 +241,144 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("goalTile is nullptr"));
 				}
-				MoveToPlayer(goalTile, gridTileManager); // ✅ 타겟 null로 넘기고 이동만 실행
+				MoveToPlayer(goalTile, gridTileManager);
+				// ✅ 타겟 null로 넘기고 이동만 실행
 			}
 		}
 	}
 
 	// 2. 스킬 처리 (예: 타격이면 공격)
-	if (Action.skill == TEXT("타격"))
+	if (action.skill == TEXT("타격"))
 	{
-		attackTarget = FindUnitById(Action.target_character_id);
+		attackTarget = FindUnitById(action.target_character_id);
 		bWantsToAttack = true;
 		bStartMontage = true;
 	}
 
+	
 	// 3. 이동/행동력 소진 후 턴 종료
-	if (Action.remaining_ap <= 0 && Action.remaining_mov <= 0)
+	if (action.remaining_ap <= 0 && action.remaining_mov <= 0)
 	{
 		FTimerHandle timerHandle;
 		GetWorld()->GetTimerManager().SetTimer(timerHandle,FTimerDelegate::CreateLambda([=, this]()
 		{
 			OnTurnEnd();
-		}),1.0f,false);
+		}), 1.0f, false);
+	}
+}
+
+void ABaseEnemy::InitActionMap()
+{
+	ActionMap.Add(TEXT("타격"), EActionMode::BaseAttack);
+	ActionMap.Add(TEXT("마비의 일격"), EActionMode::Paralysis);
+	ActionMap.Add(TEXT("몸통 박치기"), EActionMode::Charge);
+	ActionMap.Add(TEXT("맹독 공격"), EActionMode::Poison);
+	ActionMap.Add(TEXT("취약 타격"), EActionMode::Vulnerable);
+	ActionMap.Add(TEXT("약화의 일격"), EActionMode::Weakening);
+	ActionMap.Add(TEXT("치명 일격"), EActionMode::Fatal);
+	ActionMap.Add(TEXT("파열 참격"), EActionMode::Rupture);
+	ActionMap.Add(TEXT("대지 가르기"), EActionMode::Unique_EarthBreak);
+	ActionMap.Add(TEXT("독침 찌르기"), EActionMode::Unique_PoisonSting);
+	ActionMap.Add(TEXT("단단한 갑각"), EActionMode::Unique_Harden);
+	ActionMap.Add(TEXT("생존 본능"), EActionMode::Unique_Instinct);
+	ActionMap.Add(TEXT("유연한 자세"), EActionMode::Unique_Flexibility);
+	ActionMap.Add(TEXT("전투 준비"), EActionMode::BattleCry);
+	ActionMap.Add(TEXT("방어 지휘"), EActionMode::Unique_DefenseOrder);
+	ActionMap.Add(TEXT("포효"), EActionMode::Roar);
+	ActionMap.Add(TEXT("광란 유도"), EActionMode::Unique_Enrage);
+	ActionMap.Add(TEXT("전투의 외침"), EActionMode::BattleCry);
+}
+
+void ABaseEnemy::EnemyActionList(const FString& actionName)
+{
+	if (!ActionMap.Contains(actionName))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Unknown action: %s"), *actionName);
+		return;
+	}
+
+	EActionMode action = ActionMap[actionName];
+
+	switch (action)
+	{
+	case EActionMode::BaseAttack:
+		UE_LOG(LogTemp, Warning, TEXT("타격"));
+		break;
+
+	case EActionMode::Paralysis:
+		UE_LOG(LogTemp, Warning, TEXT("마비의 일격"));
+		break;
+
+	case EActionMode::Charge:
+		UE_LOG(LogTemp, Warning, TEXT("몸통 박치기"));
+		break;
+
+	case EActionMode::Poison:
+		UE_LOG(LogTemp, Warning, TEXT("맹독 공격"));
+		break;
+
+	case EActionMode::Vulnerable:
+		UE_LOG(LogTemp, Warning, TEXT("취약 타격"));
+		break;
+
+	case EActionMode::Weakening:
+		UE_LOG(LogTemp, Warning, TEXT("약화의 일격"));
+		break;
+
+	case EActionMode::Fatal:
+		UE_LOG(LogTemp, Warning, TEXT("치명 일격"));
+		break;
+
+	case EActionMode::Rupture:
+		UE_LOG(LogTemp, Warning, TEXT("파열 참격"));
+		break;
+
+	case EActionMode::Unique_EarthBreak:
+		UE_LOG(LogTemp, Warning, TEXT("대지 가르기"));
+		break;
+
+	case EActionMode::Unique_PoisonSting:
+		UE_LOG(LogTemp, Warning, TEXT("독침 찌르기"));
+		break;
+
+	case EActionMode::Unique_Harden:
+		UE_LOG(LogTemp, Warning, TEXT("단단한 갑각"));
+		break;
+
+	case EActionMode::Unique_Instinct:
+		UE_LOG(LogTemp, Warning, TEXT("생존 본능"));
+		break;
+
+	case EActionMode::Unique_Flexibility:
+		UE_LOG(LogTemp, Warning, TEXT("유연한 자세"));
+		break;
+
+	case EActionMode::BattleCry:
+		UE_LOG(LogTemp, Warning, TEXT("전투 외침"));
+		break;
+
+	case EActionMode::Unique_DefenseOrder:
+		UE_LOG(LogTemp, Warning, TEXT("방어 지휘"));
+		break;
+
+	case EActionMode::Roar:
+		UE_LOG(LogTemp, Warning, TEXT("포효"));
+		break;
+
+	case EActionMode::Unique_Enrage:
+		UE_LOG(LogTemp, Warning, TEXT("광란 유도"));
+		break;
+
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("정의되지 않은 행동"));
+		break;
 	}
 }
 
 ABaseBattlePawn* ABaseEnemy::FindUnitById(const FString& Id)
 {
 	TArray<AActor*> FoundUnits;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(),
-	                                      ABaseBattlePawn::StaticClass(),
-	                                      FoundUnits);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ABaseBattlePawn::StaticClass(),FoundUnits);
 
 	for (AActor* Actor : FoundUnits)
 	{
@@ -282,4 +391,14 @@ ABaseBattlePawn* ABaseEnemy::FindUnitById(const FString& Id)
 		}
 	}
 	return nullptr;
+}
+
+bool ABaseEnemy::TryConsumeAP(int32 amount)
+{
+	if (!enemybattleState->CanConsumeAP(amount))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
+		return false;
+	}
+	return true;
 }

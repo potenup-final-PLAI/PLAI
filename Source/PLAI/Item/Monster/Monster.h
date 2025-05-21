@@ -33,6 +33,9 @@ public:
 	class UMonFsm* MonFsm;
 	
 	UPROPERTY(EditAnywhere)
+	class ATestPlayer* TestPlayer;
+	
+	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphereComponent;
 
     UPROPERTY(EditAnywhere)

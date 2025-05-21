@@ -25,7 +25,7 @@ void UUIinitMain::OnInitPostEnter(const FText& Text, ETextCommit::Type CommitMet
 {
 	if (CommitMethod == ETextCommit::Type::OnEnter)
 	{
-		UE_LOG(LogTemp,Display,TEXT("UiInitMain 엔터키 OnInitPostOnEnter 어떤글자? %s"),*Text.ToString());
+		// UE_LOG(LogTemp,Display,TEXT("UiInitMain 엔터키 OnInitPostOnEnter 어떤글자? %s"),*Text.ToString());
 		// 추후에 질문 다 끝날떄까지만 if문 추가
 		if (UiMain->LoginComp->WebSocket.IsValid() && UiMain->LoginComp->WebSocket->IsConnected())
 		{

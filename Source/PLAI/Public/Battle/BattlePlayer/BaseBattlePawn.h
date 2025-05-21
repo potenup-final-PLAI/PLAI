@@ -46,10 +46,10 @@ public:
 	class UBattleUnitStateUI* battleUnitStateUI;
 	UPROPERTY(EditAnywhere)
 	class ABattleHUD* hud;
-	
+
 	// 다른 클래스 포인터 초기화
 	void InitOtherClassPointer();
-	
+
 	//--------------------AP System--------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	int32 maxActionPoints = 5;
@@ -95,10 +95,11 @@ public:
 
 	//----------Speed State-------------
 	int32 speed = 0;
+
 	//------------Turn System-----------------
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
-	
+
 	void OnTurnStart();
 	void OnTurnEnd();
 
@@ -120,9 +121,16 @@ public:
 	void PlayerRoar(FHitResult& hitInfo);
 	void PlayerBattleCry(FHitResult& hitInfo);
 
-	// 대미지 전달 함수
-	void ApplyAttack(ABaseBattlePawn* targetUnit,
-	                 EActionMode attackType = EActionMode::None);
+
+	// Enemy 대미지 전달 함수
+	void EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType);
+	// Damage 계산 함수
+	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk,
+	                             int32 weapon, float skillMultiplier,
+	                             float criticalRate, float criticalDamage,
+	                             int32 personality, int32 status_effect);
+	void PlayerApplyAttack(ABaseBattlePawn* targetUnit,
+	                       EActionMode attackType = EActionMode::None);
 
 	// 상태이상과 지속 턴 
 	TMap<EStatusEffect, int32> activeStatusEffects;
@@ -197,8 +205,32 @@ public:
 		TEXT("전투의 외침")
 	};
 	// Enemy State Set
+	// Enemy 성격 세팅
+	TArray<FString> enemyTraits = {
+		TEXT("강인함"),
+		TEXT("잔잔함"),
+		TEXT("호전적"),
+		TEXT("충동적"),
+		TEXT("수비적"),
+		TEXT("신중함"),
+		TEXT("관찰꾼"),
+		TEXT("잔인함"),
+		TEXT("겁쟁이"),
+		TEXT("허세꾼"),
+		TEXT("교란꾼"),
+		TEXT("파괴적"),
+		TEXT("협동적"),
+		TEXT("용감함"),
+		TEXT("조화적"),
+		TEXT("고립적"),
+		TEXT("지능적"),
+		TEXT("냉정함"),
+		TEXT("원한꾼"),
+		TEXT("민첩함")
+	};
 	void InitEnemyState();
-
+	void InitTraits();
+	void ApplyTraitModifiers(UEnemyBattleState* state);
 	// 마우스 클릭 했을 때 처리 하는 부분
 	void OnMouseLeftClick();
 	void AddOpenByOffset(FIntPoint offset);
@@ -235,7 +267,15 @@ public:
 	void PathFind();
 	void BuildPath();
 	void AddOpenArray(FVector dir);
+	// 이동 범위 보일 수 있도록 주변 타일 색 변경 하는 함
+	UPROPERTY(EditAnywhere)
+	TArray<AGridTile*> highlightedTiles;
 
+	void SeeMoveRange(int32 move_Range);
+	void ClearGridTile();
+	//--------------이동 및 공격------------------
+	
+	void UnitMoveRotateAttack();
 	//--------------Unit Move-------------------
 	// 이동 경로 저장 Array
 	UPROPERTY(EditAnywhere)
@@ -268,6 +308,10 @@ public:
 
 	void BillboardBattleUnitStateUI();
 	void OnMouseHover();
+	//------------Print Skill UI --------
+	FString curSkillName = "";
+
+	void SkillNameJudgment(const EActionMode curAction);
 	//-----------Player Anim Instace---------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABaseEnemy* targetEnemy;
@@ -283,5 +327,4 @@ public:
 
 	//------------Enemy Turn 여러 번 호출 방지--------
 	bool bTurnEnded = false;
-	
 };

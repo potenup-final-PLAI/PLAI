@@ -15,8 +15,18 @@ class PLAI_API ABattlePlayerController : public APlayerController
 	GENERATED_BODY()
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	
 public:
-
+	FTimerHandle timerHandle;
+	
+	void NotifiyReady();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_NotifyReady();
+	UFUNCTION(Client, Reliable)
+	void Client_StopReadyTimer();
+	
+	void SetViewTargetMyPawn(APawn* myPawn);
 };

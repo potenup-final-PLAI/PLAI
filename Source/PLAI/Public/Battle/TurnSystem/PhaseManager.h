@@ -29,6 +29,8 @@ class PLAI_API AUPhaseManager : public AGameStateBase
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	// 구현 해야하는 내용
@@ -37,18 +39,24 @@ public:
 	//--------------------Data Init--------------------
 	void InitBattle();
 	//--------------------Cycle System--------------------
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Cycle")
+	UPROPERTY(ReplicatedUsing = OnRep_UpdateCycleUI, VisibleAnywhere,
+		BlueprintReadOnly, Category = "Cycle")
 	int32 cycle = 0;
 
 	void SetCycle();
+	void UpdateCycleUI();
+	UFUNCTION()
+	void OnRep_UpdateCycleUI();
 	//--------------------Phase System--------------------
 	// 멀티로 변경 할 때 ReplicatedUsing을 활용하여 함수 호출 하자
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentPhase, VisibleDefaultsOnly,
+		BlueprintReadOnly, Category = "Phase")
 	EBattlePhase currentPhase;
 
 	// Phase 관리(서버에서만 실행)
 	void SetPhase(EBattlePhase phase);
-
+	UFUNCTION()
+	void OnRep_CurrentPhase();
 	//--------------------Turn System--------------------
 	// currentActionPoints = maxActionPoints;
 	// UI 안내용	"플레이어 턴입니다" UI 출력
@@ -56,12 +64,15 @@ public:
 	// 전체 행동 제한	모든 유닛이 행동 못하게 하고 Cutscene 등 삽입
 	// AI 판단	적 페이즈에만 그룹 AI 로직 실행
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintReadOnly,
+		Category = "Phase")
 	ATurnManager* turnManager;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	TSubclassOf<ATurnManager> turnManagerFactory;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintReadOnly,
+		Category = "Phase")
 	TArray<ABaseBattlePawn*> unitQueue;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
@@ -69,7 +80,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase")
 	TSubclassOf<ABaseBattlePawn> unitFactory;
-	
+
 	// 유닛 첫 큐 세팅
 	void SetUnitQueue();
 	// 유닛 Array 큐 처럼 사용하기 위한 업데이트
@@ -80,14 +91,18 @@ public:
 	ABaseBattlePawn* PopNextAliveUnit();
 	// 전투 시작
 	void StartBattle();
+	// Unit이 Player인지 Enemy인지 판별
+	void TurnPorcessing(ABaseBattlePawn* unit);
 	// 플레이어 턴 시작
 	void StartPlayerPhase();
 	// 플레이어 턴 종료
-	void EndPlayerPhase();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_EndPlayerPhase();
 	// 적 턴 시작
 	void StartEnemyPhase();
 	// 적 턴 종료
-	void EndEnemyPhase();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_EndEnemyPhase();
 	// 전투 종료
 	void BattleEnd();
 
@@ -122,7 +137,6 @@ public:
 	//-------------Set Status-----------------------
 	bool bIsInitialized = false;
 
-	UFUNCTION()
 	void TryInitStatus(ABaseBattlePawn* unit);
 	void SetStatus(ABaseBattlePawn* unit);
 
@@ -136,10 +150,26 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase")
 	class UWorldGi* gi;
-	
+
 	//-------------Damage Actor Widget-----------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DamageUI")
 	class AWorldDamageUIActor* damageUIActor;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DamageUI")
 	TSubclassOf<class AWorldDamageUIActor> damageUIFactory;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Phase")
+	class APlayerController* pc;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Phase")
+	class ABattleHUD* hud;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Phase")
+	class AGridTileManager* girdTileManager;
+
+	void InitOtherClass();
+
+
+	//----------------Player Ready Check------------------
+	UPROPERTY(EditAnywhere)
+	int32 readyCount = 0;
+
+	void PlayerReady(APlayerController* playerControl);
 };

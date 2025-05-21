@@ -18,6 +18,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -28,15 +29,21 @@ public:
 	TSubclassOf<class AGridTile> tileFactory;
 	UPROPERTY(EditAnywhere)
 	TMap<FIntPoint, class AGridTile*> map;
-
+	UPROPERTY(EditAnywhere)
+	TMap<class AGridTile*, FIntPoint> tileToCoordMap;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABattlePlayer> battlePlayerFactory;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABaseEnemy> enemyFactory;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AMonBossPawn> bossFactory;
 
+	FTimerHandle bindUnitHandle;
+
+	TArray<class ABattlePlayerController*> playerControllers;
 	void InitGridTile();
-	
+	TArray<FIntPoint> RandomCoords(int32 count, TArray<FIntPoint> coords);
 	//------------Test--------------------------
 	// 생성된 유닛들 담기
 	TArray<class ABaseBattlePawn*> unitArray;
@@ -45,4 +52,10 @@ public:
 	AGridTile* FindCurrentTile(FVector worldLoc);
 	// 맵에서 x, y위치에 있는 타일 얻기
 	AGridTile* GetTile(int32 x, int32 y);
+	// 타일 좌표 위치 반환
+	FIntPoint GetTileLoc(AGridTile* targetTile);
+	// 그 위치에 타일이 있는지 체크
+	bool IsValidTile(FIntPoint num);
+	// 타일 색 변경
+	void SetTileColor(AGridTile* targetTile, bool bHighlight);
 };

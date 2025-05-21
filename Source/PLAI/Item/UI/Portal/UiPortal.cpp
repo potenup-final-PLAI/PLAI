@@ -2,6 +2,7 @@
 
 #include "UiPortal.h"
 
+#include "BaseFile/PLAIPlayerController.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Kismet/GameplayStatics.h"
@@ -46,7 +47,6 @@ void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
 	
 	for (AActor* Actor : Actors)
 	{
-		// UE_LOG(LogTemp,Display,TEXT("UiPortal Portal 이름은? [%s]"),*Actor->GetName());
 		if (AWarp* MonSpawn = Cast<AWarp>(Actor))
 		{
 			if (MonSpawn->MonSpawnType ==  SpawnType)
@@ -57,24 +57,39 @@ void UUiPortal::WarpTestPlayer(EMonSpawnType SpawnType)
 	}
 }
 
+void UUiPortal::WarpCotnroller(EMonSpawnType SpawnType)
+{
+	if (APlayerController* PcController = GetWorld()->GetFirstPlayerController())
+	{
+		if (APLAIPlayerController* pc = Cast<APLAIPlayerController>(PcController))
+		{
+			pc->Server_WarpPlayer(SpawnType);
+		}
+	}
+}
+
 void UUiPortal::OnButton_Village()
 {
-	WarpTestPlayer(EMonSpawnType::Village);
+	WarpCotnroller(EMonSpawnType::Village);
+	// WarpTestPlayer(EMonSpawnType::Village);
 }
 
 void UUiPortal::OnButton_Mountain()
 {
-	WarpTestPlayer(EMonSpawnType::Mountain);
+	WarpCotnroller(EMonSpawnType::Mountain);
+	// WarpTestPlayer(EMonSpawnType::Mountain);
 }
 
 void UUiPortal::OnButton_Dessert()
 {
-	WarpTestPlayer(EMonSpawnType::Desert);
+	WarpCotnroller(EMonSpawnType::Desert);
+	// WarpTestPlayer(EMonSpawnType::Desert);
 }
 
 void UUiPortal::OnButton_Cave()
 {
-	WarpTestPlayer(EMonSpawnType::Dungeon);
+	WarpCotnroller(EMonSpawnType::Dungeon);
+	// WarpTestPlayer(EMonSpawnType::Dungeon);
 }
 
 void UUiPortal::OnButton_OpenMap()
@@ -90,3 +105,11 @@ void UUiPortal::OnButton_OpenMap()
 		bOpenMap = false;
 	}
 }
+
+
+
+// Warp->SetOwner(TestPlayer);
+// Warp->Server_WarpPlayer(TestPlayer);
+// UE_LOG(LogTemp,Warning,TEXT("UIPortal OnButton Village 실행 오너 누구? [%s] TestPlayer 이름은 [%s]"),*Warp->GetOwner()->GetName(),*TestPlayer->GetName());
+// WarpTestPlayer(EMonSpawnType::Village);
+// DrawDebugSphere(GetWorld(),Warp->GetOwner()->GetActorLocation(),50,12,FColor::Red,false,1.5);

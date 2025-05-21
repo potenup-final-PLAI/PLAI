@@ -27,9 +27,9 @@ FReply USlotEquip::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FP
 {
 	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item id %s"),*ItemStructTable.Item_Id)
-		UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Attack%d"),ItemStructTable.ItemStructStat.item_ATK)
-		UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Defense%d"),ItemStructTable.ItemStructStat.item_DEF)
+		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item id %s"),*ItemStructTable.Item_Id)
+		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Attack%d"),ItemStructTable.ItemStructStat.item_ATK)
+		// UE_LOG(LogTemp, Display, TEXT("Slot 테이블 Item_Defense%d"),ItemStructTable.ItemStructStat.item_DEF)
 		APlayerController* Pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 		if (Pc->GetPawn()->IsLocallyControlled())
 		{
@@ -50,13 +50,17 @@ bool USlotEquip::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 	if (static_cast<int32>(SlotType) != ItemObject->ItemStructTable.ItemIndex)
     {
 		UE_LOG(LogTemp,Warning,TEXT("SlotEquip 슬롯인덱스 %d Item인덱스 %d"),SlotType,ItemObject->ItemStructTable.ItemIndex)
-
     	UE_LOG(LogTemp,Warning,TEXT("SlotEquip 나랑 안맞아 응 %s"),*UEnum::GetValueAsString(SlotType)) return false;
     }
+	
 	APlayerController* Pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 	if (Pc->GetPawn()->IsLocallyControlled())
-	{  UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnDrop: 플레이어 캐스팅 성공 이름은? %s"),*Pc->Player->GetName());
+	{
+		UE_LOG(LogTemp,Warning,TEXT("SlotEquip::NativeOnDrop: 플레이어 캐스팅 성공 이름은? %s"),*Pc->Player->GetName());
 		ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetPawn());
+		
+		Player->InvenComp->Server_UnEquip(SlotType);
+
 		Player->InvenComp->Server_EquipItem(ItemObject->ItemStructTable,SlotType); }
 	
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);

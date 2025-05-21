@@ -118,7 +118,7 @@ struct FActionRequest
 	FString current_character_id = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FBattleAction> actions = {};
+	FBattleAction action = {};
 };
 
 // 캐릭터 스텟
@@ -171,7 +171,16 @@ enum class EActionMode : uint8
 	Fatal UMETA(DisplayName = "Fatal"),
 	Rupture UMETA(DisplayName = "Rupture"),
 	Roar UMETA(DisplayName = "Roar"),
-	BattleCry UMETA(DisplayName = "BattleCry")
+	BattleCry UMETA(DisplayName = "BattleCry"),
+	ReadyForBattle UMETA(DisplayName = "ReadyForBattle"),
+	Charge UMETA(DisplayName = "Charge"),
+	Unique_EarthBreak UMETA(DisplayName = "Unique_EarthBreak"),
+	Unique_PoisonSting UMETA(DisplayName = "Unique_PoisonSting"),
+	Unique_Harden UMETA(DisplayName = "Unique_Harden"),
+	Unique_Instinct UMETA(DisplayName = "Unique_Instinct"),
+	Unique_Flexibility UMETA(DisplayName = "Unique_Flexibility"),
+	Unique_DefenseOrder UMETA(DisplayName = "Unique_DefenseOrder"),
+	Unique_Enrage UMETA(DisplayName = "Unique_Enrage")
 };
 UENUM(BlueprintType)
 enum class EStatusEffect : uint8

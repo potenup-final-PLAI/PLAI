@@ -27,7 +27,6 @@ AWarp::AWarp()
 	
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("BoxComponent");
 	NiagaraComp->SetupAttachment(GetRootComponent());
-
 	
 }
 
@@ -58,7 +57,8 @@ void AWarp::OnOverlappedWarp(UPrimitiveComponent* OverlappedComponent, AActor* O
 	{
 		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor))
 		{
-			if (TestPlayer->HasAuthority() && TestPlayer->IsLocallyControlled())
+			// if (TestPlayer->HasAuthority() && TestPlayer->IsLocallyControlled())
+			if (TestPlayer->IsLocallyControlled())
 			{
 				UiPortal = CreateWidget<UUiPortal>(GetWorld(),UiPortalFactory);
 				UiPortal->AddToViewport(5);
@@ -77,7 +77,8 @@ void AWarp::OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	{
 		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(OtherActor))
 		{
-			if (TestPlayer->HasAuthority() && TestPlayer->IsLocallyControlled())
+			// if (TestPlayer->HasAuthority() && TestPlayer->IsLocallyControlled())
+			if (TestPlayer->IsLocallyControlled())
 			{
 				if (!UiPortal){UE_LOG(LogTemp,Warning,TEXT("Warp에 유아이포탈없음")) return;};
 				UiPortal->TestPlayer = nullptr;
@@ -87,6 +88,15 @@ void AWarp::OnEndOvelappedWarp(UPrimitiveComponent* OverlappedComp, AActor* Othe
 		}
 	}
 }
+
+void AWarp::Server_WarpPlayer_Implementation(ATestPlayer* TestPlayer)
+{
+	SetOwner(TestPlayer);
+	UE_LOG(LogTemp,Warning,TEXT("Warp ServerWarpPlayer 실행"))
+	TestPlayer->SetActorLocation(GetActorLocation() + FVector(0,0,2000));
+}
+
+
 
 void AWarp::WarpLevel(class ATestPlayer* TestPlayer, int32 index)
 {

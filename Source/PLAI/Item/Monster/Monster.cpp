@@ -3,6 +3,7 @@
 
 #include "Monster.h"
 
+#include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/SphereComponent.h"
@@ -13,6 +14,7 @@
 #include "MonUi/MonUi.h"
 #include "PLAI/Item/Item/Item.h"
 #include "PLAI/Item/Item/ItemMaster.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 
 class AItemMaster;
@@ -34,14 +36,16 @@ void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
 
+	TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+
 	MonsterParent = MonsterFactory->GetDefaultObject<AMonster>();
 	MonUi = CreateWidget<UMonUi>(GetWorld(),MonsterParent->MonUiFactory);
 	
 	MonUiComp->SetWidget(MonUi);
-	MonUiComp->SetDrawSize(FVector2D(300.f, 45.f));
+	MonUiComp->SetDrawSize(FVector2D(300.f, 80.f));
 	MonUiComp->SetVisibility(true);
 	MonUiComp->SetRelativeLocation(FVector(0,0,150));
-	MonUiComp->SetWidgetSpace(EWidgetSpace::Screen); // or World
+	MonUiComp->SetWidgetSpace(EWidgetSpace::World); // or World
 
 	SetMonsterUi();
 	SetHpBar();
@@ -54,6 +58,7 @@ void AMonster::BeginPlay()
 void AMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	MonUiComp->SetWorldRotation((-TestPlayer->TopDownCameraComponent->GetForwardVector()).Rotation());
 }
 
 // Called to bind functionality to input

@@ -26,4 +26,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* RewardGold;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* RewardExp;
 };

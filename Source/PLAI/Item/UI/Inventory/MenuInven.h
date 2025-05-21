@@ -16,6 +16,9 @@ class PLAI_API UMenuInven : public UUserWidget
 
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UInputUi* WBP_InputUi;
+	
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UItemInven* WBP_ItemInven;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -41,6 +44,12 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UItemGold* Wbp_ItemGold;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UUiChaLevelUp* Wbp_UiChaLevelUp;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UUiWorldMap* Wbp_UiWolrdMap;
 
 	virtual void NativeConstruct() override;
 };

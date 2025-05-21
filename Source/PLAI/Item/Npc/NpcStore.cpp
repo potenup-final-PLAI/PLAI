@@ -26,6 +26,7 @@ void ANpcStore::BeginPlay()
 	StoreInven = CreateWidget<UStoreInven>(GetWorld(),StoreInvenFactory);
 	StoreInven->AddToViewport();
 	StoreInven->SetVisibility(ESlateVisibility::Hidden);
+	
 	NpcUiMaster = Cast<UWidget>(StoreInven);
 }
 
@@ -53,14 +54,14 @@ void ANpcStore::SetStoreInven()
 			TArray<FName>RawNames = ItemTable->GetRowNames();
 			FItemStructTable* RowData = ItemTable->FindRow<FItemStructTable>(RawNames[index],TEXT("StoreComp"));
 			Slot->ItemStructTable = *RowData;
-			if (Slot->ItemStructTable.ItemTop == -1)
-			{
-				UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 X %s"),*Slot->ItemStructTable.Name)
-			}
-			else
-			{
-				UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 되었음 %s"),*Slot->ItemStructTable.Name)
-			}
+			// if (Slot->ItemStructTable.ItemTop == -1)
+			// {
+			// 	UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 X %s"),*Slot->ItemStructTable.Name)
+			// }
+			// else
+			// {
+			// 	UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 되었음 %s"),*Slot->ItemStructTable.Name)
+			// }
 			Slot->SlotImageUpdate();
 		}
 	}

@@ -12,6 +12,14 @@
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/Monster/Monster.h"
+#include "PLAI/Item/Portal/Warp.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
+#include "PLAI/Item/UI/Inventory/Map/UiWorldMap.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -63,6 +71,12 @@ void APLAIPlayerController::SetupInputComponent()
 void APLAIPlayerController::OnInputStarted()
 {
 	StopMovement();
+	
+	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	{
+		TestPlayer->TestInputComp->SetMappingContext();
+		TestPlayer->TestInputComp->BindInputActions();
+	}
 }
 
 // Triggered every frame when the input is held down
@@ -125,4 +139,75 @@ void APLAIPlayerController::OnTouchReleased()
 {
 	bIsTouch = false;
 	OnSetDestinationReleased();
+}
+
+void APLAIPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	if (!IsLocalController()) return;
+	MiniMapUpdate();
+}
+
+void APLAIPlayerController::TestPlayersAdd()
+{
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ATestPlayer::StaticClass(),Actors);
+	for (AActor*Actor : Actors)
+	{
+		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Actor))
+		{
+			TestPlayers.Add(TestPlayer);
+		}
+	}
+	if (TestPlayers.Num() > 0){UE_LOG(LogTemp,Warning,TEXT("PLAIController Testplayers 몇명? [%d]명"),TestPlayers.Num())}
+}
+
+void APLAIPlayerController::MiniMapUpdate()
+{
+	UE_LOG(LogTemp,Warning,TEXT("PLAIController MiniMapUpdate 실행"))
+	
+	// if (TestPlayers.Num() == 0){UE_LOG(LogTemp,Warning,TEXT("PLAIController Testplayers 0명"))return;}
+	// for (int i = 0; i < TestPlayers.Num(); i++)
+	// { TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWolrdMap->SetPlayerMinmapVector(TestPlayers[i]->GetActorLocation());}
+}
+
+void APLAIPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(APLAIPlayerController, TestPlayers);
+}
+
+void APLAIPlayerController::Server_WarpPlayer_Implementation(EMonSpawnType SpawnType)
+{
+	TArray<AActor*> Mons;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMonster::StaticClass(), Mons);
+
+	for (AActor* Mon : Mons)
+	{
+		if (AMonster* Monster = Cast<AMonster>(Mon))
+		{
+			Monster->Destroy();
+			break;
+		}
+	}
+	
+	UE_LOG(LogTemp,Warning,TEXT("UiPortal 어디소환중? [%s]"),*UEnum::GetValueAsString(SpawnType))
+	
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWarp::StaticClass(), Actors);
+	
+	if (Actors.Num() == 0){UE_LOG(LogTemp,Warning,TEXT("UiPortal 없냐? %d"),Actors.Num())return;}
+	
+	for (AActor* Actor : Actors)
+	{
+		if (AWarp* MonSpawn = Cast<AWarp>(Actor))
+		{
+			if (MonSpawn->MonSpawnType ==  SpawnType)
+			{
+				GetPawn()->SetActorLocation(MonSpawn->GetActorLocation() + FVector(250,0,1000));
+			}
+		}
+	}
+	// GetPawn()->SetActorLocation(GetPawn()->GetActorLocation() + FVector(0, 0, 2000));
 }

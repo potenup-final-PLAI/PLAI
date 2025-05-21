@@ -4,6 +4,7 @@
 #include "Battle/UI/BattleUnitStateUI.h"
 
 #include "BaseBattlePawn.h"
+#include "Components/MultiLineEditableTextBox.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
@@ -77,4 +78,24 @@ void UBattleUnitStateUI::UpdateHP(int32 hp)
 		float hpPercent = static_cast<float>(hp) / static_cast<float>(maxHP);
 		PGB_HP->SetPercent(hpPercent);
 	}
+}
+
+void UBattleUnitStateUI::ShowPrintSkillNameUI()
+{
+	if (WS_BattleUnitState) WS_BattleUnitState->SetActiveWidgetIndex(2);
+}
+
+void UBattleUnitStateUI::SetPrintSkillName(const FString& skillName)
+{
+	txt_PrintSkillName->SetText(FText::FromString(skillName));
+}
+
+void UBattleUnitStateUI::ShowAPIReasonUI()
+{
+	if (WS_BattleUnitState) WS_BattleUnitState->SetActiveWidgetIndex(3);
+}
+
+void UBattleUnitStateUI::SetAPIReason(const FString& reason)
+{
+	TB_APIReason->SetText(FText::FromString(reason));
 }

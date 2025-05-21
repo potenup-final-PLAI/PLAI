@@ -59,35 +59,50 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	//--------------Turn State---------------------
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
+	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintReadOnly,
+		Category = "Turn")
 	ETurnState curTurnState;
 
 	void SetTurnState(ETurnState newTurnState);
 	//--------------Turn Start---------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
 	class AUPhaseManager* phaseManager;
-	
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
+
+	UPROPERTY(ReplicatedUsing = OnRep_UpdateWhoTurn, VisibleDefaultsOnly,
+		BlueprintReadOnly,
+		Category = "Turn")
 	ABaseBattlePawn* curUnit;
+	//------------누구 턴인지 나타내는 UI --------
+
+	void UpdateWhoTurn();
+	UFUNCTION()
+	void OnRep_UpdateWhoTurn();
+
 	// 유닛들의 턴 순서를 저장하는 배열
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
 	TArray<ABaseBattlePawn*> enemyQueue;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Turn")
+	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintReadOnly,
+		Category = "Turn")
 	int32 turnCount = 0;
 	//--------------Player Turn---------------------
 	// 플레이어 첫 유닛 실행
 	void StartPlayerTurn();
 
+
 	//--------------Enemy Turn---------------------
 	// 적 첫 유닛 실행
 	void StartEnemyTurn();
-	
 
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_CameraChange(class APawn* target);
 };

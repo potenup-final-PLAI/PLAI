@@ -8,6 +8,7 @@
 #include "UIChaMain.h"
 #include "UIinitMain.h"
 #include "UiSign.h"
+#include "UiSteamLobby.h"
 #include "UiSUbMain.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
@@ -18,8 +19,10 @@
 #include "Components/TextBlock.h"
 #include "Interfaces/IHttpResponse.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Character/UiChaLevelUp.h"
 #include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/InputUi/InputUi.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
@@ -32,6 +35,7 @@ void UUiMain::NativeConstruct()
     Wbp_UIChaMain->UiMain = this;
 	Wbp_UiSubMain->UiMain = this;
 	Wbp_UiInitMain->UiMain = this;
+	Wbp_UiSteamLobby->UiMain = this;
 	
 	if (APlayerController* pc = Cast<APlayerController>(GetOwningPlayer()))
 		
@@ -137,6 +141,9 @@ void UUiMain::OnButtonStart()
 	LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 	LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 	LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
+	LoginComp->TestPlayer->InvenComp->MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
+	LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
+
 
 	RemoveFromParent();
 }

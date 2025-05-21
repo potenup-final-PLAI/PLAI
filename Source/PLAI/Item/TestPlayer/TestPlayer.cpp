@@ -5,6 +5,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputComp/InputComp.h"
 #include "PLAI/Item/ItemComp/CreComp.h"
@@ -21,13 +22,16 @@ ATestPlayer::ATestPlayer()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
 	bReplicates = true;
+	GetCharacterMovement()->SetIsReplicated(true);
+	
 	InvenComp = CreateDefaultSubobject<UInvenComp>(TEXT("InvenComp"));
 	StoreComp = CreateDefaultSubobject<UStoreComp>(TEXT("StoreComp"));
 	LoginComp = CreateDefaultSubobject<ULoginComp>(TEXT("LoginComp"));
 	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("CreComp"));
 	LogItemComp = CreateDefaultSubobject<ULogItemComp>(TEXT("ItemComp"));
-	InputTestComp = CreateDefaultSubobject<UInputComp>(TEXT("InputKeyComp"));
+	TestInputComp = CreateDefaultSubobject<UInputComp>(TEXT("TestpInputComp"));
 
 	CaptureComp = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureComp"));
 	CaptureComp->SetupAttachment(RootComponent);
@@ -37,18 +41,14 @@ ATestPlayer::ATestPlayer()
 void ATestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-    
-	StoreComp->StoreInven->AddToViewport();
-	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
-    
-	
-	// if (APlayerController* Pc = Cast<APlayerController>(GetController()))
-	// {
-	// 	TopDownCameraComponent->SetActive(false);
-	// 	Pc->SetViewTarget(this);
-	// }
-	// //카메라붐 카메라 회전값적용
-	// CameraBoom->bUsePawnControlRotation = true;
+    if (IsLocallyControlled())
+    {
+    	StoreComp->StoreInven->AddToViewport();
+    	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
+
+    	// TestInputComp->SetMappingContext();
+    	// TestInputComp->BindInputActions();
+    }
 }
 
 // Called every frame
@@ -61,7 +61,5 @@ void ATestPlayer::Tick(float DeltaTime)
 void ATestPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	
 }
 
