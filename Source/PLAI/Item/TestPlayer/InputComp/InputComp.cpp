@@ -204,9 +204,9 @@ void UInputComp::On_LeftMouseTriggered()
 		FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
 
 	if (Dot > 0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-1,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-0.65,0)); }
 	else if (Dot < -0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+1,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+0.65,0)); }
 	
 	else if (FMath::Abs(Dot) > 0.6)
 	{
@@ -252,6 +252,8 @@ void UInputComp::On_MouseWheelTriggered(const FInputActionValue& Value)
 
 void UInputComp::On_RoatateView()
 {
+	if (!Pc->IsLocalController()) return;
+	
 	UE_LOG(LogTemp, Warning, TEXT("UInputComp::On_RoatateView Bool 값 %d"),bRotateView);
 	if (bRotateView == true)
 	{
