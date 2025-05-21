@@ -104,11 +104,12 @@ void AGridTileManager::InitGridTile()
 
 		// 매칭된 PlayerController를 찾아 SetOwner
 		APlayerState* ps = playerStates[i];
-		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetOwner());
+		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetOwningController());
 		if (battlePC)
 		{
 			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("Before player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
 			player->SetOwner(battlePC);
+			player->MultiCastRPC_SetMyName(i);
 			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("After player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
 
 			player->ForceNetUpdate(); // 복제 보장

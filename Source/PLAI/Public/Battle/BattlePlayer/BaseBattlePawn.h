@@ -361,4 +361,12 @@ public:
 	//-------------Enemy Name----------------
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_SetEnemyName(class ABaseEnemy* enemy);
+
+
+	UPROPERTY(VisibleAnywhere)
+	FString MyName = TEXT("Unit");
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_SetMyName(int32 Count);
+	
 };

@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Battle/TurnSystem/BattlePlayerController.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Player/BattlePlayerAnimInstance.h"
 
 ABattlePlayer::ABattlePlayer()
@@ -41,6 +42,7 @@ void ABattlePlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	playerAnim = Cast<UBattlePlayerAnimInstance>(meshComp->GetAnimInstance());
 }
 
 void ABattlePlayer::Tick(float DeltaTime)
@@ -61,22 +63,36 @@ void ABattlePlayer::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	
 	UE_LOG(LogTemp, Warning,TEXT("NewController : %s"), *NewController->GetActorNameOrLabel());
+
+
+
+
+}
+
+void ABattlePlayer::NotifyControllerChanged()
+{
+	Super::NotifyControllerChanged();
+
 	
-	if (pc)
+	auto* ppc = Cast<APlayerController>(Controller);
+
+	if (ppc)
 	{
+		PRINTLOG(TEXT("ABattlePlayer::NotifyControllerChanged"));
 		//그 객체를 이용해서 EnhanceInputLocalPlayerSubSystem을 가져온다.
-		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(ppc->GetLocalPlayer());
 		if (subSys)
 		{
+			subSys->RemoveMappingContext(IMC_Player);
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PC is Nullptr"));
+		PRINTLOG(TEXT("PC is Nullptr"));
 	}
+
 	
-	playerAnim = Cast<UBattlePlayerAnimInstance>(meshComp->GetAnimInstance());
 }
 
 void ABattlePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

@@ -120,6 +120,9 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
+
+
+	DrawDebugString(GetWorld(), GetActorLocation(), MyName, nullptr, FColor::Yellow, 0);
 	
 }
 
@@ -247,14 +250,13 @@ void ABaseBattlePawn::OnTurnEnd()
 
 void ABaseBattlePawn::OnMouseLeftClick()
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s OnMouseLeftClick"), *GetName());
-	
+	PRINTLOG(TEXT("%s OnMouseLeftClick"), *GetName());
 	FVector start, end, dir;
 	FHitResult hitInfo;
 	FCollisionQueryParams params;
 
 	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(start, dir);
-	end = start + dir * 10000;
+	end = start + dir * 100000;
 
 	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,ECC_Visibility, params))
 	{
@@ -2029,4 +2031,10 @@ void ABaseBattlePawn::InitAPUI()
 void ABaseBattlePawn::MultiCastRPC_InitAPUI_Implementation()
 {
 	InitAPUI();
+}
+
+void ABaseBattlePawn::MultiCastRPC_SetMyName_Implementation(
+	int32 Count)
+{
+	MyName = FString("NyName : ") + FString::FromInt(Count);
 }

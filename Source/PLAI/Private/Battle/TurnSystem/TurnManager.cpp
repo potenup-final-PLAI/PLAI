@@ -106,6 +106,9 @@ void ATurnManager::StartPlayerTurn()
 			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
 			{
 				battlePC->Possess(playerPawn);
+
+				PRINTLOG(TEXT("Current Turn Player Name : %s"), *playerPawn->MyName);
+				
 				if (curUnit->IsValidLowLevelFast())
 				{
 					UE_LOG(LogTemp, Warning,TEXT("Safe to call OnTurnStart on %s"),*curUnit->GetName());

@@ -221,15 +221,15 @@ void AUPhaseManager::SortUnitTurnEnd()
 
 ABaseBattlePawn* AUPhaseManager::PopNextAliveUnit()
 {
-	while (unitQueue.Num() > 0)
+	if (unitQueue.Num() > 0)
 	{
 		ABaseBattlePawn* candidate = unitQueue[0];
-		unitQueue.RemoveAt(0);
 
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(candidate))
 		{
 			if (player && player->hp > 0)
 			{
+				unitQueue.RemoveAt(0);
 				return candidate;
 			}
 		}
@@ -237,6 +237,7 @@ ABaseBattlePawn* AUPhaseManager::PopNextAliveUnit()
 		{
 			if (enemy && enemy->hp > 0)
 			{
+				unitQueue.RemoveAt(0);
 				return candidate;
 			}
 		}
