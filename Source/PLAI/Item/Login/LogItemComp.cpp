@@ -5,6 +5,8 @@
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
 #include "LoginComp.h"
+#include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
 #include "Interfaces/IHttpRequest.h"
@@ -56,7 +58,25 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		TestPlayer->LoginComp->UserFullInfo.character_info.level = 1;
 		TestPlayer->LoginComp->UserFullInfo.character_info.current_exp = 0;
 		TestPlayer->LoginComp->UserFullInfo.character_info.max_exp = 1000;
+		TestPlayer->LoginComp->UserFullInfo.character_info.position.x = 0;
+		TestPlayer->LoginComp->UserFullInfo.character_info.position.y = 0;
+		TestPlayer->LoginComp->UserFullInfo.character_info.position.z = 0;
+		TestPlayer->LoginComp->UserFullInfo.inventory_info.gold = 0;
+		TestPlayer->InvenComp->MenuInven->Wbp_ItemGold->Gold->SetText(FText::AsNumber(TestPlayer->LoginComp->UserFullInfo.inventory_info.gold));
+		TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WbpItemGold->Gold->SetText(FText::AsNumber(TestPlayer->LoginComp->UserFullInfo.inventory_info.gold));
 		TestPlayer->InvenComp->GetExp(500);
+
+		for (UWidget* Widget : TestPlayer->InvenComp->MenuInven->WBP_ItemInven->WrapBox->GetAllChildren())
+		{
+			if (USlot* Slot = Cast<USlot>(Widget))
+			{
+				Slot->ItemStructTable = FItemStructTable();
+				FSlateBrush Brush;
+				Brush.SetResourceObject(nullptr);
+				Brush.DrawAs = ESlateBrushDrawType::Type::NoDrawType;
+				Slot->SlotImage->SetBrush(Brush);
+			}
+		}
 	}
 }
 

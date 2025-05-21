@@ -66,6 +66,7 @@ void UInputComp::BeginPlay()
 		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Completed, this, &UInputComp::On_LeftMouseComplete);
 		InputComp->BindAction(IE_MouseWheel, ETriggerEvent::Triggered, this, &UInputComp::On_MouseWheelTriggered);
 		InputComp->BindAction(IE_RotateView, ETriggerEvent::Started, this, &UInputComp::On_RoatateView);
+		InputComp->BindAction(IE_Map, ETriggerEvent::Started, this, &UInputComp::On_Map);
 	}
 }
 
@@ -84,6 +85,7 @@ void UInputComp::BindInputActions()
 		InputComp->BindAction(IE_MouseWheel, ETriggerEvent::Triggered, this, &UInputComp::On_MouseWheelTriggered);
 		InputComp->BindAction(IE_RotateView, ETriggerEvent::Started, this, &UInputComp::On_RoatateView);
 		InputComp->BindAction(IE_Map, ETriggerEvent::Started, this, &UInputComp::On_Map);
+		InputComp->BindAction(IE_Jump, ETriggerEvent::Started, this, &UInputComp::On_Jump);
 	}
 }
 
@@ -147,6 +149,13 @@ void UInputComp::On_Stat()
 	{ TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);}
 }
 
+void UInputComp::On_Jump()
+{
+	if (!Pc->IsLocalController()) return;
+	UE_LOG(LogTemp,Warning,TEXT("InputComp 점프 되는중"))
+	TestPlayer->LaunchCharacter(FVector(0,0,500),false,false);
+}
+
 void UInputComp::On_Map()
 {
 	UE_LOG(LogTemp,Warning,TEXT("InputComp 키누르고 OnMap 딜리게이트 실행되냐?"))
@@ -204,18 +213,18 @@ void UInputComp::On_LeftMouseTriggered()
 		FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
 
 	if (Dot > 0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-0.65,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-0.25,0)); }
 	else if (Dot < -0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+0.65,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+0.25,0)); }
 	
 	else if (FMath::Abs(Dot) > 0.6)
 	{
 		MouseTime += GetWorld()->GetDeltaSeconds();
 		{
 			if (Dot > 0.6)
-			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-FMath::Sin(90 * MouseTime) * 3.5,0)); }
+			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-FMath::Sin(90 * MouseTime) * 2.5,0)); }
 			else if (Dot < -0.6)
-			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,FMath::Sin(90 * MouseTime) * 3.5,0)); }
+			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,FMath::Sin(90 * MouseTime) * 2.5,0)); }
 		}
 		if (MouseTime > 1)
 		{
@@ -247,7 +256,7 @@ void UInputComp::On_LeftMouseComplete()
 void UInputComp::On_MouseWheelTriggered(const FInputActionValue& Value)
 {
 	float Axis = Value.Get<float>();
-	TestPlayer->CameraBoom->TargetArmLength -= 250 * Axis;
+	TestPlayer->CameraBoom->TargetArmLength -= 75 * Axis;
 }
 
 void UInputComp::On_RoatateView()

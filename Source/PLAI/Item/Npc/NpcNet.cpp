@@ -68,6 +68,7 @@ void ANpcNet::NetPost(FString String)
 	FString JsonString;
 	FNpcStructPost NpcStruct;
 	NpcStruct.question = String;
+	NpcStruct.personality = personality;
 	
 	FJsonObjectConverter::UStructToJsonObjectString(NpcStruct,JsonString);
 	HttpRequest->SetContentAsString(JsonString);

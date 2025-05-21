@@ -36,6 +36,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	APlayerController* pc;
+
+	UPROPERTY(EditAnywhere)
+	FString personality = FString("두려운");
 	
 	void OpenQuest();
 	void NetPost(FString String);

@@ -58,6 +58,11 @@ public:
 	UInputAction* IE_Stat;
 	UFUNCTION()
 	void On_Stat();
+	
+	UPROPERTY(EditAnywhere)
+	UInputAction* IE_Jump;
+	UFUNCTION()
+	void On_Jump();
 
 	UPROPERTY(EditAnywhere)
 	UInputAction* IE_Map;

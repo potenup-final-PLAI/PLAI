@@ -271,7 +271,7 @@ void ULoginComp::HttpMePost()
 			if (TestPlayer && UserFullInfo.character_info.position.x != 0)
 			{
 				TestPlayer->SetActorLocation(FVector(UserFullInfo.character_info.position.x,
-					UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z));
+					UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z + 750));
 			}
 			else
 			{ UE_LOG(LogTemp,Warning,TEXT("LoginComp 캐릭터 위치 불러오려다 TestPlayer 또는 X 좌표 0임")) }
