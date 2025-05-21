@@ -269,17 +269,20 @@ void ULoginComp::HttpMePost()
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->MaxExpCha->SetText
 			(FText::AsNumber(UserFullInfo.character_info.max_exp));
 
+			auto* MoveComp = TestPlayer->GetCharacterMovement();
+			MoveComp->GravityScale = 0.0f;
 			TestPlayer->GetCharacterMovement()->GravityScale = 0.0f;
+			
 			if(TestPlayer && UserFullInfo.character_info.position.x != 0)
 			{
 				TestPlayer->SetActorLocation(FVector(UserFullInfo.character_info.position.x,
 				UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z + 750));
 			}
 			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,MoveComp]()
 			{
-				TestPlayer->GetCharacterMovement()->GravityScale = 1.0f;;
-			},2.5,false);
+				MoveComp->GravityScale = 1.0f;;
+			},4.0f,false);
 		}
 	});
 	httpRequest->ProcessRequest();

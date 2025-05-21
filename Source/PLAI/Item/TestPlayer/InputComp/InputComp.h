@@ -94,7 +94,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	UInputAction* IE_RotateView;
 	UPROPERTY(EditAnywhere)
-	bool bRotateView = false;
+	bool bRotateView = true;
 	UFUNCTION()
 	void On_RoatateView();
 
