@@ -43,25 +43,13 @@ void UInputComp::BeginPlay()
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
 
     if (!Pc) return;
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	{
-		BindInputActions();
-		SetMappingContext();
-	},1.0f,false);
+
+	BindInputActions();
+	SetMappingContext();
 	
-	if (UEnhancedInputComponent* InputComp = Cast<UEnhancedInputComponent>(TestPlayer->InputComponent))
-	{
-		InputComp->BindAction(IE_Equip, ETriggerEvent::Started, this, &UInputComp::On_Equip);
-		InputComp->BindAction(IE_Inven, ETriggerEvent::Started, this, &UInputComp::On_Inven);
-		InputComp->BindAction(IE_Stat, ETriggerEvent::Started, this, &UInputComp::On_Stat);
-		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Started, this, &UInputComp::On_LeftMouseStart);
-		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Triggered, this, &UInputComp::On_LeftMouseTriggered);
-		InputComp->BindAction(IE_LeftMouse, ETriggerEvent::Completed, this, &UInputComp::On_LeftMouseComplete);
-		InputComp->BindAction(IE_MouseWheel, ETriggerEvent::Triggered, this, &UInputComp::On_MouseWheelTriggered);
-		InputComp->BindAction(IE_RotateView, ETriggerEvent::Started, this, &UInputComp::On_RoatateView);
-		InputComp->BindAction(IE_Map, ETriggerEvent::Started, this, &UInputComp::On_Map);
-	}
+	// FTimerHandle TimerHandle;
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	// {},1.0f,false);
 }
 
 
@@ -146,14 +134,14 @@ void UInputComp::On_Stat()
 void UInputComp::Server_On_Jump_Implementation()
 {
 	On_Jump();
+	TestPlayer->LaunchCharacter(FVector(0,0,500),false,false);
 }
 
 void UInputComp::On_Jump()
 {
-	if (!Pc->IsLocalController()) return;
+	if (!Pc || !Pc->IsLocalController()){UE_LOG(LogTemp,Warning,TEXT("InputComp PC , PC 로칼컨트롤 아님")) return;}
 	UE_LOG(LogTemp,Warning,TEXT("InputComp 점프 되는중"))
-	
-	TestPlayer->LaunchCharacter(FVector(0,0,500),false,false);
+	// TestPlayer->LaunchCharacter(FVector(0,0,500),false,false);
 }
 
 void UInputComp::On_Map()
@@ -218,12 +206,10 @@ void UInputComp::On_LeftMouseTriggered()
 	
 	else if (FMath::Abs(Dot) > 0.6)
 	{
-		{
-			if (Dot > 0.6)
-			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-FMath::Sin(90 * MouseTime) * 3.5,0)); }
-			else if (Dot < -0.6)
-			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,FMath::Sin(90 * MouseTime) * 3.5,0)); }
-		}
+		if (Dot > 0.6)
+		{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-FMath::Sin(90 * MouseTime) * 3.5,0)); }
+		else if (Dot < -0.6)
+		{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,FMath::Sin(90 * MouseTime) * 3.5,0)); }
 	}
 	float MouseX, MouseY;
 	Pc->GetInputMouseDelta(MouseX, MouseY);

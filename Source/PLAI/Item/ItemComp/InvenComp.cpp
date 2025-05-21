@@ -289,8 +289,10 @@ void UInvenComp::GetItem(const FItemStructTable& ItemStructTable)
 }
 
 void UInvenComp::Server_DestroyItem_Implementation(AItem* Item)
-{ Item->Destroy(); }
-
+{
+	if (!IsValid(Item)) return;
+	Item->Destroy();
+}
 
 void UInvenComp::Server_EquipItem_Implementation(const FItemStructTable& ItemStructTable, EquipSlotType SlotType)
 {
