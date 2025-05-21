@@ -50,6 +50,9 @@ void ULoginComp::BeginPlay()
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
+			if (WorldGi->Creature)
+			{ TestPlayer->InvenComp->Server_SpawnCreature();
+				WorldGi->Creature = nullptr; }
 			// 최초 게임 실행 했는지
 			if (WorldGi->bGameStart == false)
 			{
@@ -68,9 +71,6 @@ void ULoginComp::BeginPlay()
 
 					if (WorldGi->bBattleReward == true)
 					{
-						if (WorldGi->Creature)
-						{ TestPlayer->InvenComp->Server_SpawnCreature();
-							WorldGi->Creature = nullptr; }
 						FTimerHandle TimerHandle;
 						GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,WorldGi]()
 						{ TestPlayer->InvenComp->TurnReward(); WorldGi->bBattleReward = false;},1.0,false);

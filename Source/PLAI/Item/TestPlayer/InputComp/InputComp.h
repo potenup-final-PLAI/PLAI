@@ -61,6 +61,8 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	UInputAction* IE_Jump;
+	UFUNCTION(Server, Reliable)
+	void Server_On_Jump();
 	UFUNCTION()
 	void On_Jump();
 

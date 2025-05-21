@@ -24,7 +24,7 @@ void ANpcStore::BeginPlay()
 	Item = ItemFactory->GetDefaultObject<AItem>();
 
 	StoreInven = CreateWidget<UStoreInven>(GetWorld(),StoreInvenFactory);
-	StoreInven->AddToViewport();
+	StoreInven->AddToViewport(0);
 	StoreInven->SetVisibility(ESlateVisibility::Hidden);
 	
 	NpcUiMaster = Cast<UWidget>(StoreInven);

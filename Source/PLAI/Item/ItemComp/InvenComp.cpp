@@ -56,7 +56,7 @@ void UInvenComp::BeginPlay()
 			if (WorldGi->bBattleReward == true || WorldGi->bGameStart == true)
 			{
 				if (!MenuInven){MenuInven = CreateWidget<UMenuInven>(GetWorld(),MenuInvenFactory);}
-				MenuInven->AddToViewport(1);
+				MenuInven->AddToViewport(2);
 				MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
@@ -175,7 +175,7 @@ void UInvenComp::Client_GetCreature_Implementation()
 	if (RawNames.IsValidIndex(33))
 	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
 		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
-		TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable); }
+		TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable,TestPlayer); }
 	else
 	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?")) }
 }

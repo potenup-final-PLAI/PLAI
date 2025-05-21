@@ -43,18 +43,12 @@ void UInputComp::BeginPlay()
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
 
     if (!Pc) return;
-	
-	if (ULocalPlayer* LP = Pc->GetLocalPlayer())
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
-		{
-			Subsystem->AddMappingContext(InputMappingContext, 0);
-			{
-				UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is AddMapping [있음] 서버니 클라니? %s"),
-				TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
-			}
-		}
-	}
+		BindInputActions();
+		SetMappingContext();
+	},1.0f,false);
 	
 	if (UEnhancedInputComponent* InputComp = Cast<UEnhancedInputComponent>(TestPlayer->InputComponent))
 	{
@@ -85,7 +79,7 @@ void UInputComp::BindInputActions()
 		InputComp->BindAction(IE_MouseWheel, ETriggerEvent::Triggered, this, &UInputComp::On_MouseWheelTriggered);
 		InputComp->BindAction(IE_RotateView, ETriggerEvent::Started, this, &UInputComp::On_RoatateView);
 		InputComp->BindAction(IE_Map, ETriggerEvent::Started, this, &UInputComp::On_Map);
-		InputComp->BindAction(IE_Jump, ETriggerEvent::Started, this, &UInputComp::On_Jump);
+		InputComp->BindAction(IE_Jump, ETriggerEvent::Started, this, &UInputComp::Server_On_Jump);
 	}
 }
 
@@ -149,10 +143,16 @@ void UInputComp::On_Stat()
 	{ TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);}
 }
 
+void UInputComp::Server_On_Jump_Implementation()
+{
+	On_Jump();
+}
+
 void UInputComp::On_Jump()
 {
 	if (!Pc->IsLocalController()) return;
 	UE_LOG(LogTemp,Warning,TEXT("InputComp 점프 되는중"))
+	
 	TestPlayer->LaunchCharacter(FVector(0,0,500),false,false);
 }
 
@@ -190,7 +190,6 @@ void UInputComp::On_LeftMouseStart()
 			}
 		}
 	}
-	
 	TestPlayer->GetController()->StopMovement();
 	TimeCamera = 0;
 }
@@ -213,22 +212,17 @@ void UInputComp::On_LeftMouseTriggered()
 		FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
 
 	if (Dot > 0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-0.25,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-0.35,0)); }
 	else if (Dot < -0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+0.25,0)); }
+	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+0.35,0)); }
 	
 	else if (FMath::Abs(Dot) > 0.6)
 	{
-		MouseTime += GetWorld()->GetDeltaSeconds();
 		{
 			if (Dot > 0.6)
-			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-FMath::Sin(90 * MouseTime) * 2.5,0)); }
+			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-FMath::Sin(90 * MouseTime) * 3.5,0)); }
 			else if (Dot < -0.6)
-			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,FMath::Sin(90 * MouseTime) * 2.5,0)); }
-		}
-		if (MouseTime > 1)
-		{
-			MouseTime = 1;
+			{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,FMath::Sin(90 * MouseTime) * 3.5,0)); }
 		}
 	}
 	float MouseX, MouseY;
@@ -293,3 +287,15 @@ void UInputComp::InitializeComponent()
 // else
 // { UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is locallyControlled 있음 서버니 클라니? %s"),
 // 		TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라")) }
+
+// if (ULocalPlayer* LP = Pc->GetLocalPlayer())
+// {
+// 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+// 	{
+// 		Subsystem->AddMappingContext(InputMappingContext, 0);
+// 		{
+// 			UE_LOG(LogTemp, Error, TEXT("InputComp TestPlayer is AddMapping [있음] 서버니 클라니? %s"),
+// 			TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
+// 		}
+// 	}
+// }

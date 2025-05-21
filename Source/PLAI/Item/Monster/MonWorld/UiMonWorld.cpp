@@ -41,6 +41,7 @@ void UUiMonWorld::OnButtonYes()
             WorldGi->MonsterType = MonWorld->MonsterType;
 			if (TestPlayer && TestPlayer->CreComp->Creature)
 			{ WorldGi->Creature = TestPlayer->CreComp->Creature; }
+			
 			if (MonWorld && MonWorld->MonsterType == EMonsterType::Monster)
 			{
 				GetWorld()->ServerTravel(TEXT("/Game/JS/Maps/TestMap?listen"));
@@ -49,8 +50,6 @@ void UUiMonWorld::OnButtonYes()
 			{
 				GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/MK_BossMap?listen"));
 			}
-			// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
-			// 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);
 			
 			if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp,Warning,TEXT("UiMonWorld OnButtonYes 아이템 쉴드 넣기전 IsLocalPlayer 아님")) return;}
 
@@ -71,3 +70,6 @@ void UUiMonWorld::OnButtonYes()
 void UUiMonWorld::OnButtonNo()
 {
 }
+
+// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
+// 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);

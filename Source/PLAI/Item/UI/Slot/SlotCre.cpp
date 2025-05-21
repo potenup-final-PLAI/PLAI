@@ -59,7 +59,7 @@ bool USlotCre::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& I
 
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{
-		TestPlayer->InvenComp->Server_SpawnCreature_Implementation();
+		TestPlayer->InvenComp->Server_SpawnCreature();
 	}
 
 
@@ -86,42 +86,65 @@ bool USlotCre::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& I
 	// return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 
-void USlotCre::SpawnCreature(FItemStructTable ItemStructTab)
+void USlotCre::SpawnCreature(FItemStructTable ItemStructTab, ATestPlayer* TestPlayer)
 {
-	ItemStructTable = ItemStructTab;
 	SlotImageUpdate();
 	SlotCountUpdate(ItemStructTab.ItemNum);
-	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.bNoFail = true; // 실패하지 않게 설정
-		SpawnParams.bDeferConstruction = true;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTab.CreatureFactory,SpawnParams);
-		Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
-		TestPlayer->CreComp->EquipCreature(Creature);
-		Creature->ItemStructTable = ItemStructTable;
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.bNoFail = true; // 실패하지 않게 설정
+	SpawnParams.bDeferConstruction = true;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTab.CreatureFactory,SpawnParams);
+	Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
+	TestPlayer->CreComp->EquipCreature(Creature);
+	Creature->CreFsm->TestPlayer = TestPlayer;
+	Creature->ItemStructTable = ItemStructTable;
 		
-		Creature->CreFsm->CreStruct.Name = ItemStructTable.Name;
-		Creature->CreFsm->CreStruct.Atk = ItemStructTable.ItemStructStat.item_ATK;
-		Creature->CreFsm->CreStruct.Crit = ItemStructTable.ItemStructStat.Item_CRIT;
-		Creature->CreFsm->CreStruct.CritDmg = ItemStructTable.ItemStructStat.item_CRITDMG;
+	Creature->CreFsm->CreStruct.Name = ItemStructTable.Name;
+	Creature->CreFsm->CreStruct.Atk = ItemStructTable.ItemStructStat.item_ATK;
+	Creature->CreFsm->CreStruct.Crit = ItemStructTable.ItemStructStat.Item_CRIT;
+	Creature->CreFsm->CreStruct.CritDmg = ItemStructTable.ItemStructStat.item_CRITDMG;
 		
-		Creature->CreFsm->CreStruct.MaxHp = ItemStructTable.ItemStructStat.item_SHI;
-		Creature->CreFsm->CreStruct.CurrentHp = ItemStructTable.ItemStructStat.item_SHI;
-
-		Creature->CreFsm->CreStruct.Def = ItemStructTable.ItemStructStat.item_DEF;
-		// 왜 경험치 1000 초기화 안됨?
-		// Creature->CreFsm->CreStruct.MaxExp = 1000;
+	Creature->CreFsm->CreStruct.MaxHp = ItemStructTable.ItemStructStat.item_SHI;
+	Creature->CreFsm->CreStruct.CurrentHp = ItemStructTable.ItemStructStat.item_SHI;
+	Creature->CreFsm->CreStruct.Def = ItemStructTable.ItemStructStat.item_DEF;
 		
-		MenuInven->Wbp_UiCre->SetUiCre(&Creature->CreFsm->CreStruct);
-	}
-	else
-	{
-		UE_LOG(LogTemp,Warning,TEXT("USlotCre:: TestPlayer캐스팅 실패 NativeOnDrop"));
-	}
+	MenuInven->Wbp_UiCre->SetUiCre(&Creature->CreFsm->CreStruct);
 }
 
 void USlotCre::SetCreatureStat()
 {
 }
+
+
+// if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+// {
+// 	if (!TestPlayer->IsLocallyControlled())return;
+// 	FActorSpawnParameters SpawnParams;
+// 	SpawnParams.bNoFail = true; // 실패하지 않게 설정
+// 	SpawnParams.bDeferConstruction = true;
+// 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+// 	ACreature* Creature = GetWorld()->SpawnActor<ACreature>(ItemStructTab.CreatureFactory,SpawnParams);
+// 	Creature->FinishSpawning(FTransform(TestPlayer->GetActorLocation() + FVector(0,0,500)));
+// 	TestPlayer->CreComp->EquipCreature(Creature);
+// 	Creature->ItemStructTable = ItemStructTable;
+// 	
+// 	Creature->CreFsm->CreStruct.Name = ItemStructTable.Name;
+// 	Creature->CreFsm->CreStruct.Atk = ItemStructTable.ItemStructStat.item_ATK;
+// 	Creature->CreFsm->CreStruct.Crit = ItemStructTable.ItemStructStat.Item_CRIT;
+// 	Creature->CreFsm->CreStruct.CritDmg = ItemStructTable.ItemStructStat.item_CRITDMG;
+// 	
+// 	Creature->CreFsm->CreStruct.MaxHp = ItemStructTable.ItemStructStat.item_SHI;
+// 	Creature->CreFsm->CreStruct.CurrentHp = ItemStructTable.ItemStructStat.item_SHI;
+//
+// 	Creature->CreFsm->CreStruct.Def = ItemStructTable.ItemStructStat.item_DEF;
+// 	// 왜 경험치 1000 초기화 안됨?
+// 	// Creature->CreFsm->CreStruct.MaxExp = 1000;
+// 	
+// 	MenuInven->Wbp_UiCre->SetUiCre(&Creature->CreFsm->CreStruct);
+// }
+// else
+// {
+// 	UE_LOG(LogTemp,Warning,TEXT("USlotCre:: TestPlayer캐스팅 실패 NativeOnDrop"));
+// }

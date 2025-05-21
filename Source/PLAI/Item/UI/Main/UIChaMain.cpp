@@ -93,7 +93,7 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 void UUIChaMain::OnLoadMeInfo()
 {
 	UGameplayStatics::SetGamePaused(GetWorld(),false);
-	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport(1);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport(2);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
