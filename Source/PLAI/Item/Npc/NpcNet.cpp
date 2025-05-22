@@ -24,8 +24,7 @@ void ANpcNet::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	NpcNameString = TEXT("바스 (Guide)");
-
+	NpcNameString = TEXT("Bass");
 	
 }
 
