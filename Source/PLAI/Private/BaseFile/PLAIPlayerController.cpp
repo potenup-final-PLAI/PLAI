@@ -27,6 +27,8 @@ APLAIPlayerController::APLAIPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
+
+	bEnableMouseOverEvents = true;
 	
 }
 

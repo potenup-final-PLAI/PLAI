@@ -9,8 +9,9 @@
   <component name="ChangeListManager">
     <list default="true" id="bacb1ca5-6adf-4789-91a8-7f4a49cd39c9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/PLAI/Private/Battle/BattlePlayer/BaseBattlePawn.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PLAI/Private/Battle/BattlePlayer/BaseBattlePawn.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/PLAI/Private/Battle/Tile/GridTileManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PLAI/Private/Battle/Tile/GridTileManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/KHA/Matertial/M_Line.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/KHA/Matertial/M_Line.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/KHA/Sound/cave/BP_CaveSound.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/KHA/Sound/cave/BP_CaveSound.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/PLAI/Private/BaseFile/PLAIPlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PLAI/Private/BaseFile/PLAIPlayerController.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,6 +21,19 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "zigzaghyun"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/potenup-final-PLAI/PLAI.git",
+    "accountId": "6df7600e-8df6-43a5-9f25-f8a411b65fba"
+  }
+}]]></component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -33,7 +47,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Uproject.PLAI.executor": "Run",
-    "git-widget-placeholder": "JS__Prototype",
+    "git-widget-placeholder": "kha__prototype",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -49,7 +63,7 @@
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
         <option name="EXECUTABLE_PATH" value="C:\Program Files\Epic Games\UE_5.5\Engine\Binaries\Win64\UnrealEditor-Win64-DebugGame.exe" />
-        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\PLAI\PLAI.uproject&quot;" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\UE\PLAI\PLAI.uproject&quot;" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
         <option name="PASS_PARENT_ENVS" value="1" />
@@ -61,7 +75,7 @@
         <option name="CONFIGURATION" value="DebugGame" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\Project\PLAI\Binaries\Win64\PLAI-Win64-DebugGame.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\Project\UE\PLAI\Binaries\Win64\PLAI-Win64-DebugGame.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -75,7 +89,7 @@
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
         <option name="EXECUTABLE_PATH" value="C:\Program Files\Epic Games\UE_5.5\Engine\Binaries\Win64\UnrealEditor.exe" />
-        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\PLAI\PLAI.uproject&quot;" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\UE\PLAI\PLAI.uproject&quot;" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
         <option name="PASS_PARENT_ENVS" value="1" />
@@ -87,7 +101,7 @@
         <option name="CONFIGURATION" value="Development" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\Project\PLAI\Binaries\Win64\PLAI.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\Project\UE\PLAI\Binaries\Win64\PLAI.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -100,7 +114,7 @@
         <option name="CONFIGURATION" value="Shipping" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\Project\PLAI\Binaries\Win64\PLAI-Win64-Shipping.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\Project\UE\PLAI\Binaries\Win64\PLAI-Win64-Shipping.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -127,12 +141,14 @@
       <updated>1744706725126</updated>
       <workItem from="1744706726265" duration="3345000" />
       <workItem from="1747359890977" duration="307000" />
+      <workItem from="1747884674872" duration="6420000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
