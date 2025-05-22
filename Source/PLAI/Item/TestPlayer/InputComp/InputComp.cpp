@@ -211,9 +211,12 @@ void UInputComp::On_LeftMouseTriggered()
 		Pc->GetInputMouseDelta(MouseX, MouseY);
 		FRotator CameraBoomRot = TestPlayer->CameraBoom->GetRelativeRotation();
 
-		MousePower += MouseY;
-		if (FMath::Abs(MousePower) > 5.f)
-		{ CameraBoomRot.Pitch = FMath::Clamp(CameraBoomRot.Pitch + 0.5 * MouseY, - 60.0f, 10.0f);
+		MousePowerX += MouseX;
+		MousePowerY += MouseY;
+		if (FMath::Abs(MousePowerY) > 5.f || FMath::Abs(MousePowerX) > 5.f)
+		{
+			CameraBoomRot.Yaw = FMath::Clamp(CameraBoomRot.Pitch + 0.5 * MouseX, - 45.0f, 45.0f);
+			CameraBoomRot.Pitch = FMath::Clamp(CameraBoomRot.Pitch + 0.5 * MouseY, - 60.0f, 10.0f);
 			TestPlayer->CameraBoom->SetRelativeRotation(CameraBoomRot); }
 	}
 }
@@ -223,7 +226,8 @@ void UInputComp::On_LeftMouseComplete()
 	if (!Pc->IsLocalController()) return;
 
 	bLeftMouse = false;
-	MousePower = 0;
+	MousePowerX = 0;
+	MousePowerY = 0;
 	MouseTime = 0;
 }
 

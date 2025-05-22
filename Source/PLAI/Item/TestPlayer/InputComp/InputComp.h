@@ -74,7 +74,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bLeftMouse = false;
 	UPROPERTY(EditAnywhere)
-	float MousePower = 0;
+	float MousePowerX = 0;
+	UPROPERTY(EditAnywhere)
+	float MousePowerY = 0;
 	UPROPERTY(EditAnywhere)
 	float MouseTime = 0;
 	
