@@ -25,7 +25,6 @@ void ANpcNet::BeginPlay()
 	Super::BeginPlay();
 	
 	NpcNameString = TEXT("Bass");
-	
 }
 
 // Called every frame

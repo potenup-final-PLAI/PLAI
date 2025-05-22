@@ -108,6 +108,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	EMonsterType MonsterType;
 
+	UPROPERTY(EditAnywhere)
+	FString NpcPersonality = FString(TEXT("NpcPersonality"));
+
 	void EquipActor(AActor* MyActor);
 
 	
