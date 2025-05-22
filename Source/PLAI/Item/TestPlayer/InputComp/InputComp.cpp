@@ -244,7 +244,8 @@ void UInputComp::On_RoatateView()
 		TestPlayer->InvenComp->MenuInven->WBP_InputUi->RotateViewText->SetText(FText::FromString(TEXT("고정 시점 모드")));
 
 		TestPlayer->CameraBoom->TargetArmLength = 2500.0f;
-		TestPlayer->CameraBoom->SetWorldRotation(FRotator(-45,TestPlayer->GetActorRotation().Yaw,0));
+		// TestPlayer->CameraBoom->SetWorldRotation(FRotator(-45,TestPlayer->GetActorRotation().Yaw,0));
+		TestPlayer->CameraBoom->SetWorldRotation(FRotator(-45,-90,0));
 		bRotateView = false;
 	}
 	else
