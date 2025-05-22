@@ -42,10 +42,10 @@ void AMonster::BeginPlay()
 	MonUi = CreateWidget<UMonUi>(GetWorld(),MonsterParent->MonUiFactory);
 	
 	MonUiComp->SetWidget(MonUi);
-	MonUiComp->SetDrawSize(FVector2D(300.f, 90.f));
+	MonUiComp->SetDrawSize(FVector2D(300.f, 75.f));
 	MonUiComp->SetVisibility(true);
 	MonUiComp->SetRelativeLocation(FVector(0,0,150));
-	MonUiComp->SetWidgetSpace(EWidgetSpace::World); // or World
+	MonUiComp->SetWidgetSpace(EWidgetSpace::Screen); // or World
 
 	SetMonsterUi();
 	SetHpBar();
