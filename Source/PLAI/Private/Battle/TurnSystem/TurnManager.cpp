@@ -99,8 +99,10 @@ void ATurnManager::StartPlayerTurn()
 	
 	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("TurnManager : playerPawn"));
 		if (ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(playerPawn->GetOwner()))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("TurnManager : battlePC"));
 			FTimerHandle possessHandle;
 			GetWorld()->GetTimerManager().ClearTimer(possessHandle);
 

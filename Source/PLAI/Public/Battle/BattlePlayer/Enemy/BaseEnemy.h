@@ -53,7 +53,8 @@ public:
 
 	// 받은 데이터로 enemy 움직임
 	void ProcessAction(const FActionRequest& actionRequest);
-
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_ShowDialoge(const FString& dialogue);
 	// enemy 스킬리스트
 	TMap<FString, EActionMode> ActionMap;
 

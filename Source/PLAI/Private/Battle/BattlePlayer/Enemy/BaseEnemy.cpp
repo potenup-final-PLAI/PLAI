@@ -171,8 +171,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	// 본인이 서버에서 지시된 캐릭터인지 확인
 	if (actionRequest.current_character_id != this->GetName())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("actionRequest not for this enemy: %s"),
-		       *this->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("actionRequest not for this enemy: %s"), *this->GetName());
 		return;
 	}
 
@@ -190,20 +189,10 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	
 	
 	// 3. API 행동 이유 출력
-	if (action.reason != "")
+	if (action.dialogue != "")
 	{
-		FString reason = action.reason;
-		this->battleUnitStateComp->SetDrawSize(FVector2d(150, 100));
-		this->battleUnitStateUI->ShowAPIReasonUI();
-		this->battleUnitStateUI->SetAPIReason(reason);
-
-		FTimerHandle actionReasonTimerHandle;
-		GetWorld()->GetTimerManager().ClearTimer(actionReasonTimerHandle);
-		GetWorld()->GetTimerManager().SetTimer(actionReasonTimerHandle,FTimerDelegate::CreateLambda([this]()
-		{
-			this->battleUnitStateUI->ShowBaseUI();
-			this->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
-		}), 3.0f, false);
+		FString dialogue = action.dialogue;
+		MultiCastRPC_ShowDialoge(dialogue);
 	}
 	
 	// 1. 이동 처리
@@ -213,7 +202,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
 			enemy->currentActionMode = EActionMode::Move;
-			if (enemybattleState->move_Range) ServerRPC_SeeMoveRange(this->enemybattleState->move_Range);
+			if (enemy->moveRange) ServerRPC_SeeMoveRange(enemy->moveRange);
 			else UE_LOG(LogTemp, Warning, TEXT("Enemybattle not State"));
 			
 			if (enemyAnim)
@@ -266,6 +255,21 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 			OnTurnEnd();
 		}), 1.0f, false);
 	}
+}
+
+void ABaseEnemy::MultiCastRPC_ShowDialoge_Implementation(const FString& dialogue)
+{
+	this->battleUnitStateComp->SetDrawSize(FVector2d(150, 100));
+	this->battleUnitStateUI->ShowAPIReasonUI();
+	this->battleUnitStateUI->SetAPIReason(dialogue);
+
+	FTimerHandle actionReasonTimerHandle;
+	GetWorld()->GetTimerManager().ClearTimer(actionReasonTimerHandle);
+	GetWorld()->GetTimerManager().SetTimer(actionReasonTimerHandle,FTimerDelegate::CreateLambda([this]()
+	{
+		this->battleUnitStateUI->ShowBaseUI();
+		this->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+	}), 3.0f, false);
 }
 
 void ABaseEnemy::InitActionMap()
@@ -396,7 +400,7 @@ ABaseBattlePawn* ABaseEnemy::FindUnitById(const FString& Id)
 
 bool ABaseEnemy::TryConsumeAP(int32 amount)
 {
-	if (!enemybattleState->CanConsumeAP(amount))
+	if (!this->CanConsumeAP(amount))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 		return false;

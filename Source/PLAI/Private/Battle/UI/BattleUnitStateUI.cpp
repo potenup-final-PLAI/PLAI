@@ -99,9 +99,9 @@ void UBattleUnitStateUI::ShowAPIReasonUI()
 	if (WS_BattleUnitState) WS_BattleUnitState->SetActiveWidgetIndex(3);
 }
 
-void UBattleUnitStateUI::SetAPIReason(const FString& reason)
+void UBattleUnitStateUI::SetAPIReason(const FString& dialogue)
 {
-	TB_APIReason->SetText(FText::FromString(reason));
+	TB_APIReason->SetText(FText::FromString(dialogue));
 }
 
 FString UBattleUnitStateUI::GetNetModeString(UWorld* World)

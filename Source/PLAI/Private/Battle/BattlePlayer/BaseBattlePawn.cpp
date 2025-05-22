@@ -111,7 +111,10 @@ void ABaseBattlePawn::PossessedBy(AController* NewController)
 	
 	if (IsLocallyControlled())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s의 currentTile : %s"), *this->GetActorNameOrLabel(), *this->currentTile->GetActorNameOrLabel());
+		if (this && this->currentTile)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s의 currentTile : %s"), *this->GetActorNameOrLabel(), *this->currentTile->GetActorNameOrLabel());
+		}
 	}
 }
 
@@ -234,13 +237,9 @@ void ABaseBattlePawn::OnTurnEnd()
 	// 입력 막고 FSM 종료
 
 	// 턴 종료 상태거나 phaseManager가 없다면 return
-	if (!phaseManager && !turnManager && phaseManager->turnManager->curTurnState
-		== ETurnState::TurnEnd)
+	if (!phaseManager && !turnManager && phaseManager->turnManager->curTurnState == ETurnState::TurnEnd)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT(
-			       " OnTurnEnd : !(phaseManager && phaseManager->turnManager->curTurnState == ETurnState::TurnEnd"
-		       ));
+		UE_LOG(LogTemp, Warning,TEXT(" OnTurnEnd : !(phaseManager && phaseManager->turnManager->curTurnState == ETurnState::TurnEnd"));
 		return;
 	}
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
@@ -254,7 +253,6 @@ void ABaseBattlePawn::OnTurnEnd()
 		phaseManager->ServerRPC_EndEnemyPhase();
 	}
 }
-
 
 void ABaseBattlePawn::OnMouseLeftClick()
 {

@@ -189,6 +189,7 @@ void AUPhaseManager::SortUnitQueue()
 {
 	Algo::Sort(unitQueue, [](ABaseBattlePawn* A, const ABaseBattlePawn* B)
 	{
+		if (A->speed == B->speed) return true;
 		return A->speed > B->speed;
 	});
 }
@@ -723,7 +724,7 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 	{
 		// 데이터 받아와서 세팅
 		// 장비 장착 
-		if (gi && gi->UserFullInfoGiStat.character_info.stats.hp != 0)
+		if (gi && gi->UserFullInfoGiStat.character_info.stats.speed != 0)
 		{
 			gi->EquipActor(player);
 			UE_LOG(LogTemp, Warning, TEXT("Eqirment"));
@@ -878,6 +879,6 @@ void AUPhaseManager::PlayerReady(APlayerController* playerControl)
 			}
 		}
 
-		gridTileManager->InitGridTile();
+		gridTileManager->ServerRPC_InitGridTile();
 	}
 }

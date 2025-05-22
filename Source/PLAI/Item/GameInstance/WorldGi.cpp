@@ -81,11 +81,18 @@ void UWorldGi::OnFindSessionComplete(bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
+		// JS 추가
+		if (!SessionSearch.IsValid())
+		{
+			UE_LOG(LogTemp, Error, TEXT("WorldGI: SessionSearch가 유효하지 않음"));
+			return;
+		}
+		
 		int32 Rand = FMath::RandRange(10,100);
 		UE_LOG(LogTemp,Warning,TEXT("WorldGI 세션 검색 성공 랜덤값[%d]"),Rand)
 
 		auto Results = SessionSearch->SearchResults;
-
+	
 		UE_LOG(LogTemp, Warning, TEXT("WorldGI 검색된 세션 개수: %d"), SessionSearch->SearchResults.Num());
 		
 		for (int i = 0; i < Results.Num(); i++)

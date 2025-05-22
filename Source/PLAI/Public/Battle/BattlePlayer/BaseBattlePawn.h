@@ -138,7 +138,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_SetBattlePlayerInfoUI();
 	void OnTurnEnd();
-
 	//------------Skill System-----------------
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	EActionMode currentActionMode = EActionMode::None;
