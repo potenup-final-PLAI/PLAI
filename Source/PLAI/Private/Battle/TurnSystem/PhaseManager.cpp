@@ -878,6 +878,6 @@ void AUPhaseManager::PlayerReady(APlayerController* playerControl)
 			}
 		}
 
-		gridTileManager->InitGridTile();
+		gridTileManager->ServerRPC_InitGridTile();
 	}
 }
