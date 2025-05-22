@@ -57,7 +57,9 @@ public:
 	FTimerHandle bindUnitHandle;
 
 	TArray<class ABattlePlayerController*> playerControllers;
-	
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_InitGridTile();
 	UFUNCTION(NetMulticast, Reliable)
 	void InitGridTile();
 	

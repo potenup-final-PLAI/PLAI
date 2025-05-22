@@ -45,6 +45,10 @@ void AGridTileManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+void AGridTileManager::ServerRPC_InitGridTile_Implementation()
+{
+	InitGridTile();
+}
 
 void AGridTileManager::InitGridTile_Implementation()
 {
