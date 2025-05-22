@@ -104,6 +104,9 @@ struct FBattleAction
 	FString reason = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString dialogue = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 remaining_ap = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

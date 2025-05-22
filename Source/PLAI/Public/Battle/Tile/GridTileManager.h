@@ -62,7 +62,6 @@ public:
 	void ServerRPC_InitGridTile();
 	UFUNCTION(NetMulticast, Reliable)
 	void InitGridTile();
-	
 	UFUNCTION(NetMulticast, Reliable)
 	void SendTileData(FIntPoint coord, AGridTile* tilePointer);
 	

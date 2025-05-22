@@ -61,7 +61,7 @@ public:
 	class UMultiLineEditableTextBox* TB_APIReason;
 
 	void ShowAPIReasonUI();
-	void SetAPIReason(const FString& reason);
+	void SetAPIReason(const FString& dialogue);
 
 	FString GetNetModeString(UWorld* World);
 

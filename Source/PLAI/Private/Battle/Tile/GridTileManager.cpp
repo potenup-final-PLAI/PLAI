@@ -78,8 +78,7 @@ void AGridTileManager::InitGridTile_Implementation()
 				// 타일에 대한 좌표 저장
 				tileToCoordMap.Add(spawnTile, Coord);
 				FString s = map.FindRef(FIntPoint(X, Y))->GetActorNameOrLabel();
-
-				UE_LOG(LogTemp, Warning, TEXT("spawnTile : %s"), *spawnTile->GetActorNameOrLabel());
+				
 				SendTileData(Coord, spawnTile);
 				// 좌표 저장
 				allCoords.Add(Coord);
@@ -96,7 +95,7 @@ void AGridTileManager::InitGridTile_Implementation()
 	
 	TArray<FIntPoint> playerCoords = RandomCoords(playerStates.Num(), allCoords);
 	
-	for (int32 i = 0; i < 1; ++i)
+	for (int32 i = 0; i < playerStates.Num(); ++i)
 	{
 		const FIntPoint& coord = playerCoords[i];
 		AGridTile* gridTile = map.FindRef(coord);
@@ -114,22 +113,32 @@ void AGridTileManager::InitGridTile_Implementation()
 		}
 
 		player->currentTile = gridTile;
-		UE_LOG(LogTemp, Warning, TEXT("player : %s, currentTile : %s"), *player->GetActorNameOrLabel(), *player->currentTile->GetActorNameOrLabel());
 		// 매칭된 PlayerController를 찾아 SetOwner
+		// if (auto* playerPC = Cast<ABattlePlayerController>(player->GetController()))
+		// {
+		// 	if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("Before player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
+		// 	player->SetOwner(playerPC);
+		// 	playerPC->Possess(player);
+		// 	player->MultiCastRPC_SetMyName(i);
+		// 	if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("After player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
+		//
+		// 	player->ForceNetUpdate(); // 복제 보장
+		// 	playerControllers.Add(playerPC);
+		// }
 		APlayerState* ps = playerStates[i];
 		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetOwningController());
 		if (battlePC)
 		{
 			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("Before player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
 			player->SetOwner(battlePC);
-			battlePC->Possess(player);
+			if (HasAuthority())  battlePC->Possess(player);
 			player->MultiCastRPC_SetMyName(i);
 			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("After player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
-
+		
 			player->ForceNetUpdate(); // 복제 보장
 			playerControllers.Add(battlePC);
 		}
-
+		
 		unitArray.Add(player);
 		allCoords.Remove(coord);
 	}
