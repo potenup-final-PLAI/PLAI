@@ -71,7 +71,6 @@ void APLAIPlayerController::SetupInputComponent()
 void APLAIPlayerController::OnInputStarted()
 {
 	StopMovement();
-	
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{
 		TestPlayer->TestInputComp->SetMappingContext();

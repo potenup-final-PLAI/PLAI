@@ -30,7 +30,7 @@ UCreFsm::UCreFsm()
 void UCreFsm::BeginPlay()
 {
 	Super::BeginPlay();
-	TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	// TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	Creature = Cast<ACreature>(GetOwner());
 	// ...
 }

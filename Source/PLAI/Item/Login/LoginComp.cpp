@@ -14,6 +14,7 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
@@ -49,6 +50,7 @@ void ULoginComp::BeginPlay()
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
+			if (WorldGi->Creature) { TestPlayer->InvenComp->Server_SpawnCreature(); WorldGi->Creature = nullptr; }
 			// 최초 게임 실행 했는지
 			if (WorldGi->bGameStart == false)
 			{
@@ -268,13 +270,20 @@ void ULoginComp::HttpMePost()
 			TestPlayer->InvenComp->MenuInven->Wbp_ChaView->MaxExpCha->SetText
 			(FText::AsNumber(UserFullInfo.character_info.max_exp));
 
-			if (TestPlayer && UserFullInfo.character_info.position.x != 0)
+			auto* MoveComp = TestPlayer->GetCharacterMovement();
+			MoveComp->GravityScale = 0.0f;
+			TestPlayer->GetCharacterMovement()->GravityScale = 0.0f;
+			
+			if(TestPlayer && UserFullInfo.character_info.position.x != 0)
 			{
 				TestPlayer->SetActorLocation(FVector(UserFullInfo.character_info.position.x,
-					UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z));
+				UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z + 1000));
 			}
-			else
-			{ UE_LOG(LogTemp,Warning,TEXT("LoginComp 캐릭터 위치 불러오려다 TestPlayer 또는 X 좌표 0임")) }
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,MoveComp]()
+			{
+				MoveComp->GravityScale = 1.0f;;
+			},4.0f,false);
 		}
 	});
 	httpRequest->ProcessRequest();

@@ -7,6 +7,7 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Login/UserStruct.h"
+#include "PLAI/Item/Monster/MonWorld/MonWorld.h"
 #include "WorldGi.generated.h"
 
 DECLARE_DELEGATE(FOnFindSession)
@@ -86,6 +87,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bLoginMe = false;
 
+	UPROPERTY(EditAnywhere)
+	class ACreature* Creature;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
 	FUserFullInfo UserFullInfoGi;
 
@@ -100,6 +104,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UDataTable* ItemDataTable;
+
+	UPROPERTY(EditAnywhere)
+	EMonsterType MonsterType;
 
 	void EquipActor(AActor* MyActor);
 

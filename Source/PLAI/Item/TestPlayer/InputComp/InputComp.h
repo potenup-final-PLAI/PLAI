@@ -58,6 +58,13 @@ public:
 	UInputAction* IE_Stat;
 	UFUNCTION()
 	void On_Stat();
+	
+	UPROPERTY(EditAnywhere)
+	UInputAction* IE_Jump;
+	UFUNCTION(Server, Reliable)
+	void Server_On_Jump();
+	UFUNCTION()
+	void On_Jump();
 
 	UPROPERTY(EditAnywhere)
 	UInputAction* IE_Map;
@@ -89,7 +96,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	UInputAction* IE_RotateView;
 	UPROPERTY(EditAnywhere)
-	bool bRotateView = false;
+	bool bRotateView = true;
 	UFUNCTION()
 	void On_RoatateView();
 

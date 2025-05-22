@@ -34,13 +34,15 @@ void AMonWorld::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 	CurrentTimeTwo += DeltaTime;
+	
+	if (MonsterType == EMonsterType::Monster)
+	{ MoveToLocation(); }
+	
 	if (CurrentTimeTwo > 1.0)
 	{
+		if (MonsterType == EMonsterType::Boss)
+		{ CastPlayer(); }
 		CurrentTimeTwo = 0;
-	}
-	if (MonsterType == EMonsterType::Monster)
-	{
-		MoveToLocation();
 	}
 }
 

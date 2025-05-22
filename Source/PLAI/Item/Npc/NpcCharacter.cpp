@@ -3,9 +3,12 @@
 
 #include "NpcCharacter.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
+#include "UObject/UObjectGlobals.h" 
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 
 
@@ -17,6 +20,10 @@ ANpcCharacter::ANpcCharacter()
 	WidgetComp = CreateDefaultSubobject<UWidgetComponent>("Widget");
 	WidgetComp->SetupAttachment(RootComponent);
 	WidgetComp->SetMobility(EComponentMobility::Movable);
+	
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("Niagara");
+	NiagaraComp->SetupAttachment(RootComponent);
+	NiagaraComp->SetRelativeLocation(FVector(0,0,100));
 }
 
 // Called when the game starts or when spawned
@@ -25,7 +32,7 @@ void ANpcCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	UiNpc = CreateWidget<UUiNpc>(GetWorld(),UiNpcFactory);
-    WidgetComp->SetWidget(UiNpc);
+	WidgetComp->SetWidget(UiNpc);
 	WidgetComp->SetVisibility(true);
 	WidgetComp->SetRelativeLocation(FVector(0,0,150));
 	WidgetComp->SetDrawSize(FVector2D(300.0f,120.0f));
@@ -39,10 +46,20 @@ void ANpcCharacter::BeginPlay()
 	else
 	{ UE_LOG(LogTemp,Display,TEXT("ANpcCharacter::TestPlayer 없음")); }
 	
-	
+	if (UNiagaraSystem* LoadedSystem = LoadObject<UNiagaraSystem>(nullptr,TEXT("/Game/sA_PickupSet_1/Fx/NiagaraSystems/NS_Magic_1.NS_Magic_1")))
+	{ NiagaraComp->SetAsset(LoadedSystem); }
+	else
+	{ UE_LOG(LogTemp, Warning, TEXT("Niagara System 로드 실패! 경로 확인 필요")); }
+
+	if (!UiNpc) return;
+	UiNpc->NpcName->SetText(FText::FromString(NpcNameString));
+	// TWeakObjectPtr <UUiNpc> WeakUiNpc = UiNpc;
+	// FString NpcName = NpcNameString;  
 	// FTimerHandle TimerHandle;
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	// { UiNpc->NpcName->SetText(FText::FromString(NpcNameString));},0.5,false);
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,NpcName,WeakUiNpc]()
+	// {
+	// 	if (!IsValid(UiNpc)) return;
+	// 	WeakUiNpc->NpcName->SetText(FText::FromString(NpcName));},2.0,false);
 }
 
 // Called every frame

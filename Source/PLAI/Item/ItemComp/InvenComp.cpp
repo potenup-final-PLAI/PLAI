@@ -175,7 +175,7 @@ void UInvenComp::Client_GetCreature_Implementation()
 	if (RawNames.IsValidIndex(33))
 	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
 		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
-		TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable); }
+		TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable,TestPlayer); }
 	else
 	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?")) }
 }
@@ -289,8 +289,10 @@ void UInvenComp::GetItem(const FItemStructTable& ItemStructTable)
 }
 
 void UInvenComp::Server_DestroyItem_Implementation(AItem* Item)
-{ Item->Destroy(); }
-
+{
+	if (!IsValid(Item)) return;
+	Item->Destroy();
+}
 
 void UInvenComp::Server_EquipItem_Implementation(const FItemStructTable& ItemStructTable, EquipSlotType SlotType)
 {
@@ -314,7 +316,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemWeapon->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		
-		ItemWeapon->AddActorWorldOffset(FVector(35, 7, -8));
+		ItemWeapon->AddActorLocalOffset(FVector(-20, -10, 60));
 		ItemWeapon->AddActorLocalRotation(FRotator(-165, 10, 100));
 
 		if (ItemStructTable.Material)
@@ -554,48 +556,94 @@ void UInvenComp::LoadEquipInventory()
 
 void UInvenComp::TurnReward()
 {
-	UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
-	UiTurnReward->AddToViewport();
-
-	int32 Exp = FMath::RandRange(7300,8000);
-	TestPlayer->InvenComp->GetExp(Exp);
-
-    UiTurnReward->RewardExp->SetText(FText::AsNumber(Exp));
-	
-	int32 RandGold = FMath::RandRange(1000,5000);
-    UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
-	SetGold(RandGold);
-	
-	int32 RandomReward = FMath::RandRange(2,4);
-	for (int32 i = 0; i < RandomReward; i++)
+	if(UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
-		TArray<FName>Raws = ItemDataTable->GetRowNames();
-		int32 index = FMath::RandRange(0,Raws.Num()-1);
-		FName ItemName = Raws[index];
-		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(ItemName,TEXT("InvecComp548"));
-	
-		UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UiTurnReward->UiTurnRewardImageFactory);
-		FSlateBrush Brush;
-		Brush.SetResourceObject(ItemStructTable->Texture);
-		UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
-		UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
-	
-		Server_GetItem(*ItemStructTable);
-	}
-	FTimerHandle TurnRewardTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this, RandGold]()
-	{
-		if (UiTurnReward)
+		if (WorldGi->MonsterType == EMonsterType::Monster)
 		{
-			TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
-			TestPlayer->LogItemComp->GetEquipInfo();
-			TestPlayer->LogItemComp->GetInvenInfo();
-			
-			UiTurnReward->RemoveFromParent();
-			UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
-		}
-	},1.5f,false);
+			UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
+			UiTurnReward->AddToViewport();
+
+			int32 Exp = FMath::RandRange(7300,8000);
+			TestPlayer->InvenComp->GetExp(Exp);
+
+			UiTurnReward->RewardExp->SetText(FText::AsNumber(Exp));
 	
+			int32 RandGold = FMath::RandRange(1000,5000);
+			UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
+			SetGold(RandGold);
+	
+			int32 RandomReward = FMath::RandRange(2,4);
+			for (int32 i = 0; i < RandomReward; i++)
+			{
+				TArray<FName>Raws = ItemDataTable->GetRowNames();
+				int32 index = FMath::RandRange(0,Raws.Num()-1);
+				FName ItemName = Raws[index];
+				FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(ItemName,TEXT("InvecComp548"));
+	
+				UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UiTurnReward->UiTurnRewardImageFactory);
+				FSlateBrush Brush;
+				Brush.SetResourceObject(ItemStructTable->Texture);
+				UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
+				UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
+	
+				Server_GetItem(*ItemStructTable);
+			}
+			FTimerHandle TurnRewardTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this, RandGold]()
+			{
+				if (UiTurnReward)
+				{
+					TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
+					TestPlayer->LogItemComp->GetEquipInfo();
+					TestPlayer->LogItemComp->GetInvenInfo();
+			
+					UiTurnReward->RemoveFromParent();
+					UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
+				}
+			},1.5f,false);
+		}
+		else
+		{
+			UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
+			UiTurnReward->AddToViewport();
+
+			int32 Exp = FMath::RandRange(50000,60000);
+			TestPlayer->InvenComp->GetExp(Exp);
+
+			UiTurnReward->RewardExp->SetText(FText::AsNumber(Exp));
+	
+			int32 RandGold = FMath::RandRange(10000,15000);
+			UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
+			SetGold(RandGold);
+
+			TArray<FName>Raws = ItemDataTable->GetRowNames();
+			for (int i = 0; i < 2; i++)
+			{
+				if (34 + i > Raws.Num()-1)return;
+				FName ItemLegend = Raws[34 + i];
+				FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(ItemLegend,TEXT("InvecComp618"));
+				UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UiTurnReward->UiTurnRewardImageFactory);
+				FSlateBrush Brush;
+				Brush.SetResourceObject(ItemStructTable->Texture);
+				UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
+				UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
+				Server_GetItem(*ItemStructTable);
+			}
+			FTimerHandle TurnRewardTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this, RandGold]()
+			{
+				if (UiTurnReward)
+				{
+					TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
+					TestPlayer->LogItemComp->GetEquipInfo();
+					TestPlayer->LogItemComp->GetInvenInfo();
+			
+					UiTurnReward->RemoveFromParent();
+					UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
+				}
+			},1.5f,false);
+		}
+	}
 }
 
 void UInvenComp::GetExp(int32 Exp)

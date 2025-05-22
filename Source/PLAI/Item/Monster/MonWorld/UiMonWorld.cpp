@@ -9,6 +9,7 @@
 #include "Components/WrapBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
+#include "PLAI/Item/ItemComp/CreComp.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -25,7 +26,6 @@ void UUiMonWorld::NativeConstruct()
 
 void UUiMonWorld::OnButtonYes()
 {
-	if (!TestPlayer->HasAuthority()){UE_LOG(LogTemp,Warning,TEXT("UiMonWorld OnButtonYes TestPlayer 서버가 아님")) return;}
 	if (TestPlayer)
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
@@ -37,19 +37,19 @@ void UUiMonWorld::OnButtonYes()
 			WorldGi->UserFullInfoGi = TestPlayer->LoginComp->UserFullInfo;
 			WorldGi->bGameStart = true;
 			WorldGi->bBattleReward = true;
-			
+            WorldGi->MonsterType = MonWorld->MonsterType;
+			if (TestPlayer && TestPlayer->CreComp->Creature)
+			{ WorldGi->Creature = TestPlayer->CreComp->Creature; }
+
+			if (!TestPlayer->HasAuthority()){UE_LOG(LogTemp,Warning,TEXT("UiMonWorld OnButtonYes TestPlayer 서버가 아님")) return;}
 			if (MonWorld && MonWorld->MonsterType == EMonsterType::Monster)
 			{
-				// UGameplayStatics::OpenLevel(TestPlayer,FName("TestMap"));
 				GetWorld()->ServerTravel(TEXT("/Game/JS/Maps/TestMap?listen"));
 			}
 			else if (MonWorld && MonWorld->MonsterType == EMonsterType::Boss)
 			{
-				// UGameplayStatics::OpenLevel(TestPlayer,FName("Mk_BossMap"));
 				GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/MK_BossMap?listen"));
 			}
-			// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
-			// 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);
 			
 			if (!TestPlayer->IsLocallyControlled()){UE_LOG(LogTemp,Warning,TEXT("UiMonWorld OnButtonYes 아이템 쉴드 넣기전 IsLocalPlayer 아님")) return;}
 
@@ -70,3 +70,6 @@ void UUiMonWorld::OnButtonYes()
 void UUiMonWorld::OnButtonNo()
 {
 }
+
+// UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
+// 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);

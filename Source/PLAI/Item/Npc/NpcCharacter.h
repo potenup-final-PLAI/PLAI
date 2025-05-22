@@ -46,4 +46,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ATestPlayer* TestPlayer;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraComponent* NiagaraComp;
 };

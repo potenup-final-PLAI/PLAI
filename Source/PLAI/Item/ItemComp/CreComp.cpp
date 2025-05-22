@@ -48,6 +48,7 @@ void UCreComp::EquipCreature(ACreature* SpawnCreature)
 		UE_LOG(LogTemp,Warning,TEXT("CreComp CretureFactory없음")); return;
 	}
 	UE_LOG(LogTemp,Warning,TEXT("CreComp CretureFactory있음"))
+
 	Creature = SpawnCreature;
 	Creature->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
 	Creature->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));
