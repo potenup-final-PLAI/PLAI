@@ -18,6 +18,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
+#include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Npc/NpcNet.h"
@@ -45,11 +46,29 @@ void ULoginComp::BeginPlay()
     }
 	
     TestPlayer = Cast<ATestPlayer>(GetOwner());
-	
 	if (TestPlayer->IsLocallyControlled())
 	{
 		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 		{
+			UE_LOG(LogTemp,Warning,TEXT("ULoginComp::BeginPlay WorldGi MonType 들고오기 %s"),*UEnum::GetValueAsString(WorldGi->MonsterType));
+			if (WorldGi->MonsterType == EMonsterType::Boss)
+			{
+				TArray<AActor*>Nets;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANpcNet::StaticClass(),Nets);
+				for (int i=0;i<Nets.Num();i++)
+				{
+					if (ANpcNet* Net = Cast<ANpcNet>(Nets[i]))
+					{
+						UE_LOG(LogTemp,Warning,TEXT("UIMOnWorld NetNpc 찾는중 %s"),*Net->personality)
+						
+						if (Net->NpcNameString == FString("Bass"))
+						{
+							Net->personality = FString(TEXT("승리에 취한"));
+							UE_LOG(LogTemp,Warning,TEXT("UIMOnWorld Npc 성격 바꾸기 %s"),*Net->personality)
+						}
+					}
+				}
+			}
 			if (WorldGi->Creature) { TestPlayer->InvenComp->Server_SpawnCreature(); WorldGi->Creature = nullptr; }
 			// 최초 게임 실행 했는지
 			if (WorldGi->bGameStart == false)
