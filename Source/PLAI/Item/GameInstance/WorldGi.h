@@ -112,7 +112,5 @@ public:
 	FString NpcPersonality = FString(TEXT("NpcPersonality"));
 
 	void EquipActor(AActor* MyActor);
-
-	
 	
 };

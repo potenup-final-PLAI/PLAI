@@ -24,9 +24,10 @@
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "Player/BattlePlayer.h"
 #include "Player/BattlePlayerAnimInstance.h"
-#include "Player/BattlePlayerState.h"
 
 // Sets default values
 ABaseBattlePawn::ABaseBattlePawn()
@@ -40,23 +41,18 @@ ABaseBattlePawn::ABaseBattlePawn()
 
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("cameraComp"));
 	cameraComp->SetupAttachment(RootComponent);
-	cameraComp->SetRelativeLocationAndRotation(FVector(-600, 0, 1000),
-	                                           FRotator(-60, 0, 0));
+	cameraComp->SetRelativeLocationAndRotation(FVector(-600, 0, 1000),FRotator(-60, 0, 0));
 
 	// 이름, HP, Armor 설정 컴포넌트
-	battleUnitStateComp = CreateDefaultSubobject<UWidgetComponent>(
-		"BattleUnitStateComp");
+	battleUnitStateComp = CreateDefaultSubobject<UWidgetComponent>("BattleUnitStateComp");
 	battleUnitStateComp->SetupAttachment(RootComponent);
 	battleUnitStateComp->SetDrawSize(FVector2D((0)));
-	battleUnitStateComp->SetRelativeLocationAndRotation(
-		FVector(0, 0, 170), FRotator(0));
+	battleUnitStateComp->SetRelativeLocationAndRotation(FVector(0, 0, 170), FRotator(0));
 	battleUnitStateComp->SetGenerateOverlapEvents(false); // 충돌 막기
 	battleUnitStateComp->SetVisibility(true);
 	battleUnitStateComp->SetCastShadow(false);
 
-	ConstructorHelpers::FClassFinder<UBattleUnitStateUI> tempBattleUnitStateUI(
-		TEXT(
-			"/Script/UMGEditor.WidgetBlueprint'/Game/JS/UI/WBP_BattleUnitState.WBP_BattleUnitState_C'"));
+	ConstructorHelpers::FClassFinder<UBattleUnitStateUI> tempBattleUnitStateUI(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/JS/UI/WBP_BattleUnitState.WBP_BattleUnitState_C'"));
 	if (tempBattleUnitStateUI.Succeeded())
 	{
 		battleUnitStateComp->SetWidgetClass(tempBattleUnitStateUI.Class);
@@ -71,10 +67,10 @@ void ABaseBattlePawn::BeginPlay()
 	Super::BeginPlay();
 
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
-
+	
 	// 사용할 다른 클래스 포인터 초기화
 	InitOtherClassPointer();
-
+	
 	// UI 생성
 	if (battleUnitStateUI)
 	{
@@ -85,15 +81,45 @@ void ABaseBattlePawn::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("BattleUnitStateUI is NULL"));
 	}
-
+	
 	// AP 세팅
 	SetAP();
+}
+
+void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABaseBattlePawn, hp);
+	DOREPLIFETIME(ABaseBattlePawn, attack);
+	DOREPLIFETIME(ABaseBattlePawn, defense);
+	DOREPLIFETIME(ABaseBattlePawn, resistance);
+	DOREPLIFETIME(ABaseBattlePawn, critical_Rate);
+	DOREPLIFETIME(ABaseBattlePawn, critical_Damage);
+	DOREPLIFETIME(ABaseBattlePawn, moveRange);
+	DOREPLIFETIME(ABaseBattlePawn, speed);
+	DOREPLIFETIME(ABaseBattlePawn, points);
+	DOREPLIFETIME(ABaseBattlePawn, traits);
+	DOREPLIFETIME(ABaseBattlePawn, skills);
+	DOREPLIFETIME(ABaseBattlePawn, playerLifeState);
+	DOREPLIFETIME(ABaseBattlePawn, lastHoveredPawn);
+}
+
+void ABaseBattlePawn::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	
+	if (IsLocallyControlled())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s의 currentTile : %s"), *this->GetActorNameOrLabel(), *this->currentTile->GetActorNameOrLabel());
+	}
 }
 
 // Called every frame
 void ABaseBattlePawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
 
 	// Hover UI 띄우기 위한 함수
 	OnMouseHover();
@@ -103,6 +129,9 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
+	
+	DrawDebugString(GetWorld(), GetActorLocation(), MyName, nullptr, FColor::Yellow, 0);
+	
 }
 
 void ABaseBattlePawn::OnTurnStart()
@@ -112,26 +141,17 @@ void ABaseBattlePawn::OnTurnStart()
 		UE_LOG(LogTemp, Warning, TEXT("turnManager is Not Set"));
 		return;
 	}
+	
 	// 턴 종료 초기화
 	bTurnEnded = false;
-
 	// 기본 공격 초기화
 	bBaseAttack = true;
-
+	
 	// 턴이 시작됐으면 턴 카운트 1 증가
 	turnManager->turnCount++;
 	UE_LOG(LogTemp, Warning, TEXT("Turn Count %d"), turnManager->turnCount);
 
-	// BattlePlayerInfo UI 세팅
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (pc && hud && hud->mainUI && hud->mainUI->WBP_Player)
-		{
-			FString name = player->GetActorNameOrLabel();
-			hud->mainUI->WBP_Player->SetPlayerName(name);
-			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
-		}
-	}
+	MultiCastRPC_SetBattlePlayerInfoUI();
 
 	// 상태이상이 있다면 대미지 및 버프, 디버프 처리하기
 	ApplyStatusEffect();
@@ -140,25 +160,20 @@ void ABaseBattlePawn::OnTurnStart()
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 	{
 		player->GetAP();
-		InitAPUI();
-		UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(),
-		       player->curAP);
+		MultiCastRPC_InitAPUI();
+		UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(),player->curAP);
 	}
 	// Enemy라면
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
-		if (!enemybattleState)
-		{
-			UE_LOG(LogTemp, Error, TEXT("enemybattleState is null on OnTurnStart"));
-			return;
-		}
 		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnTurnStart"));
 
 		// 턴 시작 시 AP 증가
-		enemybattleState->curAP += enemybattleState->GetAP(enemybattleState->curAP);
-		UE_LOG(LogTemp, Warning, TEXT("Current AP: %d"),enemybattleState->curAP);
+		enemy->GetAP();
+		UE_LOG(LogTemp, Warning, TEXT("enemy Current AP: %d"),enemy->curAP);
 
-		enemy->SeeMoveRange(enemy->enemybattleState->move_Range);
+		// 이동 범위 보이게
+		enemy->ServerRPC_SeeMoveRange(enemy->moveRange);
 		
 		ABaseBattlePawn* CapturedUnit = this;
 
@@ -174,6 +189,34 @@ void ABaseBattlePawn::OnTurnStart()
 		}), 1.0f, false);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
+}
+void ABaseBattlePawn::MultiCastRPC_SetBattlePlayerInfoUI_Implementation()
+{
+	// BattlePlayerInfo UI 세팅
+	if (auto* player = Cast<ABattlePlayer>(this))
+	{
+		if (pc && hud && hud->mainUI && hud->mainUI->WBP_Player)
+		{
+			FString name = player->GetActorNameOrLabel();
+			hud->mainUI->WBP_Player->SetPlayerName(name);
+			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
+		}
+	}
+}
+
+void ABaseBattlePawn::MultiCastRPC_SetEnemyName_Implementation(class ABaseEnemy* enemy)
+{
+	// 이름 생성 및 로그 출력
+	int32 nameIndex = phaseManager->unitEnemyNameindex++;
+	FString name = FString::Printf(TEXT("엔트%d"), nameIndex);
+	UE_LOG(LogTemp, Warning, TEXT("Setting name to: %s"), *name);
+    
+	// UI가 존재하는지 확인
+	if (enemy->battleUnitStateUI)
+	{
+		enemy->battleUnitStateUI->SetUnitName(name);
+		UE_LOG(LogTemp, Warning, TEXT("Name set on UI successfully"));
+	}
 }
 
 void ABaseBattlePawn::OnTurnEnd()
@@ -215,25 +258,21 @@ void ABaseBattlePawn::OnTurnEnd()
 
 void ABaseBattlePawn::OnMouseLeftClick()
 {
+	if (turnManager->curUnit != this)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnMouseLeftClick is not my pawn"));
+		return;
+	}
+	PRINTLOG(TEXT("%s OnMouseLeftClick"), *GetName());
 	FVector start, end, dir;
 	FHitResult hitInfo;
 	FCollisionQueryParams params;
 
 	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(start, dir);
-	end = start + dir * 10000;
+	end = start + dir * 100000;
 
-	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,
-	                                         ECC_Visibility, params))
+	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,ECC_Visibility, params))
 	{
-		// // 상대와 거리 측정
-		// float dist = FVector::Dist(GetActorLocation(),hitInfo.GetActor()->GetActorLocation());
-		//
-		// // 자신의 moveRange * 100 보다 작거나 같을 때
-		// if (dist > (this->battlePlayerState->playerStatus.move_Range * 100))
-		// {
-		// 	UE_LOG(LogTemp, Warning, TEXT("Test Click : Dist too be far"));
-		// 	return;
-		// }
 		if (AGridTile* clickedTile = Cast<AGridTile>(hitInfo.GetActor()))
 		{
 			if (!highlightedTiles.Contains(clickedTile))
@@ -244,10 +283,11 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		}
 		
 		EActionMode curSkillState = currentActionMode;
-		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),
-		       *UEnum::GetValueAsString(curSkillState));
+		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),*UEnum::GetValueAsString(curSkillState));
+
 		// UI에 띄울 스킬 이름 저장 
 		SkillNameJudgment(curSkillState);
+		
 		switch (curSkillState)
 		{
 		case EActionMode::None:
@@ -325,8 +365,7 @@ void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 		FCollisionQueryParams params;
 		params.AddIgnoredActor(this);
 
-		if (GetWorld()->LineTraceSingleByChannel(
-			startHit, start, end, ECC_Visibility, params))
+		if (GetWorld()->LineTraceSingleByChannel(startHit, start, end, ECC_Visibility, params))
 		{
 			startTile = Cast<AGridTile>(startHit.GetActor());
 			if (startTile)
@@ -584,116 +623,132 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	UE_LOG(LogTemp, Warning, TEXT("In GetDamage"));
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
-		// 피를 깎는다.
-		player->battlePlayerState->playerStatus.hp = FMath::Max(
-			0, player->battlePlayerState->playerStatus.hp - damage);
-		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage,
-		       player->battlePlayerState->playerStatus.hp);
-
-		// HP를 UI에 업데이트
-		if (!(battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->
-			WBP_Player && phaseManager && player->playerAnim))
+		if (!battleUnitStateUI)
 		{
-			UE_LOG(LogTemp, Warning,
-			       TEXT(
-				       "GetDamage(Player) : !(battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->WBP_Player)"
-			       ));
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Player) : !battleUnitStateUI"));
 			return;
 		}
-
-		// BattlePlayerInfo HP 업데이트
-		player->battleUnitStateUI->UpdateHP(
-			player->battlePlayerState->playerStatus.hp);
-		player->hud->mainUI->WBP_Player->PlayerUpdateHP(
-			player, player->battlePlayerState->playerStatus.hp);
-
-		player->playerAnim->
-		        PlayHitMotionAnimation(TEXT("StartPlayerHitMotion"));
-		UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
-
-		// Actor 위치 옮기고 UI Actor 보이게
-		FVector loc = FVector(player->GetActorLocation().X,
-		                      player->GetActorLocation().Y,
-		                      player->GetActorLocation().Z + 250);
-		phaseManager->damageUIActor->SetActorLocation(loc);
-		phaseManager->damageUIActor->ShowDamageUI();
-		// 대미지 텍스트 변경
-		phaseManager->damageUIActor->damageUI->SetDamageText(damage);
-
-		// hp가 0보다 작으면 사망
-		if (player->battlePlayerState->playerStatus.hp <= 0)
+		if (!(hud && hud->mainUI && hud->mainUI->WBP_Player))
 		{
-			// player에 세팅
-			player->battlePlayerState->playerLifeState = ELifeState::Dead;
-			// playerAnim에 세팅
-			player->playerAnim->lifeState = ELifeState::Dead;
-			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),
-			       *UEnum::GetValueAsString(player->battlePlayerState->
-				       playerLifeState));
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Player) : !(hud && hud->mainUI && hud->mainUI->WBP_Player)"));
+			return;
 		}
+		if (!phaseManager)
+		{
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Player) : !phaseManager"));
+			return;
+		}
+		if (!player->playerAnim)
+		{
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Player) : !player->playerAnim"));
+			return;
+		}
+		MultiCastRPC_PlayerGetDamage(player, damage);
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 	{
-		if (!(enemy->enemyAnim && phaseManager))
+		if (!battleUnitStateUI)
 		{
-			UE_LOG(LogTemp, Warning,
-			       TEXT(
-				       "GetDamage(Enemy) : !(battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->WBP_Player)"
-			       ));
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Enemy) : !battleUnitStateUI"));
 			return;
 		}
-		// 피를 깎는다.
-		enemy->enemybattleState->hp = FMath::Max(
-			0, enemy->enemybattleState->hp - damage);
-		UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage,
-		       enemy->enemybattleState->hp);
-		// UI HP 업데이트
-		enemy->battleUnitStateUI->UpdateHP(enemy->enemybattleState->hp);
-
-		// 공격 몽타주 실행
-		enemy->enemyAnim->PlayHitMotionAnimation(TEXT("StartHitMotion"));
-		UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
-
-		// Actor 위치 옮기고 UI Actor 보이게
-		FVector loc = FVector(enemy->GetActorLocation().X,
-		                      enemy->GetActorLocation().Y,
-		                      enemy->GetActorLocation().Z + 250);
-		phaseManager->damageUIActor->SetActorLocation(loc);
-		phaseManager->damageUIActor->ShowDamageUI();
-		// 대미지 텍스트 변경
-		phaseManager->damageUIActor->damageUI->SetDamageText(damage);
-
-		// hp가 0보다 작으면 사망
-		if (enemy->enemybattleState->hp <= 0)
+		if (!(hud && hud->mainUI && hud->mainUI->WBP_Player))
 		{
-			// enemy 자체에 State 세팅
-			enemy->enemybattleState->enemyLifeState = ELifeState::Dead;
-			// enemy Anim에 State 세팅
-			enemy->enemyAnim->lifeState = ELifeState::Dead;
-			UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),
-			       *UEnum::GetValueAsString(enemy->enemybattleState->
-				       enemyLifeState));
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Enemy) : !(hud && hud->mainUI && hud->mainUI->WBP_Player)"));
+			return;
 		}
-	}
-
-	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
-	if (auto* player = Cast<ABattlePlayer>(this))
-	{
-		if (auto* anim = Cast<UBattlePlayerAnimInstance>(
-			player->meshComp->GetAnimInstance()))
+		if (!phaseManager)
 		{
-			anim->actionMode = currentActionMode;
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Enemy) : !phaseManager"));
+			return;
 		}
-	}
-	else if (auto* enemy = Cast<ABaseEnemy>(this))
-	{
-		if (auto* anim = Cast<UBattleEnemyAnimInstance>(
-			enemy->meshComp->GetAnimInstance()))
+		if (!enemy->enemyAnim)
 		{
-			anim->actionMode = currentActionMode;
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Enemy) : !Enemy->playerAnim"));
+			return;
 		}
+		MultiCastRPC_EnemyGetDamage(enemy, damage);
 	}
 }
+
+void ABaseBattlePawn::MultiCastRPC_EnemyGetDamage_Implementation(
+	class ABaseEnemy* enemy, int32 damage)
+{
+	if (!IsValid(enemy) || enemy->IsPendingKillPending()) return;
+	// 피를 깎는다.
+	enemy->hp = FMath::Max(0, enemy->hp - damage);
+	UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage, enemy->hp);
+	// UI HP 업데이트
+	enemy->battleUnitStateUI->UpdateHP(enemy->hp);
+
+	// 공격 몽타주 실행
+	enemy->enemyAnim->PlayHitMotionAnimation(TEXT("StartHitMotion"));
+	UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
+
+	// Actor 위치 옮기고 UI Actor 보이게
+	FVector loc = FVector(enemy->GetActorLocation().X, enemy->GetActorLocation().Y,enemy->GetActorLocation().Z + 250);
+	phaseManager->damageUIActor->SetActorLocation(loc);
+	phaseManager->damageUIActor->ShowDamageUI();
+	// 대미지 텍스트 변경
+	phaseManager->damageUIActor->damageUI->SetDamageText(damage);
+
+	// hp가 0보다 작으면 사망
+	if (enemy->hp <= 0)
+	{
+		// enemy 자체에 State 세팅
+		enemy->enemyLifeState = ELifeState::Dead;
+		// enemy Anim에 State 세팅
+		enemy->enemyAnim->lifeState = ELifeState::Dead;
+		UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),*UEnum::GetValueAsString(enemy->enemyLifeState));
+	}
+	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
+	if (auto* anim = Cast<UBattleEnemyAnimInstance>(
+			enemy->meshComp->GetAnimInstance()))
+	{
+		anim->actionMode = currentActionMode;
+	}
+}
+
+void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(
+	class ABattlePlayer* player, int32 damage)
+{
+	if (!IsValid(player) || player->IsPendingKillPending()) return;
+	
+	// 피를 깎는다.
+	player->hp = FMath::Max(0, player->hp - damage);
+	UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage, player->hp);
+		
+	// HP를 UI에 업데이트
+	// BattlePlayerInfo HP 업데이트
+	player->battleUnitStateUI->UpdateHP(player->hp);
+	player->hud->mainUI->WBP_Player->PlayerUpdateHP(player, player->hp);
+
+	player->playerAnim->PlayHitMotionAnimation(TEXT("StartPlayerHitMotion"));
+	UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
+
+	// Actor 위치 옮기고 UI Actor 보이게
+	FVector loc = FVector(player->GetActorLocation().X,player->GetActorLocation().Y,player->GetActorLocation().Z + 250);
+	phaseManager->damageUIActor->SetActorLocation(loc);
+	phaseManager->damageUIActor->ShowDamageUI();
+	// 대미지 텍스트 변경
+	phaseManager->damageUIActor->damageUI->SetDamageText(damage);
+
+	// hp가 0보다 작으면 사망
+	if (player->hp <= 0)
+	{
+		// player에 세팅
+		player->playerLifeState = ELifeState::Dead;
+		// playerAnim에 세팅
+		player->playerAnim->lifeState = ELifeState::Dead;
+		UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(player->playerLifeState));
+	}
+	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
+	if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
+	{
+		anim->actionMode = currentActionMode;
+	}
+}
+
 void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
                                         EActionMode attackType)
 {
@@ -705,11 +760,10 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Player Attack Enemy"));
-	int32 atk = player->battlePlayerState->playerStatus.attack;
+	int32 atk = player->attack;
 	int32 weapon = 0;
-	float critical = player->battlePlayerState->playerStatus.critical_Rate;
-	float criticalDamage = player->battlePlayerState->playerStatus.
-	                               critical_Damage;
+	float critical = player->critical_Rate;
+	float criticalDamage = player->critical_Damage;
 	int32 personality = 0;
 	int32 status_effect = 0;
 	int32 damage = 0;
@@ -809,7 +863,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 	}
 
 
-	CalculateAndApplyDamage(enemy, atk, weapon, skillMultiplier, critical, criticalDamage, personality, status_effect);
+	CalculateAndApplyDamage(enemy, atk, skillMultiplier, critical, criticalDamage);
 
 	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
 	currentActionMode = EActionMode::None;
@@ -818,8 +872,7 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 		player->playerAnim->actionMode = currentActionMode;
 	}
 }
-void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit,
-                                       EActionMode attackType)
+void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType)
 {
 	auto* player = Cast<ABattlePlayer>(targetUnit);
 	auto* enemy = Cast<ABaseEnemy>(this);
@@ -829,16 +882,11 @@ void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit,
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning,
-	       TEXT("[EnemyApplyAttack] Enemy %s attacking Player %s"),
-	       *enemy->GetName(), *player->GetName());
+	UE_LOG(LogTemp, Warning,TEXT("[EnemyApplyAttack] Enemy %s attacking Player %s"),*enemy->GetName(), *player->GetName());
 
-	int32 atk = enemybattleState->attack;
-	int32 weapon = 0;
-	float critical = enemybattleState->critical_Rate;
-	float criticalDamage = enemybattleState->critical_Damage;
-	int32 personality = 0;
-	int32 status_effect = 0;
+	int32 atk = enemy->attack;
+	float critical = enemy->critical_Rate;
+	float criticalDamage = enemy->critical_Damage;
 	float skillMultiplier = 1.0f;
 
 	switch (attackType)
@@ -918,7 +966,7 @@ void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit,
 	}
 
 	// 대미지 처리
-	CalculateAndApplyDamage(player, atk, weapon, skillMultiplier, critical, criticalDamage, personality, status_effect);
+	CalculateAndApplyDamage(player, atk, skillMultiplier, critical, criticalDamage);
 
 	// 대미지를 줬다면 None으로 변경
 	currentActionMode = EActionMode::None;
@@ -928,13 +976,7 @@ void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit,
 	}
 }
 
-void ABaseBattlePawn::CalculateAndApplyDamage(ABaseBattlePawn* target,
-                                              int32 atk, int32 weapon,
-                                              float skillMultiplier,
-                                              float criticalRate,
-                                              float criticalDamage,
-                                              int32 personality,
-                                              int32 status_effect)
+void ABaseBattlePawn::CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk, float skillMultiplier, float criticalRate, float criticalDamage)
 {
 	UE_LOG(LogTemp, Warning, TEXT("In Calculate"));
 	int32 damage = 0;
@@ -943,12 +985,12 @@ void ABaseBattlePawn::CalculateAndApplyDamage(ABaseBattlePawn* target,
 
 	if (bool bIsCrit = roll <= chance)
 	{
-		damage = ((atk + weapon) * skillMultiplier * (1 + (personality + status_effect))) * criticalDamage;
+		damage = (atk * skillMultiplier) * criticalDamage;
 		UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
 	}
 	else
 	{
-		damage = (atk + weapon) * skillMultiplier * (1 + (personality + status_effect));
+		damage = atk * skillMultiplier;
 		UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
 	}
 
@@ -1016,10 +1058,7 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 	if (!(battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->
 		WBP_Player))
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT(
-			       "HandleStatus : !battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->WBP_Player"
-		       ));
+		UE_LOG(LogTemp, Warning,TEXT("HandleStatus : !battleUnitStateUI && pc && hud && hud->mainUI && hud->mainUI->WBP_Player"));
 		return;
 	}
 	switch (effect)
@@ -1027,65 +1066,63 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 	case EStatusEffect::Poison:
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			player->battlePlayerState->playerStatus.hp -= 5;
-			battleUnitStateUI->UpdateHP(
-				player->battlePlayerState->playerStatus.hp);
+			player->hp -= 5;
+			battleUnitStateUI->UpdateHP(player->hp);
 			// BattlePlayerInfo UI 세팅
 			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
-			enemy->enemybattleState->hp -= 5;
-			battleUnitStateUI->UpdateHP(enemy->enemybattleState->hp);
+			enemy->hp -= 5;
+			battleUnitStateUI->UpdateHP(enemy->hp);
 		}
 		break;
 	case EStatusEffect::Vulnerable:
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			VulnerableProcess(player->battlePlayerState);
+			VulnerableProcess();
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
-			VulnerableEnemyProcess(enemy->enemybattleState);
+			VulnerableEnemyProcess(enemy);
 		}
 		break;
 	case EStatusEffect::Weakening:
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			WeakeningProcess(player->battlePlayerState);
+			WeakeningProcess();
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
-			WeakeningEnemyProcess(enemy->enemybattleState);
+			WeakeningEnemyProcess(enemy);
 		}
 		break;
 	case EStatusEffect::Angry:
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			AngryProcess(player->battlePlayerState);
+			AngryProcess();
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
-			AngryEnemyProcess(enemy->enemybattleState);
+			AngryEnemyProcess(enemy);
 		}
 		break;
 	case EStatusEffect::Bleeding:
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
-			player->battlePlayerState->playerStatus.hp -= 5;
-			battleUnitStateUI->UpdateHP(
-				player->battlePlayerState->playerStatus.hp);
+			player->hp -= 5;
+			battleUnitStateUI->UpdateHP(player->hp);
 
 			// BattlePlayerInfo UI 세팅
 			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
 			// 출혈로 인한 스텟 상태 변경 로직 
-			BleedingProcess(player->battlePlayerState);
+			BleedingProcess();
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
-			enemy->enemybattleState->hp -= 5;
-			battleUnitStateUI->UpdateHP(enemy->enemybattleState->hp);
-			BleedingEnemyProcess(enemy->enemybattleState);
+			enemy->hp -= 5;
+			battleUnitStateUI->UpdateHP(enemy->hp);
+			BleedingEnemyProcess(enemy);
 		}
 		break;
 	default:
@@ -1093,12 +1130,12 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 	}
 }
 
-void ABaseBattlePawn::WeakeningProcess(ABattlePlayerState* playerState)
+void ABaseBattlePawn::WeakeningProcess()
 {
 	// 약화 상태이상 처리 프로세스
 	// 공격력과 방어력 스탯 감소
-	int32& atk = playerState->playerStatus.attack;
-	int32& def = playerState->playerStatus.defense;
+	int32& atk = attack;
+	int32& def = defense;
 	// 반올림 처리
 	int32 decreaseAtkAmount = FMath::RoundToInt(atk * 0.2f);
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.2f);
@@ -1109,39 +1146,39 @@ void ABaseBattlePawn::WeakeningProcess(ABattlePlayerState* playerState)
 	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), def);
 }
 
-void ABaseBattlePawn::VulnerableProcess(ABattlePlayerState* playerState)
+void ABaseBattlePawn::VulnerableProcess()
 {
 	// 방어력 감소 처리
-	int32& def = playerState->playerStatus.defense;
+	int32& def = defense;
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.5f);
 	def = FMath::Max(0, def - decreaseDefAmount);
 	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
 }
 
-void ABaseBattlePawn::AngryProcess(ABattlePlayerState* playerState)
+void ABaseBattlePawn::AngryProcess()
 {
 	// 공격력 증가 처리
-	int32& atk = playerState->playerStatus.attack;
+	int32& atk = attack;
 	int32 decreaseAtkAmount = FMath::RoundToInt(atk * 0.5f);
 	atk = FMath::Max(0, atk - decreaseAtkAmount);
 	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
 }
 
-void ABaseBattlePawn::BleedingProcess(ABattlePlayerState* playerState)
+void ABaseBattlePawn::BleedingProcess()
 {
 	// 방어력 감소 처리
-	int32& def = playerState->playerStatus.defense;
+	int32& def = defense;
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.2f);
 	def = FMath::Max(0, def - decreaseDefAmount);
 	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
 }
 
-void ABaseBattlePawn::WeakeningEnemyProcess(UEnemyBattleState* enemyState)
+void ABaseBattlePawn::WeakeningEnemyProcess(class ABaseEnemy* enemy)
 {
 	// 약화 상태이상 처리 프로세스
 	// 공격력과 방어력 스탯 감소
-	int32& atk = enemyState->attack;
-	int32& def = enemyState->defense;
+	int32& atk = enemy->attack;
+	int32& def = enemy->defense;
 	// 반올림 처리
 	int32 decreaseAtkAmount = FMath::RoundToInt(atk * 0.2f);
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.2f);
@@ -1152,28 +1189,28 @@ void ABaseBattlePawn::WeakeningEnemyProcess(UEnemyBattleState* enemyState)
 	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), def);
 }
 
-void ABaseBattlePawn::VulnerableEnemyProcess(UEnemyBattleState* enemyState)
+void ABaseBattlePawn::VulnerableEnemyProcess(class ABaseEnemy* enemy)
 {
 	// 방어력 감소 처리
-	int32& def = enemyState->defense;
+	int32& def = enemy->defense;
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.5f);
 	def = FMath::Max(0, def - decreaseDefAmount);
 	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
 }
 
-void ABaseBattlePawn::AngryEnemyProcess(UEnemyBattleState* enemyState)
+void ABaseBattlePawn::AngryEnemyProcess(class ABaseEnemy* enemy)
 {
 	// 공격력 증가 처리
-	int32& atk = enemyState->attack;
+	int32& atk = enemy->attack;
 	int32 decreaseAtkAmount = FMath::RoundToInt(atk * 0.5f);
 	atk = FMath::Max(0, atk - decreaseAtkAmount);
 	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
 }
 
-void ABaseBattlePawn::BleedingEnemyProcess(UEnemyBattleState* enemyState)
+void ABaseBattlePawn::BleedingEnemyProcess(class ABaseEnemy* enemy)
 {
 	// 방어력 감소 처리
-	int32& def = enemyState->defense;
+	int32& def = enemy->defense;
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.2f);
 	def = FMath::Max(0, def - decreaseDefAmount);
 	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
@@ -1181,11 +1218,8 @@ void ABaseBattlePawn::BleedingEnemyProcess(UEnemyBattleState* enemyState)
 
 void ABaseBattlePawn::PathFind()
 {
-	UE_LOG(LogTemp, Warning,
-	       TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),
-	       pathArray.Num(), moveRange);
-	UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),
-	       bIsMoving ? TEXT("true") : TEXT("false"));
+	UE_LOG(LogTemp, Warning, TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"), pathArray.Num(), moveRange);
+	UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"), bIsMoving ? TEXT("true") : TEXT("false"));
 	if (openArray.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("OpenArray is empty"));
@@ -1197,11 +1231,8 @@ void ABaseBattlePawn::PathFind()
 
 	while (openArray.Num() > 0 && safetyCounter++ < maxSafetyCount)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),
-		       pathArray.Num(), moveRange);
-		UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),
-		       bIsMoving ? TEXT("true") : TEXT("false"));
+		UE_LOG(LogTemp, Warning,TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),pathArray.Num(), moveRange);
+		UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),bIsMoving ? TEXT("true") : TEXT("false"));
 		if (safetyCounter > maxSafetyCount)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Path Safe Break"));
@@ -1210,16 +1241,18 @@ void ABaseBattlePawn::PathFind()
 		currentTile = openArray[0];
 		openArray.RemoveAt(0);
 
+		UE_LOG(LogTemp, Warning, TEXT("clickedTile = %s, Coord = (%d, %d)"),
+				*currentTile->GetName(),
+				gridTileManager->GetTileLoc(currentTile).X,
+				gridTileManager->GetTileLoc(currentTile).Y);
 		if (!IsValid(currentTile))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s currentTile PathFind Error"),
-			       *GetName());
+			UE_LOG(LogTemp, Warning, TEXT("%s currentTile PathFind Error"),*GetName());
 			return;
 		}
 		if (!IsValid(goalTile))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s goalTile PathFind Error"),
-			       *GetName());
+			UE_LOG(LogTemp, Warning, TEXT("%s goalTile PathFind Error"),*GetName());
 			return;
 		}
 		// 목표 도달했으면 종료
@@ -1246,19 +1279,14 @@ void ABaseBattlePawn::PathFind()
 void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 {
 	FIntPoint nextCoord = currentTile->gridCoord + offset;
-	AGridTileManager* tileManger = Cast<AGridTileManager>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
-
-	if (AGridTile* tile = tileManger->map.FindRef(nextCoord))
+	// AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
+	
+	if (AGridTile* tile = gridTileManager->map.FindRef(nextCoord))
 	{
 		float previousCost = tile->tCostValue;
 		tile->SetCost(currentTile, goalTile);
-
-		// if (!tile->parentTile || tile->tCostValue < previousCost)
-		// {
-		// 	tile->parentTile = currentTile;
-		if (tile != currentTile && (!tile->parentTile || tile->tCostValue <
-			previousCost))
+		
+		if (tile != currentTile && (!tile->parentTile || tile->tCostValue < previousCost))
 		{
 			tile->parentTile = currentTile;
 
@@ -1277,13 +1305,13 @@ void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 
 void ABaseBattlePawn::BuildPath()
 {
+	
 	UE_LOG(LogTemp, Warning, TEXT("BuildPath: moveRange = %d"), moveRange);
 
 	// goalTile 또는 goalTile->parentTile 자체가 nullptr일 수 있다.
 	if (!goalTile || !goalTile->parentTile)
 	{
-		UE_LOG(LogTemp, Error,
-		       TEXT("BuildPath aborted: goalTile or parent is null"));
+		UE_LOG(LogTemp, Error,TEXT("BuildPath aborted: goalTile or parent is null"));
 		OnMoveEnd();
 		return;
 	}
@@ -1302,8 +1330,7 @@ void ABaseBattlePawn::BuildPath()
 	{
 		if (visitePathTiles.Contains(temp) || temp == temp->parentTile)
 		{
-			UE_LOG(LogTemp, Warning,
-			       TEXT(" Infinite loop detected in BuildPath"));
+			UE_LOG(LogTemp, Warning,TEXT(" Infinite loop detected in BuildPath"));
 			break;
 		}
 
@@ -1369,50 +1396,94 @@ void ABaseBattlePawn::AddOpenArray(FVector dir)
 	}
 }
 
-void ABaseBattlePawn::SeeMoveRange(int32 move_Range)
+void ABaseBattlePawn::ServerRPC_SeeMoveRange_Implementation(int32 move)
 {
-	if (!gridTileManager || currentActionMode != EActionMode::Move)
+	if (!gridTileManager)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange : !gridTileManager || currentActionMode != EActionMode::Move"));
+		UE_LOG(LogTemp, Error, TEXT("Multicast_SeeMoveRange: gridTileManager is null!"));
 		return;
 	}
+	
+	TArray<FIntPoint> tileCoords;
 
-	UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange called"));
+	// 서버에서만 로직 수행
+	SeeMoveRange(moveRange, tileCoords);
+
+	// 좌표 정보만 클라에 전송
+	Multicast_SeeMoveRange(tileCoords);
+}
+void ABaseBattlePawn::Multicast_SeeMoveRange_Implementation(const TArray<FIntPoint>& tiles)
+{
 	highlightedTiles.Empty();
-	// currentTile 기준으로 이동 범위 상하좌우 moveRange 만큼 색 변경
+
+	for (const FIntPoint& coord : tiles)
+	{
+		AGridTile* tile = gridTileManager->GetTile(coord.X, coord.Y);
+		if (tile)
+		{
+			gridTileManager->SetTileColor(tile, true);
+			highlightedTiles.Add(tile);
+		}
+	}
+}
+void ABaseBattlePawn::SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles)
+{
+	highlightedTiles.Empty();
+
+	UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange를 호출하는 자신 %s currentTile %s"), *this->GetActorNameOrLabel(), *currentTile->GetActorNameOrLabel());
 	FIntPoint coord = gridTileManager->GetTileLoc(currentTile);
 	int32 startX = coord.X;
 	int32 startY = coord.Y;
 
-	// 멘해튼 거리를 활용하여 대각선 포함 상하좌우에 있는 타일 색 변경
 	for (int y = startY - move_Range; y <= startY + move_Range; y++)
 	{
 		for (int x = startX - move_Range; x <= startX + move_Range; x++)
 		{
-			// 더 넓은 정사각형 모양으로 머티리얼 수정
-			// FIntPoint checkCoord(x, y);
-			// // 타일이 있는지 체크
-			// if (gridTileManager->IsValidTile(checkCoord))
-			// {
-			// 	// 있다면 그 타일에 생상 변경
-			// 	AGridTile* tempTile = gridTileManager->GetTile(x, y);
-			// 	gridTileManager->SetTileColor(gridTileManager->GetTile(x, y), true);
-			// 	highlightedTiles.Add(tempTile);
-			// }
 			int dx = FMath::Abs(x - startX);
 			int dy = FMath::Abs(y - startY);
 
 			if (dx + dy <= move_Range)
 			{
-				// 이 타일은 이동 가능 범위 안에 있음
-				AGridTile* tempTile = gridTileManager->GetTile(x, y);
-				gridTileManager->SetTileColor(gridTileManager->GetTile(x, y), true);
-				highlightedTiles.Add(tempTile);
+				AGridTile* tile = gridTileManager->GetTile(x, y);
+				if (tile)
+				{
+					tiles.Add(FIntPoint(x, y));
+					highlightedTiles.Add(tile); // 서버용 저장
+				}
 			}
 		}
 	}
 }
-
+// if (!gridTileManager || currentActionMode != EActionMode::Move)
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange : !gridTileManager || currentActionMode != EActionMode::Move"));
+// 	return;
+// }
+//
+// UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange called"));
+// highlightedTiles.Empty();
+// // currentTile 기준으로 이동 범위 상하좌우 moveRange 만큼 색 변경
+// FIntPoint coord = gridTileManager->GetTileLoc(currentTile);
+// int32 startX = coord.X;
+// int32 startY = coord.Y;
+//
+// // 멘해튼 거리를 활용하여 대각선 포함 상하좌우에 있는 타일 색 변경
+// for (int y = startY - move_Range; y <= startY + move_Range; y++)
+// {
+// 	for (int x = startX - move_Range; x <= startX + move_Range; x++)
+// 	{
+// 		int dx = FMath::Abs(x - startX);
+// 		int dy = FMath::Abs(y - startY);
+//
+// 		if (dx + dy <= move_Range)
+// 		{
+// 			// 이 타일은 이동 가능 범위 안에 있음
+// 			AGridTile* tempTile = gridTileManager->GetTile(x, y);
+// 			gridTileManager->SetTileColor(gridTileManager->GetTile(x, y), true);
+// 			highlightedTiles.Add(tempTile);
+// 		}
+// 	}
+// }
 void ABaseBattlePawn::ClearGridTile()
 {
 	for (AGridTile* target : highlightedTiles)
@@ -1475,6 +1546,7 @@ void ABaseBattlePawn::InitValues()
 
 void ABaseBattlePawn::BillboardBattleUnitStateUI()
 {
+	if (!battleUnitStateUI) return;
 	if (!phaseManager->damageUIActor)
 	{
 		UE_LOG(LogTemp, Warning,
@@ -1501,19 +1573,16 @@ void ABaseBattlePawn::OnMouseHover()
 		UE_LOG(LogTemp, Warning, TEXT("OnMouseHover : !battleUnitStateUI"));
 		return;
 	}
-
 	FVector start, end, dir;
 	FHitResult hitInfo;
 	FCollisionQueryParams params;
 
-	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(
-		start, dir);
+	GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(start, dir);
 	end = start + dir * 10000;
 
 	ABaseBattlePawn* currentHovered = nullptr;
 
-	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,
-	                                         ECC_Visibility, params))
+	if (GetWorld()->LineTraceSingleByChannel(hitInfo, start, end,ECC_Visibility, params))
 	{
 		currentHovered = Cast<ABaseBattlePawn>(hitInfo.GetActor());
 	}
@@ -1524,15 +1593,16 @@ void ABaseBattlePawn::OnMouseHover()
 		if (lastHoveredPawn && lastHoveredPawn->battleUnitStateUI)
 		{
 			lastHoveredPawn->battleUnitStateUI->ShowBaseUI();
-			lastHoveredPawn->battleUnitStateComp->
-			                 SetDrawSize(FVector2D(50, 10));
+			lastHoveredPawn->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
 		}
 
 		if (currentHovered && currentHovered->battleUnitStateUI)
 		{
+			currentHovered->battleUnitStateUI->SetUnitName(currentHovered->GetActorNameOrLabel());
+			currentHovered->battleUnitStateUI->UpdatePlayerHPUI(currentHovered->hp);
+			
 			currentHovered->battleUnitStateUI->ShowHoverUI();
-			currentHovered->battleUnitStateComp->SetDrawSize(
-				FVector2D(150, 130));
+			currentHovered->battleUnitStateComp->SetDrawSize(FVector2D(150, 130));
 		}
 
 		lastHoveredPawn = currentHovered;
@@ -1580,11 +1650,15 @@ void ABaseBattlePawn::SkillNameJudgment(const EActionMode curAction)
 
 void ABaseBattlePawn::UnitMoveRotateAttack()
 {
+	MultiCastRPC_UnitMoveRotateAttack();
+}
+
+void ABaseBattlePawn::MultiCastRPC_UnitMoveRotateAttack_Implementation()
+{
 	// AStar로 나온 방향으로 이동
 	if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
 	{
-		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() +
-			FVector(0, 0, 80);
+		FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() + FVector(0, 0, 80);
 		FVector currentLoc = GetActorLocation();
 		FVector direction = (targetLoc - currentLoc).GetSafeNormal();
 
@@ -1599,9 +1673,7 @@ void ABaseBattlePawn::UnitMoveRotateAttack()
 			{
 				FRotator currentRot = player->meshComp->GetRelativeRotation();
 				FRotator desiredRot(0.f, targetRot.Yaw + yawOffset, 0.f);
-				FRotator smoothRot = FMath::RInterpTo(
-					currentRot, desiredRot, GetWorld()->GetDeltaSeconds(),
-					interpSpeed);
+				FRotator smoothRot = FMath::RInterpTo(currentRot, desiredRot, GetWorld()->GetDeltaSeconds(), interpSpeed);
 				player->meshComp->SetRelativeRotation(smoothRot);
 			}
 		}
@@ -1611,9 +1683,7 @@ void ABaseBattlePawn::UnitMoveRotateAttack()
 			{
 				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
 				FRotator desiredRot(0.f, targetRot.Yaw + yawOffset, 0.f);
-				FRotator smoothRot = FMath::RInterpTo(
-					currentRot, desiredRot, GetWorld()->GetDeltaSeconds(),
-					interpSpeed);
+				FRotator smoothRot = FMath::RInterpTo(currentRot, desiredRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
 				enemy->meshComp->SetRelativeRotation(smoothRot);
 			}
 		}
@@ -1799,218 +1869,213 @@ void ABaseBattlePawn::InitEnemyState()
 {
 	if (!(battleUnitStateUI && phaseManager))
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("InitEnemyState : !(battleUnitStateUI && phaseManager"));
+		UE_LOG(LogTemp, Warning, TEXT("InitEnemyState : !(battleUnitStateUI && phaseManager"));
 		return;
 	}
 
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
-		// 처음 값 세팅
-		enemy->enemybattleState = NewObject<UEnemyBattleState>(this);
-
 		// 애너미 랜덤 성격 세팅
-		InitTraits();
+		InitEnemyTraits();
+		// 애너미 스킬 세팅
+		InitEnemySkills();
 		
-		for (const FString trait : enemy->enemybattleState->traits)
+		for (const FString trait : enemy->traits)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Trait : %s"), *trait);
 		}
-		// 기본 스텟 설정(일단 오우거로)
-		enemy->enemybattleState->hp = 90;
-		enemy->enemybattleState->attack = 10;
-		enemy->enemybattleState->defense = 5;
-		enemy->enemybattleState->resistance = 2;
-		enemy->enemybattleState->move_Range = 3;
-		enemy->enemybattleState->critical_Rate = 1.0f;
-		enemy->enemybattleState->critical_Damage = 1.5f;
-		enemy->enemybattleState->speed = 3;
+		for (const FString skill : enemy->skills)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Skill : %s"), *skill);
+		}
+		// 기본 스텟 설정(엔트)
+		enemy->hp = 90;
+		enemy->attack = 10;
+		enemy->defense = 5;
+		enemy->resistance = 2;
+		enemy->moveRange = 3;
+		enemy->critical_Rate = 1.0f;
+		enemy->critical_Damage = 1.5f;
+		enemy->speed = 3;
 
 		// 성격에 따른 값 추가 세팅
-		ApplyTraitModifiers(enemy->enemybattleState);
+		ApplyTraitModifiers(enemy);
 		
 		// enemy에 moveRange 세팅 작업
-		enemy->moveRange = FMath::Max(1, enemy->enemybattleState->move_Range);
-
-		
-		// 전송용 구조체에 값 세팅
-		enemy->enemybattleState->enemyStatus.hp = enemybattleState->hp;
-		enemy->enemybattleState->enemyStatus.attack = enemybattleState->attack;
-		enemy->enemybattleState->enemyStatus.defense = enemybattleState->defense;
-		enemy->enemybattleState->enemyStatus.resistance = enemybattleState->resistance;
-		enemy->enemybattleState->enemyStatus.move_Range = enemybattleState->move_Range;
-		enemy->enemybattleState->enemyStatus.critical_Rate = enemybattleState->critical_Rate;
-		enemy->enemybattleState->enemyStatus.critical_Damage = enemybattleState->critical_Damage;
-		enemy->enemybattleState->enemyStatus.speed = enemybattleState->speed;
-
+		enemy->moveRange = FMath::Max(1, enemy->moveRange);
 		
 		UE_LOG(LogTemp, Warning,TEXT("Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "", crit : %f, crit_Damge : %f, spd : %d"),
-			   enemy->enemybattleState->hp,
-			   enemy->enemybattleState->attack,
-			   enemy->enemybattleState->defense,
-			   enemy->enemybattleState->resistance,
-			   enemy->enemybattleState->move_Range,
-			   enemy->enemybattleState->critical_Rate,
-			   enemy->enemybattleState->critical_Damage,
-			   enemy->enemybattleState->speed);
-		UE_LOG(LogTemp, Warning,TEXT("API Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "", crit : %f, crit_Damge : %f, spd : %d"),
-				enemy->enemybattleState->enemyStatus.hp,
-				enemy->enemybattleState->enemyStatus.attack,
-				enemy->enemybattleState->enemyStatus.defense,
-				enemy->enemybattleState->enemyStatus.resistance,
-				enemy->enemybattleState->enemyStatus.move_Range,
-				enemy->enemybattleState->enemyStatus.critical_Rate,
-				enemy->enemybattleState->enemyStatus.critical_Damage,
-				enemy->enemybattleState->enemyStatus.speed);
+			   enemy->hp,
+			   enemy->attack,
+			   enemy->defense,
+			   enemy->resistance,
+			   enemy->moveRange,
+			   enemy->critical_Rate,
+			   enemy->critical_Damage,
+			   enemy->speed);
 		
-		FString name = "";
-		name = FString::Printf(TEXT("Enemy%d"), phaseManager->unitEnemyNameindex);
-		phaseManager->unitEnemyNameindex++;
-
-		enemy->battleUnitStateUI->SetUnitName(name);
-		enemy->battleUnitStateUI->SetHPUI(enemy);
+		// enemy 이름 세팅
+		MultiCastRPC_SetEnemyName_Implementation(enemy);
 	}
 }
 
-void ABaseBattlePawn::InitTraits()
+void ABaseBattlePawn::InitEnemyTraits()
 {
 	if (auto* enemy = Cast<ABaseEnemy>(this))
 	{
 		for (const FString trait : enemyTraits)
 		{
 			int32 seletTrait = FMath::RandRange(0, 19);
-			if (seletTrait <= 3 && !enemy->enemybattleState->traits.Contains(trait))
+			if (seletTrait <= 3 && !enemy->traits.Contains(trait))
 			{
-				enemy->enemybattleState->traits.Add(trait);
+				enemy->traits.Add(trait);
 			}
 			// 성격 개수가 3개라면 return
-			if (enemy->enemybattleState->traits.Num() >= 3) return;
+			if (enemy->traits.Num() >= 3) return;
 		}
 		// 개수가 3개보다 작으면 다시 Init을 실행
-		if (enemy->enemybattleState->traits.Num() < 3)
+		if (enemy->traits.Num() < 3)
 		{
-			InitTraits();
+			InitEnemyTraits();
 		}
 	}
 }
 
-void ABaseBattlePawn::ApplyTraitModifiers(UEnemyBattleState* state)
+void ABaseBattlePawn::InitEnemySkills()
 {
-	for (const FString& trait : state->traits)
+	// 공통 스킬 2개 다른 스킬 2개
+	if (auto* enemy = Cast<ABaseEnemy>(this))
+	{
+		// 엔트
+		enemy->skills.Add(TEXT("타격"));
+		enemy->skills.Add(TEXT("치명 일격"));
+		enemy->skills.Add(TEXT("맹독 공격"));
+		enemy->skills.Add(TEXT("취약 타격"));
+	}
+}
+
+void ABaseBattlePawn::ApplyTraitModifiers(ABaseEnemy* enemy)
+{
+	for (const FString& trait : enemy->traits)
 	{
 		if (trait == TEXT("강인함"))
 		{
-			state->hp *= 1.3f;
-			state->attack *= 0.9f;
+			enemy->hp *= 1.3f;
+			enemy->attack *= 0.9f;
 		}
 		else if (trait == TEXT("잔잔함"))
 		{
-			state->hp *= 1.3f;
-			state->move_Range -= 1;
+			enemy->hp *= 1.3f;
+			enemy->moveRange -= 1;
 		}
 		else if (trait == TEXT("호전적"))
 		{
-			state->attack *= 1.2f;
-			state->critical_Rate *= 0.85f;
+			enemy->attack *= 1.2f;
+			enemy->critical_Rate *= 0.85f;
 		}
 		else if (trait == TEXT("충동적"))
 		{
-			state->attack *= 1.2f;
-			state->defense *= 0.9f;
+			enemy->attack *= 1.2f;
+			enemy->defense *= 0.9f;
 		}
 		else if (trait == TEXT("수비적"))
 		{
-			state->defense *= 1.2f;
-			state->speed *= 0.9f;
+			enemy->defense *= 1.2f;
+			enemy->speed *= 0.9f;
 		}
 		else if (trait == TEXT("신중함"))
 		{
-			state->defense *= 1.2f;
-			state->critical_Rate *= 0.85f;
+			enemy->defense *= 1.2f;
+			enemy->critical_Rate *= 0.85f;
 		}
 		else if (trait == TEXT("관찰꾼"))
 		{
-			state->critical_Rate *= 1.3f;
-			state->attack *= 0.9f;
+			enemy->critical_Rate *= 1.3f;
+			enemy->attack *= 0.9f;
 		}
 		else if (trait == TEXT("잔인함"))
 		{
-			state->critical_Rate *= 1.3f;
-			state->speed *= 0.9f;
+			enemy->critical_Rate *= 1.3f;
+			enemy->speed *= 0.9f;
 		}
 		else if (trait == TEXT("겁쟁이"))
 		{
-			state->move_Range += 2;
-			state->attack *= 0.9f;
+			enemy->moveRange += 2;
+			enemy->attack *= 0.9f;
 		}
 		else if (trait == TEXT("허세꾼"))
 		{
-			state->move_Range += 2;
-			state->defense *= 0.9f;
+			enemy->moveRange += 2;
+			enemy->defense *= 0.9f;
 		}
 		else if (trait == TEXT("교란꾼"))
 		{
-			state->speed *= 1.2f;
-			state->attack *= 0.9f;
+			enemy->speed *= 1.2f;
+			enemy->attack *= 0.9f;
 		}
 		else if (trait == TEXT("파괴적"))
 		{
-			state->speed *= 1.2f;
-			state->defense *= 0.9f;
+			enemy->speed *= 1.2f;
+			enemy->defense *= 0.9f;
 		}
 		else if (trait == TEXT("협동적"))
 		{
-			state->hp *= 1.15f;
-			state->defense *= 1.1f;
-			state->speed *= 0.9f;
+			enemy->hp *= 1.15f;
+			enemy->defense *= 1.1f;
+			enemy->speed *= 0.9f;
 		}
 		else if (trait == TEXT("용감함"))
 		{
-			state->attack *= 1.1f;
-			state->defense *= 1.1f;
-			state->critical_Rate *= 0.85f;
+			enemy->attack *= 1.1f;
+			enemy->defense *= 1.1f;
+			enemy->critical_Rate *= 0.85f;
 		}
 		else if (trait == TEXT("조화적"))
 		{
-			state->attack *= 1.1f;
-			state->defense *= 1.1f;
-			state->speed *= 0.9f;
+			enemy->attack *= 1.1f;
+			enemy->defense *= 1.1f;
+			enemy->speed *= 0.9f;
 		}
 		else if (trait == TEXT("고립적"))
 		{
-			state->attack *= 1.1f;
-			state->speed *= 1.1f;
-			state->defense *= 0.9f;
+			enemy->attack *= 1.1f;
+			enemy->speed *= 1.1f;
+			enemy->defense *= 0.9f;
 		}
 		else if (trait == TEXT("지능적"))
 		{
-			state->defense *= 1.1f;
-			state->critical_Rate *= 1.15f;
-			state->move_Range -= 1;
+			enemy->defense *= 1.1f;
+			enemy->critical_Rate *= 1.15f;
+			enemy->moveRange -= 1;
 		}
 		else if (trait == TEXT("냉정함"))
 		{
-			state->defense *= 1.1f;
-			state->critical_Rate *= 1.15f;
-			state->speed *= 0.9f;
+			enemy->defense *= 1.1f;
+			enemy->critical_Rate *= 1.15f;
+			enemy->speed *= 0.9f;
 		}
 		else if (trait == TEXT("원한꾼"))
 		{
-			state->critical_Rate *= 1.15f;
-			state->speed *= 1.1f;
-			state->defense *= 0.9f;
+			enemy->critical_Rate *= 1.15f;
+			enemy->speed *= 1.1f;
+			enemy->defense *= 0.9f;
 		}
 		else if (trait == TEXT("민첩함"))
 		{
-			state->move_Range += 1;
-			state->speed *= 1.1f;
-			state->defense *= 0.9f;
+			enemy->moveRange += 1;
+			enemy->speed *= 1.1f;
+			enemy->defense *= 0.9f;
 		}
 	}
 }
 
 void ABaseBattlePawn::InitOtherClassPointer()
 {
+	gi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
+	if (gi)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GI is Set"));
+	}
 	// PhaseManager
 	phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState());
 	if (phaseManager)
@@ -2042,11 +2107,19 @@ void ABaseBattlePawn::InitOtherClassPointer()
 		UE_LOG(LogTemp, Warning, TEXT("gridTileManager is Set"));
 	}
 	// BaseHP UI 보여주기
-	battleUnitStateUI = Cast<UBattleUnitStateUI>(
-		this->battleUnitStateComp->GetWidget());
-	if (battleUnitStateUI) UE_LOG(LogTemp, Warning,
-	                              TEXT("battleUnitStateUI is Set"));
+	battleUnitStateUI = Cast<UBattleUnitStateUI>(this->battleUnitStateComp->GetWidget());
+	if (battleUnitStateUI) UE_LOG(LogTemp, Warning,TEXT("battleUnitStateUI is Set"));
 }
+void ABaseBattlePawn::ServerInitOtherClassPointer_Implementation()
+{
+	MulticastInitOtherClassPointer();
+}
+void ABaseBattlePawn::MulticastInitOtherClassPointer_Implementation()
+{
+	InitOtherClassPointer();
+}
+
+
 
 void ABaseBattlePawn::InitAPUI()
 {
@@ -2070,4 +2143,15 @@ void ABaseBattlePawn::InitAPUI()
 			hud->mainUI->AddAP(); // AP UI 하나씩 추가
 		}
 	}
+}
+
+void ABaseBattlePawn::MultiCastRPC_InitAPUI_Implementation()
+{
+	InitAPUI();
+}
+
+void ABaseBattlePawn::MultiCastRPC_SetMyName_Implementation(
+	int32 Count)
+{
+	MyName = FString("NyName : ") + FString::FromInt(Count);
 }

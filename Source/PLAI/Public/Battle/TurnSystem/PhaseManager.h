@@ -139,7 +139,6 @@ public:
 
 	void TryInitStatus(ABaseBattlePawn* unit);
 	void SetStatus(ABaseBattlePawn* unit);
-
 	//------------Status 이름 변경--------------------
 	FString GetStatusEffectsString(EStatusEffect effect);
 

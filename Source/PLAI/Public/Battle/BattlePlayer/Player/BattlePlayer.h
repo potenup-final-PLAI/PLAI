@@ -20,7 +20,9 @@ protected:
 	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	virtual void PossessedBy(AController* NewController) override;	
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void NotifyControllerChanged() override;
+
 public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
@@ -37,11 +39,7 @@ public:
 	//------------------Anim Instance--------------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim)
 	class UBattlePlayerAnimInstance* playerAnim;
-
-
-	//--------------------Owner-------------------
-	UPROPERTY()
-	ABattlePlayerState* owningPlayerState;
+	
 };
 
 

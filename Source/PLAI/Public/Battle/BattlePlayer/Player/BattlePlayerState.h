@@ -15,9 +15,12 @@ class PLAI_API ABattlePlayerState : public ABasePlayerState
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	//--------------------Status--------------------
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
+	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintReadWrite, Category="Battle")
 	FBaseStatus playerStatus;
 	
 	//--------------------LifeState--------------------
