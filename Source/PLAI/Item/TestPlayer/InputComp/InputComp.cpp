@@ -41,6 +41,7 @@ void UInputComp::BeginPlay()
 
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
+	TestPlayer->CameraBoom->SetWorldRotation(FRotator(-45,-90,0));
 
     if (!Pc) return;
 
@@ -229,7 +230,7 @@ void UInputComp::On_LeftMouseComplete()
 void UInputComp::On_MouseWheelTriggered(const FInputActionValue& Value)
 {
 	float Axis = Value.Get<float>();
-	TestPlayer->CameraBoom->TargetArmLength -= 75 * Axis;
+	TestPlayer->CameraBoom->TargetArmLength -= 150 * Axis;
 }
 
 void UInputComp::On_RoatateView()
