@@ -111,7 +111,10 @@ void ABaseBattlePawn::PossessedBy(AController* NewController)
 	
 	if (IsLocallyControlled())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s의 currentTile : %s"), *this->GetActorNameOrLabel(), *this->currentTile->GetActorNameOrLabel());
+		if (this && this->currentTile)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s의 currentTile : %s"), *this->GetActorNameOrLabel(), *this->currentTile->GetActorNameOrLabel());
+		}
 	}
 }
 
