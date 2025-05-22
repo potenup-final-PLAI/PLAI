@@ -332,8 +332,7 @@ void AUPhaseManager::ServerRPC_EndPlayerPhase_Implementation()
 void AUPhaseManager::StartEnemyPhase()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Start Enemy Turn"));
-	UE_LOG(LogTemp, Warning, TEXT("EnemyTurn Start Unit Name : %s"),
-	       *turnManager->curUnit->GetActorNameOrLabel());
+	UE_LOG(LogTemp, Warning, TEXT("EnemyTurn Start Unit Name : %s"),*turnManager->curUnit->GetActorNameOrLabel());
 
 	// 주기가 5와 같거나 크다면
 	if (cycle > 5)
@@ -346,6 +345,7 @@ void AUPhaseManager::StartEnemyPhase()
 	// 처음 시작할 적 유닛 턴 시작
 	if (turnManager)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PhaseManager in turnManager Set"));
 		turnManager->StartEnemyTurn();
 	}
 }
@@ -865,7 +865,8 @@ void AUPhaseManager::PlayerReady(APlayerController* playerControl)
 {
 	readyCount += 1;
 	UE_LOG(LogTemp, Warning, TEXT("PlayerArray Num : %d readyCount : %d"),GetWorld()->GetGameState()->PlayerArray.Num(), readyCount);
-	if (GetWorld()->GetGameState()->PlayerArray.Num() <= readyCount)
+	// if (GetWorld()->GetGameState()->PlayerArray.Num() <= readyCount)
+	if (readyCount >= GetWorld()->GetGameState()->PlayerArray.Num())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("모든 플레이어 준비 완료 → 전투 시작"));
 

@@ -11,6 +11,8 @@
 #include "Enemy/BaseEnemy.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/Monster/MonWorld/MonBossPawn.h"
 #include "Player/BattlePlayer.h"
 
@@ -29,19 +31,23 @@ void AGridTileManager::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AGridTileManager::GetLifetimeReplicatedProps(
+	TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGridTileManager, tile);
+	DOREPLIFETIME(AGridTileManager, tileFactory);
+}
+
 // Called every frame
 void AGridTileManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void AGridTileManager::InitGridTile()
+void AGridTileManager::InitGridTile_Implementation()
 {
-	if (!HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("서버가 아닙니다."));
-		return;
-	}
 	TArray<FIntPoint> allCoords;
 	allCoords.Reserve(625);
 	// allCoords.Reserve(49);
@@ -68,6 +74,9 @@ void AGridTileManager::InitGridTile()
 				// 타일에 대한 좌표 저장
 				tileToCoordMap.Add(spawnTile, Coord);
 				FString s = map.FindRef(FIntPoint(X, Y))->GetActorNameOrLabel();
+
+				UE_LOG(LogTemp, Warning, TEXT("spawnTile : %s"), *spawnTile->GetActorNameOrLabel());
+				SendTileData(Coord, spawnTile);
 				// 좌표 저장
 				allCoords.Add(Coord);
 			}
@@ -80,10 +89,10 @@ void AGridTileManager::InitGridTile()
 	// PlayerController 수만큼 좌표 확보
 	TArray<APlayerState*> playerStates = GetWorld()->GetGameState()->PlayerArray;
 	UE_LOG(LogTemp, Warning, TEXT("playerStates : %d"), playerStates.Num());
-
+	
 	TArray<FIntPoint> playerCoords = RandomCoords(playerStates.Num(), allCoords);
-
-	for (int32 i = 0; i < playerStates.Num(); ++i)
+	
+	for (int32 i = 0; i < 1; ++i)
 	{
 		const FIntPoint& coord = playerCoords[i];
 		AGridTile* gridTile = map.FindRef(coord);
@@ -101,7 +110,7 @@ void AGridTileManager::InitGridTile()
 		}
 
 		player->currentTile = gridTile;
-
+		UE_LOG(LogTemp, Warning, TEXT("player : %s, currentTile : %s"), *player->GetActorNameOrLabel(), *player->currentTile->GetActorNameOrLabel());
 		// 매칭된 PlayerController를 찾아 SetOwner
 		APlayerState* ps = playerStates[i];
 		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetOwningController());
@@ -109,6 +118,7 @@ void AGridTileManager::InitGridTile()
 		{
 			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("Before player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
 			player->SetOwner(battlePC);
+			battlePC->Possess(player);
 			player->MultiCastRPC_SetMyName(i);
 			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("After player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
 
@@ -148,12 +158,15 @@ void AGridTileManager::InitGridTile()
 			// 보스 레벨이라면 보스 몬스터 스폰
 			if (levelName == "MK_BossMap")
 			{
-				FVector spawnLoc = gridTile->GetActorLocation() + FVector(
-					0.f, 0.f, 80.f);
+				FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
 				// Enemy 스폰
-				if (auto* enemy = GetWorld()->SpawnActor<AMonBossPawn>(
-					bossFactory, spawnLoc, FRotator::ZeroRotator))
+				if (auto* enemy = GetWorld()->SpawnActor<AMonBossPawn>(bossFactory, spawnLoc, FRotator::ZeroRotator))
 				{
+					if (auto* pc = Cast<ABattlePlayerController>(GetWorld()->GetFirstPlayerController()))
+					{
+						enemy->SetOwner(pc);
+						pc->Possess(enemy);
+					}
 					// enemy 스피드 설정
 					enemy->speed = FMath::RandRange(1, 10);
 					// 현재 타일 설정
@@ -182,8 +195,38 @@ void AGridTileManager::InitGridTile()
 		phaseManager->SetBeforeBattle();
 	}
 	UE_LOG(LogTemp, Warning, TEXT("InitGridTile : gridTile Complete"));
+
+	// TArray<FTileNetData> netTileDataArray;
+	// for (const TPair<FIntPoint, AGridTile*>& pair : map)
+	// {
+	// 	FTileNetData tileData;
+	// 	tileData.tileName = pair.Value->GetName(); // 고유 이름으로 식별
+	// 	if (pair.Value) UE_LOG(LogTemp, Warning, TEXT("pair.Value %s"), *pair.Value->GetName());
+	// 	tileData.coord = pair.Key;
+	// 	UE_LOG(LogTemp, Warning, TEXT("pair.Key %d, %d"), pair.Key.X, pair.Key.Y);
+	// 	tileData.tileInstance = map.FindRef(pair.Key);
+	// 	// UE_LOG(LogTemp, Warning, TEXT("tileData.tileInstance %s"), *tileData.tileInstance->GetName());
+	// 	netTileDataArray.Add(tileData);
+	// }
+	//
+	// for (const FTileNetData tileData : netTileDataArray)
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("tile name %s"), *tileData.tileName);
+	// 	UE_LOG(LogTemp, Warning, TEXT("tile coord %d, %d"), tileData.coord.X, tileData.coord.Y);
+	// 	
+	// }
+	// MulticastRPC_InitClientMap(netTileDataArray);
 }
 
+void AGridTileManager::SendTileData_Implementation(FIntPoint coord, AGridTile* tilePointer)
+{
+	if (HasAuthority()) return;
+
+	// 전체적인 타일 관리할 Map에 추가
+	map.Add(coord, tilePointer);
+	// 타일에 대한 좌표 저장
+	tileToCoordMap.Add(tilePointer, coord);
+}
 
 TArray<FIntPoint> AGridTileManager::RandomCoords(int32 count, TArray<FIntPoint> coords)
 {
@@ -217,6 +260,7 @@ AGridTile* AGridTileManager::GetTile(int32 x, int32 y)
 {
 	return map.FindRef(FIntPoint(x, y));
 }
+
 
 FIntPoint AGridTileManager::GetTileLoc(AGridTile* targetTile)
 {
@@ -260,4 +304,32 @@ void AGridTileManager::SetTileColor(AGridTile* targetTile, bool bHighlight)
 		//그 위치 타일 색 변경
 		targetTile->dynDecalInstance->SetScalarParameterValue(TEXT("TileOpacity"), 0.0f);
 	}
+}
+
+void AGridTileManager::MulticastRPC_InitClientMap_Implementation(const TArray<FTileNetData>& tileData)
+{
+	if (HasAuthority()) return; // 서버는 패스
+	
+	for (const FTileNetData& data : tileData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("data is %s, coord : %d, %d, tileInstance = %s"), *data.tileName, data.coord.X, data.coord.Y, *data.tileInstance->GetActorNameOrLabel());
+		if (AGridTile* tempTile = Cast<AGridTile>(data.tileInstance))
+		{
+			map.Add(data.coord, tempTile);
+			tileToCoordMap.Add(tempTile, data.coord);
+
+			FIntPoint coord = tileToCoordMap.FindRef(tempTile);
+			UE_LOG(LogTemp, Warning, TEXT("map[%d, %d] = %s / tileToCoordMap[%s] = (%d, %d)"),
+				data.coord.X, data.coord.Y,
+				*tempTile->GetActorNameOrLabel(),
+				*tempTile->GetActorNameOrLabel(),
+				coord.X, coord.Y);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("map does not exist"));
+		}
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("클라이언트 타일 맵 초기화 완료: %d개"), map.Num());
 }

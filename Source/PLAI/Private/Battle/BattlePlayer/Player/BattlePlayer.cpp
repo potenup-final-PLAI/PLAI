@@ -63,10 +63,7 @@ void ABattlePlayer::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	
 	UE_LOG(LogTemp, Warning,TEXT("NewController : %s"), *NewController->GetActorNameOrLabel());
-
-
-
-
+	
 }
 
 void ABattlePlayer::NotifyControllerChanged()

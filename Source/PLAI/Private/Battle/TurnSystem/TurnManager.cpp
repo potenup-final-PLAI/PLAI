@@ -4,6 +4,7 @@
 #include "Battle/TurnSystem/TurnManager.h"
 
 #include "BaseBattlePawn.h"
+#include "GridTile.h"
 #include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Battle/UI/BattleHUD.h"
@@ -112,6 +113,7 @@ void ATurnManager::StartPlayerTurn()
 				if (curUnit->IsValidLowLevelFast())
 				{
 					UE_LOG(LogTemp, Warning,TEXT("Safe to call OnTurnStart on %s"),*curUnit->GetName());
+					UE_LOG(LogTemp, Warning,TEXT("turnManager : curUnit %s, currentTile : %s "),*playerPawn->GetActorNameOrLabel(), *playerPawn->currentTile->GetActorNameOrLabel());
 					auto* playerCamera = battlePC->GetPawnOrSpectator();
 					curUnit->OnTurnStart();
 					MulticastRPC_CameraChange(playerCamera);

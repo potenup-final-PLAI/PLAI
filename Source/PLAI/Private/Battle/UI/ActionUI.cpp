@@ -76,11 +76,16 @@ void UActionUI::OnClickedMove()
 		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
 		return;
 	}
+	if (!turnManager->curUnit->IsLocallyControlled())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("not LocallyControlled"));
+		return;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Move"));
 	turnManager->curUnit->currentActionMode = EActionMode::Move;
 	turnManager->curUnit->bIsMoveMode = true;
 	// 범위 보이게 설정
-	turnManager->curUnit->SeeMoveRange(turnManager->curUnit->moveRange);
+	turnManager->curUnit->ServerRPC_SeeMoveRange(turnManager->curUnit->moveRange);
 	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"), turnManager->curUnit->moveRange);
 }
 

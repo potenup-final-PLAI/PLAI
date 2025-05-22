@@ -104,7 +104,5 @@ public:
 	bool bLoginMe = false;
 
 	void EquipActor(AActor* MyActor);
-
-	
 	
 };

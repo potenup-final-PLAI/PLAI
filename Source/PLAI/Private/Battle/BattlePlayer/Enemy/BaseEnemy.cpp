@@ -31,6 +31,7 @@ void ABaseEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	// GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABaseBattlePawn::TryInitStatus, 0.1f, true);
+	enemyAnim = Cast<UBattleEnemyAnimInstance>(meshComp->GetAnimInstance());
 	InitActionMap();
 }
 
@@ -38,7 +39,7 @@ void ABaseEnemy::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	enemyAnim = Cast<UBattleEnemyAnimInstance>(meshComp->GetAnimInstance());
+	
 }
 
 // Called every frame
@@ -212,7 +213,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
 			enemy->currentActionMode = EActionMode::Move;
-			if (enemybattleState->move_Range) SeeMoveRange(this->enemybattleState->move_Range);
+			if (enemybattleState->move_Range) ServerRPC_SeeMoveRange(this->enemybattleState->move_Range);
 			else UE_LOG(LogTemp, Warning, TEXT("Enemybattle not State"));
 			
 			if (enemyAnim)

@@ -68,6 +68,8 @@ void UBattleUnitStateUI::UpdateHP(int32 hp)
 		// 현재 HP를 0~1로 만들어서 퍼센트 업데이트
 		float hpPercent = static_cast<float>(hp) / static_cast<float>(maxHP);
 		PGB_BaseHP->SetPercent(hpPercent);
+		UE_LOG(LogTemp, Warning, TEXT("UpdateHP: hp = %d / maxHP = %d / percent = %f"), hp, maxHP, hpPercent);
+
 	}
 	// 호버 시
 	if (txt_HP && PGB_HP)
@@ -77,6 +79,8 @@ void UBattleUnitStateUI::UpdateHP(int32 hp)
 		// 현재 HP를 0~1로 만들어서 퍼센트 업데이트
 		float hpPercent = static_cast<float>(hp) / static_cast<float>(maxHP);
 		PGB_HP->SetPercent(hpPercent);
+		UE_LOG(LogTemp, Warning, TEXT("UpdateHP: hp = %d / maxHP = %d / percent = %f"), hp, maxHP, hpPercent);
+
 	}
 }
 

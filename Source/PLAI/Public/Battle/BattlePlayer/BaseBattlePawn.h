@@ -21,7 +21,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-
+	virtual void PossessedBy(AController* NewController) override;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -78,6 +78,11 @@ public:
 
 	// 다른 클래스 포인터 초기화
 	void InitOtherClassPointer();
+
+	UFUNCTION(Server, Reliable)
+	void ServerInitOtherClassPointer();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastInitOtherClassPointer();
 
 	//--------------------AP System--------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
@@ -273,7 +278,10 @@ public:
 
 	//-------------Get Damage-----------------------
 	void GetDamage(ABaseBattlePawn* unit, int32 damage);
-
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_PlayerGetDamage(class ABattlePlayer* player, int32 damage);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_EnemyGetDamage(class ABaseEnemy* enemy, int32 damage);
 	//------------Move System-----------------
 	// 이 변수에 들어있는 Block 들을 기준으로 상, 하, 좌, 우 검색 후 Cost 구해야 한다.
 	UPROPERTY(EditAnywhere)
@@ -299,10 +307,14 @@ public:
 	void BuildPath();
 	void AddOpenArray(FVector dir);
 	// 이동 범위 보일 수 있도록 주변 타일 색 변경 하는 함
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	TArray<AGridTile*> highlightedTiles;
 
-	void SeeMoveRange(int32 move_Range);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SeeMoveRange(int32 move);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SeeMoveRange(const TArray<FIntPoint>& tiles);
+	void SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles);
 	void ClearGridTile();
 	//--------------이동 및 공격------------------
 	
@@ -370,3 +382,5 @@ public:
 	void MultiCastRPC_SetMyName(int32 Count);
 	
 };
+
+

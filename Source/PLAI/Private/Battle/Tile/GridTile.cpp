@@ -5,6 +5,7 @@
 
 #include "Components/BoxComponent.h"
 #include "Components/DecalComponent.h"
+#include "Net/UnrealNetwork.h"
 // Sets default values
 AGridTile::AGridTile()
 {
@@ -32,8 +33,19 @@ AGridTile::AGridTile()
 void AGridTile::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	InitDecal();
+}
+
+void AGridTile::GetLifetimeReplicatedProps(
+	TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(AGridTile, gridCoord);
+	DOREPLIFETIME(AGridTile, sCostValue);
+	DOREPLIFETIME(AGridTile, tCostValue);
+	DOREPLIFETIME(AGridTile, parentTile);
 }
 
 // Called every frame
