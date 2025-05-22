@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Slot.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "SlotCre.generated.h"
 
 /**
@@ -19,7 +20,7 @@ public:
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 public:
-	void SpawnCreature(FItemStructTable ItemStructTab);
+	void SpawnCreature(FItemStructTable ItemStructTab, ATestPlayer* TestPlayer);
 	void SetCreatureStat();
 
 	// UPROPERTY(EditAnywhere)

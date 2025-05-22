@@ -13,6 +13,8 @@ struct FNpcStructPost
 public:
 	UPROPERTY(EditAnywhere)
 	FString question = FString("Response");
+	UPROPERTY(EditAnywhere)
+	FString personality = FString("무서운");
 };
 
 

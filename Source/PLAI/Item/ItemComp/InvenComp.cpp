@@ -4,20 +4,17 @@
 #include "InvenComp.h"
 #include "JsonObjectConverter.h"
 #include "StoreComp.h"
-#include "BaseFile/PLAIPlayerController.h"
 #include "Components/BoxComponent.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
-#include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/Creture/Creature.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/Item/ItemMaster.h"
 #include "PLAI/Item/Login/LoginComp.h"
-#include "PLAI/Item/Monster/MonWorld/MonWorld.h"
 #include "PLAI/Item/Npc/NpcStart.h"
 #include "PLAI/Item/Npc/NpcStore.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -50,11 +47,6 @@ void UInvenComp::BeginPlay()
 	Super::BeginPlay();
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	PC = Cast<APlayerController>(GetOwner()->GetWorld()->GetFirstPlayerController());
-
-	// 위험한 코드다
-	if (APLAIPlayerController* Controller = Cast<APLAIPlayerController>(PC))
-	{ if (!Controller->TestPlayers.Contains(TestPlayer)){ Controller->TestPlayersAdd();}}
-	else {UE_LOG(LogTemp, Error, TEXT("UInvenComp::BeginPlay() PC 캐스팅 실패"));}
 	
 	if (TestPlayer->IsLocallyControlled())
 	{
@@ -82,55 +74,16 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     // 데이터테이블 템 먹기
 	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::R)){ CatchItem();}
-    // 스팀 세션 만들기
-	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::One))
-	{
-		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-		{
-			WorldGi->CreateSession(FString("Wanted"),4);
-		}
-	}
-	// 스팀 세션 찾기
-	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Two))
-	{
-		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-		{
-			WorldGi->FindOtherSession();
-		}
-	}
-
-	// 스팀 세션 참여하기 
-	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Three))
-	{
-		if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-		{
-			WorldGi->JoinOtherSession();
-		}
-	}
-
 	
 	if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Four))
 	{
 		Server_SpawnOneItem();
 	}
-
 	
-	// 소환수 크리처 소환하기 임시
-	if (TestPlayer->HasAuthority() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Five))
+	if (TestPlayer->IsLocallyControlled() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Five))
 	{
-		TArray<FName> RawNames = ItemDataTable->GetRowNames();
-		if (RawNames.IsValidIndex(33))
-		{
-			UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
-			FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
-            TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable);
-		}
-		else
-		{
-			UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?"))
-		}
+		Server_SpawnCreature();
 	}
-	
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
 	{
@@ -211,6 +164,22 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	}
 }
 
+void UInvenComp::Server_SpawnCreature_Implementation()
+{
+	Client_GetCreature();
+}
+
+void UInvenComp::Client_GetCreature_Implementation()
+{
+	TArray<FName> RawNames = ItemDataTable->GetRowNames();
+	if (RawNames.IsValidIndex(33))
+	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력"))
+		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(RawNames[33],TEXT("InvenComp100"));
+		TestPlayer->InvenComp->MenuInven->WBP_SlotCre->SpawnCreature(*ItemStructTable,TestPlayer); }
+	else
+	{ UE_LOG(LogTemp,Warning,TEXT("InvenComp 소환수 소환 5번키 입력 없는데?")) }
+}
+
 void UInvenComp::SetGold(int32 Getgold)
 {
 	if (TestPlayer->IsLocallyControlled())
@@ -273,8 +242,6 @@ void UInvenComp::Server_UnEquip_Implementation(EquipSlotType SlotType)
 	}
 }
 
-
-
 void UInvenComp::Server_GetItem_Implementation(const FItemStructTable& ItemStructTable)
 {
 	Client_GetItem(ItemStructTable);
@@ -322,8 +289,10 @@ void UInvenComp::GetItem(const FItemStructTable& ItemStructTable)
 }
 
 void UInvenComp::Server_DestroyItem_Implementation(AItem* Item)
-{ Item->Destroy(); }
-
+{
+	if (!IsValid(Item)) return;
+	Item->Destroy();
+}
 
 void UInvenComp::Server_EquipItem_Implementation(const FItemStructTable& ItemStructTable, EquipSlotType SlotType)
 {
@@ -347,7 +316,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		ItemWeapon->StaticMesh->SetStaticMesh(ItemStructTable.StaticMesh);
 		ItemWeapon->BoxComp->SetSimulatePhysics(ECollisionEnabled::NoCollision);
 		
-		ItemWeapon->AddActorWorldOffset(FVector(35, 7, -8));
+		ItemWeapon->AddActorLocalOffset(FVector(-20, -10, 60));
 		ItemWeapon->AddActorLocalRotation(FRotator(-165, 10, 100));
 
 		if (ItemStructTable.Material)
@@ -410,8 +379,6 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		if (ItemStructTable.Material)
 		{ Itemboots->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
 	}
-
-    
 	
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
@@ -420,8 +387,6 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 			UE_LOG(LogTemp,Warning,TEXT("InvenComp 아직 로그인 안됨 bLoginMe머고 %d"),WorldGi->bLoginMe) return;
 		};
 	};
-
-	
 
 	if (!TestPlayer->IsLocallyControlled()) return;
 	FTimerHandle TimerHandle;
@@ -454,12 +419,9 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetUiChaStat(&TestPlayer->LoginComp->UserFullInfo);
 		
 		for (int32 i = 0; i < TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list.Num(); i++)
-		{
-			// UE_LOG(LogTemp,Warning,TEXT("InvenCOmp 497번쨰줄 SetUiChaStat에 들어가는 장비정보 [%s]"),
+		{ // UE_LOG(LogTemp,Warning,TEXT("InvenCOmp 497번쨰줄 SetUiChaStat에 들어가는 장비정보 [%s]"),
 			// 	*TestPlayer->LoginComp->UserFullInfo.equipment_info.item_list[i].item_name);
-		}
-		
-	},1,false);
+		} },1,false);
 }
 
 void UInvenComp::NpcItem(const FItemStructTables ItemStructTables)
@@ -594,48 +556,94 @@ void UInvenComp::LoadEquipInventory()
 
 void UInvenComp::TurnReward()
 {
-	UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
-	UiTurnReward->AddToViewport();
-
-	int32 Exp = FMath::RandRange(7300,8000);
-	TestPlayer->InvenComp->GetExp(Exp);
-
-    UiTurnReward->RewardExp->SetText(FText::AsNumber(Exp));
-	
-	int32 RandGold = FMath::RandRange(1000,5000);
-    UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
-	SetGold(RandGold);
-	
-	int32 RandomReward = FMath::RandRange(2,4);
-	for (int32 i = 0; i < RandomReward; i++)
+	if(UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
-		TArray<FName>Raws = ItemDataTable->GetRowNames();
-		int32 index = FMath::RandRange(0,Raws.Num()-1);
-		FName ItemName = Raws[index];
-		FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(ItemName,TEXT("InvecComp548"));
-	
-		UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UiTurnReward->UiTurnRewardImageFactory);
-		FSlateBrush Brush;
-		Brush.SetResourceObject(ItemStructTable->Texture);
-		UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
-		UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
-	
-		Server_GetItem(*ItemStructTable);
-	}
-	FTimerHandle TurnRewardTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this, RandGold]()
-	{
-		if (UiTurnReward)
+		if (WorldGi->MonsterType == EMonsterType::Monster)
 		{
-			TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
-			TestPlayer->LogItemComp->GetEquipInfo();
-			TestPlayer->LogItemComp->GetInvenInfo();
-			
-			UiTurnReward->RemoveFromParent();
-			UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
-		}
-	},1.5f,false);
+			UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
+			UiTurnReward->AddToViewport();
+
+			int32 Exp = FMath::RandRange(7300,8000);
+			TestPlayer->InvenComp->GetExp(Exp);
+
+			UiTurnReward->RewardExp->SetText(FText::AsNumber(Exp));
 	
+			int32 RandGold = FMath::RandRange(1000,5000);
+			UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
+			SetGold(RandGold);
+	
+			int32 RandomReward = FMath::RandRange(2,4);
+			for (int32 i = 0; i < RandomReward; i++)
+			{
+				TArray<FName>Raws = ItemDataTable->GetRowNames();
+				int32 index = FMath::RandRange(0,Raws.Num()-1);
+				FName ItemName = Raws[index];
+				FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(ItemName,TEXT("InvecComp548"));
+	
+				UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UiTurnReward->UiTurnRewardImageFactory);
+				FSlateBrush Brush;
+				Brush.SetResourceObject(ItemStructTable->Texture);
+				UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
+				UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
+	
+				Server_GetItem(*ItemStructTable);
+			}
+			FTimerHandle TurnRewardTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this, RandGold]()
+			{
+				if (UiTurnReward)
+				{
+					TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
+					TestPlayer->LogItemComp->GetEquipInfo();
+					TestPlayer->LogItemComp->GetInvenInfo();
+			
+					UiTurnReward->RemoveFromParent();
+					UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
+				}
+			},1.5f,false);
+		}
+		else
+		{
+			UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
+			UiTurnReward->AddToViewport();
+
+			int32 Exp = FMath::RandRange(50000,60000);
+			TestPlayer->InvenComp->GetExp(Exp);
+
+			UiTurnReward->RewardExp->SetText(FText::AsNumber(Exp));
+	
+			int32 RandGold = FMath::RandRange(10000,15000);
+			UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
+			SetGold(RandGold);
+
+			TArray<FName>Raws = ItemDataTable->GetRowNames();
+			for (int i = 0; i < 2; i++)
+			{
+				if (34 + i > Raws.Num()-1)return;
+				FName ItemLegend = Raws[34 + i];
+				FItemStructTable* ItemStructTable = ItemDataTable->FindRow<FItemStructTable>(ItemLegend,TEXT("InvecComp618"));
+				UiTurnReward->UiTurnRewardImage = CreateWidget<UUiTurnRewardImage>(GetWorld(),UiTurnReward->UiTurnRewardImageFactory);
+				FSlateBrush Brush;
+				Brush.SetResourceObject(ItemStructTable->Texture);
+				UiTurnReward->UiTurnRewardImage->RewardImage->SetBrush(Brush);
+				UiTurnReward->RewardBox->AddChildToWrapBox(UiTurnReward->UiTurnRewardImage);
+				Server_GetItem(*ItemStructTable);
+			}
+			FTimerHandle TurnRewardTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this, RandGold]()
+			{
+				if (UiTurnReward)
+				{
+					TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
+					TestPlayer->LogItemComp->GetEquipInfo();
+					TestPlayer->LogItemComp->GetInvenInfo();
+			
+					UiTurnReward->RemoveFromParent();
+					UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
+				}
+			},1.5f,false);
+		}
+	}
 }
 
 void UInvenComp::GetExp(int32 Exp)
@@ -827,4 +835,30 @@ void UInvenComp::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 // {
 // 	SaveItemInventory();
 // 	SaveEquipInventory();
+// }
+
+//    // 스팀 세션 만들기
+// if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::One))
+// {
+// 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		WorldGi->CreateSession(FString("Wanted"),4);
+// 	}
+// }
+// // 스팀 세션 찾기
+// if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Two))
+// {
+// 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		WorldGi->FindOtherSession();
+// 	}
+// }
+//
+// // 스팀 세션 참여하기 
+// if (TestPlayer->HasAuthority() && PC->WasInputKeyJustPressed(EKeys::Three))
+// {
+// 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		WorldGi->JoinOtherSession();
+// 	}
 // }

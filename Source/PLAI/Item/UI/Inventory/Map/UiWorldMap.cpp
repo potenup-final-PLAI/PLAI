@@ -3,15 +3,16 @@
 
 #include "UiWorldMap.h"
 
-#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Image.h"
 #include "Components/Overlay.h"
 #include "PLAI/Item/UI/Inventory/Map/UiWorldPlayerIcon.h"
-#include "Components/SizeBox.h"
-#include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/PlayerState.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
 
 UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
 	:Super(FOI)
@@ -19,35 +20,88 @@ UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
 	bIsFocusable = true;
 }
 
-void UUiWorldMap::AddPlayerIcon()
+
+void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
-	MiniMapCanvas->AddChild(UIWorldPlayerIcon);
-	UIWorldPlayerIcons.Add(UIWorldPlayerIcon);
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+	SetPlayerIconMinimap();
+}
+
+void UUiWorldMap::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+	MaterialMapDynamic = UMaterialInstanceDynamic::Create(MaterialMapInterface,this);
+	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
+    SetRefreshPlayerList();
+	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	{
+		TestPlayer->TestInputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap);
+	}
+}
+
+void UUiWorldMap::SetRefreshPlayerList()
+{
+	TestPlayers.Empty();
+	MiniMapCanvasIcon->GetAllChildren().Empty();
+	
+	if (AGameStateBase* GS = GetWorld()->GetGameState())
+	{
+		for (APlayerState* PS : GS->PlayerArray)
+		{
+			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
+			{
+				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
+
+				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
+				TestPlayers.Add(TP);
+				if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon->Slot))
+				{
+					Icon->SetAlignment(FVector2D(0.5,0.5));
+					Icon->SetSize(FVector2d(60,60));
+				}
+				UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetRefreshPlayerList() 플레이어 갯수[%i]"),TestPlayers.Num());
+			}
+		}
+	}
 }
 
 void UUiWorldMap::SetPlayerIconMinimap()
 {
-	for (int i = 0; i < UIWorldPlayerIcons.Num(); i++)
+	for (int i = 0; i < TestPlayers.Num(); i++)
 	{
+		if (!TestPlayers[i])
+		{
+			SetRefreshPlayerList();
+			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap SetRefresh하고 한번더 체크 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;
+		}
 		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
 		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-	
+
 		U = FMath::Clamp(U, 0.f, 1.f);
 		V = FMath::Clamp(V, 0.f, 1.f);
-	
+
 		FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
+		float Yaw = TestPlayers[i]->GetActorRotation().Yaw;
 	
-		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapOverlay->Slot))
-		{ CanvasSlot->SetPosition(PixelPos); }
+		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
+		{
+			MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
+			MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+			CanvasSlot->SetPosition(PixelPos);
+		}
+		else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 	}
 }
 
 void UUiWorldMap::ExtendMap()
-{
-	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvas->Slot))
+ {
+	SetRefreshPlayerList();
+	
+	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MenuInven->Wbp_UiWorldMap->Slot))
 	{
-		// 1) 최초 호출 시 원래 크기/위치 저장
+		UE_LOG(LogTemp,Warning,TEXT("UUiWorldMap::NativeConstruct 미니맵사이즈 [%s]"),*CanvasSlot->GetSize().ToString());
 		if (bExtendMap == false)
 		{
 			CanvasSlot->SetSize(MiniMapSizeL);
@@ -69,39 +123,12 @@ void UUiWorldMap::ExtendMap()
 	}
 }
 
-void UUiWorldMap::SetPlayerMinmapVector(FVector PlayerLocation)
-{
-	float U = (PlayerLocation.X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-	float V = (PlayerLocation.Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-
-	U = FMath::Clamp(U, 0.f, 1.f);
-	V = FMath::Clamp(V, 0.f, 1.f);
-
-	FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
-	
-	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapOverlay->Slot))
-	{ CanvasSlot->SetPosition(PixelPos); }
-	else
-	{
-		UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error"));
-	}
-}
-
-void UUiWorldMap::NativeConstruct()
-{
-	Super::NativeConstruct();
-	
-	MaterialMapDynamic = UMaterialInstanceDynamic::Create(MaterialMapInterface,this);
-
-	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
-}
-
 FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	if (InGeometry.IsUnderLocation(InMouseEvent.GetScreenSpacePosition()))
 	{
 		float Delta = -InMouseEvent.GetWheelDelta();  // +1 or -1
-		CurrentZoom = FMath::Clamp(CurrentZoom + Delta * 0.1, 0, 2);
+		CurrentZoom = FMath::Clamp(CurrentZoom + Delta * 0.1, 0, 1);
 
 		if (MaterialMapDynamic)
 		{
@@ -112,36 +139,7 @@ FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPoint
 	return Super::NativeOnMouseWheel(InGeometry, InMouseEvent);
 }
 
-
-void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
-
-	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
-	{
-		if (PC->WasInputKeyJustPressed(EKeys::M))
-		{
-			ExtendMap();
-		}
-	}
-	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
-	{
-		// SetPlayerMinmapVector(TestPlayer->GetActorLocation());
-		float Yaw = TestPlayer->GetActorRotation().Yaw;
-		
-		PlayerRot->SetRenderTransformPivot(FVector2D(0.5f, 0.f));
-		PlayerRot->SetRenderTransformAngle(Yaw - 90);
-	
-		float U = (TestPlayer->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-		float V = (TestPlayer->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-		
-		U = FMath::Clamp(U, 0.f, 1.f);
-		V = FMath::Clamp(V, 0.f, 1.f);
-		
-		MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
-	}
-}
-
+// if (!TestPlayers[i]){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;}
 
 // if (MiniMapSizeBox)
 // {
@@ -149,3 +147,39 @@ void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 // 	FVector2D ChildSize = ChildGeo.GetLocalSize();
 // 	UE_LOG(LogTemp, Log, TEXT("MiniMapSizeBox 크기: %s"), *ChildSize.ToString());
 // }
+
+
+// void UUiWorldMap::SetPlayerMinmapVector(FVector PlayerLocation)
+// {
+// 	float U = (PlayerLocation.X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+// 	float V = (PlayerLocation.Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+//
+// 	U = FMath::Clamp(U, 0.f, 1.f);
+// 	V = FMath::Clamp(V, 0.f, 1.f);
+//
+// 	FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
+// 	
+// 	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapOverlay->Slot))
+// 	{ CanvasSlot->SetPosition(PixelPos); }
+// 	else
+// 	{ UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
+// }
+
+// if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+// {
+// 	if (!TestPlayer){UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 플레이어 없음")) return;}
+// 	float Yaw = TestPlayer->GetActorRotation().Yaw;
+// 	
+// 	PlayerRot->SetRenderTransformPivot(FVector2D(0.5f, 0.f));
+// 	PlayerRot->SetRenderTransformAngle(Yaw - 90);
+//
+// 	float U = (TestPlayer->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+// 	float V = (TestPlayer->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+// 	
+// 	U = FMath::Clamp(U, 0.f, 1.f);
+// 	V = FMath::Clamp(V, 0.f, 1.f);
+// 	
+// 	MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+// }
+
+// SetPlayerMinmapVector(TestPlayer->GetActorLocation());

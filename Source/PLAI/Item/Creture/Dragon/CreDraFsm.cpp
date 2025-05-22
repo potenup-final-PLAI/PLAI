@@ -75,6 +75,7 @@ void UCreDraFsm::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 void UCreDraFsm::DraIdle(float time)
 {
+	if (!TestPlayer) return;
 	// if (CurrentTime - GetWorld()->GetDeltaSeconds() <= 0.f){} 최초한번 실행됨
 	Dragon->AttachToActor(TestPlayer,FAttachmentTransformRules::KeepRelativeTransform);
 	Dragon->SetActorLocation(TestPlayer->GetActorLocation()+FVector(0,125,125));

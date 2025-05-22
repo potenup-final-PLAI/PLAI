@@ -9,7 +9,7 @@ void UStoreInven::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	for (int32 i = 0; i < 32; i++)
+	for (int32 i = 0; i < 34; i++)
 	{
 		USlotStore* SlotStore = CreateWidget<USlotStore>(GetWorld(), SlotStoreFactory);
 		WrapBox->AddChild(SlotStore);

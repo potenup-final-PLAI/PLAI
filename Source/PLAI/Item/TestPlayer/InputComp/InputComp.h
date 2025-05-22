@@ -2,6 +2,8 @@
 
 #pragma once
 
+DECLARE_DELEGATE(FInputMap);
+
 #include "CoreMinimal.h"
 #include "BaseFile/PLAIPlayerController.h"
 #include "Components/ActorComponent.h"
@@ -27,6 +29,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+	FInputMap OnInputMap;
+
 	UPROPERTY(EditAnywhere)
 	class ATestPlayer* TestPlayer;
 	UPROPERTY(EditAnywhere)
@@ -54,6 +58,18 @@ public:
 	UInputAction* IE_Stat;
 	UFUNCTION()
 	void On_Stat();
+	
+	UPROPERTY(EditAnywhere)
+	UInputAction* IE_Jump;
+	UFUNCTION(Server, Reliable)
+	void Server_On_Jump();
+	UFUNCTION()
+	void On_Jump();
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* IE_Map;
+	UFUNCTION()
+	void On_Map();
 
 	UPROPERTY(EditAnywhere)
 	bool bLeftMouse = false;
@@ -80,14 +96,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	UInputAction* IE_RotateView;
 	UPROPERTY(EditAnywhere)
-	bool bRotateView = false;
+	bool bRotateView = true;
 	UFUNCTION()
 	void On_RoatateView();
 
 	virtual void InitializeComponent() override;
 	
-	void OnPawnPossesed(AController* Controller);
-
 	void BindInputActions();
 	void SetMappingContext();
 };
