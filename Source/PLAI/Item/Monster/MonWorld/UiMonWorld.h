@@ -32,4 +32,6 @@ public:
 	class AMonWorld* MonWorld;
 
 	virtual void NativeConstruct() override;
+
+	void ChangeNpcPersonality();
 };

@@ -12,6 +12,7 @@
 #include "PLAI/Item/ItemComp/CreComp.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
+#include "PLAI/Item/Npc/NpcNet.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
@@ -23,6 +24,14 @@ void UUiMonWorld::NativeConstruct()
 	Button_No->OnClicked.AddDynamic(this,&UUiMonWorld::OnButtonNo);
 	Button_Yes->OnClicked.AddDynamic(this,&UUiMonWorld::OnButtonYes);
 }
+
+// void UUiMonWorld::ChangeNpcPersonality()
+// {
+// 	if(UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		WorldGi->NpcPersonality = FString(TEXT("승리에 취한"));
+// 	}
+// }
 
 void UUiMonWorld::OnButtonYes()
 {
@@ -65,6 +74,7 @@ void UUiMonWorld::OnButtonYes()
 			WorldGi->UserShields.UserShields.Add(UserShield);
 		}
 	}
+	// ChangeNpcPersonality();
 }
 
 void UUiMonWorld::OnButtonNo()

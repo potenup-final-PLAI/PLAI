@@ -6,6 +6,21 @@
 #include "GameFramework/Actor.h"
 #include "GridTileManager.generated.h"
 
+USTRUCT(BlueprintType)
+struct FTileNetData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	FString tileName;
+	UPROPERTY(EditAnywhere)
+	FIntPoint coord;
+	UPROPERTY(EditAnywhere)
+	class AGridTile* tileInstance;
+	
+	FTileNetData() : tileName(TEXT("")), coord(FIntPoint(-1, -1)), tileInstance(nullptr) {}
+};
+
 UCLASS()
 class PLAI_API AGridTileManager : public AActor
 {
@@ -18,14 +33,14 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	class AGridTile* tile;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	TSubclassOf<class AGridTile> tileFactory;
 	UPROPERTY(EditAnywhere)
 	TMap<FIntPoint, class AGridTile*> map;
@@ -42,7 +57,13 @@ public:
 	FTimerHandle bindUnitHandle;
 
 	TArray<class ABattlePlayerController*> playerControllers;
+	
+	UFUNCTION(NetMulticast, Reliable)
 	void InitGridTile();
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void SendTileData(FIntPoint coord, AGridTile* tilePointer);
+	
 	TArray<FIntPoint> RandomCoords(int32 count, TArray<FIntPoint> coords);
 	//------------Test--------------------------
 	// 생성된 유닛들 담기
@@ -58,4 +79,7 @@ public:
 	bool IsValidTile(FIntPoint num);
 	// 타일 색 변경
 	void SetTileColor(AGridTile* targetTile, bool bHighlight);
+	
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastRPC_InitClientMap(const TArray<FTileNetData>& tileData);
 };

@@ -18,6 +18,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	// Called every frame
@@ -31,19 +32,19 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UMaterialInstanceDynamic* dynDecalInstance;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(Replicated, VisibleAnywhere)
 	FIntPoint gridCoord;
 
-
+	
 	void InitDecal();
 	void SetGridCoord(FIntPoint coord);
 
 	//--------------------Move System------------------------
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	float sCostValue = 0;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	float tCostValue = 0;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	AGridTile* parentTile;
 
 	void SetCost(AGridTile* s, AGridTile* g);

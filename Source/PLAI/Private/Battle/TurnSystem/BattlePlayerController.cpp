@@ -12,9 +12,7 @@ void ABattlePlayerController::BeginPlay()
 
 	if (!HasAuthority())
 	{
-		GetWorld()->GetTimerManager().SetTimer(timerHandle, this,
-		                                       &ABattlePlayerController::NotifiyReady,
-		                                       0.2f, true);
+		GetWorld()->GetTimerManager().SetTimer(timerHandle, this,&ABattlePlayerController::NotifiyReady,0.2f, true);
 	}
 }
 
@@ -30,12 +28,10 @@ void ABattlePlayerController::NotifiyReady()
 
 void ABattlePlayerController::ServerRPC_NotifyReady_Implementation()
 {
-	if (AUPhaseManager* phaseManager = Cast<AUPhaseManager>(
-		GetWorld()->GetGameState()))
+	if (AUPhaseManager* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 	{
 		phaseManager->PlayerReady(this);
-		UE_LOG(LogTemp, Warning, TEXT("Player ready %s"),
-		       *this->GetActorNameOrLabel());
+		UE_LOG(LogTemp, Warning, TEXT("Player ready %s"), *this->GetActorNameOrLabel());
 	}
 }
 

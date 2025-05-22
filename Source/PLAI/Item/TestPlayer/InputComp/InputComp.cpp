@@ -41,6 +41,7 @@ void UInputComp::BeginPlay()
 
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 	Pc = Cast<APlayerController>(TestPlayer->GetController());
+	TestPlayer->CameraBoom->SetWorldRotation(FRotator(-45,-90,0));
 
     if (!Pc) return;
 
@@ -191,36 +192,29 @@ void UInputComp::On_LeftMouseTriggered()
 	Pc->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 	TestPlayer->AddMovementInput((Hit.Location - TestPlayer->GetActorLocation()).GetSafeNormal(),1.0f,false);
 
-	if (!bRotateView) return;
-	
-	TimeCamera += GetWorld()->GetDeltaSeconds();
 
-	// 오른쪽 나의 벡터와 카메라 전방 벡터 내적
-	float Dot = FVector::DotProduct(FVector(TestPlayer->GetActorRightVector().X,TestPlayer->GetActorRightVector().Y,0),
-		FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
-
-	if (Dot > 0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-0.35,0)); }
-	else if (Dot < -0.13)
-	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+0.35,0)); }
-	
-	else if (FMath::Abs(Dot) > 0.6)
+	if (bRotateView)
 	{
-		if (Dot > 0.6)
-		{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-FMath::Sin(90 * MouseTime) * 3.5,0)); }
+		TimeCamera += GetWorld()->GetDeltaSeconds();
+		// 오른쪽 나의 벡터와 카메라 전방 벡터 내적
+		float Dot = FVector::DotProduct(FVector(TestPlayer->GetActorRightVector().X,TestPlayer->GetActorRightVector().Y,0),
+			FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
+		if (Dot > 0.13)
+		{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-0.35,0)); }
+		else if (Dot < -0.13)
+		{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+0.35,0)); }
+		else if (Dot > 0.6)
+		{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,- 7,0)); }
 		else if (Dot < -0.6)
-		{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,FMath::Sin(90 * MouseTime) * 3.5,0)); }
-	}
-	float MouseX, MouseY;
-	Pc->GetInputMouseDelta(MouseX, MouseY);
-	FRotator CameraBoomRot = TestPlayer->CameraBoom->GetRelativeRotation();
+		{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+ 7,0)); }
+		float MouseX, MouseY;
+		Pc->GetInputMouseDelta(MouseX, MouseY);
+		FRotator CameraBoomRot = TestPlayer->CameraBoom->GetRelativeRotation();
 
-	MousePower += MouseY;
-
-	if (FMath::Abs(MousePower) > 5.f)
-	{
-		CameraBoomRot.Pitch = FMath::Clamp(CameraBoomRot.Pitch + 0.5 * MouseY, - 60.0f, 10.0f);
-		TestPlayer->CameraBoom->SetRelativeRotation(CameraBoomRot);
+		MousePower += MouseY;
+		if (FMath::Abs(MousePower) > 5.f)
+		{ CameraBoomRot.Pitch = FMath::Clamp(CameraBoomRot.Pitch + 0.5 * MouseY, - 60.0f, 10.0f);
+			TestPlayer->CameraBoom->SetRelativeRotation(CameraBoomRot); }
 	}
 }
 
@@ -236,7 +230,7 @@ void UInputComp::On_LeftMouseComplete()
 void UInputComp::On_MouseWheelTriggered(const FInputActionValue& Value)
 {
 	float Axis = Value.Get<float>();
-	TestPlayer->CameraBoom->TargetArmLength -= 75 * Axis;
+	TestPlayer->CameraBoom->TargetArmLength -= 150 * Axis;
 }
 
 void UInputComp::On_RoatateView()
@@ -248,12 +242,17 @@ void UInputComp::On_RoatateView()
 	{
 		TestPlayer->InvenComp->MenuInven->WBP_InputUi->InputUiHidden();
 		TestPlayer->InvenComp->MenuInven->WBP_InputUi->RotateViewText->SetText(FText::FromString(TEXT("고정 시점 모드")));
+
+		TestPlayer->CameraBoom->TargetArmLength = 2500.0f;
+		// TestPlayer->CameraBoom->SetWorldRotation(FRotator(-45,TestPlayer->GetActorRotation().Yaw,0));
+		TestPlayer->CameraBoom->SetWorldRotation(FRotator(-45,-90,0));
 		bRotateView = false;
 	}
 	else
 	{
 		TestPlayer->InvenComp->MenuInven->WBP_InputUi->InputUiHidden();
 		TestPlayer->InvenComp->MenuInven->WBP_InputUi->RotateViewText->SetText(FText::FromString(TEXT("자유 시점 모드")));
+		
 		bRotateView = true;
 	}
 }
@@ -284,4 +283,38 @@ void UInputComp::InitializeComponent()
 // 			TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
 // 		}
 // 	}
+// }
+
+
+
+// if (!bRotateView) return;
+//
+// TimeCamera += GetWorld()->GetDeltaSeconds();
+//
+// // 오른쪽 나의 벡터와 카메라 전방 벡터 내적
+// float Dot = FVector::DotProduct(FVector(TestPlayer->GetActorRightVector().X,TestPlayer->GetActorRightVector().Y,0),
+// 	FVector(TestPlayer->CameraBoom->GetForwardVector().X,TestPlayer->CameraBoom->GetForwardVector().Y,0));
+//
+// if (Dot > 0.13)
+// { TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,-0.35,0)); }
+// else if (Dot < -0.13)
+// { TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+0.35,0)); }
+//
+// else if (FMath::Abs(Dot) > 0.6)
+// {
+// 	if (Dot > 0.6)
+// 	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,- 7,0)); }
+// 	else if (Dot < -0.6)
+// 	{ TestPlayer->CameraBoom->AddWorldRotation(FRotator(0,+ 7,0)); }
+// }
+// float MouseX, MouseY;
+// Pc->GetInputMouseDelta(MouseX, MouseY);
+// FRotator CameraBoomRot = TestPlayer->CameraBoom->GetRelativeRotation();
+//
+// MousePower += MouseY;
+//
+// if (FMath::Abs(MousePower) > 5.f)
+// {
+// 	CameraBoomRot.Pitch = FMath::Clamp(CameraBoomRot.Pitch + 0.5 * MouseY, - 60.0f, 10.0f);
+// 	TestPlayer->CameraBoom->SetRelativeRotation(CameraBoomRot);
 // }

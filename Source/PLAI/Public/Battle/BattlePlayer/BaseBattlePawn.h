@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InputActionValue.h"
 #include "Enemy/EnemyBattleState.h"
 #include "GameFramework/Pawn.h"
 #include "Player/BattlePlayerState.h"
@@ -21,11 +20,39 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void PossessedBy(AController* NewController) override;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//------------------Player Status------------------------
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 hp = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 attack = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 defense = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 resistance = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	float critical_Rate = 0.0f;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	float critical_Damage = 0.0f;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 moveRange = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 speed = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 points = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	TArray<FString> traits = {};
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	TArray<FString> skills = {};
+
+	// Player가 죽었는지 살았는지 상태 체크
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	ELifeState playerLifeState;
 	//-------------------기본 콜리전 세팅----------------------
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* boxComp;
@@ -41,14 +68,21 @@ public:
 	class APlayerController* pc;
 	UPROPERTY(EditAnywhere)
 	class AGridTileManager* gridTileManager;
-	// UI
 	UPROPERTY(EditAnywhere)
+	class UWorldGi* gi;
+	// UI
+	UPROPERTY(Replicated, EditAnywhere)
 	class UBattleUnitStateUI* battleUnitStateUI;
 	UPROPERTY(EditAnywhere)
 	class ABattleHUD* hud;
 
 	// 다른 클래스 포인터 초기화
 	void InitOtherClassPointer();
+
+	UFUNCTION(Server, Reliable)
+	void ServerInitOtherClassPointer();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastInitOtherClassPointer();
 
 	//--------------------AP System--------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
@@ -57,6 +91,9 @@ public:
 	int32 curAP = 0;
 
 	void InitAPUI();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_InitAPUI();
+	
 	// Player AP 세팅
 	void SetAP()
 	{
@@ -92,15 +129,14 @@ public:
 		// 처리된 ap를 다시 호출한 대상 AP에 업데이트
 		return true;
 	}
-
-	//----------Speed State-------------
-	int32 speed = 0;
-
+	
 	//------------Turn System-----------------
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
 
 	void OnTurnStart();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_SetBattlePlayerInfoUI();
 	void OnTurnEnd();
 
 	//------------Skill System-----------------
@@ -126,9 +162,9 @@ public:
 	void EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType);
 	// Damage 계산 함수
 	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk,
-	                             int32 weapon, float skillMultiplier,
-	                             float criticalRate, float criticalDamage,
-	                             int32 personality, int32 status_effect);
+	                             float skillMultiplier,
+	                             float criticalRate, float criticalDamage
+	                             );
 	void PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 	                       EActionMode attackType = EActionMode::None);
 
@@ -142,15 +178,15 @@ public:
 
 	// 약화 상태이상 처리 함수
 	// player 상태 처리
-	void WeakeningProcess(ABattlePlayerState* playerState);
-	void VulnerableProcess(ABattlePlayerState* playerState);
-	void AngryProcess(ABattlePlayerState* playerState);
-	void BleedingProcess(ABattlePlayerState* playerState);
+	void WeakeningProcess();
+	void VulnerableProcess();
+	void AngryProcess();
+	void BleedingProcess();
 	// enemy 상태 처리
-	void WeakeningEnemyProcess(UEnemyBattleState* enemyState);
-	void VulnerableEnemyProcess(UEnemyBattleState* enemyState);
-	void AngryEnemyProcess(UEnemyBattleState* enemyState);
-	void BleedingEnemyProcess(UEnemyBattleState* enemyState);
+	void WeakeningEnemyProcess(class ABaseEnemy* enemy);
+	void VulnerableEnemyProcess(class ABaseEnemy* enemy);
+	void AngryEnemyProcess(class ABaseEnemy* enemy);
+	void BleedingEnemyProcess(class ABaseEnemy* enemy);
 
 	//---------------TEST-------------------
 	// Player 움직임
@@ -159,11 +195,7 @@ public:
 	class AGridTile* targetTile;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
 	TSubclassOf<class AGridTileManager> TileManagerFactory;
-
-	// PlayerState 부분
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Test)
-	class ABattlePlayerState* battlePlayerState;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)
 	TArray<FString> playerSkills = {
 		TEXT("타격"),
@@ -186,7 +218,7 @@ public:
 		TEXT("타격"),
 		TEXT("마비의 일격"),
 		TEXT("몸통 박치기"),
-		TEXT("맹동 공격"),
+		TEXT("맹독 공격"),
 		TEXT("취약 타격"),
 		TEXT("약화의 일격"),
 		TEXT("치명 일격"),
@@ -228,9 +260,13 @@ public:
 		TEXT("원한꾼"),
 		TEXT("민첩함")
 	};
+	// Enemy 스텟 세팅
 	void InitEnemyState();
-	void InitTraits();
-	void ApplyTraitModifiers(UEnemyBattleState* state);
+	// Enemy 성격 세팅
+	void InitEnemyTraits();
+	// Enemy 기술 세팅
+	void InitEnemySkills();
+	void ApplyTraitModifiers(class ABaseEnemy* enemy);
 	// 마우스 클릭 했을 때 처리 하는 부분
 	void OnMouseLeftClick();
 	void AddOpenByOffset(FIntPoint offset);
@@ -242,7 +278,10 @@ public:
 
 	//-------------Get Damage-----------------------
 	void GetDamage(ABaseBattlePawn* unit, int32 damage);
-
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_PlayerGetDamage(class ABattlePlayer* player, int32 damage);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_EnemyGetDamage(class ABaseEnemy* enemy, int32 damage);
 	//------------Move System-----------------
 	// 이 변수에 들어있는 Block 들을 기준으로 상, 하, 좌, 우 검색 후 Cost 구해야 한다.
 	UPROPERTY(EditAnywhere)
@@ -268,14 +307,20 @@ public:
 	void BuildPath();
 	void AddOpenArray(FVector dir);
 	// 이동 범위 보일 수 있도록 주변 타일 색 변경 하는 함
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	TArray<AGridTile*> highlightedTiles;
 
-	void SeeMoveRange(int32 move_Range);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SeeMoveRange(int32 move);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SeeMoveRange(const TArray<FIntPoint>& tiles);
+	void SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles);
 	void ClearGridTile();
 	//--------------이동 및 공격------------------
 	
 	void UnitMoveRotateAttack();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UnitMoveRotateAttack();
 	//--------------Unit Move-------------------
 	// 이동 경로 저장 Array
 	UPROPERTY(EditAnywhere)
@@ -289,11 +334,7 @@ public:
 	// 이동 속도
 	UPROPERTY(EditAnywhere)
 	float moveSpeed = 300.0f;
-
-	// 이동력 테스트 코드
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 moveRange = 0;
-
+	
 	// 골 위치를 클릭 했을 때 그쪽으로 이동
 	void OnMoveEnd();
 	void InitValues();
@@ -303,7 +344,7 @@ public:
 	//-------------Unit 이름, HP, Armor 세팅------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
 	class UWidgetComponent* battleUnitStateComp;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = UI)
 	class ABaseBattlePawn* lastHoveredPawn;
 
 	void BillboardBattleUnitStateUI();
@@ -327,4 +368,19 @@ public:
 
 	//------------Enemy Turn 여러 번 호출 방지--------
 	bool bTurnEnded = false;
+
+	
+	//-------------Enemy Name----------------
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_SetEnemyName(class ABaseEnemy* enemy);
+
+
+	UPROPERTY(VisibleAnywhere)
+	FString MyName = TEXT("Unit");
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_SetMyName(int32 Count);
+	
 };
+
+

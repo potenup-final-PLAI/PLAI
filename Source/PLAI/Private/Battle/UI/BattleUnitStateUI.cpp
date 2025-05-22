@@ -4,6 +4,7 @@
 #include "Battle/UI/BattleUnitStateUI.h"
 
 #include "BaseBattlePawn.h"
+#include "Battle/TurnSystem/TurnManager.h"
 #include "Components/MultiLineEditableTextBox.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -11,6 +12,7 @@
 #include "Components/WidgetSwitcher.h"
 #include "Enemy/BaseEnemy.h"
 #include "Player/BattlePlayer.h"
+#include "Engine/NetDriver.h"
 
 void UBattleUnitStateUI::NativeConstruct()
 {
@@ -36,14 +38,12 @@ void UBattleUnitStateUI::ShowHoverUI()
 
 void UBattleUnitStateUI::SetHPUI(ABaseBattlePawn* unit)
 {
+	UE_LOG(LogTemp, Warning, TEXT("NetMode: %s"), *GetNetModeString(GetWorld()));
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
-		if (player->battlePlayerState)
-		{
-			maxHP = player->battlePlayerState->playerStatus.hp;
-			txt_HP->SetText(FText::AsNumber(maxHP));
-			UE_LOG(LogTemp, Warning, TEXT("SetHPUI Player maxHP = %d"), maxHP);
-		}
+		maxHP = player->hp;
+		txt_HP->SetText(FText::AsNumber(maxHP));
+		UE_LOG(LogTemp, Warning, TEXT("SetHPUI Player maxHP = %d"), maxHP);
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 	{
@@ -68,6 +68,8 @@ void UBattleUnitStateUI::UpdateHP(int32 hp)
 		// 현재 HP를 0~1로 만들어서 퍼센트 업데이트
 		float hpPercent = static_cast<float>(hp) / static_cast<float>(maxHP);
 		PGB_BaseHP->SetPercent(hpPercent);
+		UE_LOG(LogTemp, Warning, TEXT("UpdateHP: hp = %d / maxHP = %d / percent = %f"), hp, maxHP, hpPercent);
+
 	}
 	// 호버 시
 	if (txt_HP && PGB_HP)
@@ -77,6 +79,8 @@ void UBattleUnitStateUI::UpdateHP(int32 hp)
 		// 현재 HP를 0~1로 만들어서 퍼센트 업데이트
 		float hpPercent = static_cast<float>(hp) / static_cast<float>(maxHP);
 		PGB_HP->SetPercent(hpPercent);
+		UE_LOG(LogTemp, Warning, TEXT("UpdateHP: hp = %d / maxHP = %d / percent = %f"), hp, maxHP, hpPercent);
+
 	}
 }
 
@@ -98,4 +102,32 @@ void UBattleUnitStateUI::ShowAPIReasonUI()
 void UBattleUnitStateUI::SetAPIReason(const FString& reason)
 {
 	TB_APIReason->SetText(FText::FromString(reason));
+}
+
+FString UBattleUnitStateUI::GetNetModeString(UWorld* World)
+{
+	switch (World->GetNetMode())
+	{
+	case NM_Standalone: return TEXT("Standalone");
+	case NM_Client: return TEXT("Client");
+	case NM_ListenServer: return TEXT("ListenServer");
+	case NM_DedicatedServer: return TEXT("DedicatedServer");
+	default: return TEXT("Unknown");
+	}
+}
+
+void UBattleUnitStateUI::UpdatePlayerHPUI(int32 hp)
+{
+	// HP가 같다면 return
+	if (curHP == hp) return;
+	// 아니라면 curHP 업데이트
+	curHP = hp;
+	// UI 변경
+	txt_HP->SetText(FText::AsNumber(hp));
+	UE_LOG(LogTemp, Warning, TEXT("SetHPUI Player maxHP = %d"), hp);
+}
+
+void UBattleUnitStateUI::UpdateEnemyHPUI(int32 hp)
+{
+	txt_HP->SetText(FText::AsNumber(hp));
 }

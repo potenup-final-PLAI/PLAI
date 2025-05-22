@@ -17,20 +17,17 @@ void UBattlePlayerInfoUI::SetPlayerHPUI(class ABaseBattlePawn* unit)
 {
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
-		if (player->battlePlayerState)
+		// MaxHP 세팅
+		if (maxHP == 0)
 		{
-			// MaxHP 세팅
-			if (maxHP == 0)
-			{
-				maxHP = player->battlePlayerState->playerStatus.hp;
-				txt_PlayerMaxHP->SetText(FText::AsNumber(maxHP));
-			}
-
-			// CurHP 세팅
-			int32 curHP = player->battlePlayerState->playerStatus.hp;
-			txt_PlayerHP->SetText(FText::AsNumber(curHP));
-			UE_LOG(LogTemp, Warning, TEXT("SetPlayerHPUI Player curHP : %d / maxHP : %d"), curHP, maxHP);
+			maxHP = player->hp;
+			txt_PlayerMaxHP->SetText(FText::AsNumber(maxHP));
 		}
+
+		// CurHP 세팅
+		int32 curHP = player->hp;
+		txt_PlayerHP->SetText(FText::AsNumber(curHP));
+		UE_LOG(LogTemp, Warning, TEXT("SetPlayerHPUI Player curHP : %d / maxHP : %d"), curHP, maxHP);
 	}
 }
 
@@ -41,7 +38,7 @@ void UBattlePlayerInfoUI::PlayerUpdateHP(class ABaseBattlePawn* unit, int32 hp)
 		// BattlePlayerInfo UI 업데이트
 		if (auto* player = Cast<ABattlePlayer>(unit)) // Warning뜸
 		{
-			txt_PlayerHP->SetText(FText::AsNumber(player->battlePlayerState->playerStatus.hp));
+			txt_PlayerHP->SetText(FText::AsNumber(player->hp));
 		}
 		
 		// 현재 HP를 0~1로 만들어서 퍼센트 업데이트

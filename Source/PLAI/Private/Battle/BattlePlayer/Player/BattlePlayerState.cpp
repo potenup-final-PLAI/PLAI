@@ -2,3 +2,12 @@
 
 
 #include "Player/BattlePlayerState.h"
+
+#include "Net/UnrealNetwork.h"
+
+void ABattlePlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABattlePlayerState, playerStatus);
+}
