@@ -67,6 +67,7 @@ void ANpcCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!TestPlayer) return;
 	FVector mCameraVec = -TestPlayer->TopDownCameraComponent->GetForwardVector(); 
 	WidgetComp->SetWorldRotation(mCameraVec.Rotation());
 }

@@ -106,7 +106,8 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
 	if (APlayerController* PC = Cast<APlayerController>(TestPlayer->GetController()))
-	{ if (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
+	{
+		if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
 		{
 		    FHitResult Hit;
 		    PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
@@ -121,6 +122,7 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			    	}
 			    	else
 			    	{
+			    		if (!NpcNet || !NpcNet->UIPost) return;
 			    		NpcNet->UIPost->RemoveFromParent();
 			    		bQuest = true;
 			    	}
@@ -405,7 +407,7 @@ void ULoginComp::HttpCreatePost(FString CharacterName)
 void ULoginComp::ConnectWebSocket()
 {
 	const FString URL = FString::Printf(TEXT(
-		"wss://919e-221-148-189-129.ngrok-free.app/service1/ws/characters/create/%s"),*UserFullInfo.user_id);
+		"wss://0b55-221-148-189-129.ngrok-free.app/service1/ws/characters/create/%s"),*UserFullInfo.user_id);
 	
 	UE_LOG(LogTemp,Warning,TEXT("LoginComp WebSocket 연결된 주소[%s]"),*URL)
 	const FString Protocol = TEXT("");

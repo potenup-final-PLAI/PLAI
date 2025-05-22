@@ -67,23 +67,23 @@ struct Fstats
     GENERATED_BODY()
 public:
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    int32 hp;
+    int32 hp = 100;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    int32 attack;
+    int32 attack = 10;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    int32 defense;
+    int32 defense = 10;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    int32 resistance;
+    int32 resistance = 0;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    float critical_rate;
+    float critical_rate = 10;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    float critical_damage;
+    float critical_damage = 10;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    int32 move_range;
+    int32 move_range = 0;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    int32 speed;
+    int32 speed = 0;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    int32 points;
+    int32 points = 0;
 };
 
 
