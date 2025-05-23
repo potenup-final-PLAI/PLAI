@@ -133,10 +133,10 @@ void ATurnManager::StartPlayerTurn()
 
 void ATurnManager::StartEnemyTurn()
 {
-	if (curTurnState != ETurnState::None)
-	{
-		return;
-	}
+	// if (curTurnState != ETurnState::None)
+	// {
+	// 	return;
+	// }
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Enemy Turn"));
 	// EnemyTurn으로 State 업데이트
 	SetTurnState(ETurnState::EnemyTurn);
