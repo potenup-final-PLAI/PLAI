@@ -308,7 +308,7 @@ public:
 	// 이동 범위 보일 수 있도록 주변 타일 색 변경 하는 함
 	UPROPERTY(Replicated, EditAnywhere)
 	TArray<AGridTile*> highlightedTiles;
-
+	
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SeeMoveRange(int32 move);
 	UFUNCTION(NetMulticast, Reliable)
@@ -316,7 +316,6 @@ public:
 	void SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles);
 	void ClearGridTile();
 	//--------------이동 및 공격------------------
-	
 	void UnitMoveRotateAttack();
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_UnitMoveRotateAttack();

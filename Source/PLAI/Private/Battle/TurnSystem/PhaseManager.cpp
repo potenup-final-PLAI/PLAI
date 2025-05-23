@@ -29,6 +29,10 @@ void AUPhaseManager::BeginPlay()
 
 	InitOtherClass();
 
+	if (pc)
+	{
+		this->SetOwner(pc);
+	}
 	// GetWorld()->GetTimerManager().SetTimer(timerBattleStartHandle, this,&AUPhaseManager::SetBeforeBattle,0.2f, true);
 }
 
@@ -99,9 +103,9 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 		// 속도를 기반으로 유닛 정렬 작업 및 다음 턴 시작
 		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundStart State"));
 		SetCycle();
-	// Unit Queue에 세팅
+		// Unit Queue에 세팅
 		SetUnitQueue();
-	// 전투 시작
+		// 전투 시작
 		StartBattle();
 		break;
 	case EBattlePhase::TurnProcessing:
@@ -131,9 +135,6 @@ void AUPhaseManager::InitBattle()
 
 void AUPhaseManager::SetUnitQueue()
 {
-	// TArray<AActor*> unitArr;
-	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), unitFactory, unitArr);
-	
 	unitQueue.Empty();
 	httpUnitQueue.Empty();
 
@@ -277,8 +278,7 @@ void AUPhaseManager::TurnPorcessing(ABaseBattlePawn* unit)
 void AUPhaseManager::StartPlayerPhase()
 {
 	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : Start PlayerPhase"));
-	UE_LOG(LogTemp, Warning, TEXT("PlayerTurn Start Unit Name : %s"),
-	       *turnManager->curUnit->GetActorNameOrLabel());
+	UE_LOG(LogTemp, Warning, TEXT("PlayerTurn Start Unit Name : %s"),*turnManager->curUnit->GetActorNameOrLabel());
 
 	// 주기가 5거나 보다 크다면
 	if (cycle > 5)
