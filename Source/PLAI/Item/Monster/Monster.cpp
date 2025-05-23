@@ -36,15 +36,16 @@ void AMonster::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetActorScale3D(FVector(1.5f, 1.5f, 1.5f));
 	TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 
 	MonsterParent = MonsterFactory->GetDefaultObject<AMonster>();
 	MonUi = CreateWidget<UMonUi>(GetWorld(),MonsterParent->MonUiFactory);
 	
 	MonUiComp->SetWidget(MonUi);
-	MonUiComp->SetDrawSize(FVector2D(200.f, 40.f));
+	MonUiComp->SetDrawSize(FVector2D(160.f, 40.f));
 	MonUiComp->SetVisibility(true);
-	MonUiComp->SetRelativeLocation(FVector(0,0,250));
+	MonUiComp->SetRelativeLocation(FVector(0,0,300));
 	MonUiComp->SetWidgetSpace(EWidgetSpace::Screen); // or World
 
 	SetMonsterUi();

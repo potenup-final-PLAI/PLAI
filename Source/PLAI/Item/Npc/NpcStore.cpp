@@ -18,8 +18,6 @@ ANpcStore::ANpcStore()
 void ANpcStore::BeginPlay()
 {
 	Super::BeginPlay();
-
-	NpcNameString = TEXT("토리 (Store)");
 	
 	Item = ItemFactory->GetDefaultObject<AItem>();
 
@@ -28,6 +26,8 @@ void ANpcStore::BeginPlay()
 	StoreInven->SetVisibility(ESlateVisibility::Hidden);
 	
 	NpcUiMaster = Cast<UWidget>(StoreInven);
+
+	NpcNameString = TEXT("토리 (Store)");
 }
 
 // Called every frame

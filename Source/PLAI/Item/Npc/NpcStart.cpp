@@ -21,7 +21,7 @@ void ANpcStart::BeginPlay()
     UiNpcStart->SetVisibility(ESlateVisibility::Hidden);
 	NpcUiMaster = Cast<UUserWidget>(UiNpcStart);
 	
-	NpcNameString = TEXT("말론 (StartEquip)");
+	NpcNameString = TEXT("알수 없는 검");
 }
 
 // Called every frame

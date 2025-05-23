@@ -157,6 +157,7 @@ void APLAIPlayerController::Server_WarpPlayer_Implementation(EMonSpawnType Spawn
 	{
 		if (AMonster* Monster = Cast<AMonster>(Mon))
 		{
+			UE_LOG(LogTemp,Warning,TEXT("PLAIPlayerController 몬스터 삭제"));
 			Monster->Destroy();
 			break;
 		}

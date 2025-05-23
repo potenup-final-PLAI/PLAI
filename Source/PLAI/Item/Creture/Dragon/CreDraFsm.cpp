@@ -146,8 +146,8 @@ void UCreDraFsm::DraAttackRange(float time)
 		{
 			// UE_LOG(LogTemp,Warning,TEXT())
 			AttackMonster(Monster);
-			DrawDebugSphere(GetWorld(),Monster->GetActorLocation(),300,
-				100,FColor::Black,false,.15); 
+			// DrawDebugSphere(GetWorld(),Monster->GetActorLocation(),300,
+			// 	100,FColor::Black,false,.15); 
 		}
 		FVector dir = PatrolPoints[0] - Dragon->GetActorLocation();
 		dir.Normalize();
