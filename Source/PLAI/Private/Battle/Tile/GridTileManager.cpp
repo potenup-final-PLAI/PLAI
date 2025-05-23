@@ -47,11 +47,6 @@ void AGridTileManager::Tick(float DeltaTime)
 }
 void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 {
-	InitGridTile();
-}
-
-void AGridTileManager::InitGridTile_Implementation()
-{
 	TArray<FIntPoint> allCoords;
 	allCoords.Reserve(625);
 	// allCoords.Reserve(49);
@@ -229,6 +224,11 @@ void AGridTileManager::InitGridTile_Implementation()
 	// 	
 	// }
 	// MulticastRPC_InitClientMap(netTileDataArray);
+}
+
+void AGridTileManager::InitGridTile_Implementation()
+{
+	
 }
 
 void AGridTileManager::SendTileData_Implementation(FIntPoint coord, AGridTile* tilePointer)

@@ -84,10 +84,11 @@ void ATurnManager::MutliCastRPC_UpdateWhoTurn_Implementation(const FString& turn
 
 void ATurnManager::StartPlayerTurn()
 {
-	if (!HasAuthority() || curTurnState != ETurnState::None)
-	{
-		return;
-	}
+	// if (!HasAuthority() || curTurnState != ETurnState::None)
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("!HasAuthority || curTurnState = : %s"), *UEnum::GetValueAsString(curTurnState));
+	// 	return;
+	// }
 
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Player Turn"));
 	// Player Turn으로 state Update

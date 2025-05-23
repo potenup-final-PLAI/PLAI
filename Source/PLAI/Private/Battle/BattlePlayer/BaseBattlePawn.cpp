@@ -59,6 +59,7 @@ ABaseBattlePawn::ABaseBattlePawn()
 	}
 
 	bReplicates = true;
+	SetReplicateMovement(true);
 }
 
 // Called when the game starts or when spawned
@@ -127,9 +128,12 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	// Hover UI 띄우기 위한 함수
 	OnMouseHover();
 
-	// Unit 이동, 회전, 공격
-	UnitMoveRotateAttack();
-
+	if (HasAuthority())
+	{
+		// Unit 이동, 회전, 공격
+		UnitMoveRotateAttack();
+	}
+	
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
 	
@@ -227,6 +231,7 @@ void ABaseBattlePawn::OnTurnEnd()
 	// 여러 번 호출 방지
 	if (bTurnEnded)
 	{
+		
 		return;
 	}
 	bTurnEnded = true;
@@ -1687,8 +1692,7 @@ void ABaseBattlePawn::MultiCastRPC_UnitMoveRotateAttack_Implementation()
 		}
 
 		// 위치 보간 이동
-		FVector newLoc = FMath::VInterpConstantTo(
-			currentLoc, targetLoc, GetWorld()->GetDeltaSeconds(), 500.f);
+		FVector newLoc = FMath::VInterpConstantTo(currentLoc, targetLoc, GetWorld()->GetDeltaSeconds(), 500.f);
 		SetActorLocation(newLoc);
 
 		if (FVector::DistSquared(currentLoc, targetLoc) < FMath::Square(5.f))
@@ -1702,9 +1706,7 @@ void ABaseBattlePawn::MultiCastRPC_UnitMoveRotateAttack_Implementation()
 					if (player->playerAnim)
 					{
 						player->playerAnim->actionMode = currentActionMode;
-						UE_LOG(LogTemp, Warning,
-						       TEXT("actionMode set to None"));
-						
+						UE_LOG(LogTemp, Warning,TEXT("actionMode set to None"));
 					}
 				}
 				else if (auto* enemy = Cast<ABaseEnemy>(this))
@@ -1729,8 +1731,7 @@ void ABaseBattlePawn::MultiCastRPC_UnitMoveRotateAttack_Implementation()
 	// 타겟 방향으로 회전
 	if (bWantsToAttack && attackTarget)
 	{
-		FVector directionToTarget = (attackTarget->GetActorLocation() -
-			GetActorLocation()).GetSafeNormal2D();
+		FVector directionToTarget = (attackTarget->GetActorLocation() -GetActorLocation()).GetSafeNormal2D();
 		FRotator desiredRot = directionToTarget.Rotation();
 		constexpr float interpSpeed = 5.f;
 		// 캐릭터의 forward 기준에 맞게 조정
@@ -1742,11 +1743,8 @@ void ABaseBattlePawn::MultiCastRPC_UnitMoveRotateAttack_Implementation()
 			if (player->meshComp)
 			{
 				FRotator currentRot = player->meshComp->GetRelativeRotation();
-				FRotator targetMeshRot = FRotator(
-					0.f, desiredRot.Yaw + yawOffset, 0.f);
-				FRotator newRot = FMath::RInterpTo(
-					currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(),
-					interpSpeed);
+				FRotator targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
+				FRotator newRot = FMath::RInterpTo(currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
 				player->meshComp->SetRelativeRotation(newRot);
 
 				// 회전이 다 됐는지 체크
