@@ -133,15 +133,11 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 					if (FJsonObjectConverter::JsonObjectStringToUStruct(
 						jsonData, &ParsedRequest, 0, 0))
 					{
-						UE_LOG(LogTemp, Warning,
-						       TEXT("Success Response Json To Struct"));
+						UE_LOG(LogTemp, Warning,TEXT("Success Response Json To Struct"));
 	
 						if (ParsedRequest.action.target_character_id == "")
 						{
-							UE_LOG(LogTemp, Error,
-							       TEXT(
-								       "Parsed ActionRequest has empty actions array"
-							       ));
+							UE_LOG(LogTemp, Error,TEXT("Parsed ActionRequest has empty actions array"));
 							if (auto* enemy = Cast<ABaseEnemy>(unit))
 							{
 								enemy->OnTurnEnd();
