@@ -9,7 +9,6 @@
 #include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
-#include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/CycleAndTurn.h"
 #include "Battle/UI/MainBattleUI.h"
 #include "Battle/UI/WorldDamageUIActor.h"
@@ -18,8 +17,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
 #include "Battle/Util/BattleType/BattleTypes.h"
-#include "Blueprint/UserWidget.h"
-#include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
 
