@@ -729,10 +729,10 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			// 스테이터스 세팅
 			UE_LOG(LogTemp, Warning, TEXT("!!! Before setting PlayerStatus"));
 			player->hp = gi->UserFullInfoGiStat.character_info.stats.hp;
-			player->attack = gi->UserFullInfoGiStat.character_info.stats.attack;
+			player->attack = gi->UserFullInfoGiStat.character_info.stats.attack * 2;
 			player->defense = gi->UserFullInfoGiStat.character_info.stats.defense;
 			player->resistance = gi->UserFullInfoGiStat.character_info.stats.resistance;
-			player->moveRange = gi->UserFullInfoGiStat.character_info.stats.move_range;
+			player->moveRange = gi->UserFullInfoGiStat.character_info.stats.move_range * 3;
 			player->critical_Rate = gi->UserFullInfoGiStat.character_info.stats.critical_rate;
 			player->critical_Damage = gi->UserFullInfoGiStat.character_info.stats.critical_damage;
 			player->speed = gi->UserFullInfoGiStat.character_info.stats.speed;
