@@ -1547,6 +1547,30 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "js@naver.com",
+			"pw": "123123",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "js@gmail.com",
+			"pw": "123123",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }
