@@ -105,9 +105,7 @@ void UUIChaMain::OnLoadMeInfo()
 	
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	{
-		UGameplayStatics::SetGamePaused(GetWorld(),true);
-	},1.0f,false);
+	{ UGameplayStatics::SetGamePaused(GetWorld(),true); },1.0f,false);
 }
 
 void UUIChaMain::OnSelectMode()
