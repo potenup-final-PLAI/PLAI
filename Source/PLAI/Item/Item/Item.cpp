@@ -3,6 +3,7 @@
 
 #include "Item.h"
 
+#include "NiagaraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
@@ -20,6 +21,8 @@ AItem::AItem()
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
 	StaticMesh->SetupAttachment(BoxComp);
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("NiagaraComp");
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 }
 
@@ -69,6 +72,17 @@ void AItem::SetMesh()
 	// if (ItemStruct.ItemTop == -1) { UE_LOG(LogTemp,Warning,TEXT("아이템 탑 -1 초기화전")) return; }
 	StaticMesh->SetStaticMesh(ItemParent->ItemStructTop.ItemMeshTops[ItemStruct.ItemTop].
 	ItemMeshIndexes[ItemStruct.ItemIndex].ItemMeshTypes[ItemStruct.ItemIndexType].StaticMeshes[ItemStruct.ItemIndexDetail]);
+}
+
+void AItem::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (NiagaraComp)
+	{
+		NiagaraComp->DestroyComponent();
+		NiagaraComp = nullptr;
+	}
 }
 
 void AItem::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

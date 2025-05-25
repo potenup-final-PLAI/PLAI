@@ -78,7 +78,7 @@ void UUiWorldMap::SetPlayerIconMinimap()
 		}
 		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
 		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-
+		
 		U = FMath::Clamp(U, 0.f, 1.f);
 		V = FMath::Clamp(V, 0.f, 1.f);
 
@@ -89,7 +89,11 @@ void UUiWorldMap::SetPlayerIconMinimap()
 		{
 			MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
 			MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
-			CanvasSlot->SetPosition(PixelPos);
+
+			if (bExtendMap == true)
+			{ CanvasSlot->SetPosition(PixelPos); }
+			else
+			{ CanvasSlot->SetPosition(FVector2d(125,125)); }
 		}
 		else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 	}
@@ -105,6 +109,7 @@ void UUiWorldMap::ExtendMap()
 		if (bExtendMap == false)
 		{
 			CanvasSlot->SetSize(MiniMapSizeL);
+			MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 1);
 			CanvasSlot->SetAnchors(FAnchors(0.5,0.5));
 			CanvasSlot->SetPosition(FVector2D::ZeroVector);
 			CanvasSlot->SetAlignment(FVector2D(0.5,0.5));
@@ -132,7 +137,14 @@ FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPoint
 
 		if (MaterialMapDynamic)
 		{
-			MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), CurrentZoom);
+			if (bExtendMap == false)
+			{
+				MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), CurrentZoom);
+			}
+			else
+			{
+				MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 1);
+			}
 		}
 		return FReply::Handled();
 	}

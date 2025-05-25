@@ -295,10 +295,11 @@ void ULoginComp::HttpMePost()
 			MoveComp->GravityScale = 0.0f;
 			TestPlayer->GetCharacterMovement()->GravityScale = 0.0f;
 			
-			if(TestPlayer && UserFullInfo.character_info.position.x != 0)
+			UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance());
+			if(WorldGi->bLoginMe == true && TestPlayer && UserFullInfo.character_info.position.x != 0)
 			{
 				TestPlayer->SetActorLocation(FVector(UserFullInfo.character_info.position.x,
-				UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z));
+				UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z + 500));
 			}
 			FTimerHandle TimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,MoveComp]()

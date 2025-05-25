@@ -3,6 +3,8 @@
 
 #include "Monster.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/ProgressBar.h"
@@ -97,8 +99,21 @@ void AMonster::Dead()
 		if (ItemStructTable->Material)
 		{ ItemMaster->StaticMesh->SetMaterial(0,ItemStructTable->Material);}
 		ItemMaster->SetActorLocation(GetActorLocation()+FVector(0,0,75));
-		ItemMaster->SetActorScale3D(FVector(2,2,2));
+		if (ItemStructTable->ItemTop !=1)
+		{ ItemMaster->SetActorScale3D(FVector(4,4,4)); }
+		else
+		{ ItemMaster->SetActorScale3D(FVector(1.3,1.3,1.3));}
 		ItemMaster->BoxComp->SetSimulatePhysics(true);
+		
+		if (ItemStructTable->ItemIndexDetail == 2)
+		{
+			ItemMaster->NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(ItemMaster->ItemParent->NiagaraSys,ItemMaster->BoxComp,
+			NAME_None,ItemMaster->GetActorLocation(),FRotator::ZeroRotator, FVector(2.0f),EAttachLocation::KeepWorldPosition,
+			true,ENCPoolMethod::None,true);
+			// ItemMaster->NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(ItemMaster->ItemParent->NiagaraSys,
+			// 	ItemMaster->StaticMesh,FRotator(0,0,0), FVector(1.f), true,true,ENCPoolMethod::AutoRelease);
+			// ItemMaster->NiagaraComp->SetActive(true);
+		}
 	}
 	Destroy();
 }
