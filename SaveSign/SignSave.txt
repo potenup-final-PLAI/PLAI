@@ -1607,6 +1607,18 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "qwe@qwe.qwe",
+			"pw": "qwe",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }

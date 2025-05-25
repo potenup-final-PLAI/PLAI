@@ -298,7 +298,7 @@ void ULoginComp::HttpMePost()
 			if(TestPlayer && UserFullInfo.character_info.position.x != 0)
 			{
 				TestPlayer->SetActorLocation(FVector(UserFullInfo.character_info.position.x,
-				UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z + 1000));
+				UserFullInfo.character_info.position.y,UserFullInfo.character_info.position.z));
 			}
 			FTimerHandle TimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,MoveComp]()
