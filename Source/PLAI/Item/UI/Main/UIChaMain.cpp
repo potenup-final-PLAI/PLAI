@@ -60,7 +60,7 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 		UTextBlock* NewTB = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 		NewTB->SetText(FText::FromString(UserFullInfo->character_info.traits[index]));
 		
-		NewTB->SetFont(FSlateFontInfo(NewTB->GetFont().FontObject, 18));
+		NewTB->SetFont(FSlateFontInfo(NewTB->GetFont().FontObject, 12));
 		TraitsName->AddChild(NewTB);
 		index++;
 	}
@@ -105,9 +105,7 @@ void UUIChaMain::OnLoadMeInfo()
 	
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	{
-		UGameplayStatics::SetGamePaused(GetWorld(),true);
-	},1.0f,false);
+	{ UGameplayStatics::SetGamePaused(GetWorld(),true); },1.0f,false);
 }
 
 void UUIChaMain::OnSelectMode()

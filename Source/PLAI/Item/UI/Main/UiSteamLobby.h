@@ -24,7 +24,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UScrollBox* ScrollBox;
-	void AddScrollBox();
+	void AddScrollBox(FString SessionName);
 	
 	UPROPERTY(EditAnywhere)
 	class UUiMain* UiMain;
@@ -38,11 +38,18 @@ public:
 	class UButton* Button_FindRoom;
 	UFUNCTION()
 	void OnFindRoom();
-	
+
 	UPROPERTY(meta = (BindWidget))
-    class UButton* Button_JoinRoom;
-    UFUNCTION()
-    void OnJoinRoom();
+	class UEditableTextBox* RoomName;
+
+	
+	// UFUNCTION()
+	// void OnFindRoom();
+	
+	// UPROPERTY(meta = (BindWidget))
+ //    class UButton* Button_JoinRoom;
+ //    UFUNCTION()
+ //    void OnJoinRoom();
 
 	virtual void NativeConstruct() override;
 };

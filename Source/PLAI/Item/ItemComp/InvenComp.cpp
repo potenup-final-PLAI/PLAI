@@ -26,6 +26,7 @@
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
+#include "PLAI/Item/UI/Inventory/QuickInven/QuickInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 #include "PLAI/Item/UI/Main/UiChaView.h"
 #include "PLAI/Item/UI/Slot/SlotCre.h"
@@ -63,6 +64,7 @@ void UInvenComp::BeginPlay()
 				MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
+				MenuInven->WBP_QuickInven->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
 	}

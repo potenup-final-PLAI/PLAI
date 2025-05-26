@@ -1549,8 +1549,8 @@
 			}
 		},
 		{
-			"id": "js@naver.com",
-			"pw": "123123",
+			"id": "c@c.c",
+			"pw": "c",
 			"itemStructsEquip":
 			{
 				"itemStructs": []
@@ -1561,8 +1561,56 @@
 			}
 		},
 		{
-			"id": "js@gmail.com",
-			"pw": "123123",
+			"id": "smk6931@naver.com",
+			"pw": "123",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "smk6931@naver.com",
+			"pw": "123",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "smk6931@naver.com",
+			"pw": "123",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "smk6931@w.w",
+			"pw": "w",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "qwe@qwe.qwe",
+			"pw": "qwe",
 			"itemStructsEquip":
 			{
 				"itemStructs": []

@@ -17,7 +17,8 @@ AItemMaster::AItemMaster()
 void AItemMaster::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	float Vec = FVector::DotProduct(GetActorForwardVector(), GetActorRightVector());
 }
 
 // Called every frame

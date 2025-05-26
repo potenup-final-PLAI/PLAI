@@ -122,6 +122,20 @@ void UUiMain::HttpLoginMe()
 			if (LoginComp->UserFullInfo.character_info.character_name != InitUserFullInfo.character_info.character_name)
 			{
 				Wbp_UiInitMain->RemoveFromParent();
+
+				UGameplayStatics::SetGamePaused(GetWorld(),false);
+				LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport(1);
+				LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+				LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+				LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+				LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
+				LoginComp->TestPlayer->InvenComp->MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
+				LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
+				LoginComp->HttpMePost();
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this](){ UGameplayStatics::SetGamePaused
+					(GetWorld(),true); },1.0f,false);
+					
 			}
 			// FString GetJson;
 			// FJsonObjectConverter::UStructToJsonObjectString(&LoginComp->UserFullInfo,GetJson);

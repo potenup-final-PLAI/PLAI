@@ -6,7 +6,16 @@
 #include "UiMain.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Character/UiChaLevelUp.h"
+#include "PLAI/Item/UI/Character/UIChaStat.h"
+#include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
+#include "PLAI/Item/UI/Inventory/InputUi/InputUi.h"
+#include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
+#include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 
 
 void UUIinitMain::NativeConstruct()
@@ -38,6 +47,19 @@ void UUIinitMain::OnInitPostEnter(const FText& Text, ETextCommit::Type CommitMet
 void UUIinitMain::OnInitEnd()
 {
 	RemoveFromParent();
+
+	UGameplayStatics::SetGamePaused(GetWorld(),false);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport(1);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemInven->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
+	UiMain->LoginComp->HttpMePost();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this](){ UGameplayStatics::SetGamePaused
+		(GetWorld(),true); },1.0f,false);
 }
 
 void UUIinitMain::LoadInitSocekt()

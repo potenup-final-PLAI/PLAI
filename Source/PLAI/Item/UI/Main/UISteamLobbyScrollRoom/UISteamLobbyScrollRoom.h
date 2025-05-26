@@ -21,6 +21,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UUiMain* UiMain;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* JoinName;
+
 	UFUNCTION()
 	void OnJoinRoom();
 
