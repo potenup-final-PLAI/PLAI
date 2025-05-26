@@ -20,16 +20,16 @@ void UUiSteamLobby::NativeConstruct()
 
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
-		WorldGi->OnFindSession.BindUObject(this, &UUiSteamLobby::AddScrollBox);
+		WorldGi->OnFindSession.AddUObject(this, &UUiSteamLobby::AddScrollBox);
 	}
 }
 
 
-void UUiSteamLobby::AddScrollBox()
+void UUiSteamLobby::AddScrollBox(FString SessionName)
 {
 	SteamLobbyScrollRoom = CreateWidget<UUISteamLobbyScrollRoom>(GetWorld(),ScrollRoomFactory);
 	SteamLobbyScrollRoom->UiMain = UiMain;
-	// SteamLobbyScrollRoom->JoinName->SetText(FText::FromString("Join Name"));
+	SteamLobbyScrollRoom->JoinName->SetText(FText::FromString(SessionName));
 	ScrollBox->AddChild(SteamLobbyScrollRoom);
 }
 

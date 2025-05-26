@@ -10,7 +10,7 @@
 #include "PLAI/Item/Monster/MonWorld/MonWorld.h"
 #include "WorldGi.generated.h"
 
-DECLARE_DELEGATE(FOnFindSession)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnFindSession, FString)
 
 /**
  * 
