@@ -4,6 +4,9 @@
 #include "TurnTile.h"
 
 #include "Misc/MapErrors.h"
+#include "PLAI/Item/Monster/MonsterMaster.h"
+#include "PLAI/Item/Monster/MonsterStruct.h"
+#include "PLAI/Item/Turn/TurnMoster/TurnMonster.h"
 
 
 // Sets default values
@@ -20,7 +23,8 @@ ATurnTile::ATurnTile()
 void ATurnTile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	MonsterSpawn();
 }
 
 // Called every frame
@@ -32,7 +36,7 @@ void ATurnTile::Tick(float DeltaTime)
 	if (CurrentTime > 2)
 	{
 		// GetTileCorner();
-		MonsterSpawn();
+		// MonsterSpawn();
 		PlayerSpawn();
 		CurrentTime = 0;
 	}
@@ -64,13 +68,21 @@ void ATurnTile::MonsterSpawn()
 		float x = FMath::FRandRange(GetTileCorner()[1].X, GetTileCorner()[2].X);
 		float y = FMath::FRandRange(GetTileCorner()[0].Y, GetTileCorner()[2].Y);
 		float z = GetTileCorner()[0].Z;
+
+		MonsterSpawnTable(FVector(x,y,z));
 		DrawDebugSphere(GetWorld(),FVector(x,y,z), 100, 20, FColor::Red,false,2,2);
 	}
 }
 
-void ATurnTile::MonsterSpawnTable()
+void ATurnTile::MonsterSpawnTable(FVector SpawnLocation)
 {
-	
+	TArray<FName>RowNames = MonsterTable->GetRowNames();
+	FTurnMonsterStruct* TurnMonsterStruct = MonsterTable->FindRow<FTurnMonsterStruct>(RowNames[0],TEXT("TurnTile"));
+	if (ATurnMonster* TurnMonster = GetWorld()->SpawnActor<ATurnMonster>(TurnMonsterStruct->TurnMonster))
+	{ TurnMonster->SetActorLocation(SpawnLocation); }
+
+	for (FName RowName : RowNames)
+	{ }
 }
 
 void ATurnTile::PlayerSpawn()

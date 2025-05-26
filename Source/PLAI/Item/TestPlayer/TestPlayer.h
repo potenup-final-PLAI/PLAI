@@ -47,6 +47,12 @@ public:
 	class UCreComp* CreComp;
 
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ATestPlayer> TestPlayerFactory;
+
+	UPROPERTY(EditAnywhere)
+	class ATestPlayer* TestPlayerParent;
+	
+	UPROPERTY(EditAnywhere)
 	class USceneCaptureComponent2D* CaptureComp;
 
 	bool bCameraChane = false;

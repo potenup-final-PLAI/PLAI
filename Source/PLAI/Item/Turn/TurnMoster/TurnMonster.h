@@ -4,17 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PLAI/Item/Monster/Monster.h"
 #include "PLAI/Item/Monster/MonsterStruct.h"
-#include "TurnMonsterWorld.generated.h"
+#include "PLAI/Item/Turn/TurnMonsterWorld/TurnMonsterWorld.h"
+#include "TurnMonster.generated.h"
 
 UCLASS()
-class PLAI_API ATurnMonsterWorld : public ACharacter
+class PLAI_API ATurnMonster : public AMonster
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	ATurnMonsterWorld();
+	ATurnMonster();
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,13 +29,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
 	UPROPERTY(EditAnywhere)
-	class USphereComponent* SphereComp;
-	
-	UPROPERTY(EditAnywhere)
-	FVector TargetLocation;
-	float CurrentTime = 0;
-	void RandomLocation();
-
-	FVector RandomLoc(float x = 200, float y = 200);
+	FTurnMonsterStruct TurnMonsterStruct;
 };

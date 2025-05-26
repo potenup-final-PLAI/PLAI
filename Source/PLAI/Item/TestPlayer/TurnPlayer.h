@@ -4,17 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "TestPlayer.h"
-#include "KHA/KHACharacter.h"
-#include "OpenPlayer.generated.h"
+#include "TurnPlayer.generated.h"
 
 UCLASS()
-class PLAI_API AOpenPlayer : public AKHACharacter
+class PLAI_API ATurnPlayer : public ATestPlayer
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AOpenPlayer();
+	ATurnPlayer();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,14 +25,4 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-public:
-	UPROPERTY(EditAnywhere)
-	class UInvenComp* InvenComp;
-
-	UPROPERTY(EditAnywhere)
-	class UStoreComp* StoreComp;
-
-	UPROPERTY(EditAnywhere)
-	class ULoginComp* LoginComp;
 };

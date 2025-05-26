@@ -50,6 +50,8 @@ void ATestPlayer::BeginPlay()
     	StoreComp->StoreInven->AddToViewport();
     	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
     }
+	
+	TestPlayerParent = TestPlayerFactory->GetDefaultObject<ATestPlayer>();
 }
 
 // Called every frame
