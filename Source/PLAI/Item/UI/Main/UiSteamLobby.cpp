@@ -16,7 +16,7 @@ void UUiSteamLobby::NativeConstruct()
 
 	Button_CreateRoom->OnClicked.AddDynamic(this,&UUiSteamLobby::OnCreateRoom);
 	Button_FindRoom->OnClicked.AddDynamic(this,&UUiSteamLobby::OnFindRoom);
-	Button_JoinRoom->OnClicked.AddDynamic(this,&UUiSteamLobby::OnJoinRoom);
+	// Button_JoinRoom->OnClicked.AddDynamic(this,&UUiSteamLobby::OnJoinRoom);
 
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
@@ -58,20 +58,20 @@ void UUiSteamLobby::OnFindRoom()
 	}
 }
 
-void UUiSteamLobby::OnJoinRoom()
-{
-	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-	{
-		// UiMain->LoginComp->TestPlayer->LogItemComp->GetInvenInfo();
-		// UiMain->LoginComp->TestPlayer->LogItemComp->GetEquipInfo();
-		UiMain->LoginComp->TestPlayer->LogItemComp->GetUserLevel();
-		
-		WorldGi->JoinOtherSession();
-			
-		WorldGi->UserFullInfoGi = UiMain->LoginComp->TestPlayer->LoginComp->UserFullInfo;
-
-		WorldGi->bLoginMe = true;
-		WorldGi->bGameStart = true;
-		WorldGi->bBattleReward = false;
-	}
-}
+// void UUiSteamLobby::OnJoinRoom()
+// {
+// 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		// UiMain->LoginComp->TestPlayer->LogItemComp->GetInvenInfo();
+// 		// UiMain->LoginComp->TestPlayer->LogItemComp->GetEquipInfo();
+// 		UiMain->LoginComp->TestPlayer->LogItemComp->GetUserLevel();
+// 		
+// 		WorldGi->JoinOtherSession();
+// 			
+// 		WorldGi->UserFullInfoGi = UiMain->LoginComp->TestPlayer->LoginComp->UserFullInfo;
+//
+// 		WorldGi->bLoginMe = true;
+// 		WorldGi->bGameStart = true;
+// 		WorldGi->bBattleReward = false;
+// 	}
+// }

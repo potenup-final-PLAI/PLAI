@@ -38,11 +38,13 @@ public:
 	class UButton* Button_FindRoom;
 	UFUNCTION()
 	void OnFindRoom();
+
 	
-	UPROPERTY(meta = (BindWidget))
-    class UButton* Button_JoinRoom;
-    UFUNCTION()
-    void OnJoinRoom();
+	
+	// UPROPERTY(meta = (BindWidget))
+ //    class UButton* Button_JoinRoom;
+ //    UFUNCTION()
+ //    void OnJoinRoom();
 
 	virtual void NativeConstruct() override;
 };

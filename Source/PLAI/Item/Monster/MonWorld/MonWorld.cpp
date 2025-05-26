@@ -142,7 +142,7 @@ void AMonWorld::CastPlayer()
 			if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Hit.GetActor()))
 			{
 				FVector Dir = TestPlayer->GetActorLocation() - GetActorLocation();
-				if (FVector::DotProduct(GetActorForwardVector() ,Dir.GetSafeNormal()) > 0)
+				//if (FVector::DotProduct(GetActorForwardVector() ,Dir.GetSafeNormal()) > 0)
 				{
 					UIMonWorld = CreateWidget<UUiMonWorld>(GetWorld(),UIMonWorldFactory);
 					UIMonWorld->AddToViewport();
@@ -150,6 +150,7 @@ void AMonWorld::CastPlayer()
 					UIMonWorld->MonWorld = this;
 					UIMonWorld->TestPlayer = TestPlayer;
 					bBattle = true;
+					break;
 				}
 			}
 		}
