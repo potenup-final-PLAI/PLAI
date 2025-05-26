@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "TurnTile.generated.h"
 
+class ATestPlayer;
+
 UCLASS()
 class PLAI_API ATurnTile : public AActor
 {
@@ -31,10 +33,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	UDataTable* MonsterTable;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ATestPlayer> TestPlayerFactory;
+
 	TArray<FVector>GetTileCorner();
 
 	void MonsterSpawn();
     void MonsterSpawnTable(FVector SpawnLocation);
 	
 	void PlayerSpawn();
+	// void PlayerSpawnFactory(FVector SpawnLocation);
 };

@@ -6,6 +6,7 @@
 #include "Misc/MapErrors.h"
 #include "PLAI/Item/Monster/MonsterMaster.h"
 #include "PLAI/Item/Monster/MonsterStruct.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/Turn/TurnMoster/TurnMonster.h"
 
 
@@ -25,6 +26,7 @@ void ATurnTile::BeginPlay()
 	Super::BeginPlay();
 
 	MonsterSpawn();
+	PlayerSpawn();
 }
 
 // Called every frame
@@ -37,7 +39,7 @@ void ATurnTile::Tick(float DeltaTime)
 	{
 		// GetTileCorner();
 		// MonsterSpawn();
-		PlayerSpawn();
+		// PlayerSpawn();
 		CurrentTime = 0;
 	}
 }
@@ -92,6 +94,17 @@ void ATurnTile::PlayerSpawn()
 		float x = FMath::FRandRange(GetTileCorner()[0].X, GetTileCorner()[1].X);
 		float y = FMath::FRandRange(GetTileCorner()[0].Y, GetTileCorner()[2].Y);
 		float z = GetTileCorner()[0].Z;
+
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		
+		if (ATestPlayer* TurnTestPlayer = GetWorld()->SpawnActor<ATestPlayer>(TestPlayerFactory,Params))
+		{
+			UE_LOG(LogTemp,Error,TEXT("TurnTile Player Spawn Success"));
+			TurnTestPlayer->SetActorLocation(FVector(x,y,z));
+			TurnTestPlayer->SetActorScale3D(FVector(2.5,2.5,2.5));
+		}
+		else{UE_LOG(LogTemp,Error,TEXT("TurnTile Player Spawn Failed"));}
 		DrawDebugSphere(GetWorld(),FVector(x,y,z), 100, 20, FColor::Blue,false,2,2);
 	}
 }
