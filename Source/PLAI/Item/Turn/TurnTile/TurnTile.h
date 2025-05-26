@@ -28,5 +28,10 @@ public:
 
 	float CurrentTime = 0;
 
-	void GetLocalBox();
+	UPROPERTY(EditAnywhere)
+	UDataTable* MonsterTable;
+
+	TArray<FVector>GetTileCorner();
+
+	void MonsterSpawn();
 };

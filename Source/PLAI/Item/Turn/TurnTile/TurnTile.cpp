@@ -31,18 +31,46 @@ void ATurnTile::Tick(float DeltaTime)
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	if (CurrentTime > 2)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("ATurnTile:: 2초뒤 로케이션 %s"),*GetActorLocation().ToString());
-		DrawDebugSphere(GetWorld(), GetActorLocation() + FVector(0,0,50), 100, 20, FColor::Red,false,2,2);
+		// GetTileCorner();
+		MonsterSpawn();
 		CurrentTime = 0;
 	}
 }
 
-void ATurnTile::GetLocalBox()
-{
-	const FBox LocalBox = StaticMeshComp->GetStaticMesh()->GetBoundingBox();
-	const FVector LocalEndPoint = LocalBox.Max;
 
-	const FTransform& CompTransform = StaticMeshComp->GetComponentTransform();
-	const FVector WorldEndPoint = CompTransform.TransformPosition(LocalEndPoint);
+TArray<FVector> ATurnTile::GetTileCorner()
+{
+	FVector LocalOrigin, LocalExtend;
+	StaticMeshComp->GetLocalBounds(LocalOrigin, LocalExtend);
+	FVector Scale = StaticMeshComp->GetComponentScale();
+	
+	FVector ScaledMin = GetActorLocation() + Scale * LocalOrigin + FVector(0,0,Scale.Z*LocalExtend.Z - Scale.Z*LocalOrigin.Z);
+	FVector ScaledOrigin = GetActorLocation()                    + FVector(0,0,Scale.Z*LocalExtend.Z - Scale.Z*LocalOrigin.Z)/2;
+	FVector ScaledExtend = GetActorLocation() + Scale * LocalExtend;
+	
+	// UE_LOG(LogTemp,Warning,TEXT("ATurnTile::GetLocalBounds ScaledMin [%s] ScaledExtend [%s]"
+	// 						 ""),*ScaledMin.ToString(), *ScaledExtend.ToString());
+
+	// DrawDebugSphere(GetWorld(),ScaledMin,    100, 20, FColor::Red,false,2,2);
+	// DrawDebugSphere(GetWorld(),GetActorLocation(), 100, 20, FColor::Red,false,2,2);
+	// DrawDebugSphere(GetWorld(),ScaledOrigin, 100, 20, FColor::Red,false,2,2);
+
+	TArray<FVector> Corners;
+	Corners.Add(ScaledMin);
+	Corners.Add(ScaledOrigin);
+	Corners.Add(ScaledExtend);
+
+	return Corners;
+}
+
+void ATurnTile::MonsterSpawn()
+{
+	for (int i = 1; i < 4; i++)
+	{
+		float x = FMath::FRandRange(GetTileCorner()[1].X, GetTileCorner()[2].X);
+		float y = FMath::FRandRange(GetTileCorner()[0].Y, GetTileCorner()[2].Y);
+		float z = GetTileCorner()[0].Z;
+		DrawDebugSphere(GetWorld(),FVector(x,y,z), 100, 20, FColor::Red,false,2,2);
+	}
 }
 
