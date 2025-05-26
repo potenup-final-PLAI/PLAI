@@ -167,8 +167,10 @@ void UInputComp::On_LeftMouseStart()
 	if (ATurnMonsterWorld* TurnMonsterWorld = Cast<ATurnMonsterWorld>(Hit.GetActor()))
 	{
 		UE_LOG(LogTemp,Warning,TEXT("InputComp 턴몬스터 월드 찾음 %s"),*TurnMonsterWorld->GetName())
-		ATurnTile* TurnTile = Cast<ATurnTile>(UGameplayStatics::GetActorOfClass(GetWorld(),ATurnTile::StaticClass()));
-		TestPlayer->SetActorLocation(TurnTile->GetActorLocation());
+		if (ATurnTile* TurnTile = Cast<ATurnTile>(UGameplayStatics::GetActorOfClass(GetWorld(),ATurnTile::StaticClass())))
+		{ TestPlayer->SetActorLocation(TurnTile->GetActorLocation());}
+		else{ UE_LOG(LogTemp,Warning,TEXT("InputComp 턴타일 없음 "))
+ }
 	}
 	else
 	{

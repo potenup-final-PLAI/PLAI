@@ -25,4 +25,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* StaticMeshComp;
+
+	float CurrentTime = 0;
+
+	void GetLocalBox();
 };
