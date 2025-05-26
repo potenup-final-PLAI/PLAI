@@ -60,9 +60,7 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_InitGridTile();
-	UFUNCTION(NetMulticast, Reliable)
-	void InitGridTile();
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(Client, Reliable)
 	void SendTileData(FIntPoint coord, AGridTile* tilePointer);
 	
 	TArray<FIntPoint> RandomCoords(int32 count, TArray<FIntPoint> coords);

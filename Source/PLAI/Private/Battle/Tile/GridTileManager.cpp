@@ -8,6 +8,7 @@
 #include "Algo/RandomShuffle.h"
 #include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Battle/TurnSystem/PhaseManager.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Enemy/BaseEnemy.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -49,7 +50,6 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 {
 	TArray<FIntPoint> allCoords;
 	allCoords.Reserve(625);
-	// allCoords.Reserve(49);
 
 	// Tile 스폰 작업
 	for (int32 Y = 0; Y < 25; ++Y)
@@ -59,8 +59,7 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 			FVector spawnLoc = GetActorLocation() + FVector(Y * 100, X * 100, 0.0f);
 			FRotator spawnRot = FRotator::ZeroRotator;
 			FActorSpawnParameters spawnParams;
-
-
+			
 			auto* spawnTile = GetWorld()->SpawnActor<AGridTile>(tileFactory, spawnLoc, spawnRot, spawnParams);
 			if (spawnTile)
 			{
@@ -108,18 +107,6 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 		}
 
 		player->currentTile = gridTile;
-		// 매칭된 PlayerController를 찾아 SetOwner
-		// if (auto* playerPC = Cast<ABattlePlayerController>(player->GetController()))
-		// {
-		// 	if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("Before player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
-		// 	player->SetOwner(playerPC);
-		// 	playerPC->Possess(player);
-		// 	player->MultiCastRPC_SetMyName(i);
-		// 	if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("After player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
-		//
-		// 	player->ForceNetUpdate(); // 복제 보장
-		// 	playerControllers.Add(playerPC);
-		// }
 		APlayerState* ps = playerStates[i];
 		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetPlayerController());
 		if (battlePC)
@@ -204,37 +191,26 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 	}
 	UE_LOG(LogTemp, Warning, TEXT("InitGridTile : gridTile Complete"));
 
-	// TArray<FTileNetData> netTileDataArray;
-	// for (const TPair<FIntPoint, AGridTile*>& pair : map)
-	// {
-	// 	FTileNetData tileData;
-	// 	tileData.tileName = pair.Value->GetName(); // 고유 이름으로 식별
-	// 	if (pair.Value) UE_LOG(LogTemp, Warning, TEXT("pair.Value %s"), *pair.Value->GetName());
-	// 	tileData.coord = pair.Key;
-	// 	UE_LOG(LogTemp, Warning, TEXT("pair.Key %d, %d"), pair.Key.X, pair.Key.Y);
-	// 	tileData.tileInstance = map.FindRef(pair.Key);
-	// 	// UE_LOG(LogTemp, Warning, TEXT("tileData.tileInstance %s"), *tileData.tileInstance->GetName());
-	// 	netTileDataArray.Add(tileData);
-	// }
-	//
-	// for (const FTileNetData tileData : netTileDataArray)
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("tile name %s"), *tileData.tileName);
-	// 	UE_LOG(LogTemp, Warning, TEXT("tile coord %d, %d"), tileData.coord.X, tileData.coord.Y);
-	// 	
-	// }
-	// MulticastRPC_InitClientMap(netTileDataArray);
-}
 
-void AGridTileManager::InitGridTile_Implementation()
-{
-	
+	// 타일 Array만들어서 변수 담기
+	TArray<FTileNetData> netTileDataArray;
+	for (const TPair<FIntPoint, AGridTile*>& pair : map)
+	{
+		FTileNetData tileData;
+		tileData.tileName = pair.Value->GetName(); // 고유 이름으로 식별
+		tileData.coord = pair.Key;
+		tileData.tileInstance = map.FindRef(pair.Key);
+		netTileDataArray.Add(tileData);
+	}
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, netTileDataArray]()
+	{
+		MulticastRPC_InitClientMap(netTileDataArray);
+	}, 1.0f, false); // 1초 후에 호출
 }
 
 void AGridTileManager::SendTileData_Implementation(FIntPoint coord, AGridTile* tilePointer)
 {
-	if (HasAuthority()) return;
-
 	// 전체적인 타일 관리할 Map에 추가
 	map.Add(coord, tilePointer);
 	// 타일에 대한 좌표 저장
@@ -277,6 +253,22 @@ AGridTile* AGridTileManager::GetTile(int32 x, int32 y)
 
 FIntPoint AGridTileManager::GetTileLoc(AGridTile* targetTile)
 {
+	if (tileToCoordMap.Contains(targetTile))
+	{
+		NET_PRINTLOG(TEXT("tileToCoordMap.Contains(targetTile)"))	
+	}
+	else if (targetTile != nullptr)
+	{
+		NET_PRINTLOG(TEXT("TargetTile : %s"), *targetTile->GetActorNameOrLabel());
+	}
+	else
+	{
+		NET_PRINTLOG(TEXT("no have TargetTile"));
+	}
+	if (tileToCoordMap.Num() <= 0)
+	{
+		NET_PRINTLOG(TEXT("tileToCoordMap.Num() <= 0"));
+	}
 	if (targetTile && tileToCoordMap.Contains(targetTile))
 	{
 		// UE_LOG(LogTemp, Warning, TEXT("%s의 좌표 : (%d, %d)"), *tile->GetActorNameOrLabel(), coord.X, coord.Y);
@@ -321,26 +313,15 @@ void AGridTileManager::SetTileColor(AGridTile* targetTile, bool bHighlight)
 
 void AGridTileManager::MulticastRPC_InitClientMap_Implementation(const TArray<FTileNetData>& tileData)
 {
+	NET_PRINTLOG(TEXT("MulticastRPC_InitClientMap_Implementation"));
 	if (HasAuthority()) return; // 서버는 패스
 	
 	for (const FTileNetData& data : tileData)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("data is %s, coord : %d, %d, tileInstance = %s"), *data.tileName, data.coord.X, data.coord.Y, *data.tileInstance->GetActorNameOrLabel());
-		if (AGridTile* tempTile = Cast<AGridTile>(data.tileInstance))
+		if (AGridTile* tempTile = data.tileInstance)
 		{
 			map.Add(data.coord, tempTile);
 			tileToCoordMap.Add(tempTile, data.coord);
-
-			FIntPoint coord = tileToCoordMap.FindRef(tempTile);
-			UE_LOG(LogTemp, Warning, TEXT("map[%d, %d] = %s / tileToCoordMap[%s] = (%d, %d)"),
-				data.coord.X, data.coord.Y,
-				*tempTile->GetActorNameOrLabel(),
-				*tempTile->GetActorNameOrLabel(),
-				coord.X, coord.Y);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("map does not exist"));
 		}
 	}
 	

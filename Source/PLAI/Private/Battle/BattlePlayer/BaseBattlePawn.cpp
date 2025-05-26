@@ -107,6 +107,7 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, skills);
 	DOREPLIFETIME(ABaseBattlePawn, playerLifeState);
 	DOREPLIFETIME(ABaseBattlePawn, lastHoveredPawn);
+	DOREPLIFETIME(ABaseBattlePawn, currentTile);
 }
 
 void ABaseBattlePawn::PossessedBy(AController* NewController)

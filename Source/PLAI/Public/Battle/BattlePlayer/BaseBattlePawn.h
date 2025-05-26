@@ -71,7 +71,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UWorldGi* gi;
 	// UI
-	UPROPERTY(Replicated, EditAnywhere)
+	UPROPERTY(EditAnywhere)
 	class UBattleUnitStateUI* battleUnitStateUI;
 	UPROPERTY(EditAnywhere)
 	class ABattleHUD* hud;
@@ -295,7 +295,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class AGridTile* goalTile;
 	// 현재 체크하고 있는 block
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	class AGridTile* currentTile;
 
 	// 움직임 플래그
@@ -306,7 +306,7 @@ public:
 	void BuildPath();
 	void AddOpenArray(FVector dir);
 	// 이동 범위 보일 수 있도록 주변 타일 색 변경 하는 함
-	UPROPERTY(Replicated, EditAnywhere)
+	UPROPERTY(EditAnywhere)
 	TArray<AGridTile*> highlightedTiles;
 	
 	UFUNCTION(Server, Reliable)
