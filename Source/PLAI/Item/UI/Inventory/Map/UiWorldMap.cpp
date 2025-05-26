@@ -39,6 +39,7 @@ void UUiWorldMap::NativeConstruct()
 	{
 		TestPlayer->TestInputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap);
 	}
+	MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.65);
 }
 
 void UUiWorldMap::SetRefreshPlayerList()
@@ -52,6 +53,7 @@ void UUiWorldMap::SetRefreshPlayerList()
 		{
 			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
 			{
+				if (!TP -> IsLocallyControlled())return;
 				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
 
 				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
