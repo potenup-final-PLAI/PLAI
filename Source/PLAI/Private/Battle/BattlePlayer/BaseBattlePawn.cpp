@@ -108,6 +108,7 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, playerLifeState);
 	DOREPLIFETIME(ABaseBattlePawn, lastHoveredPawn);
 	DOREPLIFETIME(ABaseBattlePawn, currentTile);
+	DOREPLIFETIME(ABaseBattlePawn, currentActionMode);
 }
 
 void ABaseBattlePawn::PossessedBy(AController* NewController)
@@ -271,7 +272,7 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnMouseLeftClick is not my pawn"));
 		return;
 	}
-	PRINTLOG(TEXT("%s OnMouseLeftClick"), *GetName());
+	NET_PRINTLOG(TEXT("%s OnMouseLeftClick"), *GetName());
 	FVector start, end, dir;
 	FHitResult hitInfo;
 	FCollisionQueryParams params;

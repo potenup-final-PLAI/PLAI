@@ -139,7 +139,7 @@ public:
 	void MultiCastRPC_SetBattlePlayerInfoUI();
 	void OnTurnEnd();
 	//------------Skill System-----------------
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	EActionMode currentActionMode = EActionMode::None;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	bool bBaseAttack = true;

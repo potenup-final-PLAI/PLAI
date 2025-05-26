@@ -253,22 +253,22 @@ AGridTile* AGridTileManager::GetTile(int32 x, int32 y)
 
 FIntPoint AGridTileManager::GetTileLoc(AGridTile* targetTile)
 {
-	if (tileToCoordMap.Contains(targetTile))
-	{
-		NET_PRINTLOG(TEXT("tileToCoordMap.Contains(targetTile)"))	
-	}
-	else if (targetTile != nullptr)
-	{
-		NET_PRINTLOG(TEXT("TargetTile : %s"), *targetTile->GetActorNameOrLabel());
-	}
-	else
-	{
-		NET_PRINTLOG(TEXT("no have TargetTile"));
-	}
-	if (tileToCoordMap.Num() <= 0)
-	{
-		NET_PRINTLOG(TEXT("tileToCoordMap.Num() <= 0"));
-	}
+	// if (tileToCoordMap.Contains(targetTile))
+	// {
+	// 	NET_PRINTLOG(TEXT("tileToCoordMap.Contains(targetTile)"))	
+	// }
+	// else if (targetTile != nullptr)
+	// {
+	// 	NET_PRINTLOG(TEXT("TargetTile : %s"), *targetTile->GetActorNameOrLabel());
+	// }
+	// else
+	// {
+	// 	NET_PRINTLOG(TEXT("no have TargetTile"));
+	// }
+	// if (tileToCoordMap.Num() <= 0)
+	// {
+	// 	NET_PRINTLOG(TEXT("tileToCoordMap.Num() <= 0"));
+	// }
 	if (targetTile && tileToCoordMap.Contains(targetTile))
 	{
 		// UE_LOG(LogTemp, Warning, TEXT("%s의 좌표 : (%d, %d)"), *tile->GetActorNameOrLabel(), coord.X, coord.Y);
@@ -313,7 +313,6 @@ void AGridTileManager::SetTileColor(AGridTile* targetTile, bool bHighlight)
 
 void AGridTileManager::MulticastRPC_InitClientMap_Implementation(const TArray<FTileNetData>& tileData)
 {
-	NET_PRINTLOG(TEXT("MulticastRPC_InitClientMap_Implementation"));
 	if (HasAuthority()) return; // 서버는 패스
 	
 	for (const FTileNetData& data : tileData)
