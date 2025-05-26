@@ -40,7 +40,7 @@ public:
 
 	void MonsterSpawn();
     void MonsterSpawnTable(FVector SpawnLocation);
-	
+
 	void PlayerSpawn();
 	// void PlayerSpawnFactory(FVector SpawnLocation);
 };

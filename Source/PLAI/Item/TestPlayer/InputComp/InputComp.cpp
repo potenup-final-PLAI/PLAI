@@ -163,21 +163,15 @@ void UInputComp::On_LeftMouseStart()
 	FHitResult Hit;
 	Pc->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 
+	if (Hit.GetActor()){UE_LOG(LogTemp,Warning,TEXT("InputComp 왼쪽 마우스 무슨엑터? [%s]"),*Hit.GetActor()->GetName())}
+
 	// 턴제 몬스터 찾기
 	if (ATurnMonsterWorld* TurnMonsterWorld = Cast<ATurnMonsterWorld>(Hit.GetActor()))
 	{
-		UE_LOG(LogTemp,Warning,TEXT("InputComp 턴몬스터 월드 찾음 %s"),*TurnMonsterWorld->GetName())
 		if (ATurnTile* TurnTile = Cast<ATurnTile>(UGameplayStatics::GetActorOfClass(GetWorld(),ATurnTile::StaticClass())))
 		{ TestPlayer->SetActorLocation(TurnTile->GetActorLocation() + FVector(0,0,100));}
-		else{ UE_LOG(LogTemp,Warning,TEXT("InputComp 턴타일 없음 "))
- }
 	}
-	else
-	{
-		UE_LOG(LogTemp,Warning,TEXT("InputComp 턴몬스터 못월드 찾음 "))
-	}
-
-	// Npc 찾기
+	// Npc 찾기 창 끄기
 	ANpcCharacter* NpcCharacter = Cast<ANpcCharacter>(Hit.GetActor());
 	if (!NpcCharacter)
 	{
@@ -194,6 +188,11 @@ void UInputComp::On_LeftMouseStart()
 			}
 		}
 	}
+	// 턴제 플레이어
+	// if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Hit.GetActor()))
+	// {
+	// 	
+	// }
 	TestPlayer->GetController()->StopMovement();
 	TimeCamera = 0;
 }

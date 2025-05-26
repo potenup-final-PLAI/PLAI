@@ -3,10 +3,12 @@
 
 #include "TurnTile.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Misc/MapErrors.h"
 #include "PLAI/Item/Monster/MonsterMaster.h"
 #include "PLAI/Item/Monster/MonsterStruct.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/TestPlayer/TurnPlayer.h"
 #include "PLAI/Item/Turn/TurnMoster/TurnMonster.h"
 
 
@@ -65,7 +67,7 @@ TArray<FVector> ATurnTile::GetTileCorner()
 
 void ATurnTile::MonsterSpawn()
 {
-	for (int i = 1; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		float x = FMath::FRandRange(GetTileCorner()[1].X, GetTileCorner()[2].X);
 		float y = FMath::FRandRange(GetTileCorner()[0].Y, GetTileCorner()[2].Y);
@@ -89,20 +91,19 @@ void ATurnTile::MonsterSpawnTable(FVector SpawnLocation)
 
 void ATurnTile::PlayerSpawn()
 {
-	for (int i = 1; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		float x = FMath::FRandRange(GetTileCorner()[0].X, GetTileCorner()[1].X);
 		float y = FMath::FRandRange(GetTileCorner()[0].Y, GetTileCorner()[2].Y);
-		float z = GetTileCorner()[0].Z;
+		float z = GetTileCorner()[0].Z + 185;
 
 		FActorSpawnParameters Params;
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		
-		if (ATestPlayer* TurnTestPlayer = GetWorld()->SpawnActor<ATestPlayer>(TestPlayerFactory,Params))
+		if (ATestPlayer* TestPlayer = GetWorld()->SpawnActor<ATestPlayer>(TestPlayerFactory,Params))
 		{
-			UE_LOG(LogTemp,Error,TEXT("TurnTile Player Spawn Success"));
-			TurnTestPlayer->SetActorLocation(FVector(x,y,z));
-			TurnTestPlayer->SetActorScale3D(FVector(2.5,2.5,2.5));
+			TestPlayer->SetActorLocation(FVector(x,y,z));
+			TestPlayer->SetActorScale3D(FVector(2.0,2.0,2.0));
 		}
 		else{UE_LOG(LogTemp,Error,TEXT("TurnTile Player Spawn Failed"));}
 		DrawDebugSphere(GetWorld(),FVector(x,y,z), 100, 20, FColor::Blue,false,2,2);

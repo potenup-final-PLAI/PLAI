@@ -22,6 +22,7 @@ void ATurnPlayer::BeginPlay()
 void ATurnPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	AddMovementInput(FVector(0.0f, 0.0f, -10.0f));
 }
 
 // Called to bind functionality to input
