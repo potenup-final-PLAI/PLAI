@@ -30,12 +30,12 @@ void UActionUI::OnClickedTurnEnd()
 {
 	// 플레이어이다 || 로컬플레이어가 아니라면 
 	auto* player = Cast<ABattlePlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	// if (player != turnManager->curUnit)
-	// {
-	// 	// 플레이어가 아니니까 return
-	// 	UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
-	// 	return;
-	// }
+	if (player->GetUniqueID() != turnManager->curUnit->GetUniqueID())
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
 
 	player->Server_OnClickedTurnEnd();
 }
@@ -43,12 +43,12 @@ void UActionUI::OnClickedTurnEnd()
 void UActionUI::OnClickedMove()
 {
 	auto* player = Cast<ABattlePlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	// if (player == turnManager->curUnit)
-	// {
-	// 	// 플레이어가 아니니까 return
-	// 	UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
-	// 	return;
-	// }
+	if (player->GetUniqueID() != turnManager->curUnit->GetUniqueID())
+	{
+		// 플레이어가 아니니까 return
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
+		return;
+	}
 	
 	player->Server_OnClickedMove();
 }
@@ -56,7 +56,7 @@ void UActionUI::OnClickedMove()
 void UActionUI::OnClickedBaseAttack()
 {
 	auto* player = Cast<ABattlePlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (player == turnManager->curUnit)
+	if (player->GetUniqueID() != turnManager->curUnit->GetUniqueID())
 	{
 		// 플레이어가 아니니까 return
 		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
@@ -71,7 +71,7 @@ void UActionUI::OnClickedBaseAttack()
 void UActionUI::OnClickedPoison()
 {
 	auto* player = Cast<ABattlePlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (player == turnManager->curUnit)
+	if (player->GetUniqueID() != turnManager->curUnit->GetUniqueID())
 	{
 		// 플레이어가 아니니까 return
 		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
@@ -84,7 +84,7 @@ void UActionUI::OnClickedPoison()
 void UActionUI::OnClickedFatal()
 {
 	auto* player = Cast<ABattlePlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (player == turnManager->curUnit)
+	if (player->GetUniqueID() != turnManager->curUnit->GetUniqueID())
 	{
 		// 플레이어가 아니니까 return
 		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));
@@ -98,7 +98,7 @@ void UActionUI::OnClickedFatal()
 void UActionUI::OnClickedRupture()
 {
 	auto* player = Cast<ABattlePlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (player == turnManager->curUnit)
+	if (player->GetUniqueID() != turnManager->curUnit->GetUniqueID())
 	{
 		// 플레이어가 아니니까 return
 		UE_LOG(LogTemp, Warning, TEXT("Block!!! Is Not Player"));

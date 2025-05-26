@@ -15,6 +15,7 @@
 #include "Battle/UI/ReasonUI.h"
 #include "Battle/UI/WorldDamageUI.h"
 #include "Battle/UI/WorldDamageUIActor.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/HorizontalBox.h"
@@ -1198,21 +1199,22 @@ void ABaseBattlePawn::ServerRPC_SeeMoveRange_Implementation(int32 move)
 		UE_LOG(LogTemp, Error, TEXT("Multicast_SeeMoveRange: gridTileManager is null!"));
 		return;
 	}
-	
-	TArray<FIntPoint> tileCoords;
-
-	// 서버에서만 로직 수행
-	SeeMoveRange(moveRange, tileCoords);
 
 	// 좌표 정보만 클라에 전송
-	Multicast_SeeMoveRange(tileCoords);
+	Multicast_SeeMoveRange();
 }
-void ABaseBattlePawn::Multicast_SeeMoveRange_Implementation(const TArray<FIntPoint>& tiles)
+void ABaseBattlePawn::Multicast_SeeMoveRange_Implementation()
 {
-	highlightedTiles.Empty();
+	TArray<FIntPoint> tiles;
 
+	// 서버에서만 로직 수행
+	SeeMoveRange(moveRange, tiles);
+
+	highlightedTiles.Empty();
+	
 	for (const FIntPoint& coord : tiles)
 	{
+		NET_PRINTLOG(TEXT("coord : %d, %d"), coord.X, coord.Y);
 		AGridTile* tile = gridTileManager->GetTile(coord.X, coord.Y);
 		if (tile)
 		{
@@ -1223,9 +1225,10 @@ void ABaseBattlePawn::Multicast_SeeMoveRange_Implementation(const TArray<FIntPoi
 }
 void ABaseBattlePawn::SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles)
 {
+	tiles.Empty();
 	highlightedTiles.Empty();
 
-	UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange를 호출하는 자신 %s currentTile %s"), *this->GetActorNameOrLabel(), *currentTile->GetActorNameOrLabel());
+	//UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange를 호출하는 자신 %s currentTile %s"), *this->GetActorNameOrLabel(), *currentTile->GetActorNameOrLabel());
 	FIntPoint coord = gridTileManager->GetTileLoc(currentTile);
 	int32 startX = coord.X;
 	int32 startY = coord.Y;

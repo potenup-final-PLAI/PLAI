@@ -130,11 +130,11 @@ void ABattlePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 void ABattlePlayer::Server_OnClickedMove_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Move"));
-	turnManager->curUnit->currentActionMode = EActionMode::Move;
-	turnManager->curUnit->bIsMoveMode = true;
+	this->currentActionMode = EActionMode::Move;
+	this->bIsMoveMode = true;
 	// 범위 보이게 설정
-	turnManager->curUnit->ServerRPC_SeeMoveRange(turnManager->curUnit->moveRange);
-	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"), turnManager->curUnit->moveRange);
+	this->ServerRPC_SeeMoveRange(this->moveRange);
+	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"), this->moveRange);
 }
 
 void ABattlePlayer::Server_OnClickedTurnEnd_Implementation()
@@ -151,7 +151,7 @@ void ABattlePlayer::Server_OnClickedTurnEnd_Implementation()
 		return;
 	}
 	// 버튼 상태 업데이트
-	turnManager->curUnit->currentActionMode = EActionMode::TurnEnd;
+	this->currentActionMode = EActionMode::TurnEnd;
 
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
 	{

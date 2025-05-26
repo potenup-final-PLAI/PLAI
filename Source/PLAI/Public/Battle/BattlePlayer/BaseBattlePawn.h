@@ -312,7 +312,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SeeMoveRange(int32 move);
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_SeeMoveRange(const TArray<FIntPoint>& tiles);
+	void Multicast_SeeMoveRange();
 	void SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles);
 	void ClearGridTile();
 	//--------------이동 및 공격------------------
