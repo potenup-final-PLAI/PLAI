@@ -34,4 +34,7 @@ public:
 	TArray<FVector>GetTileCorner();
 
 	void MonsterSpawn();
+    void MonsterSpawnTable();
+	
+	void PlayerSpawn();
 };

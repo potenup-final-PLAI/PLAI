@@ -33,6 +33,7 @@ void ATurnTile::Tick(float DeltaTime)
 	{
 		// GetTileCorner();
 		MonsterSpawn();
+		PlayerSpawn();
 		CurrentTime = 0;
 	}
 }
@@ -47,13 +48,6 @@ TArray<FVector> ATurnTile::GetTileCorner()
 	FVector ScaledMin = GetActorLocation() + Scale * LocalOrigin + FVector(0,0,Scale.Z*LocalExtend.Z - Scale.Z*LocalOrigin.Z);
 	FVector ScaledOrigin = GetActorLocation()                    + FVector(0,0,Scale.Z*LocalExtend.Z - Scale.Z*LocalOrigin.Z)/2;
 	FVector ScaledExtend = GetActorLocation() + Scale * LocalExtend;
-	
-	// UE_LOG(LogTemp,Warning,TEXT("ATurnTile::GetLocalBounds ScaledMin [%s] ScaledExtend [%s]"
-	// 						 ""),*ScaledMin.ToString(), *ScaledExtend.ToString());
-
-	// DrawDebugSphere(GetWorld(),ScaledMin,    100, 20, FColor::Red,false,2,2);
-	// DrawDebugSphere(GetWorld(),GetActorLocation(), 100, 20, FColor::Red,false,2,2);
-	// DrawDebugSphere(GetWorld(),ScaledOrigin, 100, 20, FColor::Red,false,2,2);
 
 	TArray<FVector> Corners;
 	Corners.Add(ScaledMin);
@@ -74,3 +68,23 @@ void ATurnTile::MonsterSpawn()
 	}
 }
 
+void ATurnTile::MonsterSpawnTable()
+{
+	
+}
+
+void ATurnTile::PlayerSpawn()
+{
+	for (int i = 1; i < 4; i++)
+	{
+		float x = FMath::FRandRange(GetTileCorner()[0].X, GetTileCorner()[1].X);
+		float y = FMath::FRandRange(GetTileCorner()[0].Y, GetTileCorner()[2].Y);
+		float z = GetTileCorner()[0].Z;
+		DrawDebugSphere(GetWorld(),FVector(x,y,z), 100, 20, FColor::Blue,false,2,2);
+	}
+}
+
+
+// DrawDebugSphere(GetWorld(),ScaledMin,    100, 20, FColor::Red,false,2,2);
+// DrawDebugSphere(GetWorld(),GetActorLocation(), 100, 20, FColor::Red,false,2,2);
+// DrawDebugSphere(GetWorld(),ScaledOrigin, 100, 20, FColor::Red,false,2,2);

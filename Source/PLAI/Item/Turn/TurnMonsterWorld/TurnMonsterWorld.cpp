@@ -24,7 +24,7 @@ void ATurnMonsterWorld::BeginPlay()
 	TargetLocation = RandomLoc(500,500);
 }
 
-// Called every frame
+// Called very frame
 void ATurnMonsterWorld::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

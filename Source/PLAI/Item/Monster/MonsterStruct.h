@@ -32,6 +32,9 @@ public:
 	int32 gold = 100;
 
 	UPROPERTY(EditAnywhere)
+	bool bTurn = false; 
+
+	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<AMonster>>MonsterFactory;
 
 	UPROPERTY(EditAnywhere)
