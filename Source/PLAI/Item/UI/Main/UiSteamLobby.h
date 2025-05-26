@@ -39,7 +39,12 @@ public:
 	UFUNCTION()
 	void OnFindRoom();
 
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* RoomName;
+
 	
+	// UFUNCTION()
+	// void OnFindRoom();
 	
 	// UPROPERTY(meta = (BindWidget))
  //    class UButton* Button_JoinRoom;

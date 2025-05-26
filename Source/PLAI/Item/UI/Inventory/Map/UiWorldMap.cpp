@@ -53,7 +53,7 @@ void UUiWorldMap::SetRefreshPlayerList()
 		{
 			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
 			{
-				if (!TP -> IsLocallyControlled())return;
+				// if (!TP -> IsLocallyControlled())return;
 				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
 
 				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);

@@ -4,6 +4,7 @@
 
 #include "UiMain.h"
 #include "Components/Button.h"
+#include "Components/EditableTextBox.h"
 #include "Components/ScrollBox.h"
 #include "Components/TextBlock.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
@@ -40,8 +41,10 @@ void UUiSteamLobby::OnCreateRoom()
 		// UiMain->LoginComp->TestPlayer->LogItemComp->GetInvenInfo();
 		// UiMain->LoginComp->TestPlayer->LogItemComp->GetEquipInfo();
 		UiMain->LoginComp->TestPlayer->LogItemComp->GetUserLevel();
+
+		FString TitleName = RoomName->GetText().ToString();
 		
-		WorldGi->CreateSession(FString("PLAI Game"),4);
+		WorldGi->CreateSession(TitleName,4);
 		WorldGi->UserFullInfoGi = UiMain->LoginComp->TestPlayer->LoginComp->UserFullInfo;
 		
 		WorldGi->bLoginMe = true;
