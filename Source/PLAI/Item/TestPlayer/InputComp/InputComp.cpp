@@ -17,6 +17,8 @@
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/Npc/NpcCharacter.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/Turn/TurnMonsterWorld/TurnMonsterWorld.h"
+#include "PLAI/Item/Turn/TurnTile/TurnTile.h"
 #include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/InputUi/InputUi.h"
@@ -161,6 +163,19 @@ void UInputComp::On_LeftMouseStart()
 	FHitResult Hit;
 	Pc->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 
+	// 턴제 몬스터 찾기
+	if (ATurnMonsterWorld* TurnMonsterWorld = Cast<ATurnMonsterWorld>(Hit.GetActor()))
+	{
+		UE_LOG(LogTemp,Warning,TEXT("InputComp 턴몬스터 월드 찾음 %s"),*TurnMonsterWorld->GetName())
+		ATurnTile* TurnTile = Cast<ATurnTile>(UGameplayStatics::GetActorOfClass(GetWorld(),ATurnTile::StaticClass()));
+		TestPlayer->SetActorLocation(TurnTile->GetActorLocation());
+	}
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("InputComp 턴몬스터 못월드 찾음 "))
+	}
+
+	// Npc 찾기
 	ANpcCharacter* NpcCharacter = Cast<ANpcCharacter>(Hit.GetActor());
 	if (!NpcCharacter)
 	{
@@ -173,9 +188,7 @@ void UInputComp::On_LeftMouseStart()
 			if (ANpcCharacter* Npc = Cast<ANpcCharacter>(Actor))
 			{
 				if (Npc->NpcUiMaster)
-				{
-					Npc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden);
-				}
+				{ Npc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden); }
 			}
 		}
 	}

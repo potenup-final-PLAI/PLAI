@@ -36,9 +36,7 @@ void UUiWorldMap::NativeConstruct()
 	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
     SetRefreshPlayerList();
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
-	{
-		TestPlayer->TestInputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap);
-	}
+	{ TestPlayer->TestInputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap); }
 	MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.65);
 }
 
