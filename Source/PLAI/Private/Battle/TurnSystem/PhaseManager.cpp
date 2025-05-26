@@ -12,6 +12,7 @@
 #include "Battle/UI/CycleAndTurn.h"
 #include "Battle/UI/MainBattleUI.h"
 #include "Battle/UI/WorldDamageUIActor.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Enemy/BaseEnemy.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
@@ -86,6 +87,8 @@ void AUPhaseManager::OnRep_CurrentPhase()
 void AUPhaseManager::SetPhase(EBattlePhase phase)
 {
 	currentPhase = phase;
+
+	NET_PRINTLOG(TEXT("AUPhaseManager::SetPhase currentPhase : %s"), *UEnum::GetValueAsString(phase));
 
 	switch (currentPhase)
 	{
@@ -247,6 +250,7 @@ ABaseBattlePawn* AUPhaseManager::PopNextAliveUnit()
 
 void AUPhaseManager::StartBattle()
 {
+	NET_PRINTLOG(TEXT("AUPhaseManager::StartBattle"));
 	ABaseBattlePawn* tempUnit = PopNextAliveUnit();
 	if (!tempUnit)
 	{
@@ -274,6 +278,7 @@ void AUPhaseManager::TurnPorcessing(ABaseBattlePawn* unit)
 
 void AUPhaseManager::StartPlayerPhase()
 {
+	if (!HasAuthority()) return;
 	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : Start PlayerPhase"));
 	UE_LOG(LogTemp, Warning, TEXT("PlayerTurn Start Unit Name : %s"),*turnManager->curUnit->GetActorNameOrLabel());
 
@@ -329,6 +334,7 @@ void AUPhaseManager::ServerRPC_EndPlayerPhase_Implementation()
 
 void AUPhaseManager::StartEnemyPhase()
 {
+	if (!HasAuthority()) return;
 	UE_LOG(LogTemp, Warning, TEXT("Start Enemy Turn"));
 	UE_LOG(LogTemp, Warning, TEXT("EnemyTurn Start Unit Name : %s"),*turnManager->curUnit->GetActorNameOrLabel());
 
@@ -369,22 +375,10 @@ void AUPhaseManager::ServerRPC_EndEnemyPhase_Implementation()
 	}
 	turnManager->curUnit = nextUnit;
 
-
+	SortUnitTurnEnd();
+	
 	SetPhase(EBattlePhase::TurnProcessing);
 	UE_LOG(LogTemp, Warning, TEXT("End Enemy Phase"));
-
-	SortUnitTurnEnd();
-	// Casting을 통해 현재 유닛이 player 또는 enemy라면 그쪽 함수 실행
-	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
-	{
-		// PlayerPhase 시작
-		StartPlayerPhase();
-	}
-	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
-	{
-		// EnemyPhase 시작
-		StartEnemyPhase();
-	}
 }
 
 void AUPhaseManager::BattleEnd()

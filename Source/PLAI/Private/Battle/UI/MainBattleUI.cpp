@@ -3,7 +3,9 @@
 
 #include "Battle/UI/MainBattleUI.h"
 
+#include "Battle/UI/ReasonUI.h"
 #include "Components/HorizontalBox.h"
+#include "Components/ScrollBox.h"
 
 void UMainBattleUI::NativeConstruct()
 {
@@ -13,8 +15,17 @@ void UMainBattleUI::NativeConstruct()
 
 void UMainBattleUI::AddAP()
 {
-	// 총알 위젯을 만들고
 	UUserWidget* apUI = CreateWidget(GetWorld(), apFactory);
-	// 만들어진 총알 위젯을 패널에 자식으로 붙이자
-	HB_AP->AddChildToHorizontalBox(apUI);
+	if (HB_AP && HB_AP->GetChildrenCount() < 5) HB_AP->AddChildToHorizontalBox(apUI);
+}
+
+void UMainBattleUI::AddReason(FString dialogue)
+{
+	UE_LOG(LogTemp, Warning, TEXT("IN AddReason"));
+	if (UReasonUI* reason = CreateWidget<UReasonUI>(GetWorld(), reasonFactory))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Cast Reason"));
+		reason->SetText(dialogue);
+		SB_Reason->AddChild(reason);
+	}
 }

@@ -93,7 +93,6 @@ public:
 	// 플레이어 첫 유닛 실행
 	void StartPlayerTurn();
 
-
 	//--------------Enemy Turn---------------------
 	// 적 첫 유닛 실행
 	void StartEnemyTurn();
@@ -101,4 +100,11 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_CameraChange(class APawn* target);
+
+
+	UPROPERTY()
+	APawn* tempBattlePlayer;
+
+	uint32 a;
+	uint32 b;
 };

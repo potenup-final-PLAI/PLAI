@@ -4,7 +4,6 @@
 #include "Battle/TurnSystem/TurnManager.h"
 
 #include "BaseBattlePawn.h"
-#include "GridTile.h"
 #include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Battle/UI/BattleHUD.h"
@@ -12,6 +11,7 @@
 #include "Enemy/BaseEnemy.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/BattlePlayer.h"
 
@@ -81,47 +81,71 @@ void ATurnManager::MutliCastRPC_UpdateWhoTurn_Implementation(const FString& turn
 	}
 }
 
-
 void ATurnManager::StartPlayerTurn()
 {
-	// if (!HasAuthority() || curTurnState != ETurnState::None)
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("!HasAuthority || curTurnState = : %s"), *UEnum::GetValueAsString(curTurnState));
-	// 	return;
-	// }
-
+	
+	if (!HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Player Turn But HasAuthority is Not"));
+		return;
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Player Turn"));
+
 	// Player Turn으로 state Update
 	SetTurnState(ETurnState::PlayerTurn);
 	// Turn UI 업데이트
 	FString s = Cast<ABattlePlayer>(curUnit) ? TEXT("Player") : TEXT("Enemy");
 	
 	MutliCastRPC_UpdateWhoTurn(s);
+
 	
 	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
+		if (nullptr == playerPawn->GetController())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("nullptr == bpc"));
+			return;
+		}
+		
 		UE_LOG(LogTemp, Warning, TEXT("TurnManager : playerPawn"));
-		if (ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(playerPawn->GetOwner()))
+		// if (playerPawn->GetController() != UGameplayStatics::GetPlayerController(this, 0))
+		if (!playerPawn->GetController()->IsLocalController())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("This Pawn is not controlled by local player"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("This Pawn is controlled by local player"));
+		}
+
+		if (auto* battlePC = Cast<ABattlePlayerController>(playerPawn->GetController()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("TurnManager : battlePC"));
-			FTimerHandle possessHandle;
-			GetWorld()->GetTimerManager().ClearTimer(possessHandle);
-
-			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
-			{
-				battlePC->Possess(playerPawn);
-
-				PRINTLOG(TEXT("Current Turn Player Name : %s"), *playerPawn->MyName);
-				
-				if (curUnit->IsValidLowLevelFast())
-				{
-					UE_LOG(LogTemp, Warning,TEXT("Safe to call OnTurnStart on %s"),*curUnit->GetName());
-					UE_LOG(LogTemp, Warning,TEXT("turnManager : curUnit %s, currentTile : %s "),*playerPawn->GetActorNameOrLabel(), *playerPawn->currentTile->GetActorNameOrLabel());
-					auto* playerCamera = battlePC->GetPawnOrSpectator();
-					curUnit->OnTurnStart();
-					MulticastRPC_CameraChange(playerCamera);
-				}
-			}), 1.0f, false);
+			//battlePC->Possess(playerPawn);
+			
+			auto* playerCamera = battlePC->GetPawnOrSpectator();
+			MulticastRPC_CameraChange(playerCamera);
+			
+			battlePC->MulticastRPC_StartPlayerTurn(playerPawn);
+			// FTimerHandle possessHandle;
+			// GetWorld()->GetTimerManager().ClearTimer(possessHandle);
+			//
+			// GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
+			// {
+			// 	battlePC->Possess(playerPawn);
+			//
+			// 	PRINTLOG(TEXT("Current Turn Player Name : %s"), *playerPawn->MyName);
+			// 	
+			// 	if (playerPawn->IsValidLowLevelFast())
+			// 	{
+			// 		UE_LOG(LogTemp, Warning,TEXT("Safe to call OnTurnStart on %s"),*playerPawn->GetName());
+			// 		UE_LOG(LogTemp, Warning,TEXT("turnManager : curUnit %s, currentTile : %s "),*playerPawn->GetActorNameOrLabel(), *playerPawn->currentTile->GetActorNameOrLabel());
+			// 		auto* playerCamera = battlePC->GetPawnOrSpectator();
+			// 		playerPawn->OnTurnStart();
+			// 		MulticastRPC_CameraChange(playerCamera);
+			// 	}
+			// }), 1.5f, false);
 		}
 	}
 	else
@@ -130,13 +154,9 @@ void ATurnManager::StartPlayerTurn()
 	}
 }
 
-
 void ATurnManager::StartEnemyTurn()
 {
-	// if (curTurnState != ETurnState::None)
-	// {
-	// 	return;
-	// }
+	if (!HasAuthority()) return;
 	UE_LOG(LogTemp, Warning, TEXT("TurnManager : Start Enemy Turn"));
 	// EnemyTurn으로 State 업데이트
 	SetTurnState(ETurnState::EnemyTurn);
@@ -150,24 +170,19 @@ void ATurnManager::StartEnemyTurn()
 		// FSM 활성화
 		if (curUnit)
 		{
-			if (APlayerController* pc = GetWorld()->GetFirstPlayerController())
+			FTimerHandle possessHandle;
+			GetWorld()->GetTimerManager().ClearTimer(possessHandle);
+			
+			// 이후에 값이 변경 및 삭제 될 수 있기 때문에 값 복사로 가져와서 람다 내에서 사용
+			GetWorld()->GetTimerManager().SetTimer(possessHandle, FTimerDelegate::CreateLambda([=, this]()
 			{
-				FTimerHandle possessHandle;
-				GetWorld()->GetTimerManager().ClearTimer(possessHandle);
-				// 이후에 값이 변경 및 삭제 될 수 있기 때문에 값 복사로 가져와서 람다 내에서 사용
-				GetWorld()->GetTimerManager().SetTimer(
-					possessHandle, FTimerDelegate::CreateLambda([=, this]()
-					{
-						if (pc && curUnit)
-						{
-							pc->Possess(curUnit);
-							auto* playerCamera = pc->GetPawnOrSpectator();
-							curUnit->OnTurnStart();
-							MulticastRPC_CameraChange(curUnit);
-							UE_LOG(LogTemp, Warning, TEXT("possess unit %s"),*curUnit->GetActorNameOrLabel());
-						}
-					}), 1.0f, false);
-			}
+				if (curUnit)
+				{
+					curUnit->OnTurnStart();
+					MulticastRPC_CameraChange(curUnit);
+					UE_LOG(LogTemp, Warning, TEXT("possess unit %s"),*curUnit->GetActorNameOrLabel());
+				}
+			}), 1.5f, false);
 		}
 	}
 	else

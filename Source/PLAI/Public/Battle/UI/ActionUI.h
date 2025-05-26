@@ -46,28 +46,10 @@ public:
 	void OnClickedBaseAttack();
 	//-----------SecondSkill Button------------------
 	UPROPERTY(meta = (BindWidget))
-	class UButton* btn_Paralysis;
-
-	UFUNCTION()
-	void OnClickedParalysis();
-	//-----------SecondSkill Button------------------
-	UPROPERTY(meta = (BindWidget))
 	class UButton* btn_Poison;
 
 	UFUNCTION()
 	void OnClickedPoison();
-	//-----------SecondSkill Button------------------
-	UPROPERTY(meta = (BindWidget))
-	class UButton* btn_Vulnerable;
-	
-	UFUNCTION()
-	void OnClickedVulnerable();
-	//-----------SecondSkill Button------------------
-	UPROPERTY(meta = (BindWidget))
-	class UButton* btn_Weakening;
-
-	UFUNCTION()
-	void OnClickedWeakening();
 	//-----------SecondSkill Button------------------
 	UPROPERTY(meta = (BindWidget))
 	class UButton* btn_Fatal;
@@ -80,16 +62,4 @@ public:
 	
 	UFUNCTION()
 	void OnClickedRupture();
-	//-----------SecondSkill Button------------------
-	UPROPERTY(meta = (BindWidget))
-	class UButton* btn_Roar;
-
-	UFUNCTION()
-	void OnClickedRoar();
-	//-----------SecondSkill Button------------------
-	UPROPERTY(meta = (BindWidget))
-	class UButton* btn_BattleCry;
-
-	UFUNCTION()
-	void OnClickedBattleCry();
 };

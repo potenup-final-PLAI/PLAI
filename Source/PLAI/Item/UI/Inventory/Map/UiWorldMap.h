@@ -16,7 +16,7 @@ class PLAI_API UUiWorldMap : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UUiWorldMap(const FObjectInitializer& FOI);
+	// UUiWorldMap(const FObjectInitializer& FOI);
 
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* MaterialMapInterface;

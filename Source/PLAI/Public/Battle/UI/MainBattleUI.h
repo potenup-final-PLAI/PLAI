@@ -32,4 +32,12 @@ public:
 	class TSubclassOf<UUserWidget> apFactory;
 
 	void AddAP();
+
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* SB_Reason;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UReasonUI> reasonFactory;
+	void AddReason(FString dialogue);
+
 };

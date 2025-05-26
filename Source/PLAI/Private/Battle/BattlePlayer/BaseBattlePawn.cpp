@@ -12,11 +12,13 @@
 #include "Battle/UI/BattlePlayerInfoUI.h"
 #include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/MainBattleUI.h"
+#include "Battle/UI/ReasonUI.h"
 #include "Battle/UI/WorldDamageUI.h"
 #include "Battle/UI/WorldDamageUIActor.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/HorizontalBox.h"
+#include "Components/ScrollBox.h"
 #include "Components/WidgetComponent.h"
 #include "Enemy/BaseEnemy.h"
 #include "Enemy/BattleEnemyAnimInstance.h"
@@ -143,6 +145,7 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 
 void ABaseBattlePawn::OnTurnStart()
 {
+	if (!IsLocallyControlled()) return;
 	if (!turnManager)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("turnManager is Not Set"));
@@ -231,12 +234,12 @@ void ABaseBattlePawn::OnTurnEnd()
 	// 여러 번 호출 방지
 	if (bTurnEnded)
 	{
-		
 		return;
 	}
+	
 	bTurnEnded = true;
-	// 타일 범위 띄워 놨었다면 지우기
-	ClearGridTile();
+	
+	MultiCastRPC_ClearGridTile();
 	
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *GetName());
 	// 입력 막고 FSM 종료
@@ -254,7 +257,7 @@ void ABaseBattlePawn::OnTurnEnd()
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
 	{
-		// EnemyPhaseEnd
+		MultiCastRPC_UpdateReason();
 		phaseManager->ServerRPC_EndEnemyPhase();
 	}
 }
@@ -305,30 +308,14 @@ void ABaseBattlePawn::OnMouseLeftClick()
 			PlayerBaseAttack(hitInfo);
 			UE_LOG(LogTemp, Warning, TEXT("OnMouseLeftClick BaseAttack"));
 			break;
-		case EActionMode::Paralysis:
-			UE_LOG(LogTemp, Warning, TEXT("OnMouseLeftClick Paralysis"));
-			PlayerParalysis(hitInfo);
-			break;
 		case EActionMode::Poison:
 			PlayerPoison(hitInfo);
-			break;
-		case EActionMode::Vulnerable:
-			PlayerVulnerable(hitInfo);
-			break;
-		case EActionMode::Weakening:
-			PlayerWeaking(hitInfo);
 			break;
 		case EActionMode::Fatal:
 			PlayerFatal(hitInfo);
 			break;
 		case EActionMode::Rupture:
 			PlayerRupture(hitInfo);
-			break;
-		case EActionMode::Roar:
-			PlayerRoar(hitInfo);
-			break;
-		case EActionMode::BattleCry:
-			PlayerBattleCry(hitInfo);
 			break;
 		}
 	}
@@ -437,31 +424,6 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 	}
 }
 
-void ABaseBattlePawn::PlayerParalysis(FHitResult& hitInfo)
-{
-	UE_LOG(LogTemp, Warning, TEXT("PlayerParalysis In"));
-	// 공격 대상이 enemy라면
-	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
-	{
-		if (enemy->enemyAnim)
-		{
-			enemy->enemyAnim->actionMode = currentActionMode;
-		}
-		UE_LOG(LogTemp, Warning, TEXT("PlayerParalysis In Enemy"));
-		EnemyApplyAttack(enemy, EActionMode::Paralysis);
-	}
-	// 공격 대상이 player라면
-	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
-		UE_LOG(LogTemp, Warning, TEXT("PlayerParalysis In Player"));
-		PlayerApplyAttack(player, EActionMode::Paralysis);
-	}
-}
-
 void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 {
 	UE_LOG(LogTemp, Warning, TEXT("PlayerPoison In"));
@@ -484,50 +446,6 @@ void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 			player->playerAnim->actionMode = currentActionMode;
 		}
 		EnemyApplyAttack(player, EActionMode::Poison);
-	}
-}
-
-void ABaseBattlePawn::PlayerVulnerable(FHitResult& hitInfo)
-{
-	// 공격 대상이 enemy라면
-	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
-	{
-		if (enemy->enemyAnim)
-		{
-			enemy->enemyAnim->actionMode = currentActionMode;
-		}
-		EnemyApplyAttack(enemy, EActionMode::Vulnerable);
-	}
-	// 공격 대상이 player라면
-	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
-		PlayerApplyAttack(player, EActionMode::Vulnerable);
-	}
-}
-
-void ABaseBattlePawn::PlayerWeaking(FHitResult& hitInfo)
-{
-	// 공격 대상이 enemy라면
-	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
-	{
-		if (enemy->enemyAnim)
-		{
-			enemy->enemyAnim->actionMode = currentActionMode;
-		}
-		EnemyApplyAttack(enemy, EActionMode::Weakening);
-	}
-	// 공격 대상이 player라면
-	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
-		PlayerApplyAttack(player, EActionMode::Weakening);
 	}
 }
 
@@ -574,51 +492,6 @@ void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
 		PlayerApplyAttack(player, EActionMode::Rupture);
 	}
 }
-
-void ABaseBattlePawn::PlayerRoar(FHitResult& hitInfo)
-{
-	// 공격 대상이 enemy라면
-	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
-	{
-		if (enemy->enemyAnim)
-		{
-			enemy->enemyAnim->actionMode = currentActionMode;
-		}
-		EnemyApplyAttack(enemy, EActionMode::Roar);
-	}
-	// 공격 대상이 player라면
-	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
-		PlayerApplyAttack(player, EActionMode::Roar);
-	}
-}
-
-void ABaseBattlePawn::PlayerBattleCry(FHitResult& hitInfo)
-{
-	// 공격 대상이 enemy라면
-	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
-	{
-		if (enemy->enemyAnim)
-		{
-			enemy->enemyAnim->actionMode = currentActionMode;
-		}
-		EnemyApplyAttack(enemy, EActionMode::BattleCry);
-	}
-	// 공격 대상이 player라면
-	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
-		PlayerApplyAttack(player, EActionMode::BattleCry);
-	}
-}
-
 
 void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 {
@@ -705,8 +578,7 @@ void ABaseBattlePawn::MultiCastRPC_EnemyGetDamage_Implementation(
 		UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),*UEnum::GetValueAsString(enemy->enemyLifeState));
 	}
 	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
-	if (auto* anim = Cast<UBattleEnemyAnimInstance>(
-			enemy->meshComp->GetAnimInstance()))
+	if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
 	{
 		anim->actionMode = currentActionMode;
 	}
@@ -745,11 +617,6 @@ void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(
 		player->playerAnim->lifeState = ELifeState::Dead;
 		UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(player->playerLifeState));
 	}
-	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
-	if (auto* anim = Cast<UBattlePlayerAnimInstance>(player->meshComp->GetAnimInstance()))
-	{
-		anim->actionMode = currentActionMode;
-	}
 }
 
 void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
@@ -776,18 +643,6 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 
 	switch (attackType)
 	{
-	case EActionMode::Paralysis:
-		// 현재 Ap가 cost보다 크다면 실행
-		UE_LOG(LogTemp, Warning, TEXT("In Paralysis"));
-		if (!player->CanConsumeAP(1))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-			return;
-		}
-		skillMultiplier = 0.8f;
-	// 상대에게 상태이상 및 몇 턴동안 진행 될지 추가
-		player->AddStatusEffect(EStatusEffect::Weakening, 2);
-		break;
 	case EActionMode::Poison:
 		if (!player->CanConsumeAP(1))
 		{
@@ -795,22 +650,6 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 			return;
 		}
 		player->AddStatusEffect(EStatusEffect::Poison, 3);
-		break;
-	case EActionMode::Vulnerable:
-		if (!player->CanConsumeAP(1))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-			return;
-		}
-		player->AddStatusEffect(EStatusEffect::Vulnerable, 2);
-		break;
-	case EActionMode::Weakening:
-		if (!player->CanConsumeAP(1))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-			return;
-		}
-		player->AddStatusEffect(EStatusEffect::Weakening, 2);
 		break;
 	case EActionMode::Fatal:
 		if (!player->CanConsumeAP(2))
@@ -830,25 +669,6 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 		skillMultiplier = 1.5f;
 		player->AddStatusEffect(EStatusEffect::Vulnerable, 1);
 		break;
-	case EActionMode::Roar:
-		if (!player->CanConsumeAP(1))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-			return;
-		}
-		player->AddStatusEffect(EStatusEffect::Weakening, 2);
-		break;
-	case EActionMode::BattleCry:
-		if (!player->CanConsumeAP(1))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
-			return;
-		}
-	// 자신과 동료들에게 버프 부여
-	// 주위 동료들에게 피해 증가 버프 부여
-	// 작성해야함 레벨에 있는 unit들 다 모아서 enemy일 때 반복문으로 버프주면 될듯
-		player->AddStatusEffect(EStatusEffect::Angry, 1);
-		break;
 	default:
 		// 기본 타격 스킬 배율
 		skillMultiplier = 1.0f;
@@ -857,23 +677,12 @@ void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
 
 	// AP 감소 UI에 반영
 	InitAPUI();
-
-	// Rour와 BattleCry는 비공격스킬 및 버프스킬이므로 return 시키면 될듯?
-	if (attackType == EActionMode::Roar || attackType ==
-		EActionMode::BattleCry)
-	{
-		return;
-	}
-
-
+	
 	CalculateAndApplyDamage(enemy, atk, skillMultiplier, critical, criticalDamage);
 
 	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
 	currentActionMode = EActionMode::None;
-	if (player->playerAnim)
-	{
-		player->playerAnim->actionMode = currentActionMode;
-	}
+	if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
 }
 void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType)
 {
@@ -970,13 +779,10 @@ void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode 
 
 	// 대미지 처리
 	CalculateAndApplyDamage(player, atk, skillMultiplier, critical, criticalDamage);
-
+	
 	// 대미지를 줬다면 None으로 변경
 	currentActionMode = EActionMode::None;
-	if (enemy->enemyAnim)
-	{
-		enemy->enemyAnim->actionMode = currentActionMode;
-	}
+	if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
 }
 
 void ABaseBattlePawn::CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk, float skillMultiplier, float criticalRate, float criticalDamage)
@@ -1005,14 +811,10 @@ void ABaseBattlePawn::AddStatusEffect(EStatusEffect newEffect, int32 duration)
 	if (activeStatusEffects.Contains(newEffect))
 	{
 		// 이미 있으면 지속시간 갱신 or 덧붙이기
-		activeStatusEffects[newEffect] = FMath::Max(
-			activeStatusEffects[newEffect], duration);
+		activeStatusEffects[newEffect] = FMath::Max(activeStatusEffects[newEffect], duration);
 		// UEnum로그를 찍기 위해 enum 메타데이터를 얻어서 Log찍는 과정 
 		UEnum* enumPtr = StaticEnum<EStatusEffect>();
-		if (enumPtr) UE_LOG(LogTemp, Warning,
-		                    TEXT("In AddStatusEffect : %s, Duration : %d"),
-		                    *enumPtr->GetNameStringByValue(static_cast<int64>(
-			                    newEffect)), activeStatusEffects[newEffect]);
+		if (enumPtr) UE_LOG(LogTemp, Warning,TEXT("In AddStatusEffect : %s, Duration : %d"),*enumPtr->GetNameStringByValue(static_cast<int64>(newEffect)), activeStatusEffects[newEffect]);
 	}
 	else
 	{
@@ -1221,8 +1023,6 @@ void ABaseBattlePawn::BleedingEnemyProcess(class ABaseEnemy* enemy)
 
 void ABaseBattlePawn::PathFind()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"), pathArray.Num(), moveRange);
-	UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"), bIsMoving ? TEXT("true") : TEXT("false"));
 	if (openArray.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("OpenArray is empty"));
@@ -1235,7 +1035,7 @@ void ABaseBattlePawn::PathFind()
 	while (openArray.Num() > 0 && safetyCounter++ < maxSafetyCount)
 	{
 		UE_LOG(LogTemp, Warning,TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),pathArray.Num(), moveRange);
-		UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"),bIsMoving ? TEXT("true") : TEXT("false"));
+		UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"), bIsMoving ? TEXT("true") : TEXT("false"));
 		if (safetyCounter > maxSafetyCount)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Path Safe Break"));
@@ -1282,7 +1082,6 @@ void ABaseBattlePawn::PathFind()
 void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 {
 	FIntPoint nextCoord = currentTile->gridCoord + offset;
-	// AGridTileManager* tileManger = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
 	
 	if (AGridTile* tile = gridTileManager->map.FindRef(nextCoord))
 	{
@@ -1351,13 +1150,11 @@ void ABaseBattlePawn::BuildPath()
 	// 경로 저장 완료했으면 이동 시작
 	if (pathArray.Num() > moveRange)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("Path too long! moveRange = %d, path length = %d"),
-		       moveRange, pathArray.Num());
+		UE_LOG(LogTemp, Warning,TEXT("Path too long! moveRange = %d, path length = %d"), moveRange, pathArray.Num());
 		pathArray.SetNum(moveRange); // 최대 이동 가능 거리만큼 잘라 이동
 	}
 
-	ClearGridTile();
+	this->ClearGridTile();
 	bIsMoving = true;
 	currentPathIndex = 0;
 }
@@ -1374,13 +1171,11 @@ void ABaseBattlePawn::AddOpenArray(FVector dir)
 
 	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f);
 
-	if (bool isHit = GetWorld()->LineTraceSingleByChannel(
-		hitInfo, start, end, ECC_Visibility, params))
+	if (bool isHit = GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, params))
 	{
 		AGridTile* tile = Cast<AGridTile>(hitInfo.GetActor());
 		// openArray, closeArray에 해당 tile이 없을 때만
-		if (IsValid(tile) && !openArray.Contains(tile) && !closedArray.
-			Contains(tile))
+		if (IsValid(tile) && !openArray.Contains(tile) && !closedArray.Contains(tile))
 		{
 			// 해당 tile에 Cost 구하기
 			tile->SetCost(currentTile, goalTile);
@@ -1389,10 +1184,7 @@ void ABaseBattlePawn::AddOpenArray(FVector dir)
 			int32 i = 0;
 			for (i = 0; i < openArray.Num(); ++i)
 			{
-				if (openArray[i]->tCostValue >= tile->tCostValue)
-				{
-					break;
-				}
+				if (openArray[i]->tCostValue >= tile->tCostValue) break;
 			}
 			openArray.Insert(tile, i);
 		}
@@ -2150,4 +1942,35 @@ void ABaseBattlePawn::MultiCastRPC_SetMyName_Implementation(
 	int32 Count)
 {
 	MyName = FString("NyName : ") + FString::FromInt(Count);
+}
+
+void ABaseBattlePawn::ShowDialoge_Implementation(const FString& dialogue)
+{
+	if (!HasAuthority()) return;
+	MultiCastRPC_ShowDialoge(dialogue);
+}
+
+void ABaseBattlePawn::MultiCastRPC_ShowDialoge_Implementation(const FString& dialogue)
+{
+	// if (!IsLocallyControlled()) return; // 본인만 처리
+	
+	if (hud && hud->mainUI)
+	{
+		hud->mainUI->AddReason(dialogue);
+	}
+}
+
+void ABaseBattlePawn::MultiCastRPC_UpdateReason_Implementation()
+{
+	// EnemyPhaseEnd
+	if (hud && hud->mainUI)
+	{
+		hud->mainUI->SB_Reason->ClearChildren();
+	}
+}
+
+void ABaseBattlePawn::MultiCastRPC_ClearGridTile_Implementation()
+{
+	// 타일 범위 띄워 놨었다면 지우기
+	this->ClearGridTile();
 }

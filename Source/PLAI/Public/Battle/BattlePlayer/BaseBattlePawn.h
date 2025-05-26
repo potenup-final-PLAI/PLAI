@@ -378,6 +378,24 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_SetMyName(int32 Count);
+
+
+	//------------Reason UI------------------
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UReasonUI> reasonUIFactory;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UMainBattleUI> mainUIFactory;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdateReason();
+	UFUNCTION(Server, Reliable)
+	void ShowDialoge(const FString& dialogue);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_ShowDialoge(const FString& dialogue);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_ClearGridTile();
+	
 	
 };
 

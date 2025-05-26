@@ -121,7 +121,7 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 		// 	playerControllers.Add(playerPC);
 		// }
 		APlayerState* ps = playerStates[i];
-		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetOwningController());
+		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetPlayerController());
 		if (battlePC)
 		{
 			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("Before player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
@@ -170,11 +170,11 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 				// Enemy 스폰
 				if (auto* enemy = GetWorld()->SpawnActor<AMonBossPawn>(bossFactory, spawnLoc, FRotator::ZeroRotator))
 				{
-					if (auto* pc = Cast<ABattlePlayerController>(GetWorld()->GetFirstPlayerController()))
-					{
-						enemy->SetOwner(pc);
-						pc->Possess(enemy);
-					}
+					// if (auto* pc = Cast<ABattlePlayerController>(GetWorld()->GetFirstPlayerController()))
+					// {
+					// 	enemy->SetOwner(pc);
+					// 	pc->Possess(enemy);
+					// }
 					// enemy 스피드 설정
 					enemy->speed = FMath::RandRange(1, 10);
 					// 현재 타일 설정

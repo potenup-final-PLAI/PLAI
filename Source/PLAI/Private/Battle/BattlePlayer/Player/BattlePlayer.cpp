@@ -6,7 +6,11 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Battle/TurnSystem/BattlePlayerController.h"
+#include "Battle/TurnSystem/PhaseManager.h"
 #include "Battle/Util/DebugHeader.h"
+#include "Components/RectLightComponent.h"
+#include "Components/SpotLightComponent.h"
+#include "Enemy/BaseEnemy.h"
 #include "Player/BattlePlayerAnimInstance.h"
 
 ABattlePlayer::ABattlePlayer()
@@ -14,27 +18,48 @@ ABattlePlayer::ABattlePlayer()
 	// 플레이어 세팅
 	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("meshComp"));
 	meshComp->SetupAttachment(RootComponent);
-	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100),
-	                                         FRotator(0, -90, 0));
+	meshComp->SetRelativeLocationAndRotation(FVector(0, 0, -100),FRotator(0, -90, 0));
 	meshComp->bReceivesDecals = false;
 	// Mesh Setting
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(
-		TEXT(
-			"'/Game/ParagonGreystone/Characters/Heroes/Greystone/Meshes/Greystone.Greystone'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("'/Game/ParagonGreystone/Characters/Heroes/Greystone/Meshes/Greystone.Greystone'"));
 	if (tempMesh.Succeeded())
 	{
 		meshComp->SetSkeletalMesh(tempMesh.Object);
 	}
 
+	// 라이트 세팅
+	firstRectLightComp = CreateDefaultSubobject<URectLightComponent>(TEXT("firstRectLightComp"));
+	firstRectLightComp->SetupAttachment(RootComponent);
+	firstRectLightComp->SetRelativeLocationAndRotation(FVector(108, 51, 76), FRotator(0, -120, 0));
+	firstRectLightComp->SetIntensity(500);
+	firstRectLightComp->SetAttenuationRadius(200);
+
+	secondRectLightComp = CreateDefaultSubobject<URectLightComponent>(TEXT("secondRectLightComp"));
+	secondRectLightComp->SetupAttachment(RootComponent);
+	secondRectLightComp->SetRelativeLocationAndRotation(FVector(92, -30, 57), FRotator(0, -230, 0));
+	secondRectLightComp->SetIntensity(500);
+	secondRectLightComp->SetAttenuationRadius(200);
+
+	thirdRectLightComp = CreateDefaultSubobject<URectLightComponent>(TEXT("thirdRectLightComp"));
+	thirdRectLightComp->SetupAttachment(RootComponent);
+	thirdRectLightComp->SetRelativeLocationAndRotation(FVector(-83, -14, 57), FRotator(0, -360, 0));
+	thirdRectLightComp->SetIntensity(500);
+	thirdRectLightComp->SetAttenuationRadius(200);
+
+	spotLightComp = CreateDefaultSubobject<USpotLightComponent>(TEXT("spotLightComp"));
+	spotLightComp->SetupAttachment(RootComponent);
+	spotLightComp->SetRelativeLocationAndRotation(FVector(0, 0, 323), FRotator(-90, 360, -360));
+	spotLightComp->SetIntensity(500);
+	spotLightComp->SetAttenuationRadius(550);
+	spotLightComp->SetOuterConeAngle(14);
+	
 	// Animation Instance 세팅
-	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnimInstance(
-		TEXT(
-			"'/Game/JS/Blueprints/Animation/ABP_BattlePlayer.ABP_BattlePlayer_C'"));
+	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnimInstance(TEXT("'/Game/JS/Blueprints/Animation/ABP_BattlePlayer.ABP_BattlePlayer_C'"));
 	if (tempAnimInstance.Succeeded())
 	{
 		meshComp->SetAnimInstanceClass(tempAnimInstance.Class);
 	}
-
+	
 	bReplicates = true;
 }
 
@@ -75,7 +100,7 @@ void ABattlePlayer::NotifyControllerChanged()
 
 	if (ppc)
 	{
-		PRINTLOG(TEXT("ABattlePlayer::NotifyControllerChanged"));
+		NET_PRINTLOG(TEXT("ABattlePlayer::NotifyControllerChanged"));
 		//그 객체를 이용해서 EnhanceInputLocalPlayerSubSystem을 가져온다.
 		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(ppc->GetLocalPlayer());
 		if (subSys)
@@ -86,7 +111,7 @@ void ABattlePlayer::NotifyControllerChanged()
 	}
 	else
 	{
-		PRINTLOG(TEXT("PC is Nullptr"));
+		NET_PRINTLOG(TEXT("PC is Nullptr"));
 	}
 
 	
@@ -101,3 +126,71 @@ void ABattlePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		pi->BindAction(IA_Move, ETriggerEvent::Completed, this, &ABaseBattlePawn::OnMouseLeftClick);
 	}
 }
+
+void ABattlePlayer::Server_OnClickedMove_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Move"));
+	turnManager->curUnit->currentActionMode = EActionMode::Move;
+	turnManager->curUnit->bIsMoveMode = true;
+	// 범위 보이게 설정
+	turnManager->curUnit->ServerRPC_SeeMoveRange(turnManager->curUnit->moveRange);
+	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"), turnManager->curUnit->moveRange);
+}
+
+void ABattlePlayer::Server_OnClickedTurnEnd_Implementation()
+{
+	if (phaseManager->currentPhase == EBattlePhase::BattleEnd)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Block!!! Battle End"));
+		return;
+	}
+	if (phaseManager == nullptr)
+	{
+		UE_LOG(LogTemp, Warning,
+			   TEXT("ActionUI OnClickedTurnEnd phaseManager nullPtr"));
+		return;
+	}
+	// 버튼 상태 업데이트
+	turnManager->curUnit->currentActionMode = EActionMode::TurnEnd;
+
+	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
+	{
+		// 플레이어 턴 종료
+		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
+		OnTurnEnd();
+	}
+	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
+	{
+		// Enemy 턴 종료
+		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
+		enemy->OnTurnEnd();
+	}
+}
+
+void ABattlePlayer::Server_OnClickedBaseAttack_Implementation()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("FirstSkill"));
+	turnManager->curUnit->currentActionMode = EActionMode::BaseAttack;
+}
+
+void ABattlePlayer::Server_OnClickedPoison_Implementation()
+{
+
+	turnManager->curUnit->currentActionMode = EActionMode::Poison;
+}
+
+void ABattlePlayer::Server_OnClickedFatal_Implementation()
+{
+
+	turnManager->curUnit->currentActionMode = EActionMode::Fatal;
+
+}
+
+void ABattlePlayer::Server_OnClickedRupture_Implementation()
+{
+	turnManager->curUnit->currentActionMode = EActionMode::Rupture;
+}
+
+
+

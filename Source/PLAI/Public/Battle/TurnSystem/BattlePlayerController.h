@@ -27,6 +27,7 @@ public:
 	void ServerRPC_NotifyReady();
 	UFUNCTION(Client, Reliable)
 	void Client_StopReadyTimer();
-	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_StartPlayerTurn(class ABattlePlayer* playerPawn);
 	void SetViewTargetMyPawn(APawn* myPawn);
 };

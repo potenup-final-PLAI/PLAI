@@ -4,6 +4,7 @@
 #include "Battle/TurnSystem/BattlePlayerController.h"
 
 #include "Battle/TurnSystem/PhaseManager.h"
+#include "Player/BattlePlayer.h"
 
 
 void ABattlePlayerController::BeginPlay()
@@ -38,6 +39,12 @@ void ABattlePlayerController::ServerRPC_NotifyReady_Implementation()
 void ABattlePlayerController::Client_StopReadyTimer_Implementation()
 {
 	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+}
+
+void ABattlePlayerController::MulticastRPC_StartPlayerTurn_Implementation(ABattlePlayer* playerPawn)
+{
+	if (playerPawn == GetWorld()->GetFirstPlayerController()->GetPawn())
+		playerPawn->OnTurnStart();
 }
 
 void ABattlePlayerController::SetViewTargetMyPawn(APawn* myPawn)
