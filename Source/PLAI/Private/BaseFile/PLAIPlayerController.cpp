@@ -2,6 +2,7 @@
 
 #include "PLAI/Public/BaseFile/PLAIPlayerController.h"
 
+#include "EngineUtils.h"
 #include "GameFramework/Pawn.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraSystem.h"
@@ -34,6 +35,71 @@ void APLAIPlayerController::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	// 시작 시 모든 BP_OutlineActor의 Overlay를 제거
+	for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (Actor->GetName().Contains(TEXT("BP_OutlineActor")))
+		{
+			if (UStaticMeshComponent* MeshComp = Actor->FindComponentByClass<UStaticMeshComponent>())
+			{
+				// 머티리얼은 기본값으로 유지, Overlay만 초기화
+				MeshComp->SetOverlayMaterial(nullptr);
+				//MeshComp->SetRenderCustomDepth(false); // 필요시
+			}
+		}
+	}
+	
+}
+
+void APLAIPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+	AActor* HitActor = Hit.GetActor();
+
+	if (HitActor && HitActor->GetName().Contains(TEXT("BP_OutlineActor")))
+	{
+		if (HitActor != PreviousOutlineActor)
+		{
+			// 이전 액터 Overlay 제거
+			if (PreviousOutlineActor)
+			{
+				if (UStaticMeshComponent* PrevComp = PreviousOutlineActor->FindComponentByClass<UStaticMeshComponent>())
+				{
+					PrevComp->SetOverlayMaterial(nullptr);
+					UE_LOG(LogTemp, Log, TEXT("❌ Overlay 제거: %s"), *PreviousOutlineActor->GetName());
+				}
+			}
+
+			// 현재 감지된 액터 Overlay 설정
+			if (UStaticMeshComponent* NewComp = HitActor->FindComponentByClass<UStaticMeshComponent>())
+			{
+				NewComp->SetOverlayMaterial(OverlayOutlineMaterial);
+				UE_LOG(LogTemp, Log, TEXT("✅ Overlay 적용: %s"), *HitActor->GetName());
+			}
+
+			PreviousOutlineActor = HitActor;
+		}
+	}
+	else
+	{
+		if (PreviousOutlineActor)
+		{
+			if (UStaticMeshComponent* MeshComp = PreviousOutlineActor->FindComponentByClass<UStaticMeshComponent>())
+			{
+				MeshComp->SetOverlayMaterial(nullptr);
+				UE_LOG(LogTemp, Log, TEXT("❌ 마우스 벗어남, Overlay 제거: %s"), *PreviousOutlineActor->GetName());
+			}
+
+			PreviousOutlineActor = nullptr;
+		}
+	}
+	
+	
 }
 
 void APLAIPlayerController::SetupInputComponent()
@@ -138,6 +204,39 @@ void APLAIPlayerController::OnTouchReleased()
 {
 	bIsTouch = false;
 	OnSetDestinationReleased();
+}
+
+void APLAIPlayerController::HandleMouseOutline()
+{
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+
+	AActor* HitActor = Hit.GetActor();
+
+	if (HitActor != PreviousOutlineActor)
+	{
+		// 이전 액터 외곽선 끄기
+		if (PreviousOutlineActor)
+		{
+			UPrimitiveComponent* PrevComp = Cast<UPrimitiveComponent>(PreviousOutlineActor->GetComponentByClass(UPrimitiveComponent::StaticClass()));
+			if (PrevComp)
+			{
+				PrevComp->SetRenderCustomDepth(false);
+			}
+		}
+
+		// 새로운 액터 외곽선 켜기
+		if (HitActor)
+		{
+			UPrimitiveComponent* NewComp = Cast<UPrimitiveComponent>(HitActor->GetComponentByClass(UPrimitiveComponent::StaticClass()));
+			if (NewComp)
+			{
+				NewComp->SetRenderCustomDepth(true);
+			}
+		}
+
+		PreviousOutlineActor = HitActor;
+	}
 }
 
 void APLAIPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
