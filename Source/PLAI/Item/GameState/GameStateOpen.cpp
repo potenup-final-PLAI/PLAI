@@ -18,10 +18,13 @@ void AGameStateOpen::FindPlayerTurn()
 {
 	TArray<AActor*> Actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ATurnPlayer::StaticClass(),Actors);
-	for(AActor* Actor : Actors)
+	for(int i = 0; i < Actors.Num(); i++)
 	{
-		if (ATurnPlayer* TurnPlayer = Cast<ATurnPlayer>(Actor))
-		{ TurnPlayers.Add(TurnPlayer); }
+		if (ATurnPlayer* TurnPlayer = Cast<ATurnPlayer>(Actors[i]))
+		{
+			TurnPlayer->TurnIndex = i;
+			TurnPlayers.Add(TurnPlayer);
+		}
 	}
 }
 

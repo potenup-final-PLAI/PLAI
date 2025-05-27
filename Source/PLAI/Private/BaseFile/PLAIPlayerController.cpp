@@ -73,8 +73,8 @@ void APLAIPlayerController::OnInputStarted()
 	StopMovement();
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{
-		TestPlayer->TestInputComp->SetMappingContext();
-		TestPlayer->TestInputComp->BindInputActions();
+		TestPlayer->InputComp->SetMappingContext();
+		TestPlayer->InputComp->BindInputActions();
 	}
 }
 

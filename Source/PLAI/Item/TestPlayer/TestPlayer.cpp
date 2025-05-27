@@ -19,6 +19,7 @@
 #include "PLAI/Item/Login/LogItemComp.h"
 #include "PLAI/Item/UI/Inventory/Map/UiWorldMap.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
+#include "TurnComp/TurnComp.h"
 
 
 // Sets default values
@@ -35,8 +36,9 @@ ATestPlayer::ATestPlayer()
 	LoginComp = CreateDefaultSubobject<ULoginComp>(TEXT("LoginComp"));
 	CreComp = CreateDefaultSubobject<UCreComp>(TEXT("CreComp"));
 	LogItemComp = CreateDefaultSubobject<ULogItemComp>(TEXT("ItemComp"));
-	TestInputComp = CreateDefaultSubobject<UInputComp>(TEXT("TestpInputComp"));
-
+	InputComp = CreateDefaultSubobject<UInputComp>(TEXT("TestInputComp"));
+	TurnComp = CreateDefaultSubobject<UTurnComp>(TEXT("TurnComp"));
+	
 	CaptureComp = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureComp"));
 	CaptureComp->SetupAttachment(RootComponent);
 }

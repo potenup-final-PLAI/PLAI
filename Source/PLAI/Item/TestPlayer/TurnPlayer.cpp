@@ -19,9 +19,6 @@ ATurnPlayer::ATurnPlayer()
 void ATurnPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	{ if (LoginComp->UiMain) { LoginComp->UiMain->RemoveFromParent(); } },0.5,false);
 }
 
 // Called every frame

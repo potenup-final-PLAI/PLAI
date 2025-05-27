@@ -7,7 +7,7 @@
 #include "TurnPlayer.generated.h"
 
 UCLASS()
-class PLAI_API ATurnPlayer : public ATestPlayer
+class PLAI_API ATurnPlayer : public ACharacter
 {
 	GENERATED_BODY()
 
