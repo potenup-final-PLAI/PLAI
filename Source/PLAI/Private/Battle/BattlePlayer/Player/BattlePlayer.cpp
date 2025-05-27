@@ -49,7 +49,7 @@ ABattlePlayer::ABattlePlayer()
 	spotLightComp = CreateDefaultSubobject<USpotLightComponent>(TEXT("spotLightComp"));
 	spotLightComp->SetupAttachment(RootComponent);
 	spotLightComp->SetRelativeLocationAndRotation(FVector(0, 0, 323), FRotator(-90, 360, -360));
-	spotLightComp->SetIntensity(500);
+	spotLightComp->SetIntensity(1000);
 	spotLightComp->SetAttenuationRadius(550);
 	spotLightComp->SetOuterConeAngle(14);
 	

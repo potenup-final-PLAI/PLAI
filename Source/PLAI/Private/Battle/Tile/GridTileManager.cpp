@@ -56,7 +56,7 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 	{
 		for (int32 X = 0; X < 25; ++X)
 		{
-			FVector spawnLoc = GetActorLocation() + FVector(Y * 100, X * 100, 0.0f);
+			FVector spawnLoc = GetActorLocation() + FVector(X * 100, Y * 100, 0.0f);
 			FRotator spawnRot = FRotator::ZeroRotator;
 			FActorSpawnParameters spawnParams;
 			
@@ -146,6 +146,7 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 	}
 
 	int32 enemyCount = 0;
+	
 	// 적 유닛 스폰
 	for (const FIntPoint& coord : enemyCoords)
 	{
@@ -158,11 +159,6 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 				// Enemy 스폰
 				if (auto* enemy = GetWorld()->SpawnActor<AMonBossPawn>(bossFactory, spawnLoc, FRotator::ZeroRotator))
 				{
-					// if (auto* pc = Cast<ABattlePlayerController>(GetWorld()->GetFirstPlayerController()))
-					// {
-					// 	enemy->SetOwner(pc);
-					// 	pc->Possess(enemy);
-					// }
 					// enemy 스피드 설정
 					enemy->speed = FMath::RandRange(1, 10);
 					// 현재 타일 설정
@@ -173,14 +169,17 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 			}
 			else
 			{
-				FVector spawnLoc = gridTile->GetActorLocation() + FVector(
-					0.f, 0.f, 80.f);
-				if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(
-					enemyFactory, spawnLoc, FRotator::ZeroRotator))
+				FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
+				if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(enemyFactory, spawnLoc, FRotator::ZeroRotator))
 				{
+					UE_LOG(LogTemp, Warning, TEXT("Spawning enemy %s at tile coord (%d, %d), tile = %s, tile location = %s"), *enemy->GetName(), coord.X, coord.Y, *gridTile->GetName(), *gridTile->GetActorLocation().ToString());
 					// 위 내용과 동일
 					enemy->speed = FMath::RandRange(1, 10);
 					enemy->currentTile = gridTile;
+					UE_LOG(LogTemp, Warning, TEXT("enemy->currentTile = %s, location = %s"), *enemy->currentTile->GetName(), *enemy->currentTile->GetActorLocation().ToString());
+					UE_LOG(LogTemp, Warning, TEXT("Enemy %s spawn location: %s"), *enemy->GetName(), *enemy->GetActorLocation().ToString());
+					UE_LOG(LogTemp, Warning, TEXT("Enemy currentTile: %s, location: %s"), *enemy->currentTile->GetName(), *enemy->currentTile->GetActorLocation().ToString());
+					NET_PRINTLOG(TEXT("InitGridTile : enemy %s, enemy->currentTile %s"), *enemy->GetActorNameOrLabel(), *enemy->currentTile->GetActorNameOrLabel());
 					enemy->MyName = TEXT("Unit_") + FString::FormatAsNumber(enemyCount++);
 					unitArray.Add(enemy);
 				}
@@ -208,7 +207,7 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, netTileDataArray]()
 	{
 		MulticastRPC_InitClientMap(netTileDataArray);
-	}, 1.0f, false); // 1초 후에 호출
+	}, 1.5f, false); // 1초 후에 호출
 }
 
 void AGridTileManager::SendTileData_Implementation(FIntPoint coord, AGridTile* tilePointer)

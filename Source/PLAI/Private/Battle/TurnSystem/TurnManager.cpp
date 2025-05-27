@@ -12,7 +12,6 @@
 #include "Enemy/BaseEnemy.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
-#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/BattlePlayer.h"
 
@@ -132,7 +131,6 @@ void ATurnManager::OnTurnStart()
 
 	// 턴 종료 초기화
 	bTurnEnded = false;
-	
 	NET_PRINTLOG(TEXT("OnTurnStart"));
 	
 	// 기본 공격 초기화
@@ -150,8 +148,7 @@ void ATurnManager::OnTurnStart()
 	// Player라면
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(curUnit))
 	{
-		player->GetAP();
-		curUnit->MultiCastRPC_InitAPUI();
+		player->MultiCastRPC_InitAPUI();
 		UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(),player->curAP);
 	}
 	// Enemy라면

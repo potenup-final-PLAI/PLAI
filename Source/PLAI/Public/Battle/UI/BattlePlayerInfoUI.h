@@ -36,9 +36,6 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* txt_PlayerMaxHP;
 	
-	int32 maxHP = 0;
-
-	
 	void SetPlayerHPUI(class ABaseBattlePawn* unit);
 	void PlayerUpdateHP(class ABaseBattlePawn* unit, int32 hp);
 };

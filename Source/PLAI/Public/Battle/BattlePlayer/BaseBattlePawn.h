@@ -50,6 +50,8 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
 	TArray<FString> skills = {};
 
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 maxHP = 0;
 	// Player가 죽었는지 살았는지 상태 체크
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
 	ELifeState playerLifeState;
@@ -155,16 +157,14 @@ public:
 	void PlayerRoar(FHitResult& hitInfo);
 	void PlayerBattleCry(FHitResult& hitInfo);
 
-
+	// Player 대미지 전달 함수
+	UFUNCTION(NetMulticast, Reliable)
+	void PlayerApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
 	// Enemy 대미지 전달 함수
-	void EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType);
+	void EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
 	// Damage 계산 함수
-	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk,
-	                             float skillMultiplier,
-	                             float criticalRate, float criticalDamage
-	                             );
-	void PlayerApplyAttack(ABaseBattlePawn* targetUnit,
-	                       EActionMode attackType = EActionMode::None);
+	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk, float skillMultiplier, float criticalRate, float criticalDamage);
+
 
 	// 상태이상과 지속 턴 
 	TMap<EStatusEffect, int32> activeStatusEffects;

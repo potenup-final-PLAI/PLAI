@@ -46,7 +46,7 @@ public:
 	class UBattleEnemyAnimInstance* enemyAnim;
 	
 	//--------------Test---------------------
-	void MoveToPlayer(class AGridTile* player,class AGridTileManager* tileManager);
+	void MoveToPlayer();
 	class ABattlePlayer* FindClosestPlayer(TArray<class ABattlePlayer*>& allPlayers);
 
 	void FindAndAttackPlayer();

@@ -6,6 +6,7 @@
 #include "GridTile.h"
 #include "GridTileManager.h"
 #include "Battle/TurnSystem/PhaseManager.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Enemy/BattleEnemyAnimInstance.h"
 #include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
@@ -54,18 +55,22 @@ void ABaseEnemy::SetupPlayerInputComponent(
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
+void ABaseEnemy::MoveToPlayer()
 {
-	if (!tileManager)
+	if (!goalTile)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - tileManager is nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - goalTile is nullptr"));
 		return;
 	}
-	if (!player && !goalTile)
+	if (!currentTile)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - player/goalTile is nullptr"));
+		UE_LOG(LogTemp, Error, TEXT("ABaseEnemy::MoveToPlayer : !currentTile"));
 		return;
 	}
+
+	// 현재 타일과 골 타일이 같다면
+	NET_PRINTLOG(TEXT("Enemy %s, currentTile %s, goalTile %s"), *GetActorNameOrLabel(), *currentTile->GetActorNameOrLabel(), *goalTile->GetActorNameOrLabel());
+	
 	if (currentTile == goalTile)
 	{
 		currentActionMode = EActionMode::None;
@@ -80,22 +85,17 @@ void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
 		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
 		return;
 	}
-	InitValues();
+	// InitValues();
 
-	if (player)
+	// 현재 위치를 startTile로 설정
+	startTile = currentTile;
+	
+	if (!IsValid(startTile))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Target Not Nullptr"));
-		goalTile = tileManager->FindCurrentTile(player->GetActorLocation());
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Target is Valid "));
-	startTile = tileManager->FindCurrentTile(GetActorLocation());
-
-	if (!IsValid(startTile) || !IsValid(goalTile))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Is Not Valid startTile or goalTile"));
+		UE_LOG(LogTemp, Warning, TEXT("Is Not Valid startTile"));
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Is Valid startTile, goalTile"));
+	NET_PRINTLOG(TEXT("Enemy %s, currentTile %s, goalTile %s, startTile %s"), *GetActorNameOrLabel(), *currentTile->GetActorNameOrLabel(), *goalTile->GetActorNameOrLabel(), *startTile->GetActorNameOrLabel());
 	startTile->sCostValue = 0;
 	openArray.Add(startTile);
 
@@ -228,21 +228,19 @@ void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 		AGridTile* goal = gridTileManager->GetTile(targetX, targetY);
 		if (goal)
 		{
-			goalTile = goal; // ✅ 기존 goalTile 변수에 대입
+			goalTile = goal;
 			if (goalTile)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("goalTile : %s"),
-					   *goal->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("ABaseEnemy::ActionMove : goalTile : %s"), *goal->GetName());
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("goalTile is nullptr"));
+				UE_LOG(LogTemp, Warning, TEXT("ABaseEnemy::ActionMove : goalTile is nullptr"));
 			}
-			MoveToPlayer(goalTile, gridTileManager);
-			// ✅ 타겟 null로 넘기고 이동만 실행
+			// Player쪽으로 이동 실행
+			MoveToPlayer();
 		}
 	}
-	
 }
 
 

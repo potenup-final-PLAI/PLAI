@@ -109,6 +109,7 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, lastHoveredPawn);
 	DOREPLIFETIME(ABaseBattlePawn, currentTile);
 	DOREPLIFETIME(ABaseBattlePawn, currentActionMode);
+	DOREPLIFETIME(ABaseBattlePawn, maxHP);
 }
 
 void ABaseBattlePawn::PossessedBy(AController* NewController)
@@ -463,15 +464,14 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 	}
 }
 
-void ABaseBattlePawn::MultiCastRPC_EnemyGetDamage_Implementation(
-	class ABaseEnemy* enemy, int32 damage)
+void ABaseBattlePawn::MultiCastRPC_EnemyGetDamage_Implementation(class ABaseEnemy* enemy, int32 damage)
 {
 	if (!IsValid(enemy) || enemy->IsPendingKillPending()) return;
 	// 피를 깎는다.
 	enemy->hp = FMath::Max(0, enemy->hp - damage);
 	UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage, enemy->hp);
 	// UI HP 업데이트
-	enemy->battleUnitStateUI->UpdateHP(enemy->hp);
+	enemy->battleUnitStateUI->UpdateHP(enemy->hp, enemy);
 
 	// 공격 몽타주 실행
 	enemy->enemyAnim->PlayHitMotionAnimation(TEXT("StartHitMotion"));
@@ -500,8 +500,7 @@ void ABaseBattlePawn::MultiCastRPC_EnemyGetDamage_Implementation(
 	}
 }
 
-void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(
-	class ABattlePlayer* player, int32 damage)
+void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(class ABattlePlayer* player, int32 damage)
 {
 	if (!IsValid(player) || player->IsPendingKillPending()) return;
 	
@@ -511,7 +510,7 @@ void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(
 		
 	// HP를 UI에 업데이트
 	// BattlePlayerInfo HP 업데이트
-	player->battleUnitStateUI->UpdateHP(player->hp);
+	player->battleUnitStateUI->UpdateHP(player->hp, player);
 	player->hud->mainUI->WBP_Player->PlayerUpdateHP(player, player->hp);
 
 	player->playerAnim->PlayHitMotionAnimation(TEXT("StartPlayerHitMotion"));
@@ -535,7 +534,7 @@ void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(
 	}
 }
 
-void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType)
+void ABaseBattlePawn::PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUnit, EActionMode attackType)
 {
 	auto* player = Cast<ABattlePlayer>(this);
 	auto* enemy = Cast<ABaseEnemy>(targetUnit);
@@ -787,14 +786,14 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
 			player->hp -= 5;
-			battleUnitStateUI->UpdateHP(player->hp);
+			battleUnitStateUI->UpdateHP(player->hp, player);
 			// BattlePlayerInfo UI 세팅
 			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
 		}
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
 			enemy->hp -= 5;
-			battleUnitStateUI->UpdateHP(enemy->hp);
+			battleUnitStateUI->UpdateHP(enemy->hp, enemy);
 		}
 		break;
 	case EStatusEffect::Vulnerable:
@@ -831,7 +830,7 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 		if (auto* player = Cast<ABattlePlayer>(this))
 		{
 			player->hp -= 5;
-			battleUnitStateUI->UpdateHP(player->hp);
+			battleUnitStateUI->UpdateHP(player->hp, player);
 
 			// BattlePlayerInfo UI 세팅
 			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
@@ -841,7 +840,7 @@ void ABaseBattlePawn::HandleStatusEffect(EStatusEffect effect)
 		else if (auto* enemy = Cast<ABaseEnemy>(this))
 		{
 			enemy->hp -= 5;
-			battleUnitStateUI->UpdateHP(enemy->hp);
+			battleUnitStateUI->UpdateHP(enemy->hp, enemy);
 			BleedingEnemyProcess(enemy);
 		}
 		break;
@@ -959,10 +958,7 @@ void ABaseBattlePawn::PathFind()
 		currentTile = openArray[0];
 		openArray.RemoveAt(0);
 
-		UE_LOG(LogTemp, Warning, TEXT("clickedTile = %s, Coord = (%d, %d)"),
-				*currentTile->GetName(),
-				gridTileManager->GetTileLoc(currentTile).X,
-				gridTileManager->GetTileLoc(currentTile).Y);
+		UE_LOG(LogTemp, Warning, TEXT("currentTile = %s, Coord = (%d, %d)"),*currentTile->GetName(),gridTileManager->GetTileLoc(currentTile).X,gridTileManager->GetTileLoc(currentTile).Y);
 		if (!IsValid(currentTile))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s currentTile PathFind Error"),*GetName());
@@ -1069,6 +1065,7 @@ void ABaseBattlePawn::BuildPath()
 		pathArray.SetNum(moveRange); // 최대 이동 가능 거리만큼 잘라 이동
 	}
 
+	InitValues();
 	this->ClearGridTile();
 	bIsMoving = true;
 	currentPathIndex = 0;
@@ -1555,6 +1552,9 @@ void ABaseBattlePawn::InitEnemyState()
 
 		// 성격에 따른 값 추가 세팅
 		ApplyTraitModifiers(enemy);
+
+		// 최대 체력 설정
+		enemy->maxHP = enemy->hp;
 		
 		// enemy에 moveRange 세팅 작업
 		enemy->moveRange = FMath::Max(1, enemy->moveRange);
@@ -1762,7 +1762,10 @@ void ABaseBattlePawn::InitOtherClassPointer()
 	}
 	// BaseHP UI 보여주기
 	battleUnitStateUI = Cast<UBattleUnitStateUI>(this->battleUnitStateComp->GetWidget());
-	if (battleUnitStateUI) UE_LOG(LogTemp, Warning,TEXT("battleUnitStateUI is Set"));
+	if (battleUnitStateUI)
+	{
+		UE_LOG(LogTemp, Warning,TEXT("battleUnitStateUI is Set"));
+	}
 }
 void ABaseBattlePawn::ServerInitOtherClassPointer_Implementation()
 {
@@ -1779,10 +1782,7 @@ void ABaseBattlePawn::InitAPUI()
 {
 	if (!(pc && hud && hud->mainUI && hud->mainUI->HB_AP))
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT(
-			       "InitAPUI is Not Set : pc && hud && hud->mainUI && hud->mainUI->HB_AP"
-		       ));
+		UE_LOG(LogTemp, Warning,TEXT("InitAPUI is Not Set : pc && hud && hud->mainUI && hud->mainUI->HB_AP"));
 		return;
 	}
 
@@ -1790,8 +1790,13 @@ void ABaseBattlePawn::InitAPUI()
 	hud->mainUI->HB_AP->ClearChildren();
 
 	// 현재 턴 유닛이 Player인 경우에만
-	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
+	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
 	{
+		if (GetWorld()->GetFirstPlayerController()->GetPawn()->GetUniqueID() == turnManager->curUnit->GetUniqueID())
+		{
+			player->GetAP();
+		}
+		NET_PRINTLOG(TEXT("Player name : %s, turnManager->curUnit : %d"), *player->GetActorNameOrLabel(), player->curAP);
 		for (int32 i = 0; i < player->curAP; ++i)
 		{
 			hud->mainUI->AddAP(); // AP UI 하나씩 추가

@@ -581,9 +581,7 @@ FBattleTurnState AUPhaseManager::SetBattleProcessingAPI()
 		// ID
 		charStatus.id = unit->GetName();
 		// 타일에 있는 유닛의 위치 
-		charStatus.position = {
-			unit->currentTile->gridCoord.X, unit->currentTile->gridCoord.Y
-		};
+		charStatus.position = {unit->currentTile->gridCoord.X, unit->currentTile->gridCoord.Y};
 
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 		{
@@ -682,6 +680,8 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			player->critical_Rate = gi->UserFullInfoGiStat.character_info.stats.critical_rate;
 			player->critical_Damage = gi->UserFullInfoGiStat.character_info.stats.critical_damage;
 			player->speed = gi->UserFullInfoGiStat.character_info.stats.speed;
+			// 최대 HP 설정
+			player->maxHP = gi->UserFullInfoGiStat.character_info.stats.hp;
 
 			for (const FString trait : gi->UserFullInfoGiStat.character_info.traits)
 			{
@@ -698,6 +698,8 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			player->critical_Rate = 0.05f;
 			player->critical_Damage = 1.5f;
 			player->speed = 10;
+			// 최대 HP 설정
+			player->maxHP = player->hp;
 		}
 		
 		player->playerLifeState = ELifeState::Alive;
