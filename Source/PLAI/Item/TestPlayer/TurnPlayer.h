@@ -27,7 +27,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+	UPROPERTY(EditAnywhere)
 	FVector MoveLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere)
+	bool bTurn = false;
 	
 	void MoveToPlayer();
 };

@@ -63,6 +63,6 @@ void ATestPlayer::Tick(float DeltaTime)
 // Called to bind functionality to input
 void ATestPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	// Super::SetupPlayerInputComponent(PlayerInputComponent);
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 

@@ -12,7 +12,7 @@
  * 
  */
 UCLASS()
-class PLAI_API AGameStateOpen : public AGameState
+class PLAI_API AGameStateOpen : public AGameStateBase
 {
 	GENERATED_BODY()
 
@@ -27,7 +27,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<ATurnMonster*> TurnMonsters;
 
-	void PlayerTurn();
+	void FindPlayerTurn();
+    void PlayerTurn();
 	
+	
+	void FindMonsterTurn();
 	void MonsterTurn();
 };
