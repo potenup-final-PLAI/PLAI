@@ -105,10 +105,10 @@ void ATurnTile::PlayerSpawn()
 		FActorSpawnParameters Params;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		
-		if (ATestPlayer* TestPlayer = GetWorld()->SpawnActor<ATestPlayer>(TestPlayerFactory,Params))
+		if (ATurnPlayer* TurnPlayer = GetWorld()->SpawnActor<ATurnPlayer>(TurnPlayerFactory,Params))
 		{
-			TestPlayer->SetActorLocation(FVector(x,y,z));
-			TestPlayer->SetActorScale3D(FVector(2.0,2.0,2.0));
+			TurnPlayer->SetActorLocation(FVector(x,y,z));
+			TurnPlayer->SetActorScale3D(FVector(2.0,2.0,2.0));
 		}
 		else{UE_LOG(LogTemp,Error,TEXT("TurnTile Player Spawn Failed"));}
 		DrawDebugSphere(GetWorld(),FVector(x,y,z), 100, 20, FColor::Blue,false,2,2);

@@ -3,7 +3,10 @@
 
 #include "TurnPlayer.h"
 
+#include "AIController.h"
 
+
+class AAIController;
 // Sets default values
 ATurnPlayer::ATurnPlayer()
 {
@@ -31,3 +34,10 @@ void ATurnPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void ATurnPlayer::MoveToPlayer()
+{
+	UE_LOG(LogTemp,Warning,TEXT("ATurnMonster::MoveToMonster 실행이 되고있니"));
+	AAIController* AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
+	AI->Possess(this);
+	AI->MoveToLocation(GetActorLocation() + GetActorForwardVector() * 150,25, true,true,false);
+}

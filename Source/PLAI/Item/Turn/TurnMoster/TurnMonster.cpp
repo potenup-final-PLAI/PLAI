@@ -55,5 +55,5 @@ void ATurnMonster::MoveToMonster()
 	UE_LOG(LogTemp,Warning,TEXT("ATurnMonster::MoveToMonster 실행이 되고있니"));
 	AAIController* AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
 	AI->Possess(this);
-	AI->MoveToLocation(GetActorForwardVector() * 250,25, true,false,false);
+	AI->MoveToLocation(GetActorLocation() + GetActorForwardVector() * 150,25, true,true,false);
 }

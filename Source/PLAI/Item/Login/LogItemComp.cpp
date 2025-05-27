@@ -44,7 +44,7 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::L))//장비창 불러오기
+	if (TestPlayer && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::L))//장비창 불러오기
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::L키 장비창 불러오기"));
 		GetEquipInfo();
@@ -52,7 +52,7 @@ void ULogItemComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		GetUserLevel();
 	}
 
-	if (TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::K))//레벨업 셋팅
+	if (TestPlayer && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::K))//레벨업 셋팅
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LogItemComp::K키 레벨 초기화 불러오기"));
 		TestPlayer->LoginComp->UserFullInfo.character_info.level = 1;

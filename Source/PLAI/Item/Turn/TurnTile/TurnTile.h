@@ -34,7 +34,7 @@ public:
 	UDataTable* MonsterTable;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ATestPlayer> TestPlayerFactory;
+	TSubclassOf<class ATurnPlayer> TurnPlayerFactory;
 
 	TArray<FVector>GetTileCorner();
 

@@ -17,6 +17,7 @@
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/Npc/NpcCharacter.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/TestPlayer/TurnPlayer.h"
 #include "PLAI/Item/Turn/TurnMonsterWorld/TurnMonsterWorld.h"
 #include "PLAI/Item/Turn/TurnMoster/TurnMonster.h"
 #include "PLAI/Item/Turn/TurnTile/TurnTile.h"
@@ -173,9 +174,16 @@ void UInputComp::On_LeftMouseStart()
 		{ TestPlayer->SetActorLocation(TurnTile->GetActorLocation() + FVector(0,0,100));}
 	}
 
+	// 턴제 전투 몬스터
 	if (ATurnMonster* TurnMonster = Cast<ATurnMonster>(Hit.GetActor()))
 	{
 		TurnMonster->MoveToMonster();
+	}
+
+	// 턴제 전투 플레이어
+	if (ATurnPlayer * TurnPlayer = Cast<ATurnPlayer>(Hit.GetActor()))
+	{
+		TurnPlayer->MoveToPlayer();
 	}
 	
 	// Npc 찾기 창 끄기
