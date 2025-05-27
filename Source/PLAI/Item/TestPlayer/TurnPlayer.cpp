@@ -4,6 +4,7 @@
 #include "TurnPlayer.h"
 
 #include "AIController.h"
+#include "PLAI/Item/Login/LoginComp.h"
 
 
 class AAIController;
@@ -18,13 +19,15 @@ ATurnPlayer::ATurnPlayer()
 void ATurnPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	{ if (LoginComp->UiMain) { LoginComp->UiMain->RemoveFromParent(); } },0.5,false);
 }
 
 // Called every frame
 void ATurnPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	AddMovementInput(FVector(0.0f, 0.0f, -10.0f));
 }
 
 // Called to bind functionality to input
@@ -40,5 +43,5 @@ void ATurnPlayer::MoveToPlayer()
 	UE_LOG(LogTemp,Warning,TEXT("ATurnPlayer::MoveToMonster 실행이 되고있니"));
 	AAIController* AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
 	AI->Possess(this);
-	AI->MoveToLocation(MoveLocation,25, true,true,false);
+	AI->MoveToLocation(MoveLocation,25, true,true,true);
 }
