@@ -31,7 +31,7 @@ public:
 	void NextPlayerTurn(ATurnPlayer* TurnPlayer);
 	
 	void FindMonsterTurn();
-	void MonsterTurn();
+	void NextMonsterTurn();
 
 	void NextRound();
 

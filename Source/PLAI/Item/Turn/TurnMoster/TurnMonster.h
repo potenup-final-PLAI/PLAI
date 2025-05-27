@@ -53,6 +53,4 @@ public:
 	virtual void SetMonsterUi() override;
 
 	virtual void SetHpBar() override;
-
-	void MoveToMonster();
 };

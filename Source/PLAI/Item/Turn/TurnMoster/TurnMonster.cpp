@@ -61,14 +61,3 @@ void ATurnMonster::SetHpBar()
 	MonUi->HpBar->SetPercent(static_cast<float>(TurnMonsterStruct.CurrentHp) / TurnMonsterStruct.MaxHp);
 	MonUi->CurrentHp->SetText(FText::AsNumber(TurnMonsterStruct.CurrentHp));
 }
-
-void ATurnMonster::MoveToMonster()
-{
-	UE_LOG(LogTemp,Warning,TEXT("ATurnMonster::MoveToMonster 실행이 되고있니"));
-	AAIController* AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
-	AI->Possess(this);
-	AI->MoveToLocation(GetActorLocation() + GetActorForwardVector() * 150,
-		25, true,true,false);
-
-	Gs->MonsterTurn();
-}

@@ -198,12 +198,6 @@ void UInputComp::On_LeftMouseStart()
 		if (ATurnTile* TurnTile = Cast<ATurnTile>(UGameplayStatics::GetActorOfClass(GetWorld(),ATurnTile::StaticClass())))
 		{ TestPlayer->SetActorLocation(TurnTile->GetActorLocation() + FVector(0,0,100));}
 	}
-
-	// 턴제 전투 몬스터
-	if (ATurnMonster* TurnMonster = Cast<ATurnMonster>(Hit.GetActor()))
-	{
-		TurnMonster->MoveToMonster();
-	}
 	
 	// Npc 찾기 창 끄기
 	ANpcCharacter* NpcCharacter = Cast<ANpcCharacter>(Hit.GetActor());

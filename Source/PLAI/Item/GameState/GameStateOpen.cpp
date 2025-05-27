@@ -17,12 +17,12 @@ void AGameStateOpen::BeginPlay()
 
 void AGameStateOpen::NextPlayerTurn(ATurnPlayer* TurnPlayer)
 {
+	if (TurnPlayers.Num() <= 0) { return; }
+
 	TurnPlayers.Remove(TurnPlayer);
 
-	if (TurnPlayers.Num() <= 0)
-	{
-		return;
-	}
+	if (TurnPlayers.Num() <= 0) { return; }
+	
 	for (int i = 0; i < TurnPlayers.Num(); i++)
 	{
 		TurnPlayers[i]->TurnIndex = i;
@@ -62,15 +62,15 @@ void AGameStateOpen::FindMonsterTurn()
 	TurnMonsters[0]->bTurn = true;
 }
 
-void AGameStateOpen::MonsterTurn()
+void AGameStateOpen::NextMonsterTurn()
 {
+	if (TurnMonsters.Num() <= 0){ return; }
+	
 	TurnMonsters.RemoveAt(0);
 	
-	if (TurnMonsters.Num() <= 0)
-	{
-		return;
-	}
-	for (int i = 0; i < TurnPlayers.Num(); i++)
+	if (TurnMonsters.Num() <= 0){ return; }
+	
+	for (int i = 0; i < TurnMonsters.Num(); i++)
 	{
 		TurnMonsters[i]->TurnIndex = i;
 	}

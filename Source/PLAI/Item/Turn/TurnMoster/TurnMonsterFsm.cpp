@@ -68,7 +68,9 @@ void UTurnMonsterFsm::MoveToPlayer()
 {
 	if (GameState->TurnPlayers.Num() <= 0){UE_LOG(LogTemp,Warning,TEXT("TurnMonFsm 플레이어 없음"))return;}
 	int32 rand = FMath::RandRange(0,GameState->TurnPlayers.Num()-1);
-	TurnMonster->AiController->MoveToLocation(GameState->TurnPlayers[rand]->GetActorLocation(),25,
+	TurnMonster->AiController->MoveToLocation(GameState->TurnPlayers[rand]->GetActorLocation(),200,
 		true,true,true);
+
+	GameState->NextMonsterTurn();
 }
 
