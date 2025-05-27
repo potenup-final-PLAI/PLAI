@@ -4,7 +4,10 @@
 #include "TurnPlayer.h"
 
 #include "AIController.h"
+#include "SAdvancedTransformInputBox.h"
+#include "Chaos/PBDSuspensionConstraintData.h"
 #include "Components/WidgetComponent.h"
+#include "Customizations/MathStructProxyCustomizations.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "PLAI/Item/GameState/GameStateOpen.h"
 #include "PLAI/Item/Login/LoginComp.h"
@@ -28,6 +31,9 @@ void ATurnPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	GameState = Cast<AGameStateOpen>(GetWorld()->GetGameState());
+
+	AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
+	AI->Possess(this);
 
 	UITurnHpBar = CreateWidget<UUITurnHpBar>(GetWorld(),TurnHpBarFactory);
 	UITurnHpBar->SetHpBar(TurnPlayerStruct);
@@ -58,7 +64,7 @@ void ATurnPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ATurnPlayer::PlayerState(FVector Location, ATurnMonster* TurnMonster)
+void ATurnPlayer::PlayerState(FVector Location = FVector::ZeroVector, ATurnMonster* TurnMonster = nullptr)
 {
 	switch (TurnPlayerState)
 	{
@@ -67,7 +73,7 @@ void ATurnPlayer::PlayerState(FVector Location, ATurnMonster* TurnMonster)
 		break;
 		
 	case ETurnPlayerState::Move:
-		MoveToMonster(Location);
+		MoveToMonster(Location, TurnMonster);
 		break;
 		
 	case ETurnPlayerState::Attack:
@@ -84,28 +90,33 @@ void ATurnPlayer::Idle()
 {
 }
 
-void ATurnPlayer::MoveToMonster(FVector Location)
+void ATurnPlayer::MoveToMonster(FVector Location, ATurnMonster* TurnMonster)
 {
-	UE_LOG(LogTemp,Warning,TEXT("ATurnPlayer::MoveToMonster 실행이 되고있니 위치는? [%s]"),*Location.ToString());
-	AAIController* AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
-	AI->Possess(this);
-	
-	AI->MoveToLocation(Location,100, true,true,true);
-	
-	AI->ReceiveMoveCompleted.AddUniqueDynamic(this,&ATurnPlayer::OnAIMoveCompleted);
+	AI->MoveToLocation(Location,125, true,true,true);
+
+	if (TurnMonster)
+	{ AI->ReceiveMoveCompleted.AddUniqueDynamic(this,&ATurnPlayer::OnAIMoveCompleted);}
 }
 
 void ATurnPlayer::AttackToMonster(ATurnMonster* TurnMonster)
 {
 	if (!TurnMonster)return;
-	UE_LOG(LogTemp,Warning,TEXT("TurnPlayer TurnMonster 공격"))
+	
 	TurnMonster->TurnMonsterStruct.CurrentHp -= TurnPlayerStruct.Atk;
 	TurnMonster->SetMonsterUi();
+
+	TurnPlayerState = ETurnPlayerState::Avoid;
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&ATurnPlayer::AvoidToMonster,2.0f,false);
 }
 
 void ATurnPlayer::AvoidToMonster()
 {
+	AI->MoveToLocation(GetActorLocation() -GetActorForwardVector() * 350,0,true,true,true);
+	GameState->NextPlayerTurn(this);
 }
+
+
 
 void ATurnPlayer::OnAIMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
 {

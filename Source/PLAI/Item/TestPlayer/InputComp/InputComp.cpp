@@ -169,30 +169,27 @@ void UInputComp::On_LeftMouseStart()
 	if (Hit.GetActor()){UE_LOG(LogTemp,Warning,TEXT("InputComp 왼쪽 마우스 무슨엑터? [%s] 서클 누구?? [%s]"),
 		*Hit.GetActor()->GetName(),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"))}
 
+	// 턴제 전투 플레이어 선택
+	if (ATurnPlayer * TurnPlayerClick = Cast<ATurnPlayer>(Hit.GetActor()))
+	{
+		DrawDebugSphere(GetWorld(),Hit.Location,50,10,FColor::Blue,false,1);
 
+		if (TurnPlayerClick->bTurn == true)
+		{ TurnPlayer = TurnPlayerClick; }
+		return;
+	}
+
+	// 턴제 전투 플레이어 행동
 	if (TurnPlayer && TurnPlayer->bTurn == true)
 	{
 		DrawDebugSphere(GetWorld(),Hit.Location,50,10,FColor::Red,false,1);
-
-		TurnPlayer->PlayerState(Hit.Location,nullptr);
 		
-		if (ATurnMonster* TurnMonster = Cast<ATurnMonster>(Hit.GetActor()))
-		{
-			TurnPlayer->PlayerState(Hit.Location,TurnMonster);
-		}
+		ATurnMonster* TurnMonster = Cast<ATurnMonster>(Hit.GetActor());
 		
+		TurnPlayer->PlayerState(Hit.Location,TurnMonster);
 		TurnPlayer = nullptr;
 	}
-
-	// 턴제 전투 플레이어
-	if (ATurnPlayer * TurnPlayerClick = Cast<ATurnPlayer>(Hit.GetActor()))
-	{
-		if (TurnPlayerClick->bTurn == true)
-		{ TurnPlayer = TurnPlayerClick; }
-
-		DrawDebugSphere(GetWorld(),Hit.Location,50,10,FColor::Blue,false,1);
-	}
-
+	
 	// 턴제 월드 몬스터 찾기
 	if (ATurnMonsterWorld* TurnMonsterWorld = Cast<ATurnMonsterWorld>(Hit.GetActor()))
 	{

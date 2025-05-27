@@ -58,6 +58,9 @@ public:
 	class AGameStateOpen* GameState;
 
 	UPROPERTY(EditAnywhere)
+	class AAIController* AI;
+
+	UPROPERTY(EditAnywhere)
 	class UWidgetComponent* WidgetComp;
 	
 	UPROPERTY(EditAnywhere)
@@ -75,10 +78,13 @@ public:
 	UPROPERTY(EditAnywhere)
 	FTurnPlayerStruct TurnPlayerStruct;
 
+	UPROPERTY(EditAnywhere)
+	FTimerHandle TurnTimerHandle;
+
 	void PlayerState(FVector Location, ATurnMonster* TurnMonster);
 
 	void Idle();
-	void MoveToMonster(FVector Location);
+	void MoveToMonster(FVector Location, ATurnMonster* TurnMonster);
 	void AttackToMonster(class ATurnMonster* TurnMonster);
 	void AvoidToMonster();
 	
