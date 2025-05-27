@@ -32,4 +32,11 @@ public:
 	
 	void FindMonsterTurn();
 	void MonsterTurn();
+
+	void NextRound();
+
+	UPROPERTY(EditAnywhere)
+	FTimerHandle TimerHandle;
+	UPROPERTY(EditAnywhere)
+	float TimerSecond;
 };

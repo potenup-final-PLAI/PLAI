@@ -4,10 +4,12 @@
 #include "TurnMonster.h"
 
 #include "AIController.h"
+#include "TurnMonsterFsm.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/SphereComponent.h"
 #include "Components/TextBlock.h"
+#include "PLAI/Item/GameState/GameStateOpen.h"
 #include "PLAI/Item/Monster/MonUi/MonUi.h"
 #include "Slate/SGameLayerManager.h"
 
@@ -17,18 +19,28 @@ ATurnMonster::ATurnMonster()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	TurnMonsterFsm = CreateDefaultSubobject<UTurnMonsterFsm>(TEXT("TurnMonsterFsm"));
 }
 
 // Called when the game starts or when spawned
 void ATurnMonster::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AiController = GetWorld()->SpawnActor<AAIController>();
+	AiController->Possess(this);
+
+	Gs = Cast<AGameStateOpen>(GetWorld()->GetGameState());
 }
 
 // Called every frame
 void ATurnMonster::Tick(float DeltaTime)
 {
 	ACharacter::Tick(DeltaTime);
+
+	DrawDebugString(GetWorld(),GetActorLocation()+FVector(0,0,150),FString::Printf(TEXT("나의 턴 있음?? [%i] \n"
+	"내턴은 몇번째? [%d]"),bTurn,TurnIndex),nullptr,FColor::Red,0,true,1);
 }
 
 // Called to bind functionality to input
@@ -55,5 +67,8 @@ void ATurnMonster::MoveToMonster()
 	UE_LOG(LogTemp,Warning,TEXT("ATurnMonster::MoveToMonster 실행이 되고있니"));
 	AAIController* AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
 	AI->Possess(this);
-	AI->MoveToLocation(GetActorLocation() + GetActorForwardVector() * 150,25, true,true,false);
+	AI->MoveToLocation(GetActorLocation() + GetActorForwardVector() * 150,
+		25, true,true,false);
+
+	Gs->MonsterTurn();
 }

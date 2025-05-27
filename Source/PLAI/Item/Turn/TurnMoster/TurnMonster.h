@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AIController.h"
 #include "GameFramework/Character.h"
 #include "PLAI/Item/Monster/Monster.h"
 #include "PLAI/Item/Monster/MonsterStruct.h"
@@ -30,8 +31,24 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+
+	UPROPERTY(EditAnywhere)
+	class UTurnMonsterFsm* TurnMonsterFsm;
+	
 	UPROPERTY(EditAnywhere)
 	FTurnMonsterStruct TurnMonsterStruct;
+
+	UPROPERTY(EditAnywhere)
+	int32 TurnIndex = 0;
+
+	UPROPERTY(EditAnywhere)
+	bool bTurn = false;
+
+	UPROPERTY(EditAnywhere)
+	AAIController* AiController;
+
+	UPROPERTY(EditAnywhere)
+	class AGameStateOpen* Gs;
 
 	virtual void SetMonsterUi() override;
 

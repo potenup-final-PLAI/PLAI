@@ -68,7 +68,7 @@ TArray<FVector> ATurnTile::GetTileCorner()
 
 void ATurnTile::MonsterSpawn()
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		float x = FMath::FRandRange(GetTileCorner()[1].X, GetTileCorner()[2].X);
 		float y = FMath::FRandRange(GetTileCorner()[0].Y, GetTileCorner()[2].Y);
@@ -96,7 +96,7 @@ void ATurnTile::MonsterSpawnTable(FVector SpawnLocation)
 
 void ATurnTile::PlayerSpawn()
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		float x = FMath::FRandRange(GetTileCorner()[0].X, GetTileCorner()[1].X);
 		float y = FMath::FRandRange(GetTileCorner()[0].Y, GetTileCorner()[2].Y);
@@ -107,7 +107,6 @@ void ATurnTile::PlayerSpawn()
 		
 		if (ATurnPlayer* TurnPlayer = GetWorld()->SpawnActor<ATurnPlayer>(TurnPlayerFactory,Params))
 		{
-			if (i == 0){TurnPlayer->bTurn = true;}
 			TurnPlayer->SetActorLocation(FVector(x,y,z));
 			TurnPlayer->SetActorScale3D(FVector(2.0,2.0,2.0));
 		}
