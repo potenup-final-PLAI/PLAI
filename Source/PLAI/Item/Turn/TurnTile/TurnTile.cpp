@@ -58,6 +58,7 @@ TArray<FVector> ATurnTile::GetTileCorner()
 	FVector ScaledExtend = GetActorLocation() + Scale * LocalExtend;
 
 	TArray<FVector> Corners;
+	
 	Corners.Add(ScaledMin);
 	Corners.Add(ScaledOrigin);
 	Corners.Add(ScaledExtend);
@@ -87,7 +88,6 @@ void ATurnTile::MonsterSpawnTable(FVector SpawnLocation)
 		TurnMonster->SetActorLocation(SpawnLocation);
 		TurnMonster->TurnMonsterStruct = *TurnMonsterStruct;
 		TurnMonster->SetMonsterUi();
-		
 	}
 
 	for (FName RowName : RowNames)

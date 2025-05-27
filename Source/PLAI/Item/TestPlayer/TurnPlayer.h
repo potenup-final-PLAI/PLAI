@@ -32,6 +32,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	bool bTurn = false;
+
+	UPROPERTY(EditAnywhere)
+	int32 TurnIndex = 0;
 	
 	void MoveToPlayer();
 };
