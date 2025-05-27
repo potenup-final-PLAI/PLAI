@@ -83,7 +83,12 @@ void ATurnTile::MonsterSpawnTable(FVector SpawnLocation)
 	TArray<FName>RowNames = MonsterTable->GetRowNames();
 	FTurnMonsterStruct* TurnMonsterStruct = MonsterTable->FindRow<FTurnMonsterStruct>(RowNames[0],TEXT("TurnTile"));
 	if (ATurnMonster* TurnMonster = GetWorld()->SpawnActor<ATurnMonster>(TurnMonsterStruct->TurnMonster))
-	{ TurnMonster->SetActorLocation(SpawnLocation); }
+	{
+		TurnMonster->SetActorLocation(SpawnLocation);
+		TurnMonster->TurnMonsterStruct = *TurnMonsterStruct;
+		TurnMonster->SetMonsterUi();
+		
+	}
 
 	for (FName RowName : RowNames)
 	{ }

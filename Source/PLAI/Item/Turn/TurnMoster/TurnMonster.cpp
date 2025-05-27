@@ -3,7 +3,13 @@
 
 #include "TurnMonster.h"
 
+#include "AIController.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "Components/ProgressBar.h"
 #include "Components/SphereComponent.h"
+#include "Components/TextBlock.h"
+#include "PLAI/Item/Monster/MonUi/MonUi.h"
+#include "Slate/SGameLayerManager.h"
 
 
 // Sets default values
@@ -17,7 +23,6 @@ ATurnMonster::ATurnMonster()
 void ATurnMonster::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -32,3 +37,23 @@ void ATurnMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void ATurnMonster::SetMonsterUi()
+{
+	MonUi->Name->SetText(FText::FromString(TurnMonsterStruct.Name));
+	MonUi->CurrentHp->SetText(FText::AsNumber(TurnMonsterStruct.CurrentHp));
+	MonUi->MaxHp->SetText(FText::AsNumber(TurnMonsterStruct.MaxHp));
+}
+
+void ATurnMonster::SetHpBar()
+{
+	MonUi->HpBar->SetPercent(static_cast<float>(TurnMonsterStruct.CurrentHp) / TurnMonsterStruct.MaxHp);
+	MonUi->CurrentHp->SetText(FText::AsNumber(TurnMonsterStruct.CurrentHp));
+}
+
+void ATurnMonster::MoveToMonster()
+{
+	UE_LOG(LogTemp,Warning,TEXT("ATurnMonster::MoveToMonster 실행이 되고있니"));
+	AAIController* AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
+	AI->Possess(this);
+	AI->MoveToLocation(GetActorForwardVector() * 250,25, true,false,false);
+}

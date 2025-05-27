@@ -18,6 +18,7 @@
 #include "PLAI/Item/Npc/NpcCharacter.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/Turn/TurnMonsterWorld/TurnMonsterWorld.h"
+#include "PLAI/Item/Turn/TurnMoster/TurnMonster.h"
 #include "PLAI/Item/Turn/TurnTile/TurnTile.h"
 #include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
@@ -165,12 +166,18 @@ void UInputComp::On_LeftMouseStart()
 
 	if (Hit.GetActor()){UE_LOG(LogTemp,Warning,TEXT("InputComp 왼쪽 마우스 무슨엑터? [%s]"),*Hit.GetActor()->GetName())}
 
-	// 턴제 몬스터 찾기
+	// 턴제 월드 몬스터 찾기
 	if (ATurnMonsterWorld* TurnMonsterWorld = Cast<ATurnMonsterWorld>(Hit.GetActor()))
 	{
 		if (ATurnTile* TurnTile = Cast<ATurnTile>(UGameplayStatics::GetActorOfClass(GetWorld(),ATurnTile::StaticClass())))
 		{ TestPlayer->SetActorLocation(TurnTile->GetActorLocation() + FVector(0,0,100));}
 	}
+
+	if (ATurnMonster* TurnMonster = Cast<ATurnMonster>(Hit.GetActor()))
+	{
+		TurnMonster->MoveToMonster();
+	}
+	
 	// Npc 찾기 창 끄기
 	ANpcCharacter* NpcCharacter = Cast<ANpcCharacter>(Hit.GetActor());
 	if (!NpcCharacter)
