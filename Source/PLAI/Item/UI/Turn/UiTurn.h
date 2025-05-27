@@ -21,6 +21,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button_TurnComplete;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* TurnName; 
+
 	UPROPERTY(EditAnywhere)
 	class AGameStateOpen* Gs;
 

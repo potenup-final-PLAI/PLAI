@@ -5,6 +5,17 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "TurnMonsterFsm.generated.h"
+
+class ATurnPlayer;
+// DECLARE_DELEGATE_OneParam(FOnAttackPlayer, ATurnPlayer)
+
+struct FAIRequestID;
+
+namespace EPathFollowingResult
+{
+	enum Type : int;
+}
+
 UENUM(BlueprintType)
 enum class ETurnMonsterState : uint8
 {
@@ -41,10 +52,16 @@ public:
 	
 	void MoveToPlayer();
 
+	UFUNCTION()
+	void AttackToPlayer(FAIRequestID RequestID, EPathFollowingResult::Type Result);
+	
 	UPROPERTY(EditAnywhere)
 	class ATurnMonster* TurnMonster;
 
 	UPROPERTY(EditAnywhere)
 	class AGameStateOpen* GameState;
+
+	UPROPERTY(EditAnywhere)
+	class ATurnPlayer* TurnPlayer;
 
 };

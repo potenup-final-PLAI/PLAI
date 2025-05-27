@@ -4,6 +4,7 @@
 #include "TurnComp.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Turn/UiTurn.h"
 
@@ -26,6 +27,7 @@ void UTurnComp::BeginPlay()
 
 	UiTurn = CreateWidget<UUiTurn>(GetWorld(),UiTurnFactory);
 	UiTurn->AddToViewport();
+	UiTurn->TurnName->SetVisibility(ESlateVisibility::Hidden);
 
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 }

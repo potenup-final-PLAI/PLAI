@@ -4,7 +4,9 @@
 #include "TurnMonsterFsm.h"
 
 #include "TurnMonster.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "PLAI/Item/GameState/GameStateOpen.h"
+#include "PLAI/Item/UI/Turn/UITurnHpBar.h"
 
 
 // Sets default values for this component's properties
@@ -64,10 +66,28 @@ void UTurnMonsterFsm::AttackState()
 void UTurnMonsterFsm::MoveToPlayer()
 {
 	if (GameState->TurnPlayers.Num() <= 0){UE_LOG(LogTemp,Warning,TEXT("TurnMonFsm 플레이어 없음"))return;}
+	
 	int32 rand = FMath::RandRange(0,GameState->TurnPlayers.Num()-1);
+
+	TurnPlayer = GameState->TurnPlayers[rand];
+	TurnMonster->AiController->ReceiveMoveCompleted.AddUniqueDynamic(this,&UTurnMonsterFsm::AttackToPlayer);
 	TurnMonster->AiController->MoveToLocation(GameState->TurnPlayers[rand]->GetActorLocation(),200,
 		true,true,true);
 
-	GameState->NextMonsterTurn();
+	// GameState->NextMonsterTurn();
 }
 
+void UTurnMonsterFsm::AttackToPlayer(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+{
+	if (Result == EPathFollowingResult::Type::Success && TurnPlayer != nullptr)
+	{
+		TurnPlayer->TurnPlayerStruct.CurrentHp -= TurnMonster->TurnMonsterStruct.Attack;
+		TurnPlayer->UITurnHpBar->SetHpBar(TurnPlayer->TurnPlayerStruct);
+	}
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	{
+		GameState->NextMonsterTurn();
+	},2.0f,false);
+}

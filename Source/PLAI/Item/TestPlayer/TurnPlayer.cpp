@@ -112,11 +112,9 @@ void ATurnPlayer::AttackToMonster(ATurnMonster* TurnMonster)
 
 void ATurnPlayer::AvoidToMonster()
 {
-	AI->MoveToLocation(GetActorLocation() -GetActorForwardVector() * 350,0,true,true,true);
+	AI->MoveToLocation(GetActorLocation() -GetActorForwardVector() * 500,0,true,true,true);
 	GameState->NextPlayerTurn(this);
 }
-
-
 
 void ATurnPlayer::OnAIMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
 {

@@ -75,8 +75,9 @@ void AGameStateOpen::NextMonsterTurn()
 		TurnMonsters[i]->TurnIndex = i;
 	}
 	if (TurnMonsters[0])
-	{ TurnMonsters[0]->bTurn = true; }
-	
+	{
+		TurnMonsters[0]->bTurn = true;
+	}
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 	{
 		TimerSecond += GetWorld()->GetDeltaSeconds();
