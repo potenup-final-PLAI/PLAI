@@ -173,13 +173,14 @@ void UInputComp::On_LeftMouseStart()
 	if (TurnPlayer && TurnPlayer->bTurn == true)
 	{
 		DrawDebugSphere(GetWorld(),Hit.Location,50,10,FColor::Red,false,1);
-		
-		TurnPlayer->MoveLocation = Hit.Location;
-		TurnPlayer->MoveToMonster();
-		TestPlayer->TurnComp->UiTurn->Gs->NextPlayerTurn(TurnPlayer);
 
-		TurnPlayer->bTurn = false;
-		TurnPlayer->TurnIndex = 100;
+		TurnPlayer->PlayerState(Hit.Location,nullptr);
+		
+		if (ATurnMonster* TurnMonster = Cast<ATurnMonster>(Hit.GetActor()))
+		{
+			TurnPlayer->PlayerState(Hit.Location,TurnMonster);
+		}
+		
 		TurnPlayer = nullptr;
 	}
 

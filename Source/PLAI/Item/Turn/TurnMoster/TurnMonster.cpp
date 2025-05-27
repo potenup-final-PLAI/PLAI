@@ -54,6 +54,8 @@ void ATurnMonster::SetMonsterUi()
 	MonUi->Name->SetText(FText::FromString(TurnMonsterStruct.Name));
 	MonUi->CurrentHp->SetText(FText::AsNumber(TurnMonsterStruct.CurrentHp));
 	MonUi->MaxHp->SetText(FText::AsNumber(TurnMonsterStruct.MaxHp));
+	MonUi->HpBar->SetPercent(static_cast<float>(TurnMonsterStruct.CurrentHp) / TurnMonsterStruct.MaxHp);
+	MonUi->CurrentHp->SetText(FText::AsNumber(TurnMonsterStruct.CurrentHp));
 }
 
 void ATurnMonster::SetHpBar()

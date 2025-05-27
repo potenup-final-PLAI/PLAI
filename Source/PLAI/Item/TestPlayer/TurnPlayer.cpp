@@ -5,6 +5,7 @@
 
 #include "AIController.h"
 #include "Components/WidgetComponent.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "PLAI/Item/GameState/GameStateOpen.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/UI/Turn/UITurnHpBar.h"
@@ -57,21 +58,62 @@ void ATurnPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ATurnPlayer::PlayerState()
+void ATurnPlayer::PlayerState(FVector Location, ATurnMonster* TurnMonster)
+{
+	switch (TurnPlayerState)
+	{
+	case ETurnPlayerState::Idle:
+		Idle();
+		break;
+		
+	case ETurnPlayerState::Move:
+		MoveToMonster(Location);
+		break;
+		
+	case ETurnPlayerState::Attack:
+		AttackToMonster(TurnMonster);
+		break;
+		
+	case ETurnPlayerState::Avoid:
+		AvoidToMonster();
+		break;
+	}
+}
+
+void ATurnPlayer::Idle()
 {
 }
 
-void ATurnPlayer::MoveToMonster()
+void ATurnPlayer::MoveToMonster(FVector Location)
 {
-	if (MoveLocation == FVector::ZeroVector) return;
-	
-	UE_LOG(LogTemp,Warning,TEXT("ATurnPlayer::MoveToMonster 실행이 되고있니"));
+	UE_LOG(LogTemp,Warning,TEXT("ATurnPlayer::MoveToMonster 실행이 되고있니 위치는? [%s]"),*Location.ToString());
 	AAIController* AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
 	AI->Possess(this);
-	AI->MoveToLocation(MoveLocation,25, true,true,true);
+	
+	AI->MoveToLocation(Location,100, true,true,true);
+	
+	AI->ReceiveMoveCompleted.AddUniqueDynamic(this,&ATurnPlayer::OnAIMoveCompleted);
 }
 
-void ATurnPlayer::AttackToMonster()
+void ATurnPlayer::AttackToMonster(ATurnMonster* TurnMonster)
 {
-	
+	if (!TurnMonster)return;
+	UE_LOG(LogTemp,Warning,TEXT("TurnPlayer TurnMonster 공격"))
+	TurnMonster->TurnMonsterStruct.CurrentHp -= TurnPlayerStruct.Atk;
+	TurnMonster->SetMonsterUi();
 }
+
+void ATurnPlayer::AvoidToMonster()
+{
+}
+
+void ATurnPlayer::OnAIMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+{
+	if (Result == EPathFollowingResult::Type::Success)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("TurnPlayer TurnMonster 위치 도착 공격State전환"))
+		TurnPlayerState = ETurnPlayerState::Attack;
+	}
+}
+
+

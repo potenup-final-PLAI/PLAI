@@ -4,7 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "TestPlayer.h"
+#include "PLAI/Item/Turn/TurnMoster/TurnMonster.h"
 #include "TurnPlayer.generated.h"
+
+UENUM(BlueprintType)
+enum class ETurnPlayerState : uint8
+{
+	Idle,
+	Move,
+	Attack,
+	Avoid
+};
+
 USTRUCT(BlueprintType)
 struct FTurnPlayerStruct
 {
@@ -12,7 +23,7 @@ struct FTurnPlayerStruct
 public:
 	int32 CurrentHp = 100;
 	int32 MaxHp = 100;
-	int32 Atk = 10;
+	int32 Atk = 50;
 };
 UCLASS()
 class PLAI_API ATurnPlayer : public ACharacter
@@ -35,6 +46,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+	UPROPERTY(EditAnywhere)
+	ETurnPlayerState TurnPlayerState = ETurnPlayerState::Move;
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUITurnHpBar> TurnHpBarFactory;
 	UPROPERTY(EditAnywhere)
@@ -61,8 +75,15 @@ public:
 	UPROPERTY(EditAnywhere)
 	FTurnPlayerStruct TurnPlayerStruct;
 
-	void PlayerState();
+	void PlayerState(FVector Location, ATurnMonster* TurnMonster);
+
+	void Idle();
+	void MoveToMonster(FVector Location);
+	void AttackToMonster(class ATurnMonster* TurnMonster);
+	void AvoidToMonster();
 	
-	void MoveToMonster();
-	void AttackToMonster();
+	UFUNCTION()
+	void OnAIMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
+	
+	// void ChangeState(ETurnPlayerState NewState);
 };
