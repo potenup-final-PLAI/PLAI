@@ -34,6 +34,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ATestPlayer* TestPlayer;
 	UPROPERTY(EditAnywhere)
+	class ATurnPlayer* TurnPlayer;
+	UPROPERTY(EditAnywhere)
 	class APlayerController* Pc;
 	
 	UPROPERTY(EditAnywhere)

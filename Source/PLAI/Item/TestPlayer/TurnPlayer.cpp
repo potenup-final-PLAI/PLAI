@@ -18,7 +18,6 @@ ATurnPlayer::ATurnPlayer()
 void ATurnPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -36,8 +35,10 @@ void ATurnPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void ATurnPlayer::MoveToPlayer()
 {
-	UE_LOG(LogTemp,Warning,TEXT("ATurnMonster::MoveToMonster 실행이 되고있니"));
+	if (MoveLocation == FVector::ZeroVector) return;
+	
+	UE_LOG(LogTemp,Warning,TEXT("ATurnPlayer::MoveToMonster 실행이 되고있니"));
 	AAIController* AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
 	AI->Possess(this);
-	AI->MoveToLocation(GetActorLocation() + GetActorForwardVector() * 150,25, true,true,false);
+	AI->MoveToLocation(MoveLocation,25, true,true,false);
 }

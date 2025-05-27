@@ -149,6 +149,7 @@ void UUiMain::HttpLoginMe()
 void UUiMain::OnButtonStart()
 {
 	UGameplayStatics::SetGamePaused(GetWorld(),false);
+	
 	LoginComp->TestPlayer->InvenComp->MenuInven->AddToViewport(1);
 	LoginComp->TestPlayer->InvenComp->MenuInven->WBP_ItemDetail->SetVisibility(ESlateVisibility::Hidden);
 	LoginComp->TestPlayer->InvenComp->MenuInven->WBP_EquipInven->SetVisibility(ESlateVisibility::Hidden);

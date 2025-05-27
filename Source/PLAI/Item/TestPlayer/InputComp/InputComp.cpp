@@ -167,6 +167,21 @@ void UInputComp::On_LeftMouseStart()
 
 	if (Hit.GetActor()){UE_LOG(LogTemp,Warning,TEXT("InputComp 왼쪽 마우스 무슨엑터? [%s]"),*Hit.GetActor()->GetName())}
 
+
+	if (TurnPlayer)
+	{
+		DrawDebugSphere(GetWorld(),Hit.Location,25,7,FColor::Red,false,1);
+		TurnPlayer->MoveLocation = Hit.Location;
+		TurnPlayer->MoveToPlayer();
+		TurnPlayer = nullptr;
+	}
+
+	// 턴제 전투 플레이어
+	if (ATurnPlayer * TurnPlayerClick = Cast<ATurnPlayer>(Hit.GetActor()))
+	{
+		TurnPlayer = TurnPlayerClick;
+	}
+
 	// 턴제 월드 몬스터 찾기
 	if (ATurnMonsterWorld* TurnMonsterWorld = Cast<ATurnMonsterWorld>(Hit.GetActor()))
 	{
@@ -178,12 +193,6 @@ void UInputComp::On_LeftMouseStart()
 	if (ATurnMonster* TurnMonster = Cast<ATurnMonster>(Hit.GetActor()))
 	{
 		TurnMonster->MoveToMonster();
-	}
-
-	// 턴제 전투 플레이어
-	if (ATurnPlayer * TurnPlayer = Cast<ATurnPlayer>(Hit.GetActor()))
-	{
-		TurnPlayer->MoveToPlayer();
 	}
 	
 	// Npc 찾기 창 끄기
