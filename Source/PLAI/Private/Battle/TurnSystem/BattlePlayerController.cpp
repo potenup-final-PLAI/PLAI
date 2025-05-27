@@ -13,7 +13,7 @@ void ABattlePlayerController::BeginPlay()
 
 	if (!HasAuthority())
 	{
-		GetWorld()->GetTimerManager().SetTimer(timerHandle, this,&ABattlePlayerController::NotifiyReady,0.2f, true);
+		GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ABattlePlayerController::NotifiyReady, 0.2f, true);
 	}
 }
 
@@ -32,19 +32,13 @@ void ABattlePlayerController::ServerRPC_NotifyReady_Implementation()
 	if (AUPhaseManager* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 	{
 		phaseManager->PlayerReady(this);
-		UE_LOG(LogTemp, Warning, TEXT("Player ready %s"), *this->GetActorNameOrLabel());
+		// UE_LOG(LogTemp, Warning, TEXT("Player ready %s"), *this->GetActorNameOrLabel());
 	}
 }
 
 void ABattlePlayerController::Client_StopReadyTimer_Implementation()
 {
 	GetWorld()->GetTimerManager().ClearTimer(timerHandle);
-}
-
-void ABattlePlayerController::MulticastRPC_StartPlayerTurn_Implementation(ABattlePlayer* playerPawn)
-{
-	if (playerPawn == GetWorld()->GetFirstPlayerController()->GetPawn())
-		playerPawn->OnTurnStart();
 }
 
 void ABattlePlayerController::SetViewTargetMyPawn(APawn* myPawn)

@@ -7,7 +7,8 @@
 
 void UCycleAndTurn::SetCycleText(int32 cycle)
 {
-	txt_Cycle->SetText(FText::AsNumber(cycle));
+	FString round = FString::Printf(TEXT("%d Round"), cycle);
+	txt_Cycle->SetText(FText::FromString(round));
 }
 
 void UCycleAndTurn::SetTurnText(FString unit)

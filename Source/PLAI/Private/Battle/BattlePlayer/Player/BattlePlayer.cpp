@@ -146,25 +146,16 @@ void ABattlePlayer::Server_OnClickedTurnEnd_Implementation()
 	}
 	if (phaseManager == nullptr)
 	{
-		UE_LOG(LogTemp, Warning,
-			   TEXT("ActionUI OnClickedTurnEnd phaseManager nullPtr"));
+		UE_LOG(LogTemp, Warning, TEXT("ActionUI OnClickedTurnEnd phaseManager nullPtr"));
 		return;
 	}
 	// 버튼 상태 업데이트
 	this->currentActionMode = EActionMode::TurnEnd;
-
-	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
-	{
-		// 플레이어 턴 종료
-		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
-		OnTurnEnd();
-	}
-	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
-	{
-		// Enemy 턴 종료
-		UE_LOG(LogTemp, Warning, TEXT("Click Turn End"));
-		enemy->OnTurnEnd();
-	}
+	
+	// 플레이어 턴 종료
+	NET_PRINTLOG(TEXT("Click Turn End Player"));
+	turnManager->bTurnEnded = false;
+	turnManager->OnTurnEnd();
 }
 
 void ABattlePlayer::Server_OnClickedBaseAttack_Implementation()

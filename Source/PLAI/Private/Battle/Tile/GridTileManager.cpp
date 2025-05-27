@@ -145,6 +145,7 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 		}
 	}
 
+	int32 enemyCount = 0;
 	// 적 유닛 스폰
 	for (const FIntPoint& coord : enemyCoords)
 	{
@@ -180,6 +181,7 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 					// 위 내용과 동일
 					enemy->speed = FMath::RandRange(1, 10);
 					enemy->currentTile = gridTile;
+					enemy->MyName = TEXT("Unit_") + FString::FormatAsNumber(enemyCount++);
 					unitArray.Add(enemy);
 				}
 			}
@@ -189,7 +191,7 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 	{
 		phaseManager->SetBeforeBattle();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("InitGridTile : gridTile Complete"));
+	// UE_LOG(LogTemp, Warning, TEXT("InitGridTile : gridTile Complete"));
 
 
 	// 타일 Array만들어서 변수 담기

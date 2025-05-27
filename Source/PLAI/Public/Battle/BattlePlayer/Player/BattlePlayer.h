@@ -48,10 +48,7 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim)
 	class UBattlePlayerAnimInstance* playerAnim;
 
-
-
-
-
+	
 
 	UFUNCTION(Server, Reliable)
 	void Server_OnClickedTurnEnd();

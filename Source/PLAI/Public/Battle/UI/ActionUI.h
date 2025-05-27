@@ -62,4 +62,6 @@ public:
 	
 	UFUNCTION()
 	void OnClickedRupture();
+
+	class ABattlePlayer* IsMyTurn();
 };

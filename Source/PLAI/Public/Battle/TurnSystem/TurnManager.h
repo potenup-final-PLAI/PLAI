@@ -42,8 +42,10 @@ UENUM()
 enum class ETurnState : uint8
 {
 	None UMETA(DisplayName = "None"),
+	PreparePlayerTurn UMETA(DisplayName = "PreparePlayerTurn"),
 	PlayerTurn UMETA(DisplayName = "PlayerTurn"),
-	EnemyTurn UMETA(DisplayName = "EnemyTurn"),
+	PrepareEnemyTurn UMETA(DisplayName = "PrepareEnemyTurn"),
+	EnemyTurn UMETA(DisplayName = "PrepareEnemyTurn"),
 	TurnEnd UMETA(DisplayName = "TurnEnd")
 };
 
@@ -89,22 +91,17 @@ public:
 	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintReadOnly,
 		Category = "Turn")
 	int32 turnCount = 0;
-	//--------------Player Turn---------------------
-	// 플레이어 첫 유닛 실행
-	void StartPlayerTurn();
-
-	//--------------Enemy Turn---------------------
-	// 적 첫 유닛 실행
-	void StartEnemyTurn();
-
+	//--------------Unit Turn 시작---------------------
+	void StartTurn();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_CameraChange(class APawn* target);
 
+	//------------Enemy Turn 여러 번 호출 방지--------
+	UPROPERTY(Replicated)
+	bool bTurnEnded;
+	
+	void OnTurnStart();
+   	void OnTurnEnd();
 
-	UPROPERTY()
-	APawn* tempBattlePlayer;
-
-	uint32 a;
-	uint32 b;
 };

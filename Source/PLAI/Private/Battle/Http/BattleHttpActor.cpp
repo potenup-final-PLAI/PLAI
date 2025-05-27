@@ -6,6 +6,7 @@
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
 #include "Battle/TurnSystem/PhaseManager.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Enemy/BaseEnemy.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
@@ -56,15 +57,13 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 	if (bHasEnv)
 	{
 		// 요청 URL - 서버가 알려줌
-		httpRequest->SetURL(TEXT(
-			"https://0b55-221-148-189-129.ngrok-free.app/service1/battle/start"));
+		httpRequest->SetURL(TEXT("https://0b55-221-148-189-129.ngrok-free.app/service1/battle/start"));
 	}
 	// Action API 일때
 	else if (bHasTurn)
 	{
 		// 요청 URL - 서버가 알려줌
-		httpRequest->SetURL(TEXT(
-			"https://0b55-221-148-189-129.ngrok-free.app/service1/battle/action"));
+		httpRequest->SetURL(TEXT("https://0b55-221-148-189-129.ngrok-free.app/service1/battle/action"));
 	}
 	// 요청 방식
 	httpRequest->SetVerb(TEXT("POST"));
@@ -76,16 +75,12 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 	// 두 값중 True인 값에 JsonString 채워짐
 	if (bHasEnv)
 	{
-		FJsonObjectConverter::UStructToJsonObjectString(
-			environmentState, jsonString);
+		FJsonObjectConverter::UStructToJsonObjectString(environmentState, jsonString);
 	}
 	if (bHasTurn)
 	{
-		FJsonObjectConverter::UStructToJsonObjectString(
-			battleTurnState, jsonString);
+		FJsonObjectConverter::UStructToJsonObjectString(battleTurnState, jsonString);
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonString);
 
 	if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 	{
@@ -100,6 +95,7 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 	// 서버에게 요청을 한 후 응답이오면 호출되는 함수 등록
 	httpRequest->OnProcessRequestComplete().BindLambda([=, this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bProcessedSuccessfully)
 	{
+		NET_PRINTLOG(TEXT("HttpPost 응답, %s"), (unit ? *unit->MyName : TEXT("unit is nullptr")));
 		//GetResponseCode : 200 - 성공, 400번대, 500번대 - 오류
 		// 응답이 오면 실행
 		// 성공
@@ -125,7 +121,6 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 				FActionRequest ParsedRequest;
 				if (FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &ParsedRequest, 0, 0))
 				{
-					UE_LOG(LogTemp, Warning,TEXT("Success Response Json To Struct"));
 					if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 					{
 						// Turn 진행 중이라면
@@ -157,6 +152,7 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 	});
 	
 	// 요청을 보내자.
+	NET_PRINTLOG(TEXT("HttpPost 요청, %s"), (unit ? *unit->MyName : TEXT("unit is nullptr")));
 	httpRequest->ProcessRequest();
 }
 

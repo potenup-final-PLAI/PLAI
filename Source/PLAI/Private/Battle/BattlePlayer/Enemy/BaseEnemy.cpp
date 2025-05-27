@@ -5,6 +5,7 @@
 
 #include "GridTile.h"
 #include "GridTileManager.h"
+#include "Battle/TurnSystem/PhaseManager.h"
 #include "Enemy/BattleEnemyAnimInstance.h"
 #include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
@@ -57,14 +58,12 @@ void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
 {
 	if (!tileManager)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("BaseEnemy : MoveToPlayer - tileManager is nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - tileManager is nullptr"));
 		return;
 	}
 	if (!player && !goalTile)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("BaseEnemy : MoveToPlayer - player/goalTile is nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - player/goalTile is nullptr"));
 		return;
 	}
 	if (currentTile == goalTile)
@@ -75,7 +74,9 @@ void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
 			enemyAnim->actionMode = currentActionMode;
 			UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"),*UEnum::GetValueAsString(enemyAnim->actionMode));
 		}
-		OnTurnEnd();
+
+		phaseManager->turnManager->OnTurnEnd();
+
 		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
 		return;
 	}
@@ -108,8 +109,7 @@ ABattlePlayer* ABaseEnemy::FindClosestPlayer(TArray<ABattlePlayer*>& allPlayers)
 
 	for (ABattlePlayer* player : allPlayers)
 	{
-		float dist = FVector::DistSquared(player->GetActorLocation(),
-		                                  GetActorLocation());
+		float dist = FVector::DistSquared(player->GetActorLocation(),GetActorLocation());
 		if (dist < minDist)
 		{
 			minDist = dist;
@@ -149,18 +149,17 @@ void ABaseEnemy::FindAndAttackPlayer()
 	for (auto& overlap : overlaps)
 	{
 		// 탐색 했을 때 그 객체가 Player라면
-		if (ABattlePlayer* detectedPlayer = Cast<ABattlePlayer>(
-			overlap.GetActor()))
+		if (ABattlePlayer* detectedPlayer = Cast<ABattlePlayer>(overlap.GetActor()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Detected Player"));
 			// 플레이어가 있다면 공격
-			this->EnemyApplyAttack(detectedPlayer, EActionMode::Poison);
+			EnemyApplyAttack(detectedPlayer, EActionMode::Poison);
 			break;
 		}
 	}
 
 	// 끝났으면 턴 종료 처리
-	OnTurnEnd();
+	phaseManager->turnManager->OnTurnEnd();
 }
 
 void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
@@ -202,7 +201,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	}
 
 	// 턴 종료 호출
-	OnTurnEnd();
+	phaseManager->turnManager->OnTurnEnd();
 }
 
 void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)

@@ -134,10 +134,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
 
-	void OnTurnStart();
+
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_SetBattlePlayerInfoUI();
-	void OnTurnEnd();
 	//------------Skill System-----------------
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	EActionMode currentActionMode = EActionMode::None;
@@ -364,10 +363,6 @@ public:
 	bool bStartMontage = false;
 	ABaseBattlePawn* attackTarget;
 
-	//------------Enemy Turn 여러 번 호출 방지--------
-	bool bTurnEnded = false;
-
-	
 	//-------------Enemy Name----------------
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_SetEnemyName(class ABaseEnemy* enemy);

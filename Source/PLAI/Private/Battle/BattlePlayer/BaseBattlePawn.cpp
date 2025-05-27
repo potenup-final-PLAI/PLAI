@@ -142,67 +142,10 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
 	
-	DrawDebugString(GetWorld(), GetActorLocation(), MyName, nullptr, FColor::Yellow, 0);
+	DrawDebugString(GetWorld(), GetActorLocation(), MyName, nullptr, FColor::Yellow, 0, true);
 	
 }
 
-void ABaseBattlePawn::OnTurnStart()
-{
-	if (!IsLocallyControlled()) return;
-	if (!turnManager)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("turnManager is Not Set"));
-		return;
-	}
-	
-	// 턴 종료 초기화
-	bTurnEnded = false;
-	// 기본 공격 초기화
-	bBaseAttack = true;
-	
-	// 턴이 시작됐으면 턴 카운트 1 증가
-	turnManager->turnCount++;
-	UE_LOG(LogTemp, Warning, TEXT("Turn Count %d"), turnManager->turnCount);
-
-	MultiCastRPC_SetBattlePlayerInfoUI();
-
-	// 상태이상이 있다면 대미지 및 버프, 디버프 처리하기
-	ApplyStatusEffect();
-
-	// Player라면
-	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
-	{
-		player->GetAP();
-		MultiCastRPC_InitAPUI();
-		UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(),player->curAP);
-	}
-	// Enemy라면
-	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnTurnStart"));
-
-		// 턴 시작 시 AP 증가
-		enemy->GetAP();
-		UE_LOG(LogTemp, Warning, TEXT("enemy Current AP: %d"),enemy->curAP);
-
-		// 이동 범위 보이게
-		enemy->ServerRPC_SeeMoveRange(enemy->moveRange);
-		
-		ABaseBattlePawn* CapturedUnit = this;
-
-		FTimerHandle battleAPIHandle;
-		GetWorld()->GetTimerManager().SetTimer(battleAPIHandle,FTimerDelegate::CreateLambda([this, CapturedUnit]()
-		{
-			UE_LOG(LogTemp, Warning,TEXT("BaseBattlePawn::In Lambda"));
-			if (turnManager && turnManager->phaseManager)
-			{
-				UE_LOG(LogTemp,Warning,TEXT("BaseBattlePawn::turnManager, phaseManager is Set"));
-				turnManager->phaseManager->TrySendbattleState(CapturedUnit);
-			}
-		}), 1.0f, false);
-	}
-	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
-}
 void ABaseBattlePawn::MultiCastRPC_SetBattlePlayerInfoUI_Implementation()
 {
 	// BattlePlayerInfo UI 세팅
@@ -229,39 +172,6 @@ void ABaseBattlePawn::MultiCastRPC_SetEnemyName_Implementation(class ABaseEnemy*
 	{
 		enemy->battleUnitStateUI->SetUnitName(name);
 		UE_LOG(LogTemp, Warning, TEXT("Name set on UI successfully"));
-	}
-}
-
-void ABaseBattlePawn::OnTurnEnd()
-{
-	// 여러 번 호출 방지
-	if (bTurnEnded)
-	{
-		return;
-	}
-	
-	bTurnEnded = true;
-	
-	MultiCastRPC_ClearGridTile();
-	
-	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *GetName());
-	// 입력 막고 FSM 종료
-
-	// 턴 종료 상태거나 phaseManager가 없다면 return
-	if (!phaseManager && !turnManager && phaseManager->turnManager->curTurnState == ETurnState::TurnEnd)
-	{
-		UE_LOG(LogTemp, Warning,TEXT(" OnTurnEnd : !(phaseManager && phaseManager->turnManager->curTurnState == ETurnState::TurnEnd"));
-		return;
-	}
-	if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
-	{
-		// PlayerPhaseEnd
-		phaseManager->ServerRPC_EndPlayerPhase();
-	}
-	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(this))
-	{
-		MultiCastRPC_UpdateReason();
-		phaseManager->ServerRPC_EndEnemyPhase();
 	}
 }
 
@@ -302,7 +212,10 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		case EActionMode::None:
 			break;
 		case EActionMode::TurnEnd:
-			OnTurnEnd();
+			if (HasAuthority())
+			{
+				turnManager->OnTurnEnd();
+			}
 			break;
 		case EActionMode::Move:
 			PlayerMove(hitInfo);
@@ -622,8 +535,7 @@ void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(
 	}
 }
 
-void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit,
-                                        EActionMode attackType)
+void ABaseBattlePawn::PlayerApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType)
 {
 	auto* player = Cast<ABattlePlayer>(this);
 	auto* enemy = Cast<ABaseEnemy>(targetUnit);
@@ -1216,7 +1128,6 @@ void ABaseBattlePawn::Multicast_SeeMoveRange_Implementation()
 	
 	for (const FIntPoint& coord : tiles)
 	{
-		NET_PRINTLOG(TEXT("coord : %d, %d"), coord.X, coord.Y);
 		AGridTile* tile = gridTileManager->GetTile(coord.X, coord.Y);
 		if (tile)
 		{
@@ -1254,36 +1165,6 @@ void ABaseBattlePawn::SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles)
 		}
 	}
 }
-// if (!gridTileManager || currentActionMode != EActionMode::Move)
-// {
-// 	UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange : !gridTileManager || currentActionMode != EActionMode::Move"));
-// 	return;
-// }
-//
-// UE_LOG(LogTemp, Warning, TEXT("SeeMoveRange called"));
-// highlightedTiles.Empty();
-// // currentTile 기준으로 이동 범위 상하좌우 moveRange 만큼 색 변경
-// FIntPoint coord = gridTileManager->GetTileLoc(currentTile);
-// int32 startX = coord.X;
-// int32 startY = coord.Y;
-//
-// // 멘해튼 거리를 활용하여 대각선 포함 상하좌우에 있는 타일 색 변경
-// for (int y = startY - move_Range; y <= startY + move_Range; y++)
-// {
-// 	for (int x = startX - move_Range; x <= startX + move_Range; x++)
-// 	{
-// 		int dx = FMath::Abs(x - startX);
-// 		int dy = FMath::Abs(y - startY);
-//
-// 		if (dx + dy <= move_Range)
-// 		{
-// 			// 이 타일은 이동 가능 범위 안에 있음
-// 			AGridTile* tempTile = gridTileManager->GetTile(x, y);
-// 			gridTileManager->SetTileColor(gridTileManager->GetTile(x, y), true);
-// 			highlightedTiles.Add(tempTile);
-// 		}
-// 	}
-// }
 void ABaseBattlePawn::ClearGridTile()
 {
 	for (AGridTile* target : highlightedTiles)
@@ -1298,7 +1179,10 @@ void ABaseBattlePawn::ClearGridTile()
 void ABaseBattlePawn::OnMoveEnd()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Move Complete"));
-	OnTurnEnd();
+	if (HasAuthority())
+	{
+		//turnManager->OnTurnEnd();
+	}
 }
 
 void ABaseBattlePawn::InitValues()
@@ -1545,18 +1429,14 @@ void ABaseBattlePawn::MultiCastRPC_UnitMoveRotateAttack_Implementation()
 				player->meshComp->SetRelativeRotation(newRot);
 
 				// 회전이 다 됐는지 체크
-				if (FMath::Abs(
-						FMath::FindDeltaAngleDegrees(
-							newRot.Yaw, targetMeshRot.Yaw))
-					< 1.f)
+				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
 				{
 					bWantsToAttack = false;
 
 					if (player->bStartMontage)
 					{
 						// 회전 끝나고 몽타주 실행
-						player->playerAnim->PlayBaseAttackAnimation(
-							TEXT("StartBaseAttack"));
+						player->playerAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
 						player->bStartMontage = false;
 						UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
 
@@ -1565,25 +1445,20 @@ void ABaseBattlePawn::MultiCastRPC_UnitMoveRotateAttack_Implementation()
 						{
 							return;
 						}
-						player->battleUnitStateComp->SetDrawSize(
-							FVector2D(150, 100));
-						player->battleUnitStateUI->SetPrintSkillName(
-							player->curSkillName);
+						player->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
+						player->battleUnitStateUI->SetPrintSkillName(player->curSkillName);
 						player->battleUnitStateUI->ShowPrintSkillNameUI();
 
 						FTimerHandle skillNameUIHandle;
-						GetWorld()->GetTimerManager().ClearTimer(
-							skillNameUIHandle);
-						GetWorld()->GetTimerManager().SetTimer(
-							skillNameUIHandle, [player]()
+						GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
+						GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [player]()
+						{
+							if (player && player->battleUnitStateUI)
 							{
-								if (player && player->battleUnitStateUI)
-								{
-									player->battleUnitStateUI->ShowBaseUI();
-									player->battleUnitStateComp->SetDrawSize(
-										FVector2D(50, 10));
-								}
-							}, 2.0f, false);
+								player->battleUnitStateUI->ShowBaseUI();
+								player->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+							}
+						}, 2.0f, false);
 					}
 				}
 			}
@@ -1593,16 +1468,11 @@ void ABaseBattlePawn::MultiCastRPC_UnitMoveRotateAttack_Implementation()
 			if (enemy->meshComp)
 			{
 				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
-				FRotator targetMeshRot = FRotator(
-					0.f, desiredRot.Yaw + yawOffset, 0.f);
-				FRotator newRot = FMath::RInterpTo(
-					currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(),
-					interpSpeed);
+				FRotator targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
+				FRotator newRot = FMath::RInterpTo(currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
 				enemy->meshComp->SetRelativeRotation(newRot);
 
-				if (FMath::Abs(
-						FMath::FindDeltaAngleDegrees(
-							newRot.Yaw, targetMeshRot.Yaw))
+				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw))
 					< 1.f)
 				{
 					bWantsToAttack = false;
@@ -1611,40 +1481,32 @@ void ABaseBattlePawn::MultiCastRPC_UnitMoveRotateAttack_Implementation()
 						// 회전 끝나고 몽타주 실행
 						if (enemy->enemyAnim)
 						{
-							enemy->enemyAnim->PlayBaseAttackAnimation(
-								TEXT("StartBaseAttack"));
-							UE_LOG(LogTemp, Warning,
-							       TEXT("EnemyBaseAttackAnimation"));
+							enemy->enemyAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
+							UE_LOG(LogTemp, Warning, TEXT("EnemyBaseAttackAnimation"));
 
 							// 어떤 스킬 사용했는지
 							if (enemy->curSkillName == "")
 							{
 								return;
 							}
-							enemy->battleUnitStateComp->SetDrawSize(
-								FVector2D(150, 100));
-							enemy->battleUnitStateUI->SetPrintSkillName(
-								enemy->curSkillName);
+							enemy->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
+							enemy->battleUnitStateUI->SetPrintSkillName(enemy->curSkillName);
 							enemy->battleUnitStateUI->ShowPrintSkillNameUI();
 
 							FTimerHandle skillNameUIHandle;
-							GetWorld()->GetTimerManager().ClearTimer(
-								skillNameUIHandle);
-							GetWorld()->GetTimerManager().SetTimer(
-								skillNameUIHandle, [enemy]()
+							GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
+							GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [enemy]()
+							{
+								if (enemy && enemy->battleUnitStateUI)
 								{
-									if (enemy && enemy->battleUnitStateUI)
-									{
-										enemy->battleUnitStateUI->ShowBaseUI();
-										enemy->battleUnitStateComp->SetDrawSize(
-											FVector2D(50, 10));
-									}
-								}, 2.0f, false);
+									enemy->battleUnitStateUI->ShowBaseUI();
+									enemy->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+								}
+							}, 2.0f, false);
 						}
 						else
 						{
-							UE_LOG(LogTemp, Error,
-							       TEXT("enemy->enemyAnim is nullptr!"));
+							UE_LOG(LogTemp, Error,TEXT("enemy->enemyAnim is nullptr!"));
 						}
 						enemy->bStartMontage = false;
 						UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
@@ -1893,8 +1755,7 @@ void ABaseBattlePawn::InitOtherClassPointer()
 		if (hud) UE_LOG(LogTemp, Warning, TEXT("hud is Set"));
 	}
 	// girdTile Setting
-	gridTileManager = Cast<AGridTileManager>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
+	gridTileManager = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), TileManagerFactory));
 	if (gridTileManager)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("gridTileManager is Set"));
@@ -1951,7 +1812,8 @@ void ABaseBattlePawn::MultiCastRPC_SetMyName_Implementation(
 
 void ABaseBattlePawn::ShowDialoge_Implementation(const FString& dialogue)
 {
-	if (!HasAuthority()) return;
+	if (HasAuthority())
+		return;
 	MultiCastRPC_ShowDialoge(dialogue);
 }
 
