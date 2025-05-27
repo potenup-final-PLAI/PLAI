@@ -107,6 +107,8 @@ void ATurnTile::PlayerSpawn()
 		
 		if (ATurnPlayer* TurnPlayer = GetWorld()->SpawnActor<ATurnPlayer>(TurnPlayerFactory,Params))
 		{
+			TurnPlayer->TileRange2D = FVector2D(GetTileCorner()[0].X-GetTileCorner()[2].X, GetTileCorner()[0].Y-GetTileCorner()[2].Y);
+			{UE_LOG(LogTemp,Error,TEXT("TurnTile Player Spawn TileRange2D크기 [%s]"),*TurnPlayer->TileRange2D.ToString());}
 			TurnPlayer->SetActorLocation(FVector(x,y,z));
 			TurnPlayer->SetActorScale3D(FVector(2.0,2.0,2.0));
 		}

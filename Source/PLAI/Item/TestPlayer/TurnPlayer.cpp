@@ -5,6 +5,7 @@
 
 #include "AIController.h"
 #include "Components/WidgetComponent.h"
+#include "PLAI/Item/GameState/GameStateOpen.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/UI/Turn/UITurnHpBar.h"
 
@@ -24,6 +25,8 @@ ATurnPlayer::ATurnPlayer()
 void ATurnPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GameState = Cast<AGameStateOpen>(GetWorld()->GetGameState());
 
 	UITurnHpBar = CreateWidget<UUITurnHpBar>(GetWorld(),TurnHpBarFactory);
 	UITurnHpBar->SetHpBar(TurnPlayerStruct);
@@ -54,7 +57,11 @@ void ATurnPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ATurnPlayer::MoveToPlayer()
+void ATurnPlayer::PlayerState()
+{
+}
+
+void ATurnPlayer::MoveToMonster()
 {
 	if (MoveLocation == FVector::ZeroVector) return;
 	
@@ -62,4 +69,9 @@ void ATurnPlayer::MoveToPlayer()
 	AAIController* AI = GetWorld()->SpawnActor<AAIController>(AIControllerClass);
 	AI->Possess(this);
 	AI->MoveToLocation(MoveLocation,25, true,true,true);
+}
+
+void ATurnPlayer::AttackToMonster()
+{
+	
 }

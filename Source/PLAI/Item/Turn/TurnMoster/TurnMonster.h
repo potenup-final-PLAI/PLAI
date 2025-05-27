@@ -48,7 +48,10 @@ public:
 	AAIController* AiController;
 
 	UPROPERTY(EditAnywhere)
-	class AGameStateOpen* Gs;
+	class AGameStateOpen* GameState;
+
+	UPROPERTY(EditAnywhere)
+	FVector2D TileRange2D;
 
 	virtual void SetMonsterUi() override;
 

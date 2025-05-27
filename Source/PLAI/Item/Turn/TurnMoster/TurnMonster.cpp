@@ -31,7 +31,7 @@ void ATurnMonster::BeginPlay()
 	AiController = GetWorld()->SpawnActor<AAIController>();
 	AiController->Possess(this);
 
-	Gs = Cast<AGameStateOpen>(GetWorld()->GetGameState());
+	GameState = Cast<AGameStateOpen>(GetWorld()->GetGameState());
 }
 
 // Called every frame

@@ -41,6 +41,9 @@ public:
 	class UUITurnHpBar* UITurnHpBar;
 
 	UPROPERTY(EditAnywhere)
+	class AGameStateOpen* GameState;
+
+	UPROPERTY(EditAnywhere)
 	class UWidgetComponent* WidgetComp;
 	
 	UPROPERTY(EditAnywhere)
@@ -51,9 +54,15 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int32 TurnIndex = 0;
+	
+	UPROPERTY(EditAnywhere)
+	FVector2D TileRange2D;
 
 	UPROPERTY(EditAnywhere)
 	FTurnPlayerStruct TurnPlayerStruct;
+
+	void PlayerState();
 	
-	void MoveToPlayer();
+	void MoveToMonster();
+	void AttackToMonster();
 };

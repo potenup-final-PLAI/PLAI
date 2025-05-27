@@ -175,7 +175,7 @@ void UInputComp::On_LeftMouseStart()
 		DrawDebugSphere(GetWorld(),Hit.Location,50,10,FColor::Red,false,1);
 		
 		TurnPlayer->MoveLocation = Hit.Location;
-		TurnPlayer->MoveToPlayer();
+		TurnPlayer->MoveToMonster();
 		TestPlayer->TurnComp->UiTurn->Gs->NextPlayerTurn(TurnPlayer);
 
 		TurnPlayer->bTurn = false;
