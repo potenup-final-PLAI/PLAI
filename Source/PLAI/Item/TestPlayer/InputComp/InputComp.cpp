@@ -13,11 +13,13 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/GameState/GameStateOpen.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/Npc/NpcCharacter.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/TestPlayer/TurnPlayer.h"
+#include "PLAI/Item/TestPlayer/TurnComp/TurnComp.h"
 #include "PLAI/Item/Turn/TurnMonsterWorld/TurnMonsterWorld.h"
 #include "PLAI/Item/Turn/TurnMoster/TurnMonster.h"
 #include "PLAI/Item/Turn/TurnTile/TurnTile.h"
@@ -25,6 +27,7 @@
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/InputUi/InputUi.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
+#include "PLAI/Item/UI/Turn/UiTurn.h"
 
 
 // Sets default values for this component's properties
@@ -158,28 +161,35 @@ void UInputComp::On_Map()
 void UInputComp::On_LeftMouseStart()
 {
 	if (!Pc->IsLocalController()) return;
-
-	UE_LOG(LogTemp,Warning,TEXT("InputComp 왼쪽마우스 클릭 [%s]"),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"));
-
+	
 	bLeftMouse = true;
 	FHitResult Hit;
 	Pc->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 
-	if (Hit.GetActor()){UE_LOG(LogTemp,Warning,TEXT("InputComp 왼쪽 마우스 무슨엑터? [%s]"),*Hit.GetActor()->GetName())}
+	if (Hit.GetActor()){UE_LOG(LogTemp,Warning,TEXT("InputComp 왼쪽 마우스 무슨엑터? [%s] 서클 누구?? [%s]"),
+		*Hit.GetActor()->GetName(),TestPlayer->HasAuthority()? TEXT("서버") : TEXT("클라"))}
 
 
-	if (TurnPlayer)
+	if (TurnPlayer && TurnPlayer->bTurn == true)
 	{
-		DrawDebugSphere(GetWorld(),Hit.Location,25,7,FColor::Red,false,1);
+		DrawDebugSphere(GetWorld(),Hit.Location,50,10,FColor::Red,false,1);
+		
 		TurnPlayer->MoveLocation = Hit.Location;
 		TurnPlayer->MoveToPlayer();
+		TestPlayer->TurnComp->UiTurn->Gs->NextPlayerTurn(TurnPlayer);
+
+		TurnPlayer->bTurn = false;
+		TurnPlayer->TurnIndex = 100;
 		TurnPlayer = nullptr;
 	}
 
 	// 턴제 전투 플레이어
 	if (ATurnPlayer * TurnPlayerClick = Cast<ATurnPlayer>(Hit.GetActor()))
 	{
-		TurnPlayer = TurnPlayerClick;
+		if (TurnPlayerClick->bTurn == true)
+		{ TurnPlayer = TurnPlayerClick; }
+
+		DrawDebugSphere(GetWorld(),Hit.Location,50,10,FColor::Blue,false,1);
 	}
 
 	// 턴제 월드 몬스터 찾기

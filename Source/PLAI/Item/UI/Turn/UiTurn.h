@@ -18,6 +18,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button_TurnStart;
 
+	UPROPERTY(EditAnywhere)
+	class AGameStateOpen* Gs;
+
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()

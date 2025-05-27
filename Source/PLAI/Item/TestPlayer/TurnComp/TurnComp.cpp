@@ -3,6 +3,10 @@
 
 #include "TurnComp.h"
 
+#include "Blueprint/UserWidget.h"
+#include "PLAI/Item/TestPlayer/TestPlayer.h"
+#include "PLAI/Item/UI/Turn/UiTurn.h"
+
 
 // Sets default values for this component's properties
 UTurnComp::UTurnComp()
@@ -20,10 +24,10 @@ void UTurnComp::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	UiTurn = CreateWidget<UUiTurn>(GetWorld(),UiTurnFactory);
+	UiTurn->AddToViewport();
 
-	// ...
-	
+	TestPlayer = Cast<ATestPlayer>(GetOwner());
 }
 
 

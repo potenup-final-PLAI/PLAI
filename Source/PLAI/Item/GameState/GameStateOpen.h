@@ -28,8 +28,7 @@ public:
 	TArray<ATurnMonster*> TurnMonsters;
 
 	void FindPlayerTurn();
-    void PlayerTurn();
-	
+	void NextPlayerTurn(ATurnPlayer* TurnPlayer);
 	
 	void FindMonsterTurn();
 	void MonsterTurn();

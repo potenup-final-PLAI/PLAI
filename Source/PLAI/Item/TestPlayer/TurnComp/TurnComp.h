@@ -30,4 +30,7 @@ public:
 	TSubclassOf<class UUiTurn> UiTurnFactory;
 	UPROPERTY(EditAnywhere)
 	class UUiTurn* UiTurn;
+
+	UPROPERTY(EditAnywhere)
+	class ATestPlayer* TestPlayer;
 };

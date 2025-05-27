@@ -14,8 +14,20 @@ void AGameStateOpen::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AGameStateOpen::NextPlayerTurn(ATurnPlayer* TurnPlayer)
+{
+	TurnPlayers.Remove(TurnPlayer);
+	for (int i = 0; i < TurnPlayers.Num(); i++)
+	{
+		if (i == 0){ TurnPlayer[i].bTurn = true; }
+		
+		TurnPlayers[i]->TurnIndex = i;
+	}
+}
+
 void AGameStateOpen::FindPlayerTurn()
 {
+	// int32 Index = Actors.IndexOfByKey(SomeActor);
 	TArray<AActor*> Actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ATurnPlayer::StaticClass(),Actors);
 	for(int i = 0; i < Actors.Num(); i++)
@@ -26,11 +38,6 @@ void AGameStateOpen::FindPlayerTurn()
 			TurnPlayers.Add(TurnPlayer);
 		}
 	}
-}
-
-void AGameStateOpen::PlayerTurn()
-{
-	
 }
 
 void AGameStateOpen::FindMonsterTurn()

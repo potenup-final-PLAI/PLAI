@@ -107,6 +107,7 @@ void ATurnTile::PlayerSpawn()
 		
 		if (ATurnPlayer* TurnPlayer = GetWorld()->SpawnActor<ATurnPlayer>(TurnPlayerFactory,Params))
 		{
+			if (i == 0){TurnPlayer->bTurn = true;}
 			TurnPlayer->SetActorLocation(FVector(x,y,z));
 			TurnPlayer->SetActorScale3D(FVector(2.0,2.0,2.0));
 		}
