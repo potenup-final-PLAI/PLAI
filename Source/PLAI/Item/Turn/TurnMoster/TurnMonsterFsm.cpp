@@ -25,9 +25,6 @@ void UTurnMonsterFsm::BeginPlay()
 
 	GameState = Cast<AGameStateOpen>(GetWorld()->GetGameState());
 	TurnMonster = Cast<ATurnMonster>(GetOwner());
-
-	// ...
-	
 }
 
 

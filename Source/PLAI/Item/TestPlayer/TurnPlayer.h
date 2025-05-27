@@ -5,7 +5,15 @@
 #include "CoreMinimal.h"
 #include "TestPlayer.h"
 #include "TurnPlayer.generated.h"
-
+USTRUCT(BlueprintType)
+struct FTurnPlayerStruct
+{
+	GENERATED_BODY()
+public:
+	int32 CurrentHp = 100;
+	int32 MaxHp = 100;
+	int32 Atk = 10;
+};
 UCLASS()
 class PLAI_API ATurnPlayer : public ACharacter
 {
@@ -28,6 +36,14 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUITurnHpBar> TurnHpBarFactory;
+	UPROPERTY(EditAnywhere)
+	class UUITurnHpBar* UITurnHpBar;
+
+	UPROPERTY(EditAnywhere)
+	class UWidgetComponent* WidgetComp;
+	
+	UPROPERTY(EditAnywhere)
 	FVector MoveLocation = FVector::ZeroVector;
 
 	UPROPERTY(EditAnywhere)
@@ -35,6 +51,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int32 TurnIndex = 0;
+
+	UPROPERTY(EditAnywhere)
+	FTurnPlayerStruct TurnPlayerStruct;
 	
 	void MoveToPlayer();
 };

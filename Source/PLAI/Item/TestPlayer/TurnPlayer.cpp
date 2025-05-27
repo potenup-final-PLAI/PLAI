@@ -4,7 +4,9 @@
 #include "TurnPlayer.h"
 
 #include "AIController.h"
+#include "Components/WidgetComponent.h"
 #include "PLAI/Item/Login/LoginComp.h"
+#include "PLAI/Item/UI/Turn/UITurnHpBar.h"
 
 
 class AAIController;
@@ -13,12 +15,24 @@ ATurnPlayer::ATurnPlayer()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
+	WidgetComp = CreateDefaultSubobject<UWidgetComponent>("Widget");
+	WidgetComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
 void ATurnPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UITurnHpBar = CreateWidget<UUITurnHpBar>(GetWorld(),TurnHpBarFactory);
+	UITurnHpBar->SetHpBar(TurnPlayerStruct);
+
+	WidgetComp->SetWidget(UITurnHpBar);
+	WidgetComp->SetDrawSize(FVector2D(200.f, 50.f));
+	WidgetComp->SetVisibility(true);
+	WidgetComp->SetRelativeLocation(FVector(0,0,200));
+	WidgetComp->SetWidgetSpace(EWidgetSpace::Screen); // or World
 }
 
 // Called every frame
