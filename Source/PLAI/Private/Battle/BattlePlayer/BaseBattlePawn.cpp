@@ -143,19 +143,21 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	OnMouseHover();
 	
 	// AStar가 끝났을 때 그 위치로 이동 나온 방향으로 이동
-	if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
+	if (HasAuthority())
 	{
-		// 이동 시 회전 처리
-		UnitRotation(this);
-		UnitMove(this);
-	}
+		if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
+		{
+			// 이동 시 회전 처리
+			UnitRotation(this);
+			UnitMove(this);
+		}
 
-	// 공격 시 타겟 방향으로 회전
-	if (bWantsToAttack && attackTarget)
-	{
-		UnitAttackBeforeRoatation(this);
+		// 공격 시 타겟 방향으로 회전
+		if (bWantsToAttack && attackTarget)
+		{
+			UnitAttackBeforeRoatation(this);
+		}
 	}
-	
 	
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
@@ -1169,6 +1171,16 @@ void ABaseBattlePawn::ClearGridTile()
 	}
 }
 
+void ABaseBattlePawn::OnRep_TargetLoc()
+{
+	bIsMoving = true;
+}
+
+void ABaseBattlePawn::MultiCastRPC_UpdateNewLoc_Implementation(const FVector& newLocation)
+{
+	SetActorLocation(newLocation);
+}
+
 void ABaseBattlePawn::InitValues()
 {
 	if (!gridTileManager)
@@ -1353,6 +1365,8 @@ void ABaseBattlePawn::UnitMove(class ABaseBattlePawn* unit)
 	// 위치 보간 이동
 	newLoc = FMath::VInterpConstantTo(currentLoc, targetLoc, GetWorld()->GetDeltaSeconds(), 500.f);
 	SetActorLocation(newLoc);
+	
+	MultiCastRPC_UpdateNewLoc(newLoc);
 
 	if (FVector::DistSquared(currentLoc, targetLoc) < FMath::Square(5.f))
 	{

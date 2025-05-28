@@ -322,9 +322,14 @@ public:
 	UPROPERTY(Replicated, EditAnywhere)
 	float moveSpeed = 300.0f;
 	
-	UPROPERTY(Replicated, EditAnywhere)
+	UPROPERTY(ReplicatedUsing = OnRep_TargetLoc, EditAnywhere)
 	FVector newLoc;
-	
+
+	UFUNCTION()
+	void OnRep_TargetLoc();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdateNewLoc(const FVector& newLocation);
 	//-------------Rotation 처리--------------------
 	UPROPERTY(Replicated, EditAnywhere)
 	FRotator newRot;
