@@ -4,6 +4,7 @@
 #include "SlotStore.h"
 
 #include "Blueprint/DragDropOperation.h"
+#include "Components/Image.h"
 #include "PLAI/Item/Item/ItemObject.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
@@ -11,9 +12,34 @@
 void USlotStore::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent,
 	UDragDropOperation*& OutOperation)
 {
+	UDragDropOperation* DragOp = NewObject<UDragDropOperation>();
+	UItemObject* ItemObject = NewObject<UItemObject>();
+ 
+	USlotEmpty* SlotEmpty = CreateWidget<USlotEmpty>(GetWorld(),SlotEmptyFactory);
+	if (SlotEmpty)
+	{
+		SlotEmpty->SlotImage->SetBrush(SlotImage->GetBrush());
+	}
+	FSlateBrush Brush;
+	Brush.SetResourceObject(nullptr);
+	Brush.DrawAs = ESlateBrushDrawType::Type::NoDrawType;
+	SlotImage->SetBrush(Brush);
 	
+	ItemObject->ItemStructTable = ItemStructTable;
+	ItemStructTable = FItemStructTable();
+	SlotCountUpdate(ItemStructTable.ItemNum);
 	
-	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+	ItemObject->SlotUi = this;
+    ItemObject->bBuy = true;
+	
+	DragOp->DefaultDragVisual = SlotEmpty;
+	DragOp->Payload = ItemObject;
+	DragOp->Pivot = EDragPivot::MouseDown;
+ 
+	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseDrag"));
+	OutOperation = DragOp;
+	
+	// Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 }
 
 bool USlotStore::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
@@ -30,9 +56,7 @@ bool USlotStore::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 		if (APlayerController* Pc = GetWorld()->GetFirstPlayerController())
 		{
 			if (ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetCharacter()))
-			{
-				Player->InvenComp->SetGold(ItemObject->ItemStructTable.ItemGold);
-			}
+			{ Player->InvenComp->SetGold(ItemObject->ItemStructTable.ItemGold); }
 		}
 		return true;
 	}

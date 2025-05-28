@@ -30,5 +30,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ATestPlayer* TestPlayer;
-	
+
+	UPROPERTY(EditAnywhere)
+	bool bBuy = false;
 };

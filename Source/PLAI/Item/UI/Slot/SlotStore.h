@@ -15,11 +15,7 @@ class PLAI_API USlotStore : public USlot
 	GENERATED_BODY()
 
 public:
-
-	UPROPERTY(EditAnywhere)
-	bool bBuy = true;
+	void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent,UDragDropOperation*& OutOperation);
 	
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-
-	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 };

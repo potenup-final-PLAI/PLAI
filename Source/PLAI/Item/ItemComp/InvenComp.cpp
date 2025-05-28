@@ -334,7 +334,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 
 	    ItemArmor->AddActorLocalOffset(FVector(-20, 0, -80));
 		ItemArmor->AddActorLocalRotation(FRotator(0, 90, 0));
-	    ItemArmor->SetActorScale3D(FVector(1.05, 1.05, 1.05));
+	    ItemArmor->SetActorRelativeScale3D(FVector(1.05, 1.05, 1.05));
 		
 		if (ItemStructTable.Material)
 		{ ItemArmor->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
@@ -349,7 +349,7 @@ void UInvenComp::EquipItem(const FItemStructTable& ItemStructTable, EquipSlotTyp
 		
 		ItemHelmet->AddActorWorldOffset(FVector(5, 0, 10));
 		ItemHelmet->AddActorLocalRotation(FRotator(0, -90, 90));
-		ItemHelmet->SetActorScale3D(FVector(0.8,0.8,0.8));
+		ItemHelmet->SetActorRelativeScale3D(FVector(0.8,0.8,0.8));
 
 		if (ItemStructTable.Material)
 		{ ItemHelmet->StaticMesh->SetMaterial(0,ItemStructTable.Material);}
