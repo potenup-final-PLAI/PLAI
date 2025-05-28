@@ -30,4 +30,7 @@ public:
 	void HttpPost(FEnvironmentState environmentState = FEnvironmentState(), FBattleTurnState battleTurnState = FBattleTurnState(), class ABaseBattlePawn* unit = nullptr);
 	bool IsEmptyEnvironmentState(const FEnvironmentState& state);
 	bool IsEmptyBattleTurnState(const FBattleTurnState& state);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateDebugLog(const FString& log);
 };

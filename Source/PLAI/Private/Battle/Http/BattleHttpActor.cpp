@@ -6,6 +6,7 @@
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
 #include "Battle/TurnSystem/PhaseManager.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Enemy/BaseEnemy.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
@@ -56,15 +57,13 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 	if (bHasEnv)
 	{
 		// 요청 URL - 서버가 알려줌
-		httpRequest->SetURL(TEXT(
-			"https://0b55-221-148-189-129.ngrok-free.app/service1/battle/start"));
+		httpRequest->SetURL(TEXT("https://0b55-221-148-189-129.ngrok-free.app/service1/battle/start"));
 	}
 	// Action API 일때
 	else if (bHasTurn)
 	{
 		// 요청 URL - 서버가 알려줌
-		httpRequest->SetURL(TEXT(
-			"https://0b55-221-148-189-129.ngrok-free.app/service1/battle/action"));
+		httpRequest->SetURL(TEXT("https://0b55-221-148-189-129.ngrok-free.app/service1/battle/action"));
 	}
 	// 요청 방식
 	httpRequest->SetVerb(TEXT("POST"));
@@ -76,16 +75,12 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 	// 두 값중 True인 값에 JsonString 채워짐
 	if (bHasEnv)
 	{
-		FJsonObjectConverter::UStructToJsonObjectString(
-			environmentState, jsonString);
+		FJsonObjectConverter::UStructToJsonObjectString(environmentState, jsonString);
 	}
 	if (bHasTurn)
 	{
-		FJsonObjectConverter::UStructToJsonObjectString(
-			battleTurnState, jsonString);
+		FJsonObjectConverter::UStructToJsonObjectString(battleTurnState, jsonString);
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonString);
 
 	if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 	{
@@ -96,82 +91,69 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 		}
 	}
 	httpRequest->SetContentAsString(jsonString);
-	
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonString);
 	// 서버에게 요청을 한 후 응답이오면 호출되는 함수 등록
-	httpRequest->OnProcessRequestComplete().BindLambda(
-		[=, this](FHttpRequestPtr Request, FHttpResponsePtr Response,
-		          bool bProcessedSuccessfully)
+	httpRequest->OnProcessRequestComplete().BindLambda([=, this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bProcessedSuccessfully)
+	{
+		NET_PRINTLOG(TEXT("HttpPost 응답, %s"), (unit ? *unit->MyName : TEXT("unit is nullptr")));
+		//GetResponseCode : 200 - 성공, 400번대, 500번대 - 오류
+		// 응답이 오면 실행
+		// 성공
+		if (bProcessedSuccessfully && EHttpResponseCodes::IsOk(Response->GetResponseCode()))
 		{
-			//GetResponseCode : 200 - 성공, 400번대, 500번대 - 오류
-			// 응답이 오면 실행
-			// 성공
-			if (bProcessedSuccessfully && EHttpResponseCodes::IsOk(Response->GetResponseCode()))
+			// 최초 데이터를 보내면 Success 값이 잘 들어오는지만 판단
+			FString jsonData = Response->GetContentAsString();
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
+			
+			if (bHasEnv)
 			{
-				if (bHasEnv)
+				if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 				{
-					// 최초 데이터를 보내면 Success 값이 잘 들어오는지만 판단
-					FString jsonData = Response->GetContentAsString();
-					UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
-	
-					if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
+					// 현재 페이즈가 None이라면
+					if (phaseManager->currentPhase == EBattlePhase::None)
 					{
-						// 현재 페이즈가 None이라면
-						if (phaseManager->currentPhase == EBattlePhase::None)
-						{
-							phaseManager->SetPhase(EBattlePhase::BattleStart);
-						}
+						phaseManager->SetPhase(EBattlePhase::BattleStart);
 					}
 				}
-				if (bHasTurn)
+			}
+			if (bHasTurn)
+			{
+				FActionRequest ParsedRequest;
+				if (FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &ParsedRequest, 0, 0))
 				{
-					FString jsonData = Response->GetContentAsString();
-					UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
-	
-					FActionRequest ParsedRequest;
-					if (FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &ParsedRequest, 0, 0))
+					if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 					{
-						UE_LOG(LogTemp, Warning,TEXT("Success Response Json To Struct"));
-	
-						// if (ParsedRequest.action.target_character_id == "")
-						// {
-						// 	UE_LOG(LogTemp, Error,TEXT("Parsed ActionRequest has empty actions array"));
-						// 	if (auto* enemy = Cast<ABaseEnemy>(unit))
-						// 	{
-						// 		enemy->OnTurnEnd();
-						// 	}
-						// 	return;
-						// }
-	
-						if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
+						// Turn 진행 중이라면
+						if (phaseManager->currentPhase == EBattlePhase::TurnProcessing)
 						{
-							if (phaseManager->currentPhase ==
-								EBattlePhase::TurnProcessing)
+							// id 값이 현재 유닛과 같다면
+							if (unit && unit->GetName() == ParsedRequest.current_character_id)
 							{
-								if (unit && unit->GetName() == ParsedRequest.current_character_id)
+								if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 								{
-									if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
-									{
-										enemy->ProcessAction(ParsedRequest);
-									}
+									// enemy 행동 시작
+									enemy->ProcessAction(ParsedRequest);
 								}
 							}
 						}
 					}
-					else
-					{
-						UE_LOG(LogTemp, Error,TEXT("Failed to parse ActionRequest JSON"));
-					}
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error,TEXT("Failed to parse ActionRequest JSON"));
 				}
 			}
-			// 실패
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("통신 실패 : %d"),
-				       Response->GetResponseCode());
-			}
-		});
+		}
+		// 실패
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("통신 실패 : %d"), Response->GetResponseCode());
+		}
+	});
 	
 	// 요청을 보내자.
+	NET_PRINTLOG(TEXT("HttpPost 요청, %s"), (unit ? *unit->MyName : TEXT("unit is nullptr")));
 	httpRequest->ProcessRequest();
 }
 

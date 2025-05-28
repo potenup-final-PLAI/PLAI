@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseBattlePawn.h"
+#include "BattleEnemyAnimInstance.h"
 #include "GameFramework/Pawn.h"
 #include "BaseEnemy.generated.h"
 
@@ -46,15 +47,14 @@ public:
 	class UBattleEnemyAnimInstance* enemyAnim;
 	
 	//--------------Test---------------------
-	void MoveToPlayer(class AGridTile* player,class AGridTileManager* tileManager);
+	void MoveToPlayer(class AGridTile* targetPlayerTile);
 	class ABattlePlayer* FindClosestPlayer(TArray<class ABattlePlayer*>& allPlayers);
 
 	void FindAndAttackPlayer();
 
 	// 받은 데이터로 enemy 움직임
 	void ProcessAction(const FActionRequest& actionRequest);
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_ShowDialoge(const FString& dialogue);
+	void ActionMove(const TArray<int32>& actionMove);
 	// enemy 스킬리스트
 	TMap<FString, EActionMode> ActionMap;
 
@@ -65,4 +65,12 @@ public:
 
 	// 현재 AP로 사용 가능한지 체크
 	bool TryConsumeAP(int32 amount);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_EnemyTile(class AGridTile* enemyTile);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdateEnemyAnim();
+
 };
+

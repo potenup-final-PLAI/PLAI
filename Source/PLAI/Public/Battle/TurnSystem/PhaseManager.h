@@ -99,7 +99,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_EndPlayerPhase();
 	// 적 턴 시작
-	void StartEnemyPhase();
+	//void StartEnemyPhase();
 	// 적 턴 종료
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_EndEnemyPhase();
@@ -160,9 +160,7 @@ public:
 	class APlayerController* pc;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Phase")
 	class ABattleHUD* hud;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Phase")
-	class AGridTileManager* girdTileManager;
-
+	
 	void InitOtherClass();
 
 
@@ -171,4 +169,17 @@ public:
 	int32 readyCount = 0;
 
 	void PlayerReady(APlayerController* playerControl);
+
+	
+	void DoingPopNextAliveUnit();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PopNextAliveUnit(ABaseBattlePawn* nextCurUnit);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString NetLog;
+
+	void ClearNetLog();
+	void AddNetLog(FString msg);
+	
 };

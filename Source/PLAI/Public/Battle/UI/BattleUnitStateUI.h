@@ -43,11 +43,10 @@ public:
 	class UProgressBar* PGB_HP;
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* txt_HP;
-	int32 maxHP = 0;
 	
 	void ShowHoverUI();
 	void SetHPUI(class ABaseBattlePawn* unit);
-	void UpdateHP(int32 hp);
+	void UpdateHP(int32 hp, ABaseBattlePawn* unit);
 
 	//----------------PrintSkillName UI------------------------
 	UPROPERTY(meta=(BindWidget))

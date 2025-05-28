@@ -29,6 +29,14 @@ public:
 	//-------------Player Settings--------------------
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	class USkeletalMeshComponent* meshComp;
+	UPROPERTY(EditAnywhere)
+	class URectLightComponent* firstRectLightComp;
+	UPROPERTY(EditAnywhere)
+	class URectLightComponent* secondRectLightComp;
+	UPROPERTY(EditAnywhere)
+	class URectLightComponent* thirdRectLightComp;
+	UPROPERTY(EditAnywhere)
+	class USpotLightComponent* spotLightComp;
 	
 	//-------------Input Mapping--------------------
 	UPROPERTY(EditAnywhere)
@@ -39,7 +47,33 @@ public:
 	//------------------Anim Instance--------------------------
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim)
 	class UBattlePlayerAnimInstance* playerAnim;
+
 	
+
+	UFUNCTION(Server, Reliable)
+	void Server_OnClickedTurnEnd();
+
+	UFUNCTION(Server, Reliable)
+	void Server_OnClickedMove();
+
+	UFUNCTION(Server, Reliable)
+	void Server_OnClickedBaseAttack();
+
+	UFUNCTION(Server, Reliable)
+	void Server_OnClickedPoison();
+
+	UFUNCTION(Server, Reliable)
+	void Server_OnClickedFatal();
+
+	UFUNCTION(Server, Reliable)
+	void Server_OnClickedRupture();
+
+
+	UFUNCTION(BlueprintCallable)
+	void ClearDebugNetLog();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdatePlayerAnim();
 };
 
 

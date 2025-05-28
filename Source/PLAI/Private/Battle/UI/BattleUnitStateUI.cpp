@@ -41,17 +41,16 @@ void UBattleUnitStateUI::SetHPUI(ABaseBattlePawn* unit)
 	UE_LOG(LogTemp, Warning, TEXT("NetMode: %s"), *GetNetModeString(GetWorld()));
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
-		maxHP = player->hp;
-		txt_HP->SetText(FText::AsNumber(maxHP));
-		UE_LOG(LogTemp, Warning, TEXT("SetHPUI Player maxHP = %d"), maxHP);
+		txt_HP->SetText(FText::AsNumber(player->maxHP));
+		UE_LOG(LogTemp, Warning, TEXT("SetHPUI Player maxHP = %d"), player->maxHP);
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 	{
 		if (enemy->enemybattleState)
 		{
-			maxHP = enemy->enemybattleState->hp;
-			txt_HP->SetText(FText::AsNumber(maxHP));
-			UE_LOG(LogTemp, Warning, TEXT("SetHPUI Enemy maxHP = %d"), maxHP);
+			enemy->maxHP = enemy->enemybattleState->hp;
+			txt_HP->SetText(FText::AsNumber(enemy->maxHP));
+			UE_LOG(LogTemp, Warning, TEXT("SetHPUI Enemy maxHP = %d"), enemy->maxHP);
 		}
 	}
 	else
@@ -60,26 +59,46 @@ void UBattleUnitStateUI::SetHPUI(ABaseBattlePawn* unit)
 	}
 }
 
-void UBattleUnitStateUI::UpdateHP(int32 hp)
+void UBattleUnitStateUI::UpdateHP(int32 hp, ABaseBattlePawn* unit)
 {
 	// 기본 HP
 	if (PGB_BaseHP)
 	{
-		// 현재 HP를 0~1로 만들어서 퍼센트 업데이트
-		float hpPercent = static_cast<float>(hp) / static_cast<float>(maxHP);
-		PGB_BaseHP->SetPercent(hpPercent);
-		UE_LOG(LogTemp, Warning, TEXT("UpdateHP: hp = %d / maxHP = %d / percent = %f"), hp, maxHP, hpPercent);
-
+		if (auto* player = Cast<ABattlePlayer>(unit))
+		{
+			// 현재 HP를 0~1로 만들어서 퍼센트 업데이트
+			float hpPercent = static_cast<float>(hp) / static_cast<float>(player->maxHP);
+			PGB_BaseHP->SetPercent(hpPercent);
+			UE_LOG(LogTemp, Warning, TEXT("UpdateHP: hp = %d / maxHP = %d / percent = %f"), hp, player->maxHP, hpPercent);
+		}
+		else if (auto* enemy = Cast<ABaseEnemy>(unit))
+		{
+			// 현재 HP를 0~1로 만들어서 퍼센트 업데이트
+			float hpPercent = static_cast<float>(hp) / static_cast<float>(enemy->maxHP);
+			PGB_BaseHP->SetPercent(hpPercent);
+		}
 	}
 	// 호버 시
 	if (txt_HP && PGB_HP)
 	{
-		// 현재 HP를 받아서 UI에 업데이트
-		txt_HP->SetText(FText::AsNumber(hp));
-		// 현재 HP를 0~1로 만들어서 퍼센트 업데이트
-		float hpPercent = static_cast<float>(hp) / static_cast<float>(maxHP);
-		PGB_HP->SetPercent(hpPercent);
-		UE_LOG(LogTemp, Warning, TEXT("UpdateHP: hp = %d / maxHP = %d / percent = %f"), hp, maxHP, hpPercent);
+		if (auto* player = Cast<ABattlePlayer>(unit))
+		{
+			// 현재 HP를 받아서 UI에 업데이트
+			txt_HP->SetText(FText::AsNumber(hp));
+			// 현재 HP를 0~1로 만들어서 퍼센트 업데이트
+			float hpPercent = static_cast<float>(hp) / static_cast<float>(player->maxHP);
+			PGB_HP->SetPercent(hpPercent);
+			UE_LOG(LogTemp, Warning, TEXT("UpdateHP: hp = %d / maxHP = %d / percent = %f"), hp, player->maxHP, hpPercent);
+		}
+		else if (auto* enemy = Cast<ABaseEnemy>(unit))
+		{
+			// 현재 HP를 받아서 UI에 업데이트
+			txt_HP->SetText(FText::AsNumber(hp));
+			// 현재 HP를 0~1로 만들어서 퍼센트 업데이트
+			float hpPercent = static_cast<float>(hp) / static_cast<float>(enemy->maxHP);
+			PGB_HP->SetPercent(hpPercent);
+			UE_LOG(LogTemp, Warning, TEXT("UpdateHP: hp = %d / maxHP = %d / percent = %f"), hp, enemy->maxHP, hpPercent);
+		}
 
 	}
 }

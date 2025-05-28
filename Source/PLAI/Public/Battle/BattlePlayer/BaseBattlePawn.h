@@ -50,6 +50,8 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
 	TArray<FString> skills = {};
 
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int32 maxHP = 0;
 	// Player가 죽었는지 살았는지 상태 체크
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Status")
 	ELifeState playerLifeState;
@@ -71,7 +73,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UWorldGi* gi;
 	// UI
-	UPROPERTY(Replicated, EditAnywhere)
+	UPROPERTY(EditAnywhere)
 	class UBattleUnitStateUI* battleUnitStateUI;
 	UPROPERTY(EditAnywhere)
 	class ABattleHUD* hud;
@@ -91,6 +93,8 @@ public:
 	int32 curAP = 0;
 
 	void InitAPUI();
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_AddAP(class ABattlePlayer* player);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_InitAPUI();
 	
@@ -134,12 +138,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
 
-	void OnTurnStart();
+
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_SetBattlePlayerInfoUI();
-	void OnTurnEnd();
 	//------------Skill System-----------------
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	EActionMode currentActionMode = EActionMode::None;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	bool bBaseAttack = true;
@@ -147,26 +150,18 @@ public:
 	// 플레이어 스킬들
 	void PlayerMove(FHitResult& hitInfo);
 	void PlayerBaseAttack(FHitResult& hitInfo);
-	void PlayerParalysis(FHitResult& hitInfo);
 	void PlayerPoison(FHitResult& hitInfo);
-	void PlayerVulnerable(FHitResult& hitInfo);
-	void PlayerWeaking(FHitResult& hitInfo);
 	void PlayerFatal(FHitResult& hitInfo);
 	void PlayerRupture(FHitResult& hitInfo);
-	void PlayerRoar(FHitResult& hitInfo);
-	void PlayerBattleCry(FHitResult& hitInfo);
 
-
+	// Player 대미지 전달 함수
+	UFUNCTION(NetMulticast, Reliable)
+	void PlayerApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
 	// Enemy 대미지 전달 함수
-	void EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType);
+	void EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
 	// Damage 계산 함수
-	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk,
-	                             float skillMultiplier,
-	                             float criticalRate, float criticalDamage
-	                             );
-	void PlayerApplyAttack(ABaseBattlePawn* targetUnit,
-	                       EActionMode attackType = EActionMode::None);
-
+	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk, float skillMultiplier, float criticalRate, float criticalDamage);
+	
 	// 상태이상과 지속 턴 
 	TMap<EStatusEffect, int32> activeStatusEffects;
 
@@ -295,7 +290,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class AGridTile* goalTile;
 	// 현재 체크하고 있는 block
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	class AGridTile* currentTile;
 
 	// 움직임 플래그
@@ -306,38 +301,58 @@ public:
 	void BuildPath();
 	void AddOpenArray(FVector dir);
 	// 이동 범위 보일 수 있도록 주변 타일 색 변경 하는 함
-	UPROPERTY(Replicated, EditAnywhere)
+	UPROPERTY(EditAnywhere)
 	TArray<AGridTile*> highlightedTiles;
 	
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_SeeMoveRange(int32 move);
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_SeeMoveRange(const TArray<FIntPoint>& tiles);
+	void Multicast_SeeMoveRange();
 	void SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles);
 	void ClearGridTile();
-	//--------------이동 및 공격------------------
-	void UnitMoveRotateAttack();
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_UnitMoveRotateAttack();
 	//--------------Unit Move-------------------
 	// 이동 경로 저장 Array
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	TArray<AGridTile*> pathArray;
 	// 현재 경로 인덱스
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	int32 currentPathIndex = 0;
 	// 이동 중인지 체크
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	bool bIsMoving = false;
 	// 이동 속도
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	float moveSpeed = 300.0f;
 	
+	UPROPERTY(Replicated, EditAnywhere)
+	FVector newLoc;
+	
+	//-------------Rotation 처리--------------------
+	UPROPERTY(Replicated, EditAnywhere)
+	FRotator newRot;
+	UPROPERTY()
+	bool bWantsToAttack = false;
+	UPROPERTY()
+	bool bStartMontage = false;
+	UPROPERTY(Replicated, EditAnywhere)
+	FRotator smoothRot;
+	UPROPERTY()
+	ABaseBattlePawn* attackTarget;
+	
+	UPROPERTY(Replicated, EditAnywhere)
+	FVector directionToTarget;
+	UPROPERTY(Replicated, EditAnywhere)
+	FRotator desiredRot;
+	UPROPERTY(Replicated, EditAnywhere)
+	FRotator targetMeshRot;
+	
 	// 골 위치를 클릭 했을 때 그쪽으로 이동
-	void OnMoveEnd();
 	void InitValues();
 
+	void UnitRotation(class ABaseBattlePawn* unit);
+	void UnitMove(class ABaseBattlePawn* unit);
 
+	void UnitAttackBeforeRoatation(class ABaseBattlePawn* unit);
+	void UnitAttack(class ABaseBattlePawn* unit);
+	
 	//------------- UI --------------
 	//-------------Unit 이름, HP, Armor 세팅------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
@@ -359,25 +374,34 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABattlePlayer* targetPlayer;
 
-	//-------------Rotation 처리--------------------
-	bool bWantsToAttack = false;
-	bool bStartMontage = false;
-	ABaseBattlePawn* attackTarget;
-
-	//------------Enemy Turn 여러 번 호출 방지--------
-	bool bTurnEnded = false;
-
-	
 	//-------------Enemy Name----------------
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_SetEnemyName(class ABaseEnemy* enemy);
 
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(Replicated)
 	FString MyName = TEXT("Unit");
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_SetMyName(int32 Count);
+
+
+	//------------Reason UI------------------
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UReasonUI> reasonUIFactory;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UMainBattleUI> mainUIFactory;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdateReason();
+	UFUNCTION(Server, Reliable)
+	void ShowDialoge(const FString& dialogue);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_ShowDialoge(const FString& dialogue);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_ClearGridTile();
+	
 	
 };
 

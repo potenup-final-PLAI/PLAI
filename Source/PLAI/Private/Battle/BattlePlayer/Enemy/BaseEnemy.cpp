@@ -5,8 +5,8 @@
 
 #include "GridTile.h"
 #include "GridTileManager.h"
-#include "Battle/UI/BattleUnitStateUI.h"
-#include "Components/WidgetComponent.h"
+#include "Battle/TurnSystem/PhaseManager.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Enemy/BattleEnemyAnimInstance.h"
 #include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
@@ -55,20 +55,22 @@ void ABaseEnemy::SetupPlayerInputComponent(
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
+void ABaseEnemy::MoveToPlayer(AGridTile* targetPlayerTile)
 {
-	if (!tileManager)
+	if (!goalTile)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("BaseEnemy : MoveToPlayer - tileManager is nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - goalTile is nullptr"));
 		return;
 	}
-	if (!player && !goalTile)
+	if (!currentTile)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT("BaseEnemy : MoveToPlayer - player/goalTile is nullptr"));
+		UE_LOG(LogTemp, Error, TEXT("ABaseEnemy::MoveToPlayer : !currentTile"));
 		return;
 	}
+
+	// 현재 타일과 골 타일이 같다면
+	NET_PRINTLOG(TEXT("Enemy %s, currentTile %s, goalTile %s"), *GetActorNameOrLabel(), *currentTile->GetActorNameOrLabel(), *goalTile->GetActorNameOrLabel());
+	
 	if (currentTile == goalTile)
 	{
 		currentActionMode = EActionMode::None;
@@ -77,27 +79,27 @@ void ABaseEnemy::MoveToPlayer(AGridTile* player, AGridTileManager* tileManager)
 			enemyAnim->actionMode = currentActionMode;
 			UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"),*UEnum::GetValueAsString(enemyAnim->actionMode));
 		}
-		OnTurnEnd();
-		UE_LOG(LogTemp, Warning,
-		       TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
+
+		phaseManager->turnManager->OnTurnEnd();
+
+		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
 		return;
 	}
 	InitValues();
-
-	if (player)
+	
+	goalTile = phaseManager->gridTileManager->FindCurrentTile(targetPlayerTile->GetActorLocation());
+	
+	startTile = phaseManager->gridTileManager->FindCurrentTile(GetActorLocation());
+	
+	// 현재 위치를 startTile로 설정
+	// startTile = currentTile;
+	
+	if (!IsValid(startTile))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Target Not Nullptr"));
-		goalTile = tileManager->FindCurrentTile(player->GetActorLocation());
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Target is Valid "));
-	startTile = tileManager->FindCurrentTile(GetActorLocation());
-
-	if (!IsValid(startTile) || !IsValid(goalTile))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Is Not Valid startTile or goalTile"));
+		UE_LOG(LogTemp, Warning, TEXT("Is Not Valid startTile"));
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Is Valid startTile, goalTile"));
+	NET_PRINTLOG(TEXT("Enemy %s, currentTile %s, goalTile %s, startTile %s"), *GetActorNameOrLabel(), *currentTile->GetActorNameOrLabel(), *goalTile->GetActorNameOrLabel(), *startTile->GetActorNameOrLabel());
 	startTile->sCostValue = 0;
 	openArray.Add(startTile);
 
@@ -111,8 +113,7 @@ ABattlePlayer* ABaseEnemy::FindClosestPlayer(TArray<ABattlePlayer*>& allPlayers)
 
 	for (ABattlePlayer* player : allPlayers)
 	{
-		float dist = FVector::DistSquared(player->GetActorLocation(),
-		                                  GetActorLocation());
+		float dist = FVector::DistSquared(player->GetActorLocation(),GetActorLocation());
 		if (dist < minDist)
 		{
 			minDist = dist;
@@ -152,18 +153,17 @@ void ABaseEnemy::FindAndAttackPlayer()
 	for (auto& overlap : overlaps)
 	{
 		// 탐색 했을 때 그 객체가 Player라면
-		if (ABattlePlayer* detectedPlayer = Cast<ABattlePlayer>(
-			overlap.GetActor()))
+		if (ABattlePlayer* detectedPlayer = Cast<ABattlePlayer>(overlap.GetActor()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Detected Player"));
 			// 플레이어가 있다면 공격
-			this->EnemyApplyAttack(detectedPlayer, EActionMode::Poison);
+			EnemyApplyAttack(detectedPlayer, EActionMode::Poison);
 			break;
 		}
 	}
 
 	// 끝났으면 턴 종료 처리
-	OnTurnEnd();
+	phaseManager->turnManager->OnTurnEnd();
 }
 
 void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
@@ -175,102 +175,71 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		return;
 	}
 
-	// 배열이 비어 있다면 return
-	if (actionRequest.action.target_character_id == "")
-	{
-		UE_LOG(LogTemp, Error, TEXT("ProcessAction: actions array is empty"));
-		OnTurnEnd();
-		return;
-	}
+	// 0. 턴 종료하라고 오면 턴 종료
+	
 	
 	const FBattleAction& action = actionRequest.action;
-	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"),
-	       *actionRequest.current_character_id);
+	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"), *actionRequest.current_character_id);
+
+	// 1. API로 받은 Enemy 이동
+	if (actionRequest.action.move_to.Num() != 0)
+	{
+		// Player Move 시작
+		ActionMove(actionRequest.action.move_to);	
+	}
 	
-	
-	// 3. API 행동 이유 출력
+	// 2. API 행동 이유 출력
 	if (action.dialogue != "")
 	{
 		FString dialogue = action.dialogue;
-		MultiCastRPC_ShowDialoge(dialogue);
+		UE_LOG(LogTemp, Warning, TEXT("action.dialogue != 공백 아님 "));
+		ShowDialoge(dialogue);
 	}
 	
-	// 1. 이동 처리
-	if (action.move_to.Num() == 2)
+	// 3. 스킬 처리 (예: 타격이면 공격)
+	if (action.skill != "")
 	{
-		// enemy actionmode 업데이트
-		if (auto* enemy = Cast<ABaseEnemy>(this))
-		{
-			enemy->currentActionMode = EActionMode::Move;
-			if (enemy->moveRange) ServerRPC_SeeMoveRange(enemy->moveRange);
-			else UE_LOG(LogTemp, Warning, TEXT("Enemybattle not State"));
-			
-			if (enemyAnim)
-			{
-				enemyAnim->actionMode = currentActionMode;
-				UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
-			}
-		}
-
-		int32 targetX = action.move_to[0];
-		int32 targetY = action.move_to[1];
-
-		// GridTileManager 통해 목표 타일 찾기
-		if (gridTileManager)
-		{
-			AGridTile* goal = gridTileManager->GetTile(targetX, targetY);
-			if (goal)
-			{
-				goalTile = goal; // ✅ 기존 goalTile 변수에 대입
-				if (goalTile)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("goalTile : %s"),
-					       *goal->GetName());
-				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT("goalTile is nullptr"));
-				}
-				MoveToPlayer(goalTile, gridTileManager);
-				// ✅ 타겟 null로 넘기고 이동만 실행
-			}
-		}
-	}
-
-	// 2. 스킬 처리 (예: 타격이면 공격)
-	if (action.skill == TEXT("타격"))
-	{
+		EnemyActionList(actionRequest.action.skill);
 		attackTarget = FindUnitById(action.target_character_id);
 		bWantsToAttack = true;
 		bStartMontage = true;
 	}
 
+	// 턴 종료 호출
+	phaseManager->turnManager->OnTurnEnd();
+}
+
+void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
+{
+	// 1. 이동 처리
+	// enemy actionmode 업데이트
+	currentActionMode = EActionMode::Move;
 	
-	// 3. 이동/행동력 소진 후 턴 종료
-	if (action.remaining_ap <= 0 && action.remaining_mov <= 0)
+	if (enemyAnim)
 	{
-		FTimerHandle timerHandle;
-		GetWorld()->GetTimerManager().SetTimer(timerHandle,FTimerDelegate::CreateLambda([=, this]()
+		enemyAnim->actionMode = currentActionMode;
+		UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
+	}
+
+	int32 targetX = actionMove[0];
+	int32 targetY = actionMove[1];
+
+	// GridTileManager 통해 목표 타일 찾기
+	if (gridTileManager)
+	{
+		goalTile = gridTileManager->GetTile(targetX, targetY);
+		FString netLog = FString::Printf(TEXT("%s(%s) : myTile(%d,%d) goalTile(%d,%d)"), *GetName(), *MyName, currentTile->gridCoord.X, currentTile->gridCoord.Y, targetX, targetY);
+		phaseManager->AddNetLog(netLog);
+		
+		NET_PRINTLOG(TEXT("ABaseEnemy::ActionMove : %s, goalTile : %s"), *netLog, goalTile ? *goalTile->GetActorNameOrLabel() : TEXT("nullptr"));
+		if (goalTile)
 		{
-			OnTurnEnd();
-		}), 1.0f, false);
+			// Player쪽으로 이동 실행
+			MoveToPlayer(goalTile);
+		}
 	}
 }
 
-void ABaseEnemy::MultiCastRPC_ShowDialoge_Implementation(const FString& dialogue)
-{
-	this->battleUnitStateComp->SetDrawSize(FVector2d(150, 100));
-	this->battleUnitStateUI->ShowAPIReasonUI();
-	this->battleUnitStateUI->SetAPIReason(dialogue);
-
-	FTimerHandle actionReasonTimerHandle;
-	GetWorld()->GetTimerManager().ClearTimer(actionReasonTimerHandle);
-	GetWorld()->GetTimerManager().SetTimer(actionReasonTimerHandle,FTimerDelegate::CreateLambda([this]()
-	{
-		this->battleUnitStateUI->ShowBaseUI();
-		this->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
-	}), 3.0f, false);
-}
 
 void ABaseEnemy::InitActionMap()
 {
@@ -382,16 +351,16 @@ void ABaseEnemy::EnemyActionList(const FString& actionName)
 
 ABaseBattlePawn* ABaseEnemy::FindUnitById(const FString& Id)
 {
-	TArray<AActor*> FoundUnits;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ABaseBattlePawn::StaticClass(),FoundUnits);
+	TArray<AActor*> foundUnits;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ABaseBattlePawn::StaticClass(),foundUnits);
 
-	for (AActor* Actor : FoundUnits)
+	for (AActor* actor : foundUnits)
 	{
-		if (ABaseBattlePawn* Unit = Cast<ABaseBattlePawn>(Actor))
+		if (ABaseBattlePawn* unit = Cast<ABaseBattlePawn>(actor))
 		{
-			if (Unit->GetName() == Id)
+			if (unit->GetName() == Id)
 			{
-				return Unit;
+				return unit;
 			}
 		}
 	}
@@ -408,4 +377,18 @@ bool ABaseEnemy::TryConsumeAP(int32 amount)
 	return true;
 }
 
+void ABaseEnemy::MulticastRPC_EnemyTile_Implementation(class AGridTile* enemyTile)
+{
+	currentTile = enemyTile;
+	Multicast_SeeMoveRange_Implementation();
 
+	NET_PRINTLOG(TEXT("enemy %s, enemy->currentTile %s"), *MyName, *currentTile->GetActorNameOrLabel());
+}
+
+void ABaseEnemy::MultiCastRPC_UpdateEnemyAnim_Implementation()
+{
+	if (enemyAnim)
+	{
+		enemyAnim->actionMode = currentActionMode;
+	}
+}

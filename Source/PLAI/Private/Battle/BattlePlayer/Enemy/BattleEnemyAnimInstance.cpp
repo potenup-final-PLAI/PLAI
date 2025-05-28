@@ -34,7 +34,7 @@ void UBattleEnemyAnimInstance::AnimNotify_BaseAttackPoint()
 		return;
 	}
 
-	battleEnemy->PlayerApplyAttack(battleEnemy->targetPlayer,EActionMode::BaseAttack);
+	battleEnemy->EnemyApplyAttack(battleEnemy->targetPlayer,EActionMode::BaseAttack);
 
 	battleEnemy->targetPlayer = nullptr;
 	battleEnemy->attackTarget = nullptr;

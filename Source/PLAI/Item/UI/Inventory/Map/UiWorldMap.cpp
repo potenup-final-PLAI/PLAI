@@ -14,11 +14,11 @@
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
 
-UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
-	:Super(FOI)
-{
-	bIsFocusable = true;
-}
+// UUiWorldMap::UUiWorldMap(const FObjectInitializer& FOI)
+// 	:Super(FOI)
+// {
+// 	bIsFocusable = true;
+// }
 
 
 void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
