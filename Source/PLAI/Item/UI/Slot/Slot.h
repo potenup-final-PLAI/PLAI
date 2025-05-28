@@ -47,9 +47,6 @@ public:
 
     UPROPERTY(EditAnywhere)
 	class UEquipInven* EquipInven;
-
-	UPROPERTY(EditAnywhere)
-	bool bBuy = false;
 	
 	void SlotCountUpdate(const int32 Count);
 
