@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PLAI/Item/Item/Item.h"
 #include "PLAI/Item/Item/ItemStruct.h"
+#include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "Slot.generated.h"
 
 /**
@@ -32,6 +33,11 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<USlotEmpty> SlotEmptyFactory;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UItemDetail> ItemDetailFactory;
+	UPROPERTY(EditAnywhere)
+	class UItemDetail* ItemDetail;
 	
 	UPROPERTY(EditAnywhere)
 	class AItem* ParentItem;

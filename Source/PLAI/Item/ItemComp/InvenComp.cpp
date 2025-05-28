@@ -149,8 +149,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			}
 			else if (ANpcStore* Store = Cast<ANpcStore>(Hit.GetActor()))
 			{
-				Store->TestPlayer = TestPlayer;
-                Store->SetStoreInven();
 				if (FlipflopStore == false)
 				{
 					Store->StoreInven->SetVisibility(ESlateVisibility::Visible);

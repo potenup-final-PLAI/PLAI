@@ -34,6 +34,17 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class UStoreInven* StoreInven;
-
-	void SetStoreInven(UDataTable* ItemTable);
 };
+
+
+
+
+
+
+
+
+
+
+
+// void SetStoreInven(UDataTable* ItemTable);
+

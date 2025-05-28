@@ -23,6 +23,9 @@ public:
 	class UWrapBox* WrapBox;
 
 	UPROPERTY(meta = (BindWidget))
+	class UWrapBox* EquipBox;
+
+	UPROPERTY(meta = (BindWidget))
 	class UWrapBox* ConsumeBox;
 
 	UPROPERTY(meta = (BindWidget))
@@ -36,6 +39,9 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button_Legendary;
+
+	UPROPERTY(EditAnywhere)
+	UDataTable* ItemTable;
 	
 	virtual void NativeConstruct() override;
 

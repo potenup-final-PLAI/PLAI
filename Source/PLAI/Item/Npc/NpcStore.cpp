@@ -26,7 +26,6 @@ void ANpcStore::BeginPlay()
 	StoreInven->SetVisibility(ESlateVisibility::Hidden);
 	
 	NpcUiMaster = Cast<UWidget>(StoreInven);
-
 	NpcNameString = TEXT("토리 (Store)");
 }
 
@@ -42,28 +41,29 @@ void ANpcStore::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ANpcStore::SetStoreInven()
-{
-	if (TestPlayer && TestPlayer->IsLocallyControlled())
-	{
-		for (UWidget* Widget : StoreInven->WrapBox->GetAllChildren())
-		{
-			USlotStore* Slot = Cast<USlotStore>(Widget);
-			int32 index = StoreInven->WrapBox->GetChildIndex(Slot);
-
-			TArray<FName>RawNames = ItemTable->GetRowNames();
-			FItemStructTable* RowData = ItemTable->FindRow<FItemStructTable>(RawNames[index],TEXT("StoreComp"));
-			Slot->ItemStructTable = *RowData;
-			// if (Slot->ItemStructTable.ItemTop == -1)
-			// {
-			// 	UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 X %s"),*Slot->ItemStructTable.Name)
-			// }
-			// else
-			// {
-			// 	UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 되었음 %s"),*Slot->ItemStructTable.Name)
-			// }
-			Slot->SlotImageUpdate();
-		}
-	}
-}
+// void ANpcStore::SetStoreInven()
+// {
+// 	if (TestPlayer && TestPlayer->IsLocallyControlled())
+// 	{
+// 		for (UWidget* Widget : StoreInven->WrapBox->GetAllChildren())
+// 		{
+// 			USlotStore* Slot = Cast<USlotStore>(Widget);
+// 			int32 index = StoreInven->WrapBox->GetChildIndex(Slot);
+//
+// 			TArray<FName>RawNames = ItemTable->GetRowNames();
+// 			FItemStructTable* RowData = ItemTable->FindRow<FItemStructTable>(RawNames[index],TEXT("StoreComp"));
+// 			Slot->ItemStructTable = *RowData;
+// 			Slot->SlotImageUpdate();
+//
+// 			// if (Slot->ItemStructTable.ItemTop == -1)
+// 			// {
+// 			// 	UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 X %s"),*Slot->ItemStructTable.Name)
+// 			// }
+// 			// else
+// 			// {
+// 			// 	UE_LOG(LogTemp,Warning,TEXT("스토어컴프 테이블 복사 셋팅 되었음 %s"),*Slot->ItemStructTable.Name)
+// 			// }
+// 		}
+// 	}
+// }
 
