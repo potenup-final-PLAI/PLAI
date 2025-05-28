@@ -110,6 +110,7 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, currentTile);
 	DOREPLIFETIME(ABaseBattlePawn, currentActionMode);
 	DOREPLIFETIME(ABaseBattlePawn, maxHP);
+	DOREPLIFETIME(ABaseBattlePawn, MyName);
 }
 
 void ABaseBattlePawn::PossessedBy(AController* NewController)
@@ -142,8 +143,8 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
-	
-	DrawDebugString(GetWorld(), GetActorLocation(), MyName, nullptr, FColor::Yellow, 0, true);
+	FString str = FString::Printf(TEXT("%s,(%d,%d)"), *MyName, currentTile ? currentTile->gridCoord.X : -1, currentTile ? currentTile->gridCoord.Y : -1);
+	DrawDebugString(GetWorld(), GetActorLocation(), str, nullptr, FColor::Yellow, 0, true);
 	
 }
 
@@ -1065,7 +1066,7 @@ void ABaseBattlePawn::BuildPath()
 		pathArray.SetNum(moveRange); // 최대 이동 가능 거리만큼 잘라 이동
 	}
 
-	InitValues();
+	// InitValues();
 	this->ClearGridTile();
 	bIsMoving = true;
 	currentPathIndex = 0;
@@ -1103,17 +1104,18 @@ void ABaseBattlePawn::AddOpenArray(FVector dir)
 	}
 }
 
-void ABaseBattlePawn::ServerRPC_SeeMoveRange_Implementation(int32 move)
-{
-	if (!gridTileManager)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Multicast_SeeMoveRange: gridTileManager is null!"));
-		return;
-	}
+// void ABaseBattlePawn::ServerRPC_SeeMoveRange_Implementation(int32 move)
+// {
+// 	if (!gridTileManager)
+// 	{
+// 		UE_LOG(LogTemp, Error, TEXT("Multicast_SeeMoveRange: gridTileManager is null!"));
+// 		return;
+// 	}
+//
+// 	// 좌표 정보만 클라에 전송
+// 	Multicast_SeeMoveRange();
+// }
 
-	// 좌표 정보만 클라에 전송
-	Multicast_SeeMoveRange();
-}
 void ABaseBattlePawn::Multicast_SeeMoveRange_Implementation()
 {
 	TArray<FIntPoint> tiles;

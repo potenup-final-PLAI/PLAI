@@ -127,13 +127,19 @@ void ABattlePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	}
 }
 
+void ABattlePlayer::ClearDebugNetLog()
+{
+	phaseManager->ClearNetLog();
+}
+
 void ABattlePlayer::Server_OnClickedMove_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Move"));
 	this->currentActionMode = EActionMode::Move;
 	this->bIsMoveMode = true;
 	// 범위 보이게 설정
-	this->ServerRPC_SeeMoveRange(this->moveRange);
+	//this->ServerRPC_SeeMoveRange(this->moveRange);
+	Multicast_SeeMoveRange();
 	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"), this->moveRange);
 }
 

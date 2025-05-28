@@ -4,6 +4,8 @@
 #include "Battle/TurnSystem/TurnManager.h"
 
 #include "BaseBattlePawn.h"
+#include "GridTile.h"
+#include "GridTileManager.h"
 #include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Battle/UI/BattleHUD.h"
@@ -160,8 +162,19 @@ void ATurnManager::OnTurnStart()
 		enemy->GetAP();
 		UE_LOG(LogTemp, Warning, TEXT("enemy Current AP: %d"),enemy->curAP);
 
+		// 현재 위치에 타일을 가져와서
+		
+		if (auto* tile = phaseManager->gridTileManager->FindCurrentTile(enemy->GetActorLocation()))
+		{
+			// 현재 타일 설정
+			NET_PRINTLOG(TEXT(""));
+			enemy->currentTile = tile;
+			enemy->MulticastRPC_EnemyTile(tile);
+		}
+		
 		// 이동 범위 보이게
-		enemy->ServerRPC_SeeMoveRange(enemy->moveRange);
+		//enemy->ServerRPC_SeeMoveRange(enemy->moveRange);
+		enemy->Multicast_SeeMoveRange();
 		
 		ABaseBattlePawn* CapturedUnit = curUnit;
 

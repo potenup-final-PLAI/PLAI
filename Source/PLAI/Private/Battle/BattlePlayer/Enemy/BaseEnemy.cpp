@@ -85,7 +85,7 @@ void ABaseEnemy::MoveToPlayer()
 		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
 		return;
 	}
-	// InitValues();
+	InitValues();
 
 	// 현재 위치를 startTile로 설정
 	startTile = currentTile;
@@ -208,15 +208,12 @@ void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 {
 	// 1. 이동 처리
 	// enemy actionmode 업데이트
-	if (auto* enemy = Cast<ABaseEnemy>(this))
+	currentActionMode = EActionMode::Move;
+	
+	if (enemyAnim)
 	{
-		enemy->currentActionMode = EActionMode::Move;
-		
-		if (enemyAnim)
-		{
-			enemyAnim->actionMode = currentActionMode;
-			UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
-		}
+		enemyAnim->actionMode = currentActionMode;
+		UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
 	}
 
 	int32 targetX = actionMove[0];
@@ -225,18 +222,13 @@ void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 	// GridTileManager 통해 목표 타일 찾기
 	if (gridTileManager)
 	{
-		AGridTile* goal = gridTileManager->GetTile(targetX, targetY);
-		if (goal)
+		goalTile = gridTileManager->GetTile(targetX, targetY);
+		FString netLog = FString::Printf(TEXT("%s(%s) : myTile(%d,%d) goalTile(%d,%d)"), *GetName(), *MyName, currentTile->gridCoord.X, currentTile->gridCoord.Y, targetX, targetY);
+		phaseManager->AddNetLog(netLog);
+		
+		NET_PRINTLOG(TEXT("ABaseEnemy::ActionMove : %s, goalTile : %s"), *netLog, goalTile ? *goalTile->GetActorNameOrLabel() : TEXT("nullptr"));
+		if (goalTile)
 		{
-			goalTile = goal;
-			if (goalTile)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("ABaseEnemy::ActionMove : goalTile : %s"), *goal->GetName());
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("ABaseEnemy::ActionMove : goalTile is nullptr"));
-			}
 			// Player쪽으로 이동 실행
 			MoveToPlayer();
 		}
@@ -378,6 +370,14 @@ bool ABaseEnemy::TryConsumeAP(int32 amount)
 		return false;
 	}
 	return true;
+}
+
+void ABaseEnemy::MulticastRPC_EnemyTile_Implementation(class AGridTile* enemyTile)
+{
+	currentTile = enemyTile;
+	Multicast_SeeMoveRange_Implementation();
+
+	NET_PRINTLOG(TEXT("enemy %s, enemy->currentTile %s"), *MyName, *currentTile->GetActorNameOrLabel());
 }
 
 

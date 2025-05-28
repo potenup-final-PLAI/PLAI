@@ -476,8 +476,8 @@ FEnvironmentState AUPhaseManager::SetStartBattleAPI()
 
 			UE_LOG(LogTemp, Warning, TEXT("Set API Data !!!"));
 			FCharacterData charData;
-			charData.id = unit->GetName();
-			FString name = unit->GetName();
+			charData.id =  unit->GetName();
+			FString name = unit->MyName;
 			charData.name = Cast<ABattlePlayer>(unit) ? name : TEXT("오크");
 			// 따로 이름 필드 있으면
 			charData.type = Cast<ABattlePlayer>(unit)
@@ -859,7 +859,26 @@ void AUPhaseManager::DoingPopNextAliveUnit()
 	Multicast_PopNextAliveUnit(tempUnit);
 }
 
+
 void AUPhaseManager::Multicast_PopNextAliveUnit_Implementation(ABaseBattlePawn* nextCurUnit)
 {
 	turnManager->curUnit = nextCurUnit;
+}
+
+void AUPhaseManager::ClearNetLog()
+{
+	NetLog = "";
+	if (auto* httpActor = Cast<ABattleHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), httpActorFactory)))
+	{
+		httpActor->UpdateDebugLog(NetLog);
+	}
+}
+
+void AUPhaseManager::AddNetLog(FString msg)
+{
+	NetLog += msg + "\n";
+	if (auto* httpActor = Cast<ABattleHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), httpActorFactory)))
+	{
+		httpActor->UpdateDebugLog(NetLog);
+	}
 }

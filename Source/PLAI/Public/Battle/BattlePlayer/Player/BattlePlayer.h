@@ -67,7 +67,10 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_OnClickedRupture();
-	
+
+
+	UFUNCTION(BlueprintCallable)
+	void ClearDebugNetLog();
 	
 };
 

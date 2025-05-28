@@ -176,10 +176,6 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 					// 위 내용과 동일
 					enemy->speed = FMath::RandRange(1, 10);
 					enemy->currentTile = gridTile;
-					UE_LOG(LogTemp, Warning, TEXT("enemy->currentTile = %s, location = %s"), *enemy->currentTile->GetName(), *enemy->currentTile->GetActorLocation().ToString());
-					UE_LOG(LogTemp, Warning, TEXT("Enemy %s spawn location: %s"), *enemy->GetName(), *enemy->GetActorLocation().ToString());
-					UE_LOG(LogTemp, Warning, TEXT("Enemy currentTile: %s, location: %s"), *enemy->currentTile->GetName(), *enemy->currentTile->GetActorLocation().ToString());
-					NET_PRINTLOG(TEXT("InitGridTile : enemy %s, enemy->currentTile %s"), *enemy->GetActorNameOrLabel(), *enemy->currentTile->GetActorNameOrLabel());
 					enemy->MyName = TEXT("Unit_") + FString::FormatAsNumber(enemyCount++);
 					unitArray.Add(enemy);
 				}
@@ -248,7 +244,12 @@ AGridTile* AGridTileManager::FindCurrentTile(FVector worldLoc)
 
 AGridTile* AGridTileManager::GetTile(int32 x, int32 y)
 {
-	return map.FindRef(FIntPoint(x, y));
+	auto key = FIntPoint(x, y);
+
+	if (map.Contains(key))
+		return map.FindRef(key);
+
+	return nullptr;
 }
 
 

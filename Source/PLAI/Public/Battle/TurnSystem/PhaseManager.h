@@ -178,6 +178,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PopNextAliveUnit(ABaseBattlePawn* nextCurUnit);
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString NetLog;
 
+	void ClearNetLog();
+	void AddNetLog(FString msg);
 	
 };

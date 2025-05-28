@@ -308,8 +308,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<AGridTile*> highlightedTiles;
 	
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_SeeMoveRange(int32 move);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SeeMoveRange();
 	void SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles);
@@ -368,7 +366,7 @@ public:
 	void MultiCastRPC_SetEnemyName(class ABaseEnemy* enemy);
 
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(Replicated)
 	FString MyName = TEXT("Unit");
 
 	UFUNCTION(NetMulticast, Reliable)

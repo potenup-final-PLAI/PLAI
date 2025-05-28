@@ -64,4 +64,8 @@ public:
 
 	// 현재 AP로 사용 가능한지 체크
 	bool TryConsumeAP(int32 amount);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_EnemyTile(class AGridTile* enemyTile);
+
 };
