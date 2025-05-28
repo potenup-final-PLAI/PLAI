@@ -20,14 +20,14 @@ void USlotStore::NativeOnDragDetected(const FGeometry& InGeometry, const FPointe
 	{
 		SlotEmpty->SlotImage->SetBrush(SlotImage->GetBrush());
 	}
-	FSlateBrush Brush;
-	Brush.SetResourceObject(nullptr);
-	Brush.DrawAs = ESlateBrushDrawType::Type::NoDrawType;
-	SlotImage->SetBrush(Brush);
+	// FSlateBrush Brush;
+	// Brush.SetResourceObject(nullptr);
+	// Brush.DrawAs = ESlateBrushDrawType::Type::NoDrawType;
+	// SlotImage->SetBrush(Brush);
 	
 	ItemObject->ItemStructTable = ItemStructTable;
-	ItemStructTable = FItemStructTable();
-	SlotCountUpdate(ItemStructTable.ItemNum);
+	// ItemStructTable = FItemStructTable();
+	// SlotCountUpdate(ItemStructTable.ItemNum);
 	
 	ItemObject->SlotUi = this;
     ItemObject->bBuy = true;

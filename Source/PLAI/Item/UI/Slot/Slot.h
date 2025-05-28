@@ -36,6 +36,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UItemDetail> ItemDetailFactory;
+	
 	UPROPERTY(EditAnywhere)
 	class UItemDetail* ItemDetail;
 	
