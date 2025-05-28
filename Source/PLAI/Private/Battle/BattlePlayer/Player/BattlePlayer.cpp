@@ -189,5 +189,21 @@ void ABattlePlayer::Server_OnClickedRupture_Implementation()
 	turnManager->curUnit->currentActionMode = EActionMode::Rupture;
 }
 
+void ABattlePlayer::MultiCastRPC_UpdatePlayerAnim_Implementation()
+{
+	if (playerAnim)
+	{
+		playerAnim->actionMode = currentActionMode;
+
+		switch (currentActionMode)
+		{
+			case EActionMode::Move:
+				break;
+			case EActionMode::BaseAttack:
+				bStartMontage = true;
+				break;
+		}
+	}
+}
 
 

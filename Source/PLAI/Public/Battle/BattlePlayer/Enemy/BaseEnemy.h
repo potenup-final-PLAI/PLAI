@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseBattlePawn.h"
+#include "BattleEnemyAnimInstance.h"
 #include "GameFramework/Pawn.h"
 #include "BaseEnemy.generated.h"
 
@@ -68,4 +69,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_EnemyTile(class AGridTile* enemyTile);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdateEnemyAnim();
+
 };
+

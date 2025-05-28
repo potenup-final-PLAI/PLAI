@@ -149,19 +149,7 @@ public:
 
 	// 플레이어 스킬들
 	void PlayerMove(FHitResult& hitInfo);
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_UpdatePlayerMoveAnim();
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_UpdatePlayerMoveAnim();
 	void PlayerBaseAttack(FHitResult& hitInfo);
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_UpdatPlayerBaseAttack();
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_UpdatePlayerBaseAttack();
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_UpdatEnemyBaseAttack();
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_UpdateEnemyBaseAttack();
 	void PlayerPoison(FHitResult& hitInfo);
 	void PlayerFatal(FHitResult& hitInfo);
 	void PlayerRupture(FHitResult& hitInfo);
@@ -173,8 +161,7 @@ public:
 	void EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
 	// Damage 계산 함수
 	void CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk, float skillMultiplier, float criticalRate, float criticalDamage);
-
-
+	
 	// 상태이상과 지속 턴 
 	TMap<EStatusEffect, int32> activeStatusEffects;
 
@@ -321,10 +308,6 @@ public:
 	void Multicast_SeeMoveRange();
 	void SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles);
 	void ClearGridTile();
-	//--------------이동 및 공격------------------
-	void UnitMoveRotateAttack();
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_UnitMoveRotateAttack();
 	//--------------Unit Move-------------------
 	// 이동 경로 저장 Array
 	UPROPERTY(Replicated, EditAnywhere)
@@ -341,7 +324,6 @@ public:
 	
 	UPROPERTY(Replicated, EditAnywhere)
 	FVector newLoc;
-	
 	
 	//-------------Rotation 처리--------------------
 	UPROPERTY(Replicated, EditAnywhere)
@@ -361,15 +343,16 @@ public:
 	FRotator desiredRot;
 	UPROPERTY(Replicated, EditAnywhere)
 	FRotator targetMeshRot;
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_UpdatePlayerNoneAnim();
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_UpdateEnemyNoneAnim();
+	
 	// 골 위치를 클릭 했을 때 그쪽으로 이동
 	void InitValues();
 
-	void UnitRotation(const FRotator& rotation);
+	void UnitRotation(class ABaseBattlePawn* unit);
+	void UnitMove(class ABaseBattlePawn* unit);
+
+	void UnitAttackBeforeRoatation(class ABaseBattlePawn* unit);
+	void UnitAttack(class ABaseBattlePawn* unit);
+	
 	//------------- UI --------------
 	//-------------Unit 이름, HP, Armor 세팅------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
@@ -390,8 +373,6 @@ public:
 	//-----------Enemy Anim Instace---------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABattlePlayer* targetPlayer;
-
-
 
 	//-------------Enemy Name----------------
 	UFUNCTION(NetMulticast, Reliable)

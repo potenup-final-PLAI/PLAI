@@ -385,4 +385,10 @@ void ABaseEnemy::MulticastRPC_EnemyTile_Implementation(class AGridTile* enemyTil
 	NET_PRINTLOG(TEXT("enemy %s, enemy->currentTile %s"), *MyName, *currentTile->GetActorNameOrLabel());
 }
 
-
+void ABaseEnemy::MultiCastRPC_UpdateEnemyAnim_Implementation()
+{
+	if (enemyAnim)
+	{
+		enemyAnim->actionMode = currentActionMode;
+	}
+}

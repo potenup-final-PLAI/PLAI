@@ -71,7 +71,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ClearDebugNetLog();
-	
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdatePlayerAnim();
 };
 
 
