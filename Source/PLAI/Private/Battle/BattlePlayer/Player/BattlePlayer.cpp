@@ -135,12 +135,14 @@ void ABattlePlayer::ClearDebugNetLog()
 void ABattlePlayer::Server_OnClickedMove_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Move"));
-	this->currentActionMode = EActionMode::Move;
-	this->bIsMoveMode = true;
+	// 애니메이션 세팅
+	currentActionMode = EActionMode::Move;
+
+	bIsMoveMode = true;
+	
 	// 범위 보이게 설정
-	//this->ServerRPC_SeeMoveRange(this->moveRange);
 	Multicast_SeeMoveRange();
-	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"), this->moveRange);
+	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"), moveRange);
 }
 
 void ABattlePlayer::Server_OnClickedTurnEnd_Implementation()
@@ -166,9 +168,8 @@ void ABattlePlayer::Server_OnClickedTurnEnd_Implementation()
 
 void ABattlePlayer::Server_OnClickedBaseAttack_Implementation()
 {
-
 	UE_LOG(LogTemp, Warning, TEXT("FirstSkill"));
-	turnManager->curUnit->currentActionMode = EActionMode::BaseAttack;
+	currentActionMode = EActionMode::BaseAttack;
 }
 
 void ABattlePlayer::Server_OnClickedPoison_Implementation()
@@ -179,23 +180,24 @@ void ABattlePlayer::Server_OnClickedPoison_Implementation()
 
 void ABattlePlayer::Server_OnClickedFatal_Implementation()
 {
-
 	turnManager->curUnit->currentActionMode = EActionMode::Fatal;
-
 }
 
 void ABattlePlayer::Server_OnClickedRupture_Implementation()
 {
 	turnManager->curUnit->currentActionMode = EActionMode::Rupture;
 }
-
-void ABattlePlayer::MultiCastRPC_UpdatePlayerAnim_Implementation()
+void ABattlePlayer::Server_UpdatePlayerAnim_Implementation(EActionMode mode)
+{
+	MultiCastRPC_UpdatePlayerAnim(mode);
+}
+void ABattlePlayer::MultiCastRPC_UpdatePlayerAnim_Implementation(EActionMode mode)
 {
 	if (playerAnim)
 	{
-		playerAnim->actionMode = currentActionMode;
-
-		switch (currentActionMode)
+		playerAnim->actionMode = mode;
+		NET_PRINTLOG(TEXT("호출한 객체 : %s, currentActionMode : %s, playerAnim->actionMode : %s"), *GetActorNameOrLabel(), *UEnum::GetValueAsString(currentActionMode), *UEnum::GetValueAsString(playerAnim->actionMode));
+		switch (mode)
 		{
 			case EActionMode::Move:
 				break;

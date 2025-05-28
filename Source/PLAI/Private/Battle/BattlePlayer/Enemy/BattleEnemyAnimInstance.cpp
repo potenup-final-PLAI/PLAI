@@ -5,6 +5,7 @@
 
 #include "Battle/Util/BattleType/BattleTypes.h"
 #include "Enemy/BaseEnemy.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/BattlePlayer.h"
 
 void UBattleEnemyAnimInstance::NativeBeginPlay()
@@ -25,6 +26,16 @@ void UBattleEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// 	moveSpeed = FVector::DotProduct(velocity, forward);
 	// }
 }
+
+void UBattleEnemyAnimInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UBattleEnemyAnimInstance, lifeState);
+	DOREPLIFETIME(UBattleEnemyAnimInstance, actionMode);
+	DOREPLIFETIME(UBattleEnemyAnimInstance, moveSpeed);
+}
+
 void UBattleEnemyAnimInstance::AnimNotify_BaseAttackPoint()
 {
 	// battlePlayer나 targetEnemy가 Null이면 return

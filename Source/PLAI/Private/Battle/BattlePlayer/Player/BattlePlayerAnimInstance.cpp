@@ -4,6 +4,7 @@
 #include "Player/BattlePlayerAnimInstance.h"
 
 #include "Enemy/BaseEnemy.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/BattlePlayer.h"
 
 void UBattlePlayerAnimInstance::NativeBeginPlay()
@@ -24,6 +25,15 @@ void UBattlePlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// 	FVector forward = player->GetActorForwardVector();
 	// 	moveSpeed = FVector::DotProduct(velocity, forward);
 	// }
+}
+
+void UBattlePlayerAnimInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(UBattlePlayerAnimInstance, actionMode);
+	DOREPLIFETIME(UBattlePlayerAnimInstance, lifeState);
+	DOREPLIFETIME(UBattlePlayerAnimInstance, moveSpeed);
 }
 
 void UBattlePlayerAnimInstance::AnimNotify_BaseAttackPoint()

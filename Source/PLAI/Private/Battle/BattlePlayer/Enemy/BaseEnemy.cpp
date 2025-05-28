@@ -73,10 +73,10 @@ void ABaseEnemy::MoveToPlayer(AGridTile* targetPlayerTile)
 	
 	if (currentTile == goalTile)
 	{
-		currentActionMode = EActionMode::None;
 		if (enemyAnim)
 		{
-			enemyAnim->actionMode = currentActionMode;
+			currentActionMode = EActionMode::None;
+			MultiCastRPC_UpdateEnemyAnim(currentActionMode);
 			UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"),*UEnum::GetValueAsString(enemyAnim->actionMode));
 		}
 
@@ -206,7 +206,11 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	}
 
 	// 턴 종료 호출
-	phaseManager->turnManager->OnTurnEnd();
+	FTimerHandle timerHandle;
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([&]()
+	{
+		phaseManager->turnManager->OnTurnEnd();	
+	}), 1.5f, false);
 }
 
 void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
@@ -217,7 +221,7 @@ void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 	
 	if (enemyAnim)
 	{
-		enemyAnim->actionMode = currentActionMode;
+		MultiCastRPC_UpdateEnemyAnim(currentActionMode);
 		UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
 	}
 
@@ -385,10 +389,16 @@ void ABaseEnemy::MulticastRPC_EnemyTile_Implementation(class AGridTile* enemyTil
 	NET_PRINTLOG(TEXT("enemy %s, enemy->currentTile %s"), *MyName, *currentTile->GetActorNameOrLabel());
 }
 
-void ABaseEnemy::MultiCastRPC_UpdateEnemyAnim_Implementation()
+void ABaseEnemy::ServerRPC_UpdateEnemyAnim_Implementation(EActionMode mode)
+{
+	MultiCastRPC_UpdateEnemyAnim(mode);
+}
+
+void ABaseEnemy::MultiCastRPC_UpdateEnemyAnim_Implementation(EActionMode mode)
 {
 	if (enemyAnim)
 	{
-		enemyAnim->actionMode = currentActionMode;
+		enemyAnim->actionMode = mode;
+		NET_PRINTLOG(TEXT("호출한 객체 : %s, currentActionMode : %s, enemyAnim->actionMode : %s"), *GetActorNameOrLabel(), *UEnum::GetValueAsString(currentActionMode), *UEnum::GetValueAsString(enemyAnim->actionMode));
 	}
 }

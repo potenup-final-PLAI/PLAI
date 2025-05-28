@@ -144,6 +144,10 @@ public:
 	//------------Skill System-----------------
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	EActionMode currentActionMode = EActionMode::None;
+
+	// UFUNCTION()
+	// void OnRep_ActionModeChanged();
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	bool bBaseAttack = true;
 
@@ -352,9 +356,19 @@ public:
 	// 골 위치를 클릭 했을 때 그쪽으로 이동
 	void InitValues();
 
+	// Unit 회전 동기화
 	void UnitRotation(class ABaseBattlePawn* unit);
-	void UnitMove(class ABaseBattlePawn* unit);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_UnitRotation(const FRotator& rot);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UnitRotation(const FRotator& rot);
 
+	// Unit 이동 동기화
+	void UnitMove(class ABaseBattlePawn* unit);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_UnitMove(const FVector& loc);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UnitMove(const FVector& loc);
 	void UnitAttackBeforeRoatation(class ABaseBattlePawn* unit);
 	void UnitAttack(class ABaseBattlePawn* unit);
 	

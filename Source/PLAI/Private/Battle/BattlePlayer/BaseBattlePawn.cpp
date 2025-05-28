@@ -143,21 +143,32 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	OnMouseHover();
 	
 	// AStar가 끝났을 때 그 위치로 이동 나온 방향으로 이동
-	if (HasAuthority())
+	// if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
+	// {
+	// 	// 이동 시 회전 처리
+	// 	UnitRotation(this);
+	// 	UnitMove(this);
+	// }
+	// ✅ 플레이어: 클라이언트가 소유한 경우
+	if (IsLocallyControlled() && bIsMoving && pathArray.IsValidIndex(currentPathIndex))
 	{
-		if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
-		{
-			// 이동 시 회전 처리
-			UnitRotation(this);
-			UnitMove(this);
-		}
-
-		// 공격 시 타겟 방향으로 회전
-		if (bWantsToAttack && attackTarget)
-		{
-			UnitAttackBeforeRoatation(this);
-		}
+		UnitRotation(this);
+		UnitMove(this); // Client → ServerRPC 호출 (OK)
 	}
+
+	// ✅ 적 유닛: 서버가 직접 처리
+	if (HasAuthority() && !IsPlayerControlled() && bIsMoving && pathArray.IsValidIndex(currentPathIndex))
+	{
+		UnitRotation(this);
+		UnitMove(this); // 서버가 직접 처리, RPC 없이 직접 SetActorLocation 사용
+	}
+
+	// 공격 시 타겟 방향으로 회전
+	if (bWantsToAttack && attackTarget)
+	{
+		UnitAttackBeforeRoatation(this);
+	}
+	
 	
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
@@ -257,6 +268,18 @@ void ABaseBattlePawn::OnMouseLeftClick()
 	}
 }
 
+// void ABaseBattlePawn::OnRep_ActionModeChanged()
+// {
+// 	if (auto* player = Cast<ABattlePlayer>(this))
+// 	{
+// 		if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
+// 	}
+// 	else if (auto* enemy = Cast<ABaseEnemy>(this))
+// 	{
+// 		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
+// 	}
+// }
+
 void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 {
 	// 이전 그리드 타일 클리어
@@ -271,7 +294,15 @@ void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 		}
 
 		// AnimInstance actionMode 업데이트
-		if (auto* player = Cast<ABattlePlayer>(this)) player->MultiCastRPC_UpdatePlayerAnim();
+		if (IsLocallyControlled())
+		{
+			if (auto* player = Cast<ABattlePlayer>(this)) player->Server_UpdatePlayerAnim(player->currentActionMode);
+		}
+		else if (HasAuthority())
+		{
+			if (auto* player = Cast<ABattlePlayer>(this)) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
+		}
+
 		
 		// 타일 초기화
 		InitValues();
@@ -333,7 +364,10 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 		bWantsToAttack = true;
 
 		if (thisAsPlayer)
-			thisAsPlayer->MultiCastRPC_UpdatePlayerAnim();
+		{
+			if (IsLocallyControlled()) thisAsPlayer->Server_UpdatePlayerAnim(thisAsPlayer->currentActionMode);
+			else if (HasAuthority()) thisAsPlayer->MultiCastRPC_UpdatePlayerAnim(thisAsPlayer->currentActionMode);
+		}
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitActor))
@@ -344,7 +378,7 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 
 		if (thisAsEnemy)
 		{
-			thisAsEnemy->MultiCastRPC_UpdateEnemyAnim();
+			thisAsEnemy->ServerRPC_UpdateEnemyAnim(thisAsEnemy->currentActionMode);
 			thisAsEnemy->bStartMontage = true;
 		}
 	}
@@ -1345,7 +1379,7 @@ void ABaseBattlePawn::UnitRotation(class ABaseBattlePawn* unit)
 		FRotator currentRot = player->meshComp->GetRelativeRotation();
 		FRotator desireRot(0.f, targetRot.Yaw + yawOffset, 0.f);
 		smoothRot = FMath::RInterpTo(currentRot, desireRot, GetWorld()->GetDeltaSeconds(), interpSpeed);
-		player->meshComp->SetRelativeRotation(smoothRot);
+		ServerRPC_UnitRotation(smoothRot);
 	}
 	// Enemy 회전
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
@@ -1353,8 +1387,19 @@ void ABaseBattlePawn::UnitRotation(class ABaseBattlePawn* unit)
 		FRotator currentRot = enemy->meshComp->GetRelativeRotation();
 		FRotator desireRot(0.f, targetRot.Yaw + yawOffset, 0.f);
 		smoothRot = FMath::RInterpTo(currentRot, desireRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
-		enemy->meshComp->SetRelativeRotation(smoothRot);
+		ServerRPC_UnitRotation(smoothRot);
 	}
+}
+
+void ABaseBattlePawn::ServerRPC_UnitRotation_Implementation(const FRotator& rot)
+{
+	MultiCastRPC_UnitRotation(rot);
+}
+
+void ABaseBattlePawn::MultiCastRPC_UnitRotation_Implementation(const FRotator& rot)
+{
+	if (auto* player = Cast<ABattlePlayer>(this)) player->meshComp->SetRelativeRotation(rot);
+	else if (auto* enemy = Cast<ABaseEnemy>(this)) enemy->meshComp->SetRelativeRotation(rot);
 }
 
 void ABaseBattlePawn::UnitMove(class ABaseBattlePawn* unit)
@@ -1364,23 +1409,34 @@ void ABaseBattlePawn::UnitMove(class ABaseBattlePawn* unit)
 	
 	// 위치 보간 이동
 	newLoc = FMath::VInterpConstantTo(currentLoc, targetLoc, GetWorld()->GetDeltaSeconds(), 500.f);
-	SetActorLocation(newLoc);
-	
-	MultiCastRPC_UpdateNewLoc(newLoc);
+	// ServerRPC_UnitMove(newLoc); *
 
+	// 플레이어 : RPC로 서버 동기화 요청
+	if (IsLocallyControlled())
+	{
+		ServerRPC_UnitMove(newLoc);
+	}
+	// 적 유닛 : 서버에서 직접 이동
+	else if (HasAuthority())
+	{
+		SetActorLocation(newLoc);
+	}
+	
 	if (FVector::DistSquared(currentLoc, targetLoc) < FMath::Square(5.f))
 	{
 		currentPathIndex++;
 		if (!pathArray.IsValidIndex(currentPathIndex))
 		{
-			currentActionMode = EActionMode::None;
 			if (auto* player = Cast<ABattlePlayer>(this))
 			{
-				player->MultiCastRPC_UpdatePlayerAnim();
+				player->currentActionMode = EActionMode::None;
+				if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
+				else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
 			}
 			else if (auto* enemy = Cast<ABaseEnemy>(this))
 			{
-				enemy->MultiCastRPC_UpdateEnemyAnim();
+				enemy->currentActionMode = EActionMode::None;
+				enemy->ServerRPC_UpdateEnemyAnim(enemy->currentActionMode);
 			}
 			bIsMoving = false;
 			currentTile = pathArray.Last();
@@ -1392,6 +1448,16 @@ void ABaseBattlePawn::UnitMove(class ABaseBattlePawn* unit)
 			}
 		}
 	}
+}
+
+void ABaseBattlePawn::ServerRPC_UnitMove_Implementation(const FVector& loc)
+{
+	MultiCastRPC_UnitMove(loc);
+}
+
+void ABaseBattlePawn::MultiCastRPC_UnitMove_Implementation(const FVector& loc)
+{
+	SetActorLocation(loc);
 }
 
 void ABaseBattlePawn::UnitAttackBeforeRoatation(class ABaseBattlePawn* unit)
