@@ -7,19 +7,37 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bacb1ca5-6adf-4789-91a8-7f4a49cd39c9" name="Changes" comment="">
+    <list default="true" id="bacb1ca5-6adf-4789-91a8-7f4a49cd39c9" name="Changes" comment="merge file">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/PLAI/Private/Battle/BattlePlayer/BaseBattlePawn.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PLAI/Private/Battle/BattlePlayer/BaseBattlePawn.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/PLAI/Private/Battle/Tile/GridTileManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PLAI/Private/Battle/Tile/GridTileManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.PLAI/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/KHA/Blueprints/BP_KHACharacter.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/KHA/Blueprints/BP_KHACharacter.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/PLAI/Private/BaseFile/PLAIPlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PLAI/Private/BaseFile/PLAIPlayerController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/PLAI/Public/BaseFile/PLAIPlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PLAI/Public/BaseFile/PLAIPlayerController.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DpaMonitoringSettings">
+    <option name="firstShow" value="false" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "zigzaghyun"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/potenup-final-PLAI/PLAI.git",
+    "accountId": "6df7600e-8df6-43a5-9f25-f8a411b65fba"
+  }
+}]]></component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="false" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -28,20 +46,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "Uproject.PLAI.executor": "Run",
-    "git-widget-placeholder": "JS__Prototype",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Uproject.PLAI.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;kha__new&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="PLAI" type="Uproject" factoryName="rider.uproject">
       <configuration_1 setup="1">
@@ -49,7 +67,7 @@
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
         <option name="EXECUTABLE_PATH" value="C:\Program Files\Epic Games\UE_5.5\Engine\Binaries\Win64\UnrealEditor-Win64-DebugGame.exe" />
-        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\PLAI\PLAI.uproject&quot;" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\UE\PLAI\PLAI.uproject&quot;" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
         <option name="PASS_PARENT_ENVS" value="1" />
@@ -61,7 +79,7 @@
         <option name="CONFIGURATION" value="DebugGame" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\Project\PLAI\Binaries\Win64\PLAI-Win64-DebugGame.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\Project\UE\PLAI\Binaries\Win64\PLAI-Win64-DebugGame.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -75,7 +93,7 @@
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
         <option name="EXECUTABLE_PATH" value="C:\Program Files\Epic Games\UE_5.5\Engine\Binaries\Win64\UnrealEditor.exe" />
-        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\PLAI\PLAI.uproject&quot;" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\UE\PLAI\PLAI.uproject&quot;" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
         <option name="PASS_PARENT_ENVS" value="1" />
@@ -87,7 +105,7 @@
         <option name="CONFIGURATION" value="Development" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\Project\PLAI\Binaries\Win64\PLAI.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\Project\UE\PLAI\Binaries\Win64\PLAI.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -100,7 +118,7 @@
         <option name="CONFIGURATION" value="Shipping" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\Project\PLAI\Binaries\Win64\PLAI-Win64-Shipping.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\Project\UE\PLAI\Binaries\Win64\PLAI-Win64-Shipping.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -127,14 +145,32 @@
       <updated>1744706725126</updated>
       <workItem from="1744706726265" duration="3345000" />
       <workItem from="1747359890977" duration="307000" />
+      <workItem from="1747941695067" duration="51000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="false" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="1. 외곽선 머테리얼 작업중" />
+    <MESSAGE value="1 텍스트 타이핑 효과 작업 중" />
+    <MESSAGE value="1. 아웃라인 머테리얼 작업 중" />
+    <MESSAGE value="merge file" />
+    <option name="LAST_COMMIT_MESSAGE" value="merge file" />
   </component>
 </project>
