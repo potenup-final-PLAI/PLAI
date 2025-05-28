@@ -10,6 +10,16 @@
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "Slot.generated.h"
 
+UENUM(BlueprintType)
+enum class ESLotType : uint8
+{
+	Slot,
+	Equip,
+	Store,
+	Inven,
+	Creature,
+};
+
 /**
  * 
  */
@@ -19,6 +29,9 @@ class PLAI_API USlot : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+    UPROPERTY(EditAnywhere)
+	ESLotType SlotType = ESLotType::Slot;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemStruct ItemStruct;
 

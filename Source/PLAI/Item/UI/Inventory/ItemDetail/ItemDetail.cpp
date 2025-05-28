@@ -26,9 +26,9 @@ void UItemDetail::SetItemDetail(const FItemStructTable& ItemStruct)
 		FSlateBrush Brush;
 		Brush.SetResourceObject(ItemStruct.Texture);
 		IconImage->SetBrush(Brush);
-		FString Index = FString::Printf(TEXT("T[%d] I[%d] Y[%d] D[%d]"), ItemStruct.ItemTop, ItemStruct.ItemIndex, 
-	    ItemStruct.ItemIndexType, ItemStruct.ItemIndexDetail);
-		StatE->SetText(FText::FromString(Index));
+		// FString Index = FString::Printf(TEXT("T[%d] I[%d] Y[%d] D[%d]"), ItemStruct.ItemTop, ItemStruct.ItemIndex, 
+	 //    ItemStruct.ItemIndexType, ItemStruct.ItemIndexDetail);
+		// StatE->SetText(FText::FromString(Index));
 		StatD->SetText(FText::AsNumber(ItemStruct.ItemGold));
 		
 		StatNameE->SetText(FText::AsNumber(ItemStruct.ItemStructStat.Item_CRIT));

@@ -24,7 +24,7 @@ void UStoreInven::NativeConstruct()
 	for (FName RawName : RawNames)
 	{
 		FItemStructTable* ItemStructTable = ItemTable->FindRow<FItemStructTable>(RawName,"StoreInven");
-		if (ItemStructTable->ItemTop == 1)
+		if (ItemStructTable->ItemTop == 1 && ItemStructTable->ItemIndexDetail !=3)
 		{
 			USlotStore* SlotStore = CreateWidget<USlotStore>(GetWorld(), SlotStoreFactory);
 			SlotStore->ItemStructTable = *ItemStructTable;
@@ -38,7 +38,7 @@ void UStoreInven::NativeConstruct()
 			ConsumeBox->AddChild(SlotStore);
 			SlotStore->SlotImageUpdate();
 		}
-		else if (ItemStructTable->ItemTop == 3,4)
+		else if (ItemStructTable->ItemTop == 3 || ItemStructTable->ItemIndexDetail == 3)
 		{
 			USlotStore* SlotStore = CreateWidget<USlotStore>(GetWorld(), SlotStoreFactory);
 			SlotStore->ItemStructTable = *ItemStructTable;

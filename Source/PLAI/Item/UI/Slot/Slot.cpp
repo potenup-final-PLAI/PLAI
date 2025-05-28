@@ -186,18 +186,13 @@ void USlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent&
 
 	if (ItemDetail == nullptr && ItemStructTable.ItemTop != -1)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Slot::MouseEnter 아이템있음"));
-		FVector2d MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
+		FVector2d MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld()) + FVector2d(-100,0);
 		ItemDetail = CreateWidget<UItemDetail>(GetWorld(),ItemDetailFactory);
 		if (ItemDetail)
 		{
 			ItemDetail->AddToViewport();
 			ItemDetail->SetItemDetail(ItemStructTable);
 			ItemDetail->SetPositionInViewport(MousePos);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Display, TEXT("Slot::MouseEnter ItemDetail 생성실패"));
 		}
 	}
 }
@@ -208,8 +203,6 @@ void USlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 	
 	if (ItemDetail)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Slot::MouseLeave 아이템있음"));
-		
 		ItemDetail->RemoveFromParent();
 		ItemDetail=nullptr;
 	}

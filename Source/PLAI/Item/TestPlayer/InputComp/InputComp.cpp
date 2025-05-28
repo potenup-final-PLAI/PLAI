@@ -198,22 +198,22 @@ void UInputComp::On_LeftMouseStart()
 	}
 	
 	// Npc 찾기 창 끄기
-	// ANpcCharacter* NpcCharacter = Cast<ANpcCharacter>(Hit.GetActor());
-	// if (!NpcCharacter)
-	// {
-	// 	TArray<AActor*> Actors;
-	// 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANpcCharacter::StaticClass(), Actors);
-	// 	if (Actors.Num() == 0) return;
-	// 		
-	// 	for (AActor* Actor : Actors)
-	// 	{
-	// 		if (ANpcCharacter* Npc = Cast<ANpcCharacter>(Actor))
-	// 		{
-	// 			if (Npc->NpcUiMaster)
-	// 			{ Npc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden); }
-	// 		}
-	// 	}
-	// }
+	ANpcCharacter* NpcCharacter = Cast<ANpcCharacter>(Hit.GetActor());
+	if (!NpcCharacter)
+	{
+		TArray<AActor*> Actors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANpcCharacter::StaticClass(), Actors);
+		if (Actors.Num() == 0) return;
+			
+		for (AActor* Actor : Actors)
+		{
+			if (ANpcCharacter* Npc = Cast<ANpcCharacter>(Actor))
+			{
+				if (Npc->NpcUiMaster)
+				{ Npc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden); }
+			}
+		}
+	}
 	
 	// 턴제 플레이어
 	// if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Hit.GetActor()))

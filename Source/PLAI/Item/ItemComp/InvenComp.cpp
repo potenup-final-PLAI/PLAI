@@ -86,6 +86,12 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	{
 		Server_SpawnCreature();
 	}
+
+	if (TestPlayer->IsLocallyControlled() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Six))
+	{
+		SetGold(100000);
+	}
+
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
 	{
@@ -93,21 +99,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
         PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 		if (Hit.bBlockingHit)
 		{
-			// if (ANpcCharacter* Npc = Cast<ANpcCharacter>(Hit.GetActor()))
-			// {
-			// 	TArray<AActor*> Actors;
-			// 	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ANpcCharacter::StaticClass(),Actors);
-			// 	for (AActor* Actor : Actors)
-			// 	{
-			// 		if (ANpcCharacter* OtherNpc = Cast<ANpcCharacter>(Actor))
-			// 		{
-			// 			if (OtherNpc->NpcUiMaster)
-			// 			{
-			// 				OtherNpc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden);
-			// 			}
-			// 		}
-			// 	}
-			// }
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
 				if (FlipflopStart == false)
@@ -137,11 +128,6 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 						}
 					}
 				}
-				// else
-				// {
-				// 	Start->UiNpcStart->SetVisibility(ESlateVisibility::Hidden);
-				// 	FlipflopStart = false;
-				// }
 			}
 			if (ANpcStore* Store = Cast<ANpcStore>(Hit.GetActor()))
 			{

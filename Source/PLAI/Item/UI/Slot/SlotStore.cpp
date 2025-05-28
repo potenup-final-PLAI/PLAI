@@ -28,8 +28,9 @@ void USlotStore::NativeOnDragDetected(const FGeometry& InGeometry, const FPointe
 	ItemObject->ItemStructTable = ItemStructTable;
 	// ItemStructTable = FItemStructTable();
 	// SlotCountUpdate(ItemStructTable.ItemNum);
-	
+
 	ItemObject->SlotUi = this;
+	ItemObject->SlotUi->SlotType = ESLotType::Store;
     ItemObject->bBuy = true;
 	
 	DragOp->DefaultDragVisual = SlotEmpty;
@@ -49,15 +50,18 @@ bool USlotStore::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent&
 	if (ItemObject->ItemStructTable.ItemIndex != -1)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SlotStore::NativeOnDrop: ItemObject is 아이템이 있네 %d"),ItemObject->ItemStructTable.ItemGold);
-	
-		ItemObject->SlotUi->ItemStructTable = FItemStructTable();
-		ItemObject->SlotUi->SlotImageUpdate();
-		
-		if (APlayerController* Pc = GetWorld()->GetFirstPlayerController())
+
+		if (ItemObject->SlotUi->SlotType != ESLotType::Store)
 		{
-			if (ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetCharacter()))
-			{ Player->InvenComp->SetGold(ItemObject->ItemStructTable.ItemGold); }
+			ItemObject->SlotUi->ItemStructTable = FItemStructTable();
+			ItemObject->SlotUi->SlotImageUpdate();
+			if (APlayerController* Pc = GetWorld()->GetFirstPlayerController())
+			{
+				if (ATestPlayer* Player = Cast<ATestPlayer>(Pc->GetCharacter()))
+				{ Player->InvenComp->SetGold(ItemObject->ItemStructTable.ItemGold); }
+			}
 		}
+		
 		return true;
 	}
 	else
