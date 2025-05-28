@@ -180,6 +180,24 @@ void USlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDr
 	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnDrop 다른창에 했음"));
 }
 
+void USlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+
+	if (ItemStructTable.ItemTop != -1)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseEnter"));
+	}
+}
+
+void USlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseLeave(InMouseEvent);
+	if (ItemStructTable.ItemTop != -1)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseLeave"));
+	}
+}
 
 
 // Swap(ItemObject->SlotUi->ItemStructTable, ItemStructTable);

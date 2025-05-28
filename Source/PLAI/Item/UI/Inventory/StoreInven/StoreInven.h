@@ -22,5 +22,29 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UWrapBox* WrapBox;
 
+	UPROPERTY(meta = (BindWidget))
+	class UWrapBox* ConsumeBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UWrapBox* LegendaryBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Button_Equip;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Button_Consume;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Button_Legendary;
+	
 	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnButtonEquip();
+
+	UFUNCTION()
+	void OnButtonConsume();
+
+	UFUNCTION()
+	void OnButtonLegendary();
 };
