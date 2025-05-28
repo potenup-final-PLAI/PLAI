@@ -48,7 +48,7 @@ void UUiMain::NativeConstruct()
 
 	ButtonCreate->OnClicked.AddDynamic(this,&UUiMain::CreateCharacter);
 
-	LoginFail->SetVisibility(ESlateVisibility::Hidden);;
+	loginFailed->SetVisibility(ESlateVisibility::Hidden);;
 	WbpUiSign->SetVisibility(ESlateVisibility::Hidden);
 }
 
@@ -73,10 +73,10 @@ void UUiMain::Login()
 			//여기까지 아이디는 들어왔음
 		}
 		else
-		{   LoginFail->SetVisibility(ESlateVisibility::Visible);
+		{   loginFailed->SetVisibility(ESlateVisibility::Visible);
 			FTimerHandle TimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-			{ LoginFail->SetVisibility(ESlateVisibility::Hidden);},1.5f,false);
+			{ loginFailed->SetVisibility(ESlateVisibility::Hidden);},1.5f,false);
 		}
 	});
 	LoginComp->HttpLoginPost();

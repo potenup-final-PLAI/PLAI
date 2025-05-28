@@ -66,7 +66,7 @@ public:
 	class UEditableTextBox* LoginPw;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* LoginFail;
+	class UCanvasPanel* loginFailed;
 
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* CanvasMain;

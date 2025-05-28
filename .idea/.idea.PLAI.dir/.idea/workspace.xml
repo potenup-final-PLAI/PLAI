@@ -8,8 +8,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bacb1ca5-6adf-4789-91a8-7f4a49cd39c9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Content/__ExternalActors__/Mk_Item/Mk_WorldPartition/6/S4/BBJ1LXUU3IN6Z0TV9AOKN0.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/__ExternalActors__/Mk_Item/Mk_WorldPartition/6/S4/BBJ1LXUU3IN6Z0TV9AOKN0.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/__ExternalActors__/Mk_Item/Mk_WorldPartition/A/HV/MSK31D5SDATZ6LDU62GDX3.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/__ExternalActors__/Mk_Item/Mk_WorldPartition/A/HV/MSK31D5SDATZ6LDU62GDX3.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UIChaMain.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UIChaMain.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiMain.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiMain.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSign.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSign.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSubMain.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSubMain.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,6 +23,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;zigzaghyun&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/potenup-final-PLAI/PLAI.git&quot;,
+    &quot;accountId&quot;: &quot;6df7600e-8df6-43a5-9f25-f8a411b65fba&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -27,20 +43,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "Uproject.PLAI.executor": "Run",
-    "git-widget-placeholder": "Mk__ItemAlpha2",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Uproject.PLAI.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;kha__new&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="PLAI" type="Uproject" factoryName="rider.uproject">
       <configuration_1 setup="1">
@@ -48,7 +64,7 @@
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
         <option name="EXECUTABLE_PATH" value="C:\Program Files\Epic Games\UE_5.5\Engine\Binaries\Win64\UnrealEditor-Win64-DebugGame.exe" />
-        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\A_Wanted_Projects\E_Baldus\Baldus\PLAI.uproject&quot;" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\UE\PLAI\PLAI.uproject&quot;" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
         <option name="PASS_PARENT_ENVS" value="1" />
@@ -60,7 +76,7 @@
         <option name="CONFIGURATION" value="DebugGame" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\A_Wanted_Projects\E_Baldus\Baldus\Binaries\Win64\PLAI-Win64-DebugGame.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\Project\UE\PLAI\Binaries\Win64\PLAI-Win64-DebugGame.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -74,7 +90,7 @@
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
         <option name="EXECUTABLE_PATH" value="C:\Program Files\Epic Games\UE_5.5\Engine\Binaries\Win64\UnrealEditor.exe" />
-        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\A_Wanted_Projects\E_Baldus\Baldus\PLAI.uproject&quot;" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\UE\PLAI\PLAI.uproject&quot;" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
         <option name="PASS_PARENT_ENVS" value="1" />
@@ -86,7 +102,7 @@
         <option name="CONFIGURATION" value="Development" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\A_Wanted_Projects\E_Baldus\Baldus\Binaries\Win64\PLAI.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\Project\UE\PLAI\Binaries\Win64\PLAI.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -99,7 +115,7 @@
         <option name="CONFIGURATION" value="Shipping" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\A_Wanted_Projects\E_Baldus\Baldus\Binaries\Win64\PLAI-Win64-Shipping.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\Project\UE\PLAI\Binaries\Win64\PLAI-Win64-Shipping.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -127,6 +143,8 @@
       <workItem from="1744706726265" duration="3345000" />
       <workItem from="1747359890977" duration="307000" />
       <workItem from="1748242466974" duration="75000" />
+      <workItem from="1748443775699" duration="596000" />
+      <workItem from="1748445216541" duration="29000" />
     </task>
     <servers />
   </component>
