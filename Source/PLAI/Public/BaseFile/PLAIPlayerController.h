@@ -22,7 +22,9 @@ class APLAIPlayerController : public APlayerController
 
 public:
 	APLAIPlayerController();
-
+	
+	
+	
 	/** Time Threshold to know if it was a short press */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	float ShortPressThreshold;
@@ -51,7 +53,8 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
-
+	virtual void Tick(float DeltaSeconds) override;
+	
 	/** Input handlers for SetDestination action. */
 	void OnInputStarted();
 	void OnSetDestinationTriggered();
@@ -68,8 +71,27 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	float MiniMapTime = 0.0f;
-	
 
+
+//outline
+	UPROPERTY()
+	AActor* PreviousOutlineActor;
+
+	void HandleMouseOutline();
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* OutlineMaterial;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* BaseMaterial;
+
+	UPROPERTY()
+	AActor* OutlineActor = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Outline")
+	UMaterialInterface* OverlayOutlineMaterial;
+
+	
 private:
 	FVector CachedDestination;
 
