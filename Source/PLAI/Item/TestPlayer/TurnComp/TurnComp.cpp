@@ -27,8 +27,10 @@ void UTurnComp::BeginPlay()
 
 	UiTurn = CreateWidget<UUiTurn>(GetWorld(),UiTurnFactory);
 	UiTurn->AddToViewport();
-	UiTurn->TurnName->SetVisibility(ESlateVisibility::Hidden);
-
+	UiTurn->SetVisibility(ESlateVisibility::Hidden);
+	
+	// UiTurn->TurnName->SetVisibility(ESlateVisibility::Hidden);
+	
 	TestPlayer = Cast<ATestPlayer>(GetOwner());
 }
 

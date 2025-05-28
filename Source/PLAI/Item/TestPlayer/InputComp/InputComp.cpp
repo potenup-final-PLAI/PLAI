@@ -142,7 +142,7 @@ void UInputComp::On_Stat()
 void UInputComp::Server_On_Jump_Implementation()
 {
 	On_Jump();
-	TestPlayer->LaunchCharacter(FVector(0,0,500),false,false);
+	TestPlayer->LaunchCharacter(FVector(0,0,1000),false,false);
 }
 
 void UInputComp::On_Jump()

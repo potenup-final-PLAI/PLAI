@@ -10,6 +10,7 @@
 #include "Components/TextBlock.h"
 #include "PLAI/Item/Item/ItemObject.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 
@@ -126,23 +127,38 @@ void USlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEven
 bool USlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
 	UDragDropOperation* InOperation)
 {
+	UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
+
+	if (ItemObject && ItemObject->bBuy)
+	{
+		if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+		{
+			if (TestPlayer->LoginComp->UserFullInfo.inventory_info.gold >= ItemObject->ItemStructTable.ItemGold)
+			{ TestPlayer->InvenComp->SetGold(-ItemObject->ItemStructTable.ItemGold); }
+			else
+			{
+				UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseDrag 아이템을 살려는데 돈이 없네"));
+				return false;
+			}
+		}
+	}
+	
 	// Swap 추가 나중에 네트워크 동기화는 확인안해봐서 확인해볼것
 	if (ItemStructTable.ItemTop != -1)
 	{
-		UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
         if (USlot* SlotPre = Cast<USlot>(ItemObject->SlotUi))
         {
 	        SlotPre->ItemStructTable = ItemStructTable;
         	ItemStructTable = ItemObject->ItemStructTable;
         	SlotPre->SlotImageUpdate();
         	SlotImageUpdate();
-        } 
+        }
 		return true;
 	}
 	// 밑에거는 동기화까지는 끝내는거 확인했던 함수임!!
 	else
 	{
-		UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
+		// UItemObject* ItemObject = Cast<UItemObject>(InOperation->Payload);
 		Swap(ItemStructTable, ItemObject->ItemStructTable);
 
 		SlotImageUpdate();
