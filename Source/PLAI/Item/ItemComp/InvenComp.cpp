@@ -93,21 +93,21 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
         PC->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 		if (Hit.bBlockingHit)
 		{
-			if (ANpcCharacter* Npc = Cast<ANpcCharacter>(Hit.GetActor()))
-			{
-				TArray<AActor*> Actors;
-				UGameplayStatics::GetAllActorsOfClass(GetWorld(),ANpcCharacter::StaticClass(),Actors);
-				for (AActor* Actor : Actors)
-				{
-					if (ANpcCharacter* OtherNpc = Cast<ANpcCharacter>(Actor))
-					{
-						if (OtherNpc->NpcUiMaster)
-						{
-							OtherNpc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden);
-						}
-					}
-				}
-			}
+			// if (ANpcCharacter* Npc = Cast<ANpcCharacter>(Hit.GetActor()))
+			// {
+			// 	TArray<AActor*> Actors;
+			// 	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ANpcCharacter::StaticClass(),Actors);
+			// 	for (AActor* Actor : Actors)
+			// 	{
+			// 		if (ANpcCharacter* OtherNpc = Cast<ANpcCharacter>(Actor))
+			// 		{
+			// 			if (OtherNpc->NpcUiMaster)
+			// 			{
+			// 				OtherNpc->NpcUiMaster->SetVisibility(ESlateVisibility::Hidden);
+			// 			}
+			// 		}
+			// 	}
+			// }
 			if (ANpcStart* Start = Cast<ANpcStart>(Hit.GetActor()))
 			{
 				if (FlipflopStart == false)
@@ -135,19 +135,15 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 							Start->OnNpcStart.BindUObject(this,&UInvenComp::NpcItem);
 							Start->HunterStarter();
 						}
-						else
-						{
-							UE_LOG(LogTemp,Warning,TEXT("LoginComp StartNpc 직업 아직 없음"))
-						}
 					}
 				}
-				else
-				{
-					Start->UiNpcStart->SetVisibility(ESlateVisibility::Hidden);
-					FlipflopStart = false;
-				}
+				// else
+				// {
+				// 	Start->UiNpcStart->SetVisibility(ESlateVisibility::Hidden);
+				// 	FlipflopStart = false;
+				// }
 			}
-			else if (ANpcStore* Store = Cast<ANpcStore>(Hit.GetActor()))
+			if (ANpcStore* Store = Cast<ANpcStore>(Hit.GetActor()))
 			{
 				if (FlipflopStore == false)
 				{

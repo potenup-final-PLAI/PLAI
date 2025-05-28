@@ -40,10 +40,7 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class UStoreInven* StoreInven;
-
-	void SetStoreInven();
-
-
+	
 	// void SetStoreInven();
 
 	// Called to bind functionality to input

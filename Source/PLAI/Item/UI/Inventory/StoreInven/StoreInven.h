@@ -20,9 +20,6 @@ public:
 	TSubclassOf<USlotStore> SlotStoreFactory;
 
 	UPROPERTY(meta = (BindWidget))
-	class UWrapBox* WrapBox;
-
-	UPROPERTY(meta = (BindWidget))
 	class UWrapBox* EquipBox;
 
 	UPROPERTY(meta = (BindWidget))
@@ -30,6 +27,15 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UWrapBox* LegendaryBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* Equip;
+
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* Consume;
+
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* Legendary;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button_Equip;

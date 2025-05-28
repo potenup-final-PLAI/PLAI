@@ -183,10 +183,10 @@ void USlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDr
 void USlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+	UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseEnter"));
 
 	if (ItemStructTable.ItemTop != -1)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Slot::NativeOnMouseEnter"));
 	}
 }
 

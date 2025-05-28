@@ -4,6 +4,7 @@
 #include "StoreInven.h"
 
 #include "Components/Button.h"
+#include "Components/ScrollBox.h"
 #include "Components/WrapBox.h"
 #include "PLAI/Item/UI/Slot/SlotStore.h"
 
@@ -15,9 +16,9 @@ void UStoreInven::NativeConstruct()
 	Button_Consume->OnClicked.AddDynamic(this,&UStoreInven::OnButtonConsume);
 	Button_Legendary->OnClicked.AddDynamic(this,&UStoreInven::OnButtonLegendary);
 
-	// EquipBox->SetVisibility(ESlateVisibility::Visible);
-	// ConsumeBox->SetVisibility(ESlateVisibility::Hidden);
-	// LegendaryBox->SetVisibility(ESlateVisibility::Hidden);
+	Equip->SetVisibility(ESlateVisibility::Visible);
+	Consume->SetVisibility(ESlateVisibility::Hidden);
+	Legendary->SetVisibility(ESlateVisibility::Hidden);
 
 	TArray<FName>RawNames = ItemTable->GetRowNames();
 	for (FName RawName : RawNames)
@@ -45,31 +46,26 @@ void UStoreInven::NativeConstruct()
 			SlotStore->SlotImageUpdate();
 		}
 	}
-
-	// for (int32 i = 0; i < 34; i++)
-	// {
-	// 	USlotStore* SlotStore = CreateWidget<USlotStore>(GetWorld(), SlotStoreFactory);
-	// 	WrapBox->AddChild(SlotStore);
-	// }
+	
 }
 
 void UStoreInven::OnButtonEquip()
 {
-	EquipBox->SetVisibility(ESlateVisibility::Visible);
-	ConsumeBox->SetVisibility(ESlateVisibility::Hidden);
-	LegendaryBox->SetVisibility(ESlateVisibility::Hidden);
+	Equip->SetVisibility(ESlateVisibility::Visible);
+	Consume->SetVisibility(ESlateVisibility::Hidden);
+	Legendary->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UStoreInven::OnButtonConsume()
 {
-	EquipBox->SetVisibility(ESlateVisibility::Hidden);
-	ConsumeBox->SetVisibility(ESlateVisibility::Visible);
-	LegendaryBox->SetVisibility(ESlateVisibility::Hidden);
+	Equip->SetVisibility(ESlateVisibility::Hidden);
+	Consume->SetVisibility(ESlateVisibility::Visible);
+	Legendary->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UStoreInven::OnButtonLegendary()
 {
-	EquipBox->SetVisibility(ESlateVisibility::Hidden);
-	ConsumeBox->SetVisibility(ESlateVisibility::Hidden);
-	LegendaryBox->SetVisibility(ESlateVisibility::Visible);
+	Equip->SetVisibility(ESlateVisibility::Hidden);
+	Consume->SetVisibility(ESlateVisibility::Hidden);
+	Legendary->SetVisibility(ESlateVisibility::Visible);
 }

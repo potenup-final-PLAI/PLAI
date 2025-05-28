@@ -49,7 +49,7 @@ void ATestPlayer::BeginPlay()
 	Super::BeginPlay();
     if (IsLocallyControlled())
     {
-    	StoreComp->StoreInven->AddToViewport();
+    	// StoreComp->StoreInven->AddToViewport();
     	CaptureComp->PrimaryComponentTick.bCanEverTick = true;
     }
 	

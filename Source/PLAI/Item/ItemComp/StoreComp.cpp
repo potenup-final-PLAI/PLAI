@@ -24,16 +24,16 @@ UStoreComp::UStoreComp()
 void UStoreComp::BeginPlay()
 {
 	Super::BeginPlay();
-	if (StoreInvenFactory)
-	{
-		StoreInven = CreateWidget<UStoreInven>(GetWorld(),StoreInvenFactory);
-		StoreInven->AddToViewport(0);
-		StoreInven->SetVisibility(ESlateVisibility::Hidden);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("UStoreComp::BeginPlay 스토인벤 생성불가"));
-	}
+	// if (StoreInvenFactory)
+	// {
+	// 	StoreInven = CreateWidget<UStoreInven>(GetWorld(),StoreInvenFactory);
+	// 	StoreInven->AddToViewport(0);
+	// 	StoreInven->SetVisibility(ESlateVisibility::Hidden);
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("UStoreComp::BeginPlay 스토인벤 생성불가"));
+	// }
 	// ...
 }
 
