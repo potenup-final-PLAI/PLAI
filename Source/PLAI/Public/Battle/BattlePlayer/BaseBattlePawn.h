@@ -93,6 +93,8 @@ public:
 	int32 curAP = 0;
 
 	void InitAPUI();
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_AddAP(class ABattlePlayer* player);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_InitAPUI();
 	
@@ -147,15 +149,22 @@ public:
 
 	// 플레이어 스킬들
 	void PlayerMove(FHitResult& hitInfo);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_UpdatePlayerMoveAnim();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdatePlayerMoveAnim();
 	void PlayerBaseAttack(FHitResult& hitInfo);
-	void PlayerParalysis(FHitResult& hitInfo);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_UpdatPlayerBaseAttack();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdatePlayerBaseAttack();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_UpdatEnemyBaseAttack();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdateEnemyBaseAttack();
 	void PlayerPoison(FHitResult& hitInfo);
-	void PlayerVulnerable(FHitResult& hitInfo);
-	void PlayerWeaking(FHitResult& hitInfo);
 	void PlayerFatal(FHitResult& hitInfo);
 	void PlayerRupture(FHitResult& hitInfo);
-	void PlayerRoar(FHitResult& hitInfo);
-	void PlayerBattleCry(FHitResult& hitInfo);
 
 	// Player 대미지 전달 함수
 	UFUNCTION(NetMulticast, Reliable)
@@ -318,23 +327,49 @@ public:
 	void MultiCastRPC_UnitMoveRotateAttack();
 	//--------------Unit Move-------------------
 	// 이동 경로 저장 Array
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	TArray<AGridTile*> pathArray;
 	// 현재 경로 인덱스
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	int32 currentPathIndex = 0;
 	// 이동 중인지 체크
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	bool bIsMoving = false;
 	// 이동 속도
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	float moveSpeed = 300.0f;
 	
+	UPROPERTY(Replicated, EditAnywhere)
+	FVector newLoc;
+	
+	
+	//-------------Rotation 처리--------------------
+	UPROPERTY(Replicated, EditAnywhere)
+	FRotator newRot;
+	UPROPERTY()
+	bool bWantsToAttack = false;
+	UPROPERTY()
+	bool bStartMontage = false;
+	UPROPERTY(Replicated, EditAnywhere)
+	FRotator smoothRot;
+	UPROPERTY()
+	ABaseBattlePawn* attackTarget;
+	
+	UPROPERTY(Replicated, EditAnywhere)
+	FVector directionToTarget;
+	UPROPERTY(Replicated, EditAnywhere)
+	FRotator desiredRot;
+	UPROPERTY(Replicated, EditAnywhere)
+	FRotator targetMeshRot;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdatePlayerNoneAnim();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdateEnemyNoneAnim();
 	// 골 위치를 클릭 했을 때 그쪽으로 이동
-	void OnMoveEnd();
 	void InitValues();
 
-
+	void UnitRotation(const FRotator& rotation);
 	//------------- UI --------------
 	//-------------Unit 이름, HP, Armor 세팅------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
@@ -356,10 +391,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABattlePlayer* targetPlayer;
 
-	//-------------Rotation 처리--------------------
-	bool bWantsToAttack = false;
-	bool bStartMontage = false;
-	ABaseBattlePawn* attackTarget;
+
 
 	//-------------Enemy Name----------------
 	UFUNCTION(NetMulticast, Reliable)

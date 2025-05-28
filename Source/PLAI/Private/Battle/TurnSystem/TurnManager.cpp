@@ -150,7 +150,9 @@ void ATurnManager::OnTurnStart()
 	// Player라면
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(curUnit))
 	{
+		player->ClientRPC_AddAP(player);
 		player->MultiCastRPC_InitAPUI();
+	
 		UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(),player->curAP);
 	}
 	// Enemy라면
@@ -163,7 +165,6 @@ void ATurnManager::OnTurnStart()
 		UE_LOG(LogTemp, Warning, TEXT("enemy Current AP: %d"),enemy->curAP);
 
 		// 현재 위치에 타일을 가져와서
-		
 		if (auto* tile = phaseManager->gridTileManager->FindCurrentTile(enemy->GetActorLocation()))
 		{
 			// 현재 타일 설정
@@ -173,7 +174,6 @@ void ATurnManager::OnTurnStart()
 		}
 		
 		// 이동 범위 보이게
-		//enemy->ServerRPC_SeeMoveRange(enemy->moveRange);
 		enemy->Multicast_SeeMoveRange();
 		
 		ABaseBattlePawn* CapturedUnit = curUnit;

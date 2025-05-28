@@ -192,6 +192,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	if (action.dialogue != "")
 	{
 		FString dialogue = action.dialogue;
+		UE_LOG(LogTemp, Warning, TEXT("action.dialogue != 공백 아님 "));
 		ShowDialoge(dialogue);
 	}
 	
