@@ -35,8 +35,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ATestPlayer* TestPlayer;
 	
-	UPROPERTY(EditAnywhere)
-	class USphereComponent* SphereComponent;
+	// UPROPERTY(EditAnywhere)
+	// class USphereComponent* SphereComponent;
 
     UPROPERTY(EditAnywhere)
 	class UWidgetComponent* MonUiComp;
@@ -72,8 +72,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FDataTableRowHandle> DataTableRows;
 
-	void SetMonsterUi();
-	void SetHpBar();
+	virtual void SetMonsterUi();
+	virtual void SetHpBar();
 	void Dead();
 
 	UPROPERTY(EditAnywhere)

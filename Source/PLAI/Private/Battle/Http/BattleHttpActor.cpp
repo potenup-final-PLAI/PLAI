@@ -105,8 +105,7 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 			//GetResponseCode : 200 - 성공, 400번대, 500번대 - 오류
 			// 응답이 오면 실행
 			// 성공
-			if (bProcessedSuccessfully && EHttpResponseCodes::IsOk(
-				Response->GetResponseCode()))
+			if (bProcessedSuccessfully && EHttpResponseCodes::IsOk(Response->GetResponseCode()))
 			{
 				if (bHasEnv)
 				{
@@ -114,8 +113,7 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 					FString jsonData = Response->GetContentAsString();
 					UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
 	
-					if (auto* phaseManager = Cast<AUPhaseManager>(
-						GetWorld()->GetGameState()))
+					if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 					{
 						// 현재 페이즈가 None이라면
 						if (phaseManager->currentPhase == EBattlePhase::None)
@@ -130,36 +128,28 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 					UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonData);
 	
 					FActionRequest ParsedRequest;
-					if (FJsonObjectConverter::JsonObjectStringToUStruct(
-						jsonData, &ParsedRequest, 0, 0))
+					if (FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &ParsedRequest, 0, 0))
 					{
-						UE_LOG(LogTemp, Warning,
-						       TEXT("Success Response Json To Struct"));
+						UE_LOG(LogTemp, Warning,TEXT("Success Response Json To Struct"));
 	
-						if (ParsedRequest.action.target_character_id == "")
-						{
-							UE_LOG(LogTemp, Error,
-							       TEXT(
-								       "Parsed ActionRequest has empty actions array"
-							       ));
-							if (auto* enemy = Cast<ABaseEnemy>(unit))
-							{
-								enemy->OnTurnEnd();
-							}
-							return;
-						}
+						// if (ParsedRequest.action.target_character_id == "")
+						// {
+						// 	UE_LOG(LogTemp, Error,TEXT("Parsed ActionRequest has empty actions array"));
+						// 	if (auto* enemy = Cast<ABaseEnemy>(unit))
+						// 	{
+						// 		enemy->OnTurnEnd();
+						// 	}
+						// 	return;
+						// }
 	
-						if (auto* phaseManager = Cast<AUPhaseManager>(
-							GetWorld()->GetGameState()))
+						if (auto* phaseManager = Cast<AUPhaseManager>(GetWorld()->GetGameState()))
 						{
 							if (phaseManager->currentPhase ==
 								EBattlePhase::TurnProcessing)
 							{
-								if (unit && unit->GetName() == ParsedRequest.
-									current_character_id)
+								if (unit && unit->GetName() == ParsedRequest.current_character_id)
 								{
-									if (ABaseEnemy* enemy = Cast<ABaseEnemy>(
-										unit))
+									if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
 									{
 										enemy->ProcessAction(ParsedRequest);
 									}
@@ -169,8 +159,7 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 					}
 					else
 					{
-						UE_LOG(LogTemp, Error,
-						       TEXT("Failed to parse ActionRequest JSON"));
+						UE_LOG(LogTemp, Error,TEXT("Failed to parse ActionRequest JSON"));
 					}
 				}
 			}

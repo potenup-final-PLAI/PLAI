@@ -9,7 +9,6 @@
 #include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
-#include "Battle/UI/BattleUnitStateUI.h"
 #include "Battle/UI/CycleAndTurn.h"
 #include "Battle/UI/MainBattleUI.h"
 #include "Battle/UI/WorldDamageUIActor.h"
@@ -18,8 +17,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/BattlePlayer.h"
 #include "Battle/Util/BattleType/BattleTypes.h"
-#include "Blueprint/UserWidget.h"
-#include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "PLAI/Item/GameInstance/WorldGi.h"
 
@@ -732,10 +729,10 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			// 스테이터스 세팅
 			UE_LOG(LogTemp, Warning, TEXT("!!! Before setting PlayerStatus"));
 			player->hp = gi->UserFullInfoGiStat.character_info.stats.hp;
-			player->attack = gi->UserFullInfoGiStat.character_info.stats.attack;
+			player->attack = gi->UserFullInfoGiStat.character_info.stats.attack * 2;
 			player->defense = gi->UserFullInfoGiStat.character_info.stats.defense;
 			player->resistance = gi->UserFullInfoGiStat.character_info.stats.resistance;
-			player->moveRange = gi->UserFullInfoGiStat.character_info.stats.move_range;
+			player->moveRange = gi->UserFullInfoGiStat.character_info.stats.move_range * 3;
 			player->critical_Rate = gi->UserFullInfoGiStat.character_info.stats.critical_rate;
 			player->critical_Damage = gi->UserFullInfoGiStat.character_info.stats.critical_damage;
 			player->speed = gi->UserFullInfoGiStat.character_info.stats.speed;

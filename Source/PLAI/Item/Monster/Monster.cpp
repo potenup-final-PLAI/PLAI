@@ -26,8 +26,8 @@ AMonster::AMonster()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
-	SphereComponent->SetupAttachment(RootComponent);
+	// SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
+	// SphereComponent->SetupAttachment(RootComponent);
 	
 	MonUiComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("MonUiComponent"));
 	MonUiComp->SetupAttachment(RootComponent);

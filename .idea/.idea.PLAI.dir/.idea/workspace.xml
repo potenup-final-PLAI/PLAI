@@ -8,9 +8,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bacb1ca5-6adf-4789-91a8-7f4a49cd39c9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/PLAI/Private/Battle/BattlePlayer/BaseBattlePawn.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PLAI/Private/Battle/BattlePlayer/BaseBattlePawn.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/PLAI/Private/Battle/Tile/GridTileManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PLAI/Private/Battle/Tile/GridTileManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/__ExternalActors__/Mk_Item/Mk_WorldPartition/6/S4/BBJ1LXUU3IN6Z0TV9AOKN0.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/__ExternalActors__/Mk_Item/Mk_WorldPartition/6/S4/BBJ1LXUU3IN6Z0TV9AOKN0.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/__ExternalActors__/Mk_Item/Mk_WorldPartition/A/HV/MSK31D5SDATZ6LDU62GDX3.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/__ExternalActors__/Mk_Item/Mk_WorldPartition/A/HV/MSK31D5SDATZ6LDU62GDX3.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +32,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Uproject.PLAI.executor": "Run",
-    "git-widget-placeholder": "JS__Prototype",
+    "git-widget-placeholder": "Mk__ItemAlpha2",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -49,7 +48,7 @@
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
         <option name="EXECUTABLE_PATH" value="C:\Program Files\Epic Games\UE_5.5\Engine\Binaries\Win64\UnrealEditor-Win64-DebugGame.exe" />
-        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\PLAI\PLAI.uproject&quot;" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\A_Wanted_Projects\E_Baldus\Baldus\PLAI.uproject&quot;" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
         <option name="PASS_PARENT_ENVS" value="1" />
@@ -61,7 +60,7 @@
         <option name="CONFIGURATION" value="DebugGame" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\Project\PLAI\Binaries\Win64\PLAI-Win64-DebugGame.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\A_Wanted_Projects\E_Baldus\Baldus\Binaries\Win64\PLAI-Win64-DebugGame.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -75,7 +74,7 @@
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
         <option name="EXECUTABLE_PATH" value="C:\Program Files\Epic Games\UE_5.5\Engine\Binaries\Win64\UnrealEditor.exe" />
-        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Project\PLAI\PLAI.uproject&quot;" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\A_Wanted_Projects\E_Baldus\Baldus\PLAI.uproject&quot;" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
         <option name="PASS_PARENT_ENVS" value="1" />
@@ -87,7 +86,7 @@
         <option name="CONFIGURATION" value="Development" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\Project\PLAI\Binaries\Win64\PLAI.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\A_Wanted_Projects\E_Baldus\Baldus\Binaries\Win64\PLAI.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -100,7 +99,7 @@
         <option name="CONFIGURATION" value="Shipping" />
         <option name="PLATFORM" value="Win64" />
         <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
-        <option name="EXECUTABLE_PATH" value="C:\Project\PLAI\Binaries\Win64\PLAI-Win64-Shipping.exe" />
+        <option name="EXECUTABLE_PATH" value="C:\A_Wanted_Projects\E_Baldus\Baldus\Binaries\Win64\PLAI-Win64-Shipping.exe" />
         <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
         <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
         <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.5" />
@@ -127,6 +126,7 @@
       <updated>1744706725126</updated>
       <workItem from="1744706726265" duration="3345000" />
       <workItem from="1747359890977" duration="307000" />
+      <workItem from="1748242466974" duration="75000" />
     </task>
     <servers />
   </component>

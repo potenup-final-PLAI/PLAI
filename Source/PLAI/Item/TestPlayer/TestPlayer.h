@@ -41,11 +41,20 @@ public:
 	class ULogItemComp* LogItemComp;
 
 	UPROPERTY(EditAnywhere)
-	class UInputComp* TestInputComp;
+	class UInputComp* InputComp;
 	
 	UPROPERTY(EditAnywhere)
 	class UCreComp* CreComp;
 
+	UPROPERTY(EditAnywhere)
+	class UTurnComp* TurnComp;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ATestPlayer> TestPlayerFactory;
+
+	UPROPERTY(EditAnywhere)
+	class ATestPlayer* TestPlayerParent;
+	
 	UPROPERTY(EditAnywhere)
 	class USceneCaptureComponent2D* CaptureComp;
 

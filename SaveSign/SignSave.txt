@@ -1619,6 +1619,30 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "e@e.e",
+			"pw": "e",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "e@e.e",
+			"pw": "e",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }
