@@ -91,7 +91,8 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 		}
 	}
 	httpRequest->SetContentAsString(jsonString);
-	
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *jsonString);
 	// 서버에게 요청을 한 후 응답이오면 호출되는 함수 등록
 	httpRequest->OnProcessRequestComplete().BindLambda([=, this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bProcessedSuccessfully)
 	{

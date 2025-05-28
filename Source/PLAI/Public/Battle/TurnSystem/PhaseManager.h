@@ -160,9 +160,7 @@ public:
 	class APlayerController* pc;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Phase")
 	class ABattleHUD* hud;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Phase")
-	class AGridTileManager* girdTileManager;
-
+	
 	void InitOtherClass();
 
 

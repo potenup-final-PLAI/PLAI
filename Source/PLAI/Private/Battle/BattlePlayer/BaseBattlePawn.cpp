@@ -1026,13 +1026,13 @@ void ABaseBattlePawn::BuildPath()
 	if (!goalTile || !goalTile->parentTile)
 	{
 		UE_LOG(LogTemp, Error,TEXT("BuildPath aborted: goalTile or parent is null"));
-		OnMoveEnd();
+		turnManager->OnTurnEnd();
 		return;
 	}
 	if (startTile == goalTile)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Start tile is same as goal tile"));
-		OnMoveEnd();
+		turnManager->OnTurnEnd();
 		return;
 	}
 
@@ -1067,7 +1067,7 @@ void ABaseBattlePawn::BuildPath()
 	}
 
 	// InitValues();
-	this->ClearGridTile();
+	ClearGridTile();
 	bIsMoving = true;
 	currentPathIndex = 0;
 }
@@ -1222,7 +1222,7 @@ void ABaseBattlePawn::InitValues()
 	pathArray.Empty();
 	currentPathIndex = 0;
 	bIsMoving = false;
-	currentTile = nullptr;
+	// currentTile = nullptr;
 	startTile = nullptr;
 	goalTile = nullptr;
 }

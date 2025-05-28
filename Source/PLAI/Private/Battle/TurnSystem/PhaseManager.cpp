@@ -27,6 +27,11 @@ void AUPhaseManager::BeginPlay()
 
 	InitOtherClass();
 
+	gridTileManager = Cast<AGridTileManager>(UGameplayStatics::GetActorOfClass(GetWorld(), girdTileManagerFactory));
+	if (gridTileManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Grid tile manager created"));
+	}
 	if (pc)
 	{
 		this->SetOwner(pc);
@@ -478,7 +483,7 @@ FEnvironmentState AUPhaseManager::SetStartBattleAPI()
 			FCharacterData charData;
 			charData.id =  unit->GetName();
 			FString name = unit->MyName;
-			charData.name = Cast<ABattlePlayer>(unit) ? name : TEXT("오크");
+			charData.name = Cast<ABattlePlayer>(unit) ? name : TEXT("엔트");
 			// 따로 이름 필드 있으면
 			charData.type = Cast<ABattlePlayer>(unit)
 				                ? TEXT("player")

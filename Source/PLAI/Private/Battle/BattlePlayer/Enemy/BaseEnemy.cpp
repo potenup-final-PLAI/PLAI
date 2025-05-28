@@ -55,7 +55,7 @@ void ABaseEnemy::SetupPlayerInputComponent(
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseEnemy::MoveToPlayer()
+void ABaseEnemy::MoveToPlayer(AGridTile* targetPlayerTile)
 {
 	if (!goalTile)
 	{
@@ -86,9 +86,13 @@ void ABaseEnemy::MoveToPlayer()
 		return;
 	}
 	InitValues();
-
+	
+	goalTile = phaseManager->gridTileManager->FindCurrentTile(targetPlayerTile->GetActorLocation());
+	
+	startTile = phaseManager->gridTileManager->FindCurrentTile(GetActorLocation());
+	
 	// 현재 위치를 startTile로 설정
-	startTile = currentTile;
+	// startTile = currentTile;
 	
 	if (!IsValid(startTile))
 	{
@@ -230,7 +234,7 @@ void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 		if (goalTile)
 		{
 			// Player쪽으로 이동 실행
-			MoveToPlayer();
+			MoveToPlayer(goalTile);
 		}
 	}
 }
