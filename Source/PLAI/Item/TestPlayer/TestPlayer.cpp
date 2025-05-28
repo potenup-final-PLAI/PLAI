@@ -55,7 +55,7 @@ void ATestPlayer::BeginPlay()
 	
 	TestPlayerParent = TestPlayerFactory->GetDefaultObject<ATestPlayer>();
 
-	SetActorScale3D(FVector(3.0f));
+	SetActorScale3D(FVector(2.25f));
 }
 
 // Called every frame
