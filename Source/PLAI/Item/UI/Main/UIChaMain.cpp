@@ -45,22 +45,22 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 	int32 index = 0;
 	for (FString trait : UserFullInfo->character_info.traits)
 	{
-        TArray<FName>Traits = UiMain->LoginComp->TraitStructTable->GetRowNames();
-		for (FName Trait : Traits)
-		{
-			FTraitStructTable* TraitStruct = UiMain->LoginComp->TraitStructTable->FindRow<FTraitStructTable>(Trait,TEXT("UiChaMain"));
-			if (TraitStruct->Trait == UserFullInfo->character_info.traits[index])
-			{
-				UTextBlock* TraitStatName = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("UiChaMain"));
-				TraitStatName->SetFont(FSlateFontInfo(TraitStatName->GetFont().FontObject, 18));
-				TraitStatName->SetText(FText::FromString(TraitStruct->TraitStat));
-				TraitsStatNameBox->AddChild(TraitStatName);
-			}
-		}
+  //       TArray<FName>Traits = UiMain->LoginComp->TraitStructTable->GetRowNames();
+		// for (FName Trait : Traits)
+		// {
+		// 	FTraitStructTable* TraitStruct = UiMain->LoginComp->TraitStructTable->FindRow<FTraitStructTable>(Trait,TEXT("UiChaMain"));
+		// 	if (TraitStruct->Trait == UserFullInfo->character_info.traits[index])
+		// 	{
+		// 		UTextBlock* TraitStatName = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("UiChaMain"));
+		// 		TraitStatName->SetFont(FSlateFontInfo(TraitStatName->GetFont().FontObject, 12));
+		// 		TraitStatName->SetText(FText::FromString(TraitStruct->TraitStat));
+		// 		TraitsStatNameBox->AddChild(TraitStatName);
+		// 	}
+		// }
 		UTextBlock* NewTB = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 		NewTB->SetText(FText::FromString(UserFullInfo->character_info.traits[index]));
 		
-		NewTB->SetFont(FSlateFontInfo(NewTB->GetFont().FontObject, 12));
+		NewTB->SetFont(FSlateFontInfo(NewTB->GetFont().FontObject, 18));
 		TraitsName->AddChild(NewTB);
 		index++;
 	}
