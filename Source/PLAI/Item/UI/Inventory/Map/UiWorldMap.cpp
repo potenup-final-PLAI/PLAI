@@ -51,7 +51,7 @@ void UUiWorldMap::SetRefreshPlayerList()
 		{
 			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
 			{
-				// if (!TP -> IsLocallyControlled())return;
+				if (!TP -> IsLocallyControlled())return;
 				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
 
 				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
@@ -120,7 +120,8 @@ void UUiWorldMap::ExtendMap()
 		{
 			CanvasSlot->SetSize(MiniMapSizeS);
 			CanvasSlot->SetAnchors(FAnchors(1,1));
-			CanvasSlot->SetPosition(FVector2D(-25,-25));
+			CanvasSlot->SetPosition(FVector2D(-10,-10));
+			// CanvasSlot->SetPosition(FVector2D(0,0));
 			CanvasSlot->SetAlignment(FVector2D(1,1));
 			MiniMapSize = MiniMapSizeS;;
 			bExtendMap = false;

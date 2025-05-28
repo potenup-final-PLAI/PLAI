@@ -23,7 +23,7 @@ ANpcCharacter::ANpcCharacter()
 	
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("Niagara");
 	NiagaraComp->SetupAttachment(RootComponent);
-	NiagaraComp->SetRelativeLocation(FVector(0,0,100));
+	NiagaraComp->SetRelativeLocation(FVector(0,0,180));
 }
 
 // Called when the game starts or when spawned
