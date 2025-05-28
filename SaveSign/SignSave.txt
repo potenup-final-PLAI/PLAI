@@ -1463,6 +1463,18 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "",
+			"pw": "",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }
