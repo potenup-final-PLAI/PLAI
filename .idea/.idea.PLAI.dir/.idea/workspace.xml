@@ -7,13 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bacb1ca5-6adf-4789-91a8-7f4a49cd39c9" name="Changes" comment="">
+    <list default="true" id="bacb1ca5-6adf-4789-91a8-7f4a49cd39c9" name="Changes" comment="UI 디테일 수정">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/KHA/UI/Common/WBP_Logo.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/KHA/UI/Common/WBP_Logo.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UIChaMain.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UIChaMain.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiMain.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiMain.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSign.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSign.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveSign/SignSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveSign/SignSave.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSubMain.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSubMain.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +34,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/../../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/UMG/Public/Blueprint/UserWidget.h" root0="FORCE_HIGHLIGHTING" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -150,15 +147,27 @@
       <workItem from="1748445216541" duration="29000" />
       <workItem from="1748446342913" duration="4000" />
       <workItem from="1748447090115" duration="1000" />
-      <workItem from="1748488691824" duration="9775000" />
+      <workItem from="1748488691824" duration="11301000" />
     </task>
+    <task id="LOCAL-00001" summary="UI 디테일 수정">
+      <option name="closed" value="true" />
+      <created>1748508443787</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1748508443787</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="UI 디테일 수정" />
+    <option name="LAST_COMMIT_MESSAGE" value="UI 디테일 수정" />
   </component>
 </project>
