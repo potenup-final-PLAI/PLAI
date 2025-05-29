@@ -102,6 +102,12 @@ public:
 	bool bTurnEnded;
 	
 	void OnTurnStart();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_AddOrderUnit();
    	void OnTurnEnd();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_RemoveOrderUnit();
 
 };
