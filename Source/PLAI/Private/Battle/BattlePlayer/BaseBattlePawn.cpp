@@ -339,6 +339,10 @@ void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 	}
 }
 
+void ABaseBattlePawn::Server_UpdateCurrentTile_Implementation(class AGridTile* tile)
+{
+	currentTile = tile;
+}
 
 
 void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
@@ -1016,6 +1020,8 @@ void ABaseBattlePawn::PathFind()
 		// 목표 도달했으면 종료
 		if (currentTile == goalTile)
 		{
+			// 로컬이라면 서버로 currentTile 업데이트
+			if (IsLocallyControlled()) Server_UpdateCurrentTile(currentTile);
 			BuildPath();
 			return;
 		}

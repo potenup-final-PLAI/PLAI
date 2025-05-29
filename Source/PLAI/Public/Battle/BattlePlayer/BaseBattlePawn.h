@@ -153,6 +153,8 @@ public:
 
 	// 플레이어 스킬들
 	void PlayerMove(FHitResult& hitInfo);
+	UFUNCTION(Server, Reliable)
+	void Server_UpdateCurrentTile(class AGridTile* tile);
 	void PlayerBaseAttack(FHitResult& hitInfo);
 	void PlayerPoison(FHitResult& hitInfo);
 	void PlayerFatal(FHitResult& hitInfo);
