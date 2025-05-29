@@ -161,6 +161,8 @@ public:
 	void PlayerRupture(FHitResult& hitInfo);
 
 	// Player 대미지 전달 함수
+	UFUNCTION(Server, Reliable)
+	void Server_PlayerApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
 	UFUNCTION(NetMulticast, Reliable)
 	void PlayerApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
 	// Enemy 대미지 전달 함수
@@ -339,13 +341,13 @@ public:
 	//-------------Rotation 처리--------------------
 	UPROPERTY(Replicated, EditAnywhere)
 	FRotator newRot;
-	UPROPERTY()
+	UPROPERTY(Replicated, EditAnywhere)
 	bool bWantsToAttack = false;
-	UPROPERTY()
+	UPROPERTY(Replicated, EditAnywhere)
 	bool bStartMontage = false;
 	UPROPERTY(Replicated, EditAnywhere)
 	FRotator smoothRot;
-	UPROPERTY()
+	UPROPERTY(Replicated, EditAnywhere)
 	ABaseBattlePawn* attackTarget;
 	
 	UPROPERTY(Replicated, EditAnywhere)

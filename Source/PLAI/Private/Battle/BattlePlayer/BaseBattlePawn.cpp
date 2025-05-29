@@ -119,6 +119,9 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, newLoc);
 	DOREPLIFETIME(ABaseBattlePawn, newRot);
 	DOREPLIFETIME(ABaseBattlePawn, curSkillName);
+	DOREPLIFETIME(ABaseBattlePawn, bWantsToAttack);
+	DOREPLIFETIME(ABaseBattlePawn, bStartMontage);
+	DOREPLIFETIME(ABaseBattlePawn, attackTarget);
 
 }
 
@@ -397,10 +400,11 @@ void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		if (enemy->enemyAnim)
-		{
-			enemy->enemyAnim->actionMode = currentActionMode;
-		}
+		// if (enemy->enemyAnim)
+		// {
+		// 	enemy->enemyAnim->actionMode = currentActionMode;
+		// }
+		enemy->ServerRPC_UpdateEnemyAnim(enemy->currentActionMode);
 		UE_LOG(LogTemp, Warning, TEXT("Cast Enemy In"));
 		PlayerApplyAttack(enemy, EActionMode::Poison);
 		
@@ -408,10 +412,13 @@ void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
+		// if (player->playerAnim)
+		// {
+		// 	player->playerAnim->actionMode = currentActionMode;
+		// }
+		if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
+		else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
+		
 		EnemyApplyAttack(player, EActionMode::Poison);
 	}
 }
@@ -421,20 +428,23 @@ void ABaseBattlePawn::PlayerFatal(FHitResult& hitInfo)
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		if (enemy->enemyAnim)
-		{
-			enemy->enemyAnim->actionMode = currentActionMode;
-		}
-		EnemyApplyAttack(enemy, EActionMode::Fatal);
+		// if (enemy->enemyAnim)
+		// {
+		// 	enemy->enemyAnim->actionMode = currentActionMode;
+		// }
+		enemy->ServerRPC_UpdateEnemyAnim(enemy->currentActionMode);
+		PlayerApplyAttack(enemy, EActionMode::Fatal);
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
-		PlayerApplyAttack(player, EActionMode::Fatal);
+		// if (player->playerAnim)
+		// {
+		// 	player->playerAnim->actionMode = currentActionMode;
+		// }
+		if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
+		else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
+		EnemyApplyAttack(player, EActionMode::Fatal);
 	}
 }
 
@@ -443,20 +453,25 @@ void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		if (enemy->enemyAnim)
-		{
-			enemy->enemyAnim->actionMode = currentActionMode;
-		}
-		EnemyApplyAttack(enemy, EActionMode::Rupture);
+		// if (enemy->enemyAnim)
+		// {
+		// 	enemy->enemyAnim->actionMode = currentActionMode;
+		// }
+		enemy->ServerRPC_UpdateEnemyAnim(enemy->currentActionMode);
+		
+		PlayerApplyAttack(enemy, EActionMode::Rupture);
 	}
 	// 공격 대상이 player라면
 	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
 	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
-		PlayerApplyAttack(player, EActionMode::Rupture);
+		// if (player->playerAnim)
+		// {
+		// 	player->playerAnim->actionMode = currentActionMode;
+		// }
+		if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
+		else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
+		
+		EnemyApplyAttack(player, EActionMode::Rupture);
 	}
 }
 
@@ -582,6 +597,11 @@ void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(class ABattleP
 		player->playerAnim->lifeState = ELifeState::Dead;
 		UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(player->playerLifeState));
 	}
+}
+
+void ABaseBattlePawn::Server_PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUnit, EActionMode attackType)
+{
+	PlayerApplyAttack_Implementation(targetUnit, attackType);
 }
 
 void ABaseBattlePawn::PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUnit, EActionMode attackType)

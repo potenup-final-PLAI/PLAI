@@ -29,7 +29,7 @@ public:
 	EActionMode actionMode;
 
 	//----------Battle Player-----------------
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	class ABattlePlayer* battlePlayer;
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = "Anim")
