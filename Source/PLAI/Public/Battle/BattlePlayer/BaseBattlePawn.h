@@ -144,11 +144,17 @@ public:
 	//------------Skill System-----------------
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = "Skill")
 	EActionMode currentActionMode = EActionMode::None;
+
+	// UFUNCTION()
+	// void OnRep_ActionModeChanged();
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	bool bBaseAttack = true;
 
 	// 플레이어 스킬들
 	void PlayerMove(FHitResult& hitInfo);
+	UFUNCTION(Server, Reliable)
+	void Server_UpdateCurrentTile(class AGridTile* tile);
 	void PlayerBaseAttack(FHitResult& hitInfo);
 	void PlayerPoison(FHitResult& hitInfo);
 	void PlayerFatal(FHitResult& hitInfo);
@@ -322,9 +328,14 @@ public:
 	UPROPERTY(Replicated, EditAnywhere)
 	float moveSpeed = 300.0f;
 	
-	UPROPERTY(Replicated, EditAnywhere)
+	UPROPERTY(ReplicatedUsing = OnRep_TargetLoc, EditAnywhere)
 	FVector newLoc;
-	
+
+	UFUNCTION()
+	void OnRep_TargetLoc();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UpdateNewLoc(const FVector& newLocation);
 	//-------------Rotation 처리--------------------
 	UPROPERTY(Replicated, EditAnywhere)
 	FRotator newRot;
@@ -347,9 +358,19 @@ public:
 	// 골 위치를 클릭 했을 때 그쪽으로 이동
 	void InitValues();
 
+	// Unit 회전 동기화
 	void UnitRotation(class ABaseBattlePawn* unit);
-	void UnitMove(class ABaseBattlePawn* unit);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_UnitRotation(const FRotator& rot);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UnitRotation(const FRotator& rot);
 
+	// Unit 이동 동기화
+	void UnitMove(class ABaseBattlePawn* unit);
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_UnitMove(const FVector& loc);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_UnitMove(const FVector& loc);
 	void UnitAttackBeforeRoatation(class ABaseBattlePawn* unit);
 	void UnitAttack(class ABaseBattlePawn* unit);
 	

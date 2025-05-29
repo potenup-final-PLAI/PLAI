@@ -69,8 +69,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_EnemyTile(class AGridTile* enemyTile);
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_UpdateEnemyAnim(EActionMode mode);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_UpdateEnemyAnim();
+	void MultiCastRPC_UpdateEnemyAnim(EActionMode mode);
 
 };
 
