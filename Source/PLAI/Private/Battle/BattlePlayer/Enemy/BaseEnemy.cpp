@@ -80,7 +80,7 @@ void ABaseEnemy::MoveToPlayer(AGridTile* targetPlayerTile)
 			UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"),*UEnum::GetValueAsString(enemyAnim->actionMode));
 		}
 
-		phaseManager->turnManager->OnTurnEnd();
+		// phaseManager->turnManager->OnTurnEnd();
 
 		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
 		return;
@@ -224,15 +224,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 {
 	// 1. 이동 처리
-	// enemy actionmode 업데이트
-	currentActionMode = EActionMode::Move;
 	
-	if (enemyAnim)
-	{
-		MultiCastRPC_UpdateEnemyAnim(currentActionMode);
-		UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
-	}
-
 	int32 targetX = actionMove[0];
 	int32 targetY = actionMove[1];
 
