@@ -4,6 +4,7 @@
 #include "Battle/UI/MainBattleUI.h"
 
 #include "Battle/UI/ReasonUI.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Components/HorizontalBox.h"
 #include "Components/ScrollBox.h"
 #include "Enemy/BaseEnemy.h"
@@ -34,6 +35,7 @@ void UMainBattleUI::AddReason(FString dialogue)
 
 void UMainBattleUI::AddOrder(const TArray<class ABaseBattlePawn*> unitArray)
 {
+	NET_PRINTLOG(TEXT("IN AddOrder"));
 	// 시작할 때 원래 있던 UI 초기화
 	HB_TurnOrder->ClearChildren();
 

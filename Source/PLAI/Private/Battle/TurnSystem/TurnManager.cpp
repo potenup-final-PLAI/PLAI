@@ -94,12 +94,12 @@ void ATurnManager::StartTurn()
 		return;
 	}
 	
-	
 	SetTurnState(ETurnState::None);
 
 	MutliCastRPC_UpdateWhoTurn(curUnit->MyName);
 	MulticastRPC_CameraChange(curUnit);
-
+	
+	
 	if (ABattlePlayer* playerPawn = Cast<ABattlePlayer>(curUnit))
 	{
 		SetTurnState(ETurnState::PreparePlayerTurn);
@@ -235,18 +235,18 @@ void ATurnManager::OnTurnEnd()
 	
 	curUnit->MultiCastRPC_ClearGridTile();
 
-	// 턴이 종료 되면 turnOrderArray에 0번을 빼서 orderUnit에 담아놓고 RmoveAt 후 다시 Add로 추가
-	if (phaseManager && phaseManager->turnOrderArray.Num() > 0)
-	{
-		auto* orderUnit = phaseManager->turnOrderArray[0];
-		phaseManager->turnOrderArray.RemoveAt(0);
-		phaseManager->turnOrderArray.Add(orderUnit);
-		Multicast_RemoveOrderUnit();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("ATurnManager::OnTurnEnd : phaseManager && phaseManager->turnOrderArray.Num() > 0"));
-	}
+	// // 턴이 종료 되면 turnOrderArray에 0번을 빼서 orderUnit에 담아놓고 RmoveAt 후 다시 Add로 추가
+	// if (phaseManager && phaseManager->turnOrderArray.Num() > 0)
+	// {
+	// 	auto* orderUnit = phaseManager->turnOrderArray[0];
+	// 	phaseManager->turnOrderArray.RemoveAt(0);
+	// 	phaseManager->turnOrderArray.Add(orderUnit);
+	// 	Multicast_RemoveOrderUnit();
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("ATurnManager::OnTurnEnd : phaseManager && phaseManager->turnOrderArray.Num() > 0"));
+	// }
 	
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *curUnit->MyName);
 	
