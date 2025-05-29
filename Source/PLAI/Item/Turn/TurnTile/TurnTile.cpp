@@ -27,8 +27,8 @@ void ATurnTile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MonsterSpawn();
-	PlayerSpawn();
+	// MonsterSpawn();
+	// PlayerSpawn();
 }
 
 // Called every frame
