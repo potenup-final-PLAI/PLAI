@@ -8,12 +8,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bacb1ca5-6adf-4789-91a8-7f4a49cd39c9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/.name" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/PLAI/Item/UI/Main/UiGameLogo.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.PLAI.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UIChaMain.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UIChaMain.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiMain.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiMain.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSign.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSign.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSubMain.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Mk_Item/UI/UiMain/Wbp_UiSubMain.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/KHA/UI/Common/WBP_Main.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/PLAI.uproject" beforeDir="false" afterPath="$PROJECT_DIR$/PLAI.uproject" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/PLAI/Item/UI/Main/UiMain.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PLAI/Item/UI/Main/UiMain.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,6 +34,9 @@
     &quot;accountId&quot;: &quot;6df7600e-8df6-43a5-9f25-f8a411b65fba&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/UMG/Public/Blueprint/UserWidget.h" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -145,6 +147,8 @@
       <workItem from="1748242466974" duration="75000" />
       <workItem from="1748443775699" duration="596000" />
       <workItem from="1748445216541" duration="29000" />
+      <workItem from="1748446342913" duration="4000" />
+      <workItem from="1748447090115" duration="1000" />
     </task>
     <servers />
   </component>

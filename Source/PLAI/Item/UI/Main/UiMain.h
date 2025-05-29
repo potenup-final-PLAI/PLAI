@@ -83,6 +83,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UUiSteamLobby* Wbp_UiSteamLobby;
 	
+	
+	
 	// Init 클래스
     UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* CanvasInit;
