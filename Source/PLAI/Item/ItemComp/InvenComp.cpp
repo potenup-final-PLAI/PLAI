@@ -550,7 +550,7 @@ void UInvenComp::TurnReward()
 
 			UiTurnReward->RewardExp->SetText(FText::AsNumber(Exp));
 	
-			int32 RandGold = FMath::RandRange(1000,5000);
+			int32 RandGold = FMath::RandRange(100000,250000);
 			UiTurnReward->RewardGold->SetText(FText::AsNumber(RandGold));
 			SetGold(RandGold);
 	
