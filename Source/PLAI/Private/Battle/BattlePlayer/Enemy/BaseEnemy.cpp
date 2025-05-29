@@ -150,20 +150,25 @@ void ABaseEnemy::FindAndAttackPlayer()
 		FCollisionShape::MakeSphere(detectRadius),
 		queryParams
 	);
+	
 	for (auto& overlap : overlaps)
 	{
 		// 탐색 했을 때 그 객체가 Player라면
 		if (ABattlePlayer* detectedPlayer = Cast<ABattlePlayer>(overlap.GetActor()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Detected Player"));
-			// 플레이어가 있다면 공격
-			EnemyApplyAttack(detectedPlayer, EActionMode::Poison);
+			// 플레이어가 있다면 대상에 추가
+			targetPlayer = detectedPlayer;
+			attackTarget = targetPlayer;
+			FString s = " ";
+			NET_PRINTLOG(TEXT("attackPlayer %s, targetPlayer %s"), attackTarget != nullptr ? *attackTarget->GetActorNameOrLabel() : *s, targetPlayer != nullptr ? *targetPlayer->GetActorNameOrLabel() : *s);
+			// EnemyApplyAttack(detectedPlayer, EActionMode::Poison);
 			break;
 		}
 	}
 
 	// 끝났으면 턴 종료 처리
-	phaseManager->turnManager->OnTurnEnd();
+	// phaseManager->turnManager->OnTurnEnd();
 }
 
 void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
@@ -200,7 +205,10 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	if (action.skill != "")
 	{
 		EnemyActionList(actionRequest.action.skill);
-		attackTarget = FindUnitById(action.target_character_id);
+		// attackTarget = FindUnitById(action.target_character_id);
+		// targetPlayer = Cast<ABattlePlayer>(attackTarget);
+		// FString s = " ";
+		// NET_PRINTLOG(TEXT("attackPlayer %s, targetPlayer %s"), attackTarget != nullptr ? *attackTarget->GetActorNameOrLabel() : *s, targetPlayer != nullptr ? *targetPlayer->GetActorNameOrLabel() : *s);
 		bWantsToAttack = true;
 		bStartMontage = true;
 	}
@@ -210,7 +218,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([&]()
 	{
 		phaseManager->turnManager->OnTurnEnd();	
-	}), 1.5f, false);
+	}), 2.5f, false);
 }
 
 void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
@@ -356,13 +364,13 @@ void ABaseEnemy::EnemyActionList(const FString& actionName)
 ABaseBattlePawn* ABaseEnemy::FindUnitById(const FString& Id)
 {
 	TArray<AActor*> foundUnits;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ABaseBattlePawn::StaticClass(),foundUnits);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABattlePlayer::StaticClass(),foundUnits);
 
 	for (AActor* actor : foundUnits)
 	{
-		if (ABaseBattlePawn* unit = Cast<ABaseBattlePawn>(actor))
+		if (ABattlePlayer* unit = Cast<ABattlePlayer>(actor))
 		{
-			if (unit->GetName() == Id)
+			if (unit->MyName == Id)
 			{
 				return unit;
 			}

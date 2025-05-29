@@ -387,6 +387,8 @@ public:
 	void Multicast_PlayerBaseAttack(class ABattlePlayer* player);
 
 	// Enemy 공격 동기화
+	UPROPERTY(Replicated, EditAnywhere)
+	class UAnimMontage* enemyBaseAttack;
 	UFUNCTION(Server, Reliable)
 	void Server_EnemyBaseAttack(class ABaseEnemy* enemy);
 	UFUNCTION(NetMulticast, Reliable)
@@ -414,7 +416,7 @@ public:
 	class ABaseEnemy* targetEnemy;
 
 	//-----------Enemy Anim Instace---------------------
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABattlePlayer* targetPlayer;
 
 	//-------------Enemy Name----------------

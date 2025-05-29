@@ -122,6 +122,7 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, bWantsToAttack);
 	DOREPLIFETIME(ABaseBattlePawn, bStartMontage);
 	DOREPLIFETIME(ABaseBattlePawn, attackTarget);
+	DOREPLIFETIME(ABaseBattlePawn, targetPlayer);
 
 }
 
@@ -379,18 +380,18 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 		}
 	}
 	// 공격 대상이 player라면
-	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitActor))
-	{
-		targetPlayer = player;
-		attackTarget = targetPlayer;
-		bWantsToAttack = true;
-
-		if (thisAsEnemy)
-		{
-			thisAsEnemy->ServerRPC_UpdateEnemyAnim(thisAsEnemy->currentActionMode);
-			thisAsEnemy->bStartMontage = true;
-		}
-	}
+	// else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitActor))
+	// {
+	// 	targetPlayer = player;
+	// 	attackTarget = targetPlayer;
+	// 	bWantsToAttack = true;
+	// 	NET_PRINTLOG(TEXT("targetPlayer = %s"), *targetPlayer->GetActorNameOrLabel());
+	// 	if (thisAsEnemy)
+	// 	{
+	// 		thisAsEnemy->ServerRPC_UpdateEnemyAnim(thisAsEnemy->currentActionMode);
+	// 		thisAsEnemy->bStartMontage = true;
+	// 	}
+	// }
 }
 
 
@@ -756,8 +757,6 @@ void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode 
 		return;
 
 	default:
-		// EnemySkillList에서 고유 스킬 처리
-		// HandleEnemyUniqueSkill(enemy, player, attackType);
 		break;
 	}
 
