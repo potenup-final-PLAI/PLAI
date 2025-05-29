@@ -1554,41 +1554,10 @@ void ABaseBattlePawn::UnitAttack(class ABaseBattlePawn* unit)
 	}
 	else if (auto* enemy = Cast<ABaseEnemy>(unit))
 	{
-		bWantsToAttack = false;
+		// bWantsToAttack = false;
 		if (enemy->bStartMontage)
 		{
-			// 회전 끝나고 몽타주 실행
-			if (enemy->enemyAnim)
-			{
-				enemy->enemyAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
-				UE_LOG(LogTemp, Warning, TEXT("EnemyBaseAttackAnimation"));
-
-				// 어떤 스킬 사용했는지
-				if (enemy->curSkillName == "")
-				{
-					return;
-				}
-				enemy->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
-				enemy->battleUnitStateUI->SetPrintSkillName(enemy->curSkillName);
-				enemy->battleUnitStateUI->ShowPrintSkillNameUI();
-
-				FTimerHandle skillNameUIHandle;
-				GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
-				GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [enemy]()
-				{
-					if (enemy && enemy->battleUnitStateUI)
-					{
-						enemy->battleUnitStateUI->ShowBaseUI();
-						enemy->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
-					}
-				}, 2.0f, false);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error,TEXT("enemy->enemyAnim is nullptr!"));
-			}
-			enemy->bStartMontage = false;
-			UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+			Server_EnemyBaseAttack(enemy);
 		}
 	}
 }
@@ -1627,6 +1596,47 @@ void ABaseBattlePawn::Multicast_PlayerBaseAttack_Implementation(class ABattlePla
 			player->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
 		}
 	}, 2.0f, false);
+}
+
+void ABaseBattlePawn::Server_EnemyBaseAttack_Implementation(class ABaseEnemy* enemy)
+{
+	Multicast_EnemyBaseAttack(enemy);
+}
+
+void ABaseBattlePawn::Multicast_EnemyBaseAttack_Implementation(class ABaseEnemy* enemy)
+{
+	// 회전 끝나고 몽타주 실행
+	if (enemy->enemyAnim)
+	{
+		enemy->enemyAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
+		UE_LOG(LogTemp, Warning, TEXT("EnemyBaseAttackAnimation"));
+
+		// 어떤 스킬 사용했는지
+		if (enemy->curSkillName == "")
+		{
+			return;
+		}
+		enemy->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
+		enemy->battleUnitStateUI->SetPrintSkillName(enemy->curSkillName);
+		enemy->battleUnitStateUI->ShowPrintSkillNameUI();
+
+		FTimerHandle skillNameUIHandle;
+		GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
+		GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [enemy]()
+		{
+			if (enemy && enemy->battleUnitStateUI)
+			{
+				enemy->battleUnitStateUI->ShowBaseUI();
+				enemy->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+			}
+		}, 2.0f, false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error,TEXT("enemy->enemyAnim is nullptr!"));
+	}
+	enemy->bStartMontage = false;
+	UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
 }
 
 void ABaseBattlePawn::InitEnemyState()

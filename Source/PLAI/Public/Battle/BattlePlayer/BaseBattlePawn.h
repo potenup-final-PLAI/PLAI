@@ -373,13 +373,24 @@ public:
 	void ServerRPC_UnitMove(const FVector& loc);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_UnitMove(const FVector& loc);
+
+	// 공격 하기전 회전
 	void UnitAttackBeforeRoatation(class ABaseBattlePawn* unit);
+
+	// Unit 공격
 	void UnitAttack(class ABaseBattlePawn* unit);
+
+	// Player 공격 동기화
 	UFUNCTION(Server, Reliable)
 	void Server_PlayerBaseAttack(class ABattlePlayer* player);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayerBaseAttack(class ABattlePlayer* player);
-	
+
+	// Enemy 공격 동기화
+	UFUNCTION(Server, Reliable)
+	void Server_EnemyBaseAttack(class ABaseEnemy* enemy);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_EnemyBaseAttack(class ABaseEnemy* enemy);
 	//------------- UI --------------
 	//-------------Unit 이름, HP, Armor 세팅------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
