@@ -52,6 +52,7 @@ void AUPhaseManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AUPhaseManager, currentPhase);
 	DOREPLIFETIME(AUPhaseManager, unitQueue);
 	DOREPLIFETIME(AUPhaseManager, turnManager);
+	DOREPLIFETIME(AUPhaseManager, turnOrderArray);
 }
 
 void AUPhaseManager::SetCycle()
@@ -191,6 +192,12 @@ void AUPhaseManager::SetUnitQueue()
 
 	SortUnitQueue();
 
+	if (turnManager)
+	{
+		turnManager->Multicast_AddOrderUnit();
+		NET_PRINTLOG(TEXT(" AUPhaseManager::SetUnitQueue : turnManager->Multicast_AddOrderUnit"));
+	}
+	
 	for (int i = 0; i < unitQueue.Num(); i++)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UnitName %s Unit Speed : %d"),
@@ -366,6 +373,9 @@ void AUPhaseManager::SetBeforeBattle()
 		return;
 	}
 
+	// unitArray turnOrderArray에 세팅
+	turnOrderArray = gridTileManager->unitArray;
+	
 	// girdTile에 저장해둔 unit들 순서대로 Possess해서 PlayerState 세팅
 	if (gridTileManager->unitArray.Num() > 0)
 	{

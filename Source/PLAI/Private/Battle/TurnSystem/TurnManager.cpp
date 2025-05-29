@@ -93,7 +93,8 @@ void ATurnManager::StartTurn()
 	{
 		return;
 	}
-
+	
+	
 	SetTurnState(ETurnState::None);
 
 	MutliCastRPC_UpdateWhoTurn(curUnit->MyName);
@@ -192,6 +193,24 @@ void ATurnManager::OnTurnStart()
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
 }
 
+void ATurnManager::Multicast_AddOrderUnit_Implementation()
+{
+	// 턴 시작할 때 TurnOrder UI 초기화해서 다시 세팅
+	if (phaseManager->hud)
+	{
+		phaseManager->hud->mainUI->AddOrder(phaseManager->turnOrderArray);
+	}
+	else if (phaseManager->turnOrderArray.Num() > 0)
+	{
+		NET_PRINTLOG(TEXT("Turn order array is empty or hud is Null"));
+	}
+	else
+	{
+		NET_PRINTLOG(TEXT("phaseManager->hud"));
+	}
+	
+}
+
 void ATurnManager::OnTurnEnd()
 {
 	if (!HasAuthority())
@@ -215,9 +234,27 @@ void ATurnManager::OnTurnEnd()
 	bTurnEnded = true;
 	
 	curUnit->MultiCastRPC_ClearGridTile();
+
+	// 턴이 종료 되면 turnOrderArray에 0번을 빼서 orderUnit에 담아놓고 RmoveAt 후 다시 Add로 추가
+	if (phaseManager && phaseManager->turnOrderArray.Num() > 0)
+	{
+		auto* orderUnit = phaseManager->turnOrderArray[0];
+		phaseManager->turnOrderArray.RemoveAt(0);
+		phaseManager->turnOrderArray.Add(orderUnit);
+		Multicast_RemoveOrderUnit();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ATurnManager::OnTurnEnd : phaseManager && phaseManager->turnOrderArray.Num() > 0"));
+	}
 	
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *curUnit->MyName);
-
+	
+	// 순서 바꾸고 UI 갱신 호출
+	Multicast_RemoveOrderUnit();
+	Multicast_AddOrderUnit();
+	
+	
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(curUnit))
 	{
 		// PlayerPhaseEnd
@@ -229,5 +266,20 @@ void ATurnManager::OnTurnEnd()
 		NET_PRINTLOG(TEXT("Enemy Turn End"));
 		curUnit->MultiCastRPC_UpdateReason();
 		phaseManager->ServerRPC_EndEnemyPhase_Implementation();
+	}
+}
+
+void ATurnManager::Multicast_RemoveOrderUnit_Implementation()
+{
+	// 턴이 종료 되면 turnOrderArray에 0번을 빼서 orderUnit에 담아놓고 RmoveAt 후 다시 Add로 추가
+	if (phaseManager && phaseManager->turnOrderArray.Num() > 0)
+	{
+		auto* orderUnit = phaseManager->turnOrderArray[0];
+		phaseManager->turnOrderArray.RemoveAt(0);
+		phaseManager->turnOrderArray.Add(orderUnit);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ATurnManager::OnTurnEnd : phaseManager && phaseManager->turnOrderArray.Num() > 0"));
 	}
 }

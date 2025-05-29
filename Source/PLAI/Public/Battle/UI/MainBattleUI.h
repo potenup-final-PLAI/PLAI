@@ -23,7 +23,8 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UBattlePlayerInfoUI* WBP_Player;
-	
+
+	//--------------- AP 추가 하는 부분 ---------------------
 	// AP 추가될 패널
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* HB_AP;
@@ -32,12 +33,21 @@ public:
 	class TSubclassOf<UUserWidget> apFactory;
 
 	void AddAP();
-
+	//--------------- Reason 출력 해주는 부분 ---------------------
 	UPROPERTY(meta = (BindWidget))
 	class UScrollBox* SB_Reason;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UReasonUI> reasonFactory;
 	void AddReason(FString dialogue);
+	
+	//--------------- TurnOrder 추가 해주는 부분 ---------------------
+	UPROPERTY(meta = (BindWidget))
+	class UHorizontalBox* HB_TurnOrder;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> playerOrderFactory;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> enemyOrderFactory;
+	void AddOrder(const TArray<class ABaseBattlePawn*> unitArray);
 };

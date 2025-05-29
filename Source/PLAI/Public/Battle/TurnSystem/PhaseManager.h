@@ -163,7 +163,10 @@ public:
 	
 	void InitOtherClass();
 
-
+	// TurnOrder에 사용할 Array
+	UPROPERTY(Replicated, EditAnywhere)
+	TArray<class ABaseBattlePawn*> turnOrderArray;
+	
 	//----------------Player Ready Check------------------
 	UPROPERTY(EditAnywhere)
 	int32 readyCount = 0;
