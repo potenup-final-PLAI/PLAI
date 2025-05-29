@@ -28,6 +28,7 @@
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
 #include "PLAI/Item/UI/Inventory/QuickInven/QuickInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
+#include "PLAI/Item/UI/Inventory/UiCre/UiCre.h"
 #include "PLAI/Item/UI/Main/UiChaView.h"
 #include "PLAI/Item/UI/Slot/SlotCre.h"
 
