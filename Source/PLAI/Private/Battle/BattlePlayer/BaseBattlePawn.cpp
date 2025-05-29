@@ -1516,11 +1516,9 @@ void ABaseBattlePawn::UnitAttack(class ABaseBattlePawn* unit)
 	{
 		if (player->bStartMontage)
 		{
-			// 회전 끝나고 몽타주 실행
-			player->playerAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
-			player->bStartMontage = false;
-			UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
-
+			// 플레이어 공격 동기화
+			Server_PlayerBaseAttack(player);
+			
 			// 어떤 스킬 사용했는지
 			if (player->curSkillName == "")
 			{
@@ -1581,6 +1579,19 @@ void ABaseBattlePawn::UnitAttack(class ABaseBattlePawn* unit)
 			UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
 		}
 	}
+}
+
+void ABaseBattlePawn::Server_PlayerBaseAttack_Implementation(class ABattlePlayer* player)
+{
+	Multicast_PlayerBaseAttack(player);
+}
+
+void ABaseBattlePawn::Multicast_PlayerBaseAttack_Implementation(class ABattlePlayer* player)
+{
+	// 회전 끝나고 몽타주 실행
+	player->playerAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
+	player->bStartMontage = false;
+	UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
 }
 
 void ABaseBattlePawn::InitEnemyState()
@@ -1804,8 +1815,7 @@ void ABaseBattlePawn::InitOtherClassPointer()
 		UE_LOG(LogTemp, Warning, TEXT("phaseManager is Set"));
 	}
 	// TurnManager
-	turnManager = Cast<ATurnManager>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
+	turnManager = Cast<ATurnManager>(UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
 	if (turnManager)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("turnManager is Set"));

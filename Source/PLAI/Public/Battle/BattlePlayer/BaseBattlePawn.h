@@ -373,6 +373,10 @@ public:
 	void MultiCastRPC_UnitMove(const FVector& loc);
 	void UnitAttackBeforeRoatation(class ABaseBattlePawn* unit);
 	void UnitAttack(class ABaseBattlePawn* unit);
+	UFUNCTION(Server, Reliable)
+	void Server_PlayerBaseAttack(class ABattlePlayer* player);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayerBaseAttack(class ABattlePlayer* player);
 	
 	//------------- UI --------------
 	//-------------Unit 이름, HP, Armor 세팅------------------------
