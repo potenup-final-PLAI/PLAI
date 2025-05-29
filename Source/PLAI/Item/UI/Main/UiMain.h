@@ -66,7 +66,7 @@ public:
 	class UEditableTextBox* LoginPw;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* LoginFail;
+	class UCanvasPanel* loginFailed;
 
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* CanvasMain;
@@ -82,6 +82,8 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UUiSteamLobby* Wbp_UiSteamLobby;
+	
+	
 	
 	// Init 클래스
     UPROPERTY(meta = (BindWidget))
