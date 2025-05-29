@@ -32,6 +32,8 @@ void AMonWorld::BeginPlay()
 void AMonWorld::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!HasAuthority()){return;}
 	
 	CurrentTimeTwo += DeltaTime;
 	
