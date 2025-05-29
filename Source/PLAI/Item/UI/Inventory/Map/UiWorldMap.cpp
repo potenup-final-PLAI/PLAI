@@ -34,10 +34,12 @@ void UUiWorldMap::NativeConstruct()
 	
 	MaterialMapDynamic = UMaterialInstanceDynamic::Create(MaterialMapInterface,this);
 	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
+
     SetRefreshPlayerList();
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{ TestPlayer->InputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap); }
-	MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.65);
+	
+	MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.5);
 }
 
 void UUiWorldMap::SetRefreshPlayerList()
@@ -118,6 +120,7 @@ void UUiWorldMap::ExtendMap()
 		}
 		else
 		{
+			MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.5);
 			CanvasSlot->SetSize(MiniMapSizeS);
 			CanvasSlot->SetAnchors(FAnchors(1,1));
 			CanvasSlot->SetPosition(FVector2D(-10,-10));

@@ -186,7 +186,7 @@ void USlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent&
 
 	if (ItemDetail == nullptr && ItemStructTable.ItemTop != -1)
 	{
-		FVector2d MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld()) + FVector2d(-100,0);
+		FVector2d MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld()) + FVector2d(-100,100);
 		ItemDetail = CreateWidget<UItemDetail>(GetWorld(),ItemDetailFactory);
 		if (ItemDetail)
 		{
