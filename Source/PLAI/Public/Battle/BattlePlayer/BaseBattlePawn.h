@@ -388,9 +388,14 @@ public:
 	void BillboardBattleUnitStateUI();
 	void OnMouseHover();
 	//------------Print Skill UI --------
+	UPROPERTY(Replicated, EditAnywhere)
 	FString curSkillName = "";
-
+	
 	void SkillNameJudgment(const EActionMode curAction);
+	UFUNCTION(Server, Reliable)
+	void Server_SkillName(const EActionMode curAction);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCast_SkillName(const EActionMode curAction);
 	//-----------Player Anim Instace---------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABaseEnemy* targetEnemy;

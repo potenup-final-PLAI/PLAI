@@ -118,6 +118,7 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, smoothRot);
 	DOREPLIFETIME(ABaseBattlePawn, newLoc);
 	DOREPLIFETIME(ABaseBattlePawn, newRot);
+	DOREPLIFETIME(ABaseBattlePawn, curSkillName);
 
 }
 
@@ -236,7 +237,8 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),*UEnum::GetValueAsString(curSkillState));
 
 		// UI에 띄울 스킬 이름 저장 
-		SkillNameJudgment(curSkillState);
+		// SkillNameJudgment(curSkillState);
+		Server_SkillName(curSkillState);
 		
 		switch (curSkillState)
 		{
@@ -1330,6 +1332,16 @@ void ABaseBattlePawn::OnMouseHover()
 	}
 }
 
+void ABaseBattlePawn::Server_SkillName_Implementation(const EActionMode curAction)
+{
+	MultiCast_SkillName(curAction);
+}
+
+void ABaseBattlePawn::MultiCast_SkillName_Implementation(const EActionMode curAction)
+{
+	SkillNameJudgment(curAction);
+}
+
 void ABaseBattlePawn::SkillNameJudgment(const EActionMode curAction)
 {
 	switch (curAction)
@@ -1518,26 +1530,6 @@ void ABaseBattlePawn::UnitAttack(class ABaseBattlePawn* unit)
 		{
 			// 플레이어 공격 동기화
 			Server_PlayerBaseAttack(player);
-			
-			// 어떤 스킬 사용했는지
-			if (player->curSkillName == "")
-			{
-				return;
-			}
-			player->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
-			player->battleUnitStateUI->SetPrintSkillName(player->curSkillName);
-			player->battleUnitStateUI->ShowPrintSkillNameUI();
-
-			FTimerHandle skillNameUIHandle;
-			GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
-			GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [player]()
-			{
-				if (player && player->battleUnitStateUI)
-				{
-					player->battleUnitStateUI->ShowBaseUI();
-					player->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
-				}
-			}, 2.0f, false);
 		}
 	}
 	else if (auto* enemy = Cast<ABaseEnemy>(unit))
@@ -1588,10 +1580,33 @@ void ABaseBattlePawn::Server_PlayerBaseAttack_Implementation(class ABattlePlayer
 
 void ABaseBattlePawn::Multicast_PlayerBaseAttack_Implementation(class ABattlePlayer* player)
 {
+	NET_PRINTLOG(TEXT("playerBaseAttack"));
 	// 회전 끝나고 몽타주 실행
 	player->playerAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
 	player->bStartMontage = false;
 	UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+
+	// 어떤 스킬 사용했는지
+	if (player->curSkillName == "")
+	{
+		NET_PRINTLOG(TEXT("player->curSkillName == \"\" "));
+		return;
+	}
+	
+	player->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
+	player->battleUnitStateUI->SetPrintSkillName(player->curSkillName);
+	player->battleUnitStateUI->ShowPrintSkillNameUI();
+
+	FTimerHandle skillNameUIHandle;
+	GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
+	GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [player]()
+	{
+		if (player && player->battleUnitStateUI)
+		{
+			player->battleUnitStateUI->ShowBaseUI();
+			player->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+		}
+	}, 2.0f, false);
 }
 
 void ABaseBattlePawn::InitEnemyState()
