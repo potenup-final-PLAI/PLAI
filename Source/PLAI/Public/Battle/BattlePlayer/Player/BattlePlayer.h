@@ -49,7 +49,6 @@ public:
 	class UBattlePlayerAnimInstance* playerAnim;
 
 	
-
 	UFUNCTION(Server, Reliable)
 	void Server_OnClickedTurnEnd();
 
@@ -72,8 +71,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ClearDebugNetLog();
 
+	UFUNCTION(Server, Reliable)
+	void Server_UpdatePlayerAnim(EActionMode mode);
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_UpdatePlayerAnim();
+	void MultiCastRPC_UpdatePlayerAnim(EActionMode mode);
 };
 
 

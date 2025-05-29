@@ -19,19 +19,20 @@ class PLAI_API UBattlePlayerAnimInstance : public UAnimInstance
 public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	// Player가 살아 있는지 죽었는지 판단해서 Animation 업데이트하는 변수
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = Animation)
 	ELifeState lifeState;
 
 	// 현재 턴인 Player의 동작 상태를 애니메이션에 업데이트하는 변수
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = Animation)
 	EActionMode actionMode;
 
 	//----------Battle Player-----------------
 	UPROPERTY(BlueprintReadOnly)
 	class ABattlePlayer* battlePlayer;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Anim")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = "Anim")
 	float moveSpeed;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Anim")
