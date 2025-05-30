@@ -80,6 +80,14 @@ public:
 	void Server_PlayerTryConsumeAP(int32 amount);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayerTryConsumeAP(int32 amount);
+
+
+	// Sound
+	UPROPERTY(EditAnywhere)
+	class USoundCue* swordSound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* ruptureSound;
 };
 
 

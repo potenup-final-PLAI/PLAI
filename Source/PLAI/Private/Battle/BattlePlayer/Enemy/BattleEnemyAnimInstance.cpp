@@ -6,6 +6,7 @@
 #include "Battle/Util/DebugHeader.h"
 #include "Battle/Util/BattleType/BattleTypes.h"
 #include "Enemy/BaseEnemy.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/BattlePlayer.h"
 
@@ -45,7 +46,8 @@ void UBattleEnemyAnimInstance::AnimNotify_BaseAttackPoint()
 		UE_LOG(LogTemp, Warning, TEXT("battlePlayer Or targetEnemy Nullptr"));
 		return;
 	}
-
+	UGameplayStatics::PlaySoundAtLocation(this, battleEnemy->attackSound, battleEnemy->GetActorLocation());
+	
 	battleEnemy->EnemyApplyAttack(battleEnemy->targetPlayer,EActionMode::BaseAttack);
 	NET_PRINTLOG(TEXT("Enemy %s"), *battleEnemy->GetActorNameOrLabel());
 	battleEnemy->targetPlayer = nullptr;

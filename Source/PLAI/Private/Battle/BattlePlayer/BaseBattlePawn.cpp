@@ -125,6 +125,7 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, targetPlayer);
 	DOREPLIFETIME(ABaseBattlePawn, maxActionPoints);
 	DOREPLIFETIME(ABaseBattlePawn, curAP);
+	DOREPLIFETIME(ABaseBattlePawn, nickName);
 
 }
 
@@ -995,26 +996,30 @@ void ABaseBattlePawn::PathFind()
 
 	while (openArray.Num() > 0 && safetyCounter++ < maxSafetyCount)
 	{
-		UE_LOG(LogTemp, Warning,TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),pathArray.Num(), moveRange);
-		UE_LOG(LogTemp, Warning, TEXT("Final bIsMoving = %s"), bIsMoving ? TEXT("true") : TEXT("false"));
+		NET_PRINTLOG(TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),pathArray.Num(), moveRange);
+		NET_PRINTLOG(TEXT("Final bIsMoving = %s"), bIsMoving ? TEXT("true") : TEXT("false"));
 		if (safetyCounter > maxSafetyCount)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Path Safe Break"));
+			NET_PRINTLOG(TEXT("Path Safe Break"));
+			bIsMoving = false;
 			break;
 		}
 		currentTile = openArray[0];
 		openArray.RemoveAt(0);
 
 		UE_LOG(LogTemp, Warning, TEXT("currentTile = %s, Coord = (%d, %d)"),*currentTile->GetName(),gridTileManager->GetTileLoc(currentTile).X,gridTileManager->GetTileLoc(currentTile).Y);
+		
 		if (!IsValid(currentTile))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s currentTile PathFind Error"),*GetName());
+			NET_PRINTLOG(TEXT("%s currentTile PathFind Error"),*GetName());
+			bIsMoving = false;
 			turnManager->OnTurnEnd();
 			return;
 		}
 		if (!IsValid(goalTile))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s goalTile PathFind Error"),*GetName());
+			NET_PRINTLOG(TEXT("%s goalTile PathFind Error"),*GetName());
+			bIsMoving = false;
 			turnManager->OnTurnEnd();
 			return;
 		}
@@ -1038,8 +1043,8 @@ void ABaseBattlePawn::PathFind()
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("길을 찾지 못했습니다"));
-	turnManager->OnTurnEnd();
+	NET_PRINTLOG(TEXT("길을 찾지 못했습니다"));
+	// turnManager->OnTurnEnd();
 }
 
 void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
@@ -1078,12 +1083,14 @@ void ABaseBattlePawn::BuildPath()
 		if (!goalTile || !goalTile->parentTile)
 		{
 			UE_LOG(LogTemp, Error,TEXT("BuildPath aborted: goalTile or parent is null"));
+			bIsMoving = false;
 			turnManager->OnTurnEnd();
 			return;
 		}
 		if (startTile == goalTile)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Start tile is same as goal tile"));
+			bIsMoving = false;
 			turnManager->OnTurnEnd();
 			return;
 		}
@@ -1097,6 +1104,7 @@ void ABaseBattlePawn::BuildPath()
 			if (visitePathTiles.Contains(temp) || temp == temp->parentTile)
 			{
 				UE_LOG(LogTemp, Warning,TEXT(" Infinite loop detected in BuildPath"));
+				bIsMoving = false;
 				break;
 			}
 
@@ -1107,11 +1115,11 @@ void ABaseBattlePawn::BuildPath()
 
 		if (pathArray.Num() == 0)
 		{
+			bIsMoving = false;
 			turnManager->OnTurnEnd(); // 이동 실패 시 턴 종료
 			return;
 		}
 		
-		// 경로 저장 완료했으면 이동 시작
 		if (pathArray.Num() > moveRange)
 		{
 			UE_LOG(LogTemp, Warning,TEXT("Path too long! moveRange = %d, path length = %d"), moveRange, pathArray.Num());
@@ -1125,12 +1133,14 @@ void ABaseBattlePawn::BuildPath()
 		if (!goalTile || !goalTile->parentTile)
 		{
 			UE_LOG(LogTemp, Error,TEXT("BuildPath aborted: goalTile or parent is null"));
+			bIsMoving = false;
 			turnManager->OnTurnEnd();
 			return;
 		}
 		if (startTile == goalTile)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Start tile is same as goal tile"));
+			bIsMoving = false;
 			turnManager->OnTurnEnd();
 			return;
 		}
@@ -1144,6 +1154,7 @@ void ABaseBattlePawn::BuildPath()
 			if (visitePathTiles.Contains(temp) || temp == temp->parentTile)
 			{
 				UE_LOG(LogTemp, Warning,TEXT(" Infinite loop detected in BuildPath"));
+				bIsMoving = false;
 				break;
 			}
 
@@ -1279,7 +1290,7 @@ void ABaseBattlePawn::ClearGridTile()
 
 void ABaseBattlePawn::OnRep_TargetLoc()
 {
-	bIsMoving = true;
+	// bIsMoving = !bIsMoving;
 }
 
 void ABaseBattlePawn::MultiCastRPC_UpdateNewLoc_Implementation(const FVector& newLocation)
@@ -1714,10 +1725,10 @@ void ABaseBattlePawn::InitEnemyState()
 		enemy->attack = 10;
 		enemy->defense = 5;
 		enemy->resistance = 2;
-		enemy->moveRange = 3;
+		enemy->moveRange = FMath::RandRange(3, 10);
 		enemy->critical_Rate = 1.0f;
 		enemy->critical_Damage = 1.5f;
-		enemy->speed = 3;
+		enemy->speed = FMath::RandRange(1, 10);
 
 		// 성격에 따른 값 추가 세팅
 		ApplyTraitModifiers(enemy);
@@ -1977,8 +1988,7 @@ void ABaseBattlePawn::MultiCastRPC_InitAPUI_Implementation()
 	InitAPUI();
 }
 
-void ABaseBattlePawn::MultiCastRPC_SetMyName_Implementation(
-	int32 Count)
+void ABaseBattlePawn::MultiCastRPC_SetMyName_Implementation(int32 Count)
 {
 	MyName = FString("NyName : ") + FString::FromInt(Count);
 }

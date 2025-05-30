@@ -337,7 +337,7 @@ public:
 	UPROPERTY(Replicated, EditAnywhere)
 	float moveSpeed = 300.0f;
 	
-	UPROPERTY(ReplicatedUsing = OnRep_TargetLoc, EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	FVector newLoc;
 
 	UFUNCTION()
@@ -454,7 +454,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_ClearGridTile();
 	
-	
+	UPROPERTY(Replicated, EditAnywhere)
+	FString nickName = "";
 };
 
 

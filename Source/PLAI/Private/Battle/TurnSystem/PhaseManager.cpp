@@ -436,7 +436,9 @@ void AUPhaseManager::SetBeforeBattle()
 					{
 						FVector dir = closestTarget->GetActorLocation() - player->GetActorLocation();
 						FRotator meshRot = dir.Rotation();
-						player->meshComp->SetRelativeRotation(FRotator(0, meshRot.Yaw + yawOffset, 0));
+						FRotator newRotate = FRotator(0, meshRot.Yaw + yawOffset, 0);
+						player->MultiCastRPC_UnitRotation(newRotate);
+						// player->meshComp->SetRelativeRotation(FRotator(0, meshRot.Yaw + yawOffset, 0));
 					}
 				}
 				else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
@@ -445,7 +447,9 @@ void AUPhaseManager::SetBeforeBattle()
 					{
 						FVector dir = closestTarget->GetActorLocation() - enemy->GetActorLocation();
 						FRotator meshRot = dir.Rotation();
-						enemy->meshComp->SetWorldRotation(FRotator(0, meshRot.Yaw + yawOffset, 0));
+						FRotator newRotate = FRotator(0, meshRot.Yaw + yawOffset, 0);
+						// enemy->meshComp->SetWorldRotation(FRotator(0, meshRot.Yaw + yawOffset, 0));
+						enemy->MultiCastRPC_UnitRotation(newRotate);
 					}
 				}
 				else
@@ -453,7 +457,9 @@ void AUPhaseManager::SetBeforeBattle()
 					// enemy 임시로 회전
 					FVector dir = closestTarget->GetActorLocation() - unit->GetActorLocation();
 					FRotator lookRot = dir.Rotation();
-					unit->SetActorRotation(FRotator(0, lookRot.Yaw, 0));
+					FRotator newRotate = FRotator(0, lookRot.Yaw, 0);
+					// unit->SetActorRotation(FRotator(0, lookRot.Yaw, 0));
+					unit->MultiCastRPC_UnitRotation(newRotate);
 				}
 			}
 		}
@@ -706,6 +712,8 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			{
 				player->traits.Add(trait);
 			}
+
+			player->nickName = gi->UserFullInfoGiStat.character_info.character_name;
 		}
 		else
 		{
@@ -741,6 +749,7 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		
 		enemy->enemyLifeState = ELifeState::Alive;
 
+		enemy->nickName = FString::Printf(TEXT("엔트"));
 		// UE_LOG(LogTemp, Warning,TEXT("PhaseManger SetStatus : Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, crit : %f, crit_Damge : %f, spd : %d"),
 		//        enemy->hp,
 		//        enemy->attack,

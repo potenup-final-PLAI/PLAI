@@ -74,5 +74,11 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_UpdateEnemyAnim(EActionMode mode);
 
+
+	//SOund
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* attackSound;
+
 };
 
