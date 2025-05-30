@@ -13,6 +13,10 @@
 void UUiSign::NativeConstruct()
 {
 	Super::NativeConstruct();
+	if (ButtonExit)
+	{
+		ButtonExit->OnClicked.AddDynamic(this, &UUiSign::OnExit);
+	}
 	ButtonSign->OnClicked.AddDynamic(this,&UUiSign::OnSignin);
 	SignCompleteBox->SetVisibility(ESlateVisibility::Hidden);
 }
@@ -49,4 +53,10 @@ void UUiSign::OnSignin()
 	// 	UE_LOG(LogTemp,Display,TEXT("Sign Complete 1.5초뒤 지우자"));
 	// 	RemoveFromParent();
 	// },1.5,false);
+}
+
+void UUiSign::OnExit()
+{
+	// 이 위젯 자체를 숨김 처리
+	this->SetVisibility(ESlateVisibility::Hidden);
 }
