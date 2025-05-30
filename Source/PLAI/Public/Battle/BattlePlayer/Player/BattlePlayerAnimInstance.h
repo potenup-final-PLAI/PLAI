@@ -36,11 +36,20 @@ public:
 	float moveSpeed;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Anim")
-	void PlayBaseAttackAnimation(FName sectionName);
+	void PlayerAttackAnimation(FName sectionName);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Anim")
 	void PlayHitMotionAnimation(FName sectionName);
 
 	UFUNCTION()
 	void AnimNotify_BaseAttackPoint();
+
+	UFUNCTION()
+	void AnimNotify_PosionAttackPoint();
+
+	UFUNCTION()
+	void AnimNotify_FatalAttackPoint();
+
+	UFUNCTION()
+	void AnimNotify_RuptureAttackPoint();
 };

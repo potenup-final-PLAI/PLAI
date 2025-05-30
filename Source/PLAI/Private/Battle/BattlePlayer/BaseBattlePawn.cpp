@@ -123,6 +123,8 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, bStartMontage);
 	DOREPLIFETIME(ABaseBattlePawn, attackTarget);
 	DOREPLIFETIME(ABaseBattlePawn, targetPlayer);
+	DOREPLIFETIME(ABaseBattlePawn, maxActionPoints);
+	DOREPLIFETIME(ABaseBattlePawn, curAP);
 
 }
 
@@ -177,8 +179,8 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
-	FString str = FString::Printf(TEXT("%s,(%d,%d)"), *MyName, currentTile ? currentTile->gridCoord.X : -1, currentTile ? currentTile->gridCoord.Y : -1);
-	DrawDebugString(GetWorld(), GetActorLocation(), str, nullptr, FColor::Yellow, 0, true);
+	// FString str = FString::Printf(TEXT("%s,(%d,%d)"), *MyName, currentTile ? currentTile->gridCoord.X : -1, currentTile ? currentTile->gridCoord.Y : -1);
+	// DrawDebugString(GetWorld(), GetActorLocation(), str, nullptr, FColor::Yellow, 0, true);
 	
 }
 
@@ -408,25 +410,14 @@ void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 		// enemy->ServerRPC_UpdateEnemyAnim(enemy->currentActionMode);
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
+			targetEnemy = enemy;
+			attackTarget = targetEnemy;
+			bWantsToAttack = true;
+			
 			if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
 			else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Cast Enemy In"));
-		PlayerApplyAttack(enemy, EActionMode::Poison);
-		
 	}
-	// 공격 대상이 player라면
-	// else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	// {
-	// 	// if (player->playerAnim)
-	// 	// {
-	// 	// 	player->playerAnim->actionMode = currentActionMode;
-	// 	// }
-	// 	if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
-	// 	else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
-	// 	
-	// 	EnemyApplyAttack(player, EActionMode::Poison);
-	// }
 }
 
 void ABaseBattlePawn::PlayerFatal(FHitResult& hitInfo)
@@ -440,22 +431,14 @@ void ABaseBattlePawn::PlayerFatal(FHitResult& hitInfo)
 		// }
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
+			targetEnemy = enemy;
+			attackTarget = targetEnemy;
+			bWantsToAttack = true;
+			
 			if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
 			else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
 		}
-		PlayerApplyAttack(enemy, EActionMode::Fatal);
 	}
-	// 공격 대상이 player라면
-	// else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	// {
-	// 	// if (player->playerAnim)
-	// 	// {
-	// 	// 	player->playerAnim->actionMode = currentActionMode;
-	// 	// }
-	// 	if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
-	// 	else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
-	// 	EnemyApplyAttack(player, EActionMode::Fatal);
-	// }
 }
 
 void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
@@ -469,24 +452,14 @@ void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
 		// }
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
+			targetEnemy = enemy;
+			attackTarget = targetEnemy;
+			bWantsToAttack = true;
+			
 			if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
 			else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
 		}
-		
-		PlayerApplyAttack(enemy, EActionMode::Rupture);
 	}
-	// 공격 대상이 player라면
-	// else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	// {
-	// 	// if (player->playerAnim)
-	// 	// {
-	// 	// 	player->playerAnim->actionMode = currentActionMode;
-	// 	// }
-	// 	if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
-	// 	else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
-	// 	
-	// 	EnemyApplyAttack(player, EActionMode::Rupture);
-	// }
 }
 
 void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
@@ -647,6 +620,7 @@ void ABaseBattlePawn::PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUn
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
 		}
+	
 		player->AddStatusEffect(EStatusEffect::Poison, 3);
 		break;
 	case EActionMode::Fatal:
@@ -1651,7 +1625,7 @@ void ABaseBattlePawn::Multicast_PlayerBaseAttack_Implementation(class ABattlePla
 {
 	NET_PRINTLOG(TEXT("playerBaseAttack"));
 	// 회전 끝나고 몽타주 실행
-	player->playerAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
+	player->playerAnim->PlayerAttackAnimation(TEXT("StartBaseAttack"));
 	player->bStartMontage = false;
 	UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
 

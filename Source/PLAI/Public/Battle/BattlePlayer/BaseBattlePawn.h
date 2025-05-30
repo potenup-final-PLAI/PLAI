@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Enemy/EnemyBattleState.h"
 #include "GameFramework/Pawn.h"
 #include "Player/BattlePlayerState.h"
@@ -87,9 +88,9 @@ public:
 	void MulticastInitOtherClassPointer();
 
 	//--------------------AP System--------------------
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	int32 maxActionPoints = 5;
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	int32 curAP = 0;
 
 	void InitAPUI();
@@ -125,6 +126,7 @@ public:
 	{
 		if (!CanUseSkill(cost))
 		{
+			NET_PRINTLOG(TEXT("cost : %d, ap : %d "), cost, curAP);
 			UE_LOG(LogTemp, Warning, TEXT("Not enough AP"));
 			return false;
 		}

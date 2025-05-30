@@ -17,15 +17,7 @@ void UBattlePlayerAnimInstance::NativeBeginPlay()
 void UBattlePlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-
-
-	// if (auto* player = Cast<ABaseBattlePawn>(TryGetPawnOwner()))
-	// {
-	// 	// 전방방향 벡터 구하기
-	// 	FVector velocity = player->GetVelocity();
-	// 	FVector forward = player->GetActorForwardVector();
-	// 	moveSpeed = FVector::DotProduct(velocity, forward);
-	// }
+	
 }
 
 void UBattlePlayerAnimInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -54,6 +46,72 @@ void UBattlePlayerAnimInstance::AnimNotify_BaseAttackPoint()
 	else if (!battlePlayer->HasAuthority() && battlePlayer->IsLocallyControlled())
 	{
 		battlePlayer->Server_PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::BaseAttack);
+	}
+
+	battlePlayer->targetEnemy = nullptr;
+	battlePlayer->attackTarget = nullptr;
+}
+
+void UBattlePlayerAnimInstance::AnimNotify_PosionAttackPoint()
+{
+	// battlePlayer나 targetEnemy가 Null이면 return
+	if (!(battlePlayer && battlePlayer->targetEnemy))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("battlePlayer Or targetEnemy Nullptr"));
+		return;
+	}
+	NET_PRINTLOG(TEXT("AnimNotify_PoisonAttackPoint"));
+	if (battlePlayer->HasAuthority())
+	{
+		battlePlayer->PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::Poison);
+	}
+	else if (!battlePlayer->HasAuthority() && battlePlayer->IsLocallyControlled())
+	{
+		battlePlayer->Server_PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::Poison);
+	}
+
+	battlePlayer->targetEnemy = nullptr;
+	battlePlayer->attackTarget = nullptr;
+}
+
+void UBattlePlayerAnimInstance::AnimNotify_FatalAttackPoint()
+{
+	// battlePlayer나 targetEnemy가 Null이면 return
+	if (!(battlePlayer && battlePlayer->targetEnemy))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("battlePlayer Or targetEnemy Nullptr"));
+		return;
+	}
+	NET_PRINTLOG(TEXT("AnimNotify_FatalAttackPoint"));
+	if (battlePlayer->HasAuthority())
+	{
+		battlePlayer->PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::Fatal);
+	}
+	else if (!battlePlayer->HasAuthority() && battlePlayer->IsLocallyControlled())
+	{
+		battlePlayer->Server_PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::Fatal);
+	}
+
+	battlePlayer->targetEnemy = nullptr;
+	battlePlayer->attackTarget = nullptr;
+}
+
+void UBattlePlayerAnimInstance::AnimNotify_RuptureAttackPoint()
+{
+	// battlePlayer나 targetEnemy가 Null이면 return
+	if (!(battlePlayer && battlePlayer->targetEnemy))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("battlePlayer Or targetEnemy Nullptr"));
+		return;
+	}
+	NET_PRINTLOG(TEXT("AnimNotify_RuptureAttackPoint"));
+	if (battlePlayer->HasAuthority())
+	{
+		battlePlayer->PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::Rupture);
+	}
+	else if (!battlePlayer->HasAuthority() && battlePlayer->IsLocallyControlled())
+	{
+		battlePlayer->Server_PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::Rupture);
 	}
 
 	battlePlayer->targetEnemy = nullptr;

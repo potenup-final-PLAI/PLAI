@@ -129,15 +129,16 @@ void ABaseEnemy::FindAndAttackPlayer()
 	FVector centerPos = GetActorLocation();
 	float detectRadius = 200.0f;
 	// Debug sphere로 주변 탐색
-	DrawDebugSphere(
-		GetWorld(),
-		centerPos,
-		detectRadius,
-		16,
-		FColor::Red,
-		false,
-		0.1f
-	);
+	// DrawDebugSphere(
+	// 	GetWorld(),
+	// 	centerPos,
+	// 	detectRadius,
+	// 	16,
+	// 	FColor::Red,
+	// 	false,
+	// 	0
+	// );
+	
 	TArray<FOverlapResult> overlaps;
 	FCollisionQueryParams queryParams;
 	queryParams.AddIgnoredActor(this);
@@ -162,13 +163,9 @@ void ABaseEnemy::FindAndAttackPlayer()
 			attackTarget = targetPlayer;
 			FString s = " ";
 			NET_PRINTLOG(TEXT("attackPlayer %s, targetPlayer %s"), attackTarget != nullptr ? *attackTarget->GetActorNameOrLabel() : *s, targetPlayer != nullptr ? *targetPlayer->GetActorNameOrLabel() : *s);
-			// EnemyApplyAttack(detectedPlayer, EActionMode::Poison);
 			break;
 		}
 	}
-
-	// 끝났으면 턴 종료 처리
-	// phaseManager->turnManager->OnTurnEnd();
 }
 
 void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
@@ -232,10 +229,10 @@ void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 	if (gridTileManager)
 	{
 		goalTile = gridTileManager->GetTile(targetX, targetY);
-		FString netLog = FString::Printf(TEXT("%s(%s) : myTile(%d,%d) goalTile(%d,%d)"), *GetName(), *MyName, currentTile->gridCoord.X, currentTile->gridCoord.Y, targetX, targetY);
-		phaseManager->AddNetLog(netLog);
+		// FString netLog = FString::Printf(TEXT("%s(%s) : myTile(%d,%d) goalTile(%d,%d)"), *GetName(), *MyName, currentTile->gridCoord.X, currentTile->gridCoord.Y, targetX, targetY);
+		// phaseManager->AddNetLog(netLog);
 		
-		NET_PRINTLOG(TEXT("ABaseEnemy::ActionMove : %s, goalTile : %s"), *netLog, goalTile ? *goalTile->GetActorNameOrLabel() : TEXT("nullptr"));
+		// NET_PRINTLOG(TEXT("ABaseEnemy::ActionMove : %s, goalTile : %s"), *netLog, goalTile ? *goalTile->GetActorNameOrLabel() : TEXT("nullptr"));
 		if (goalTile)
 		{
 			// Player쪽으로 이동 실행
