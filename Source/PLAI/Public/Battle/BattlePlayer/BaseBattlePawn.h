@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Battle/Util/DebugHeader.h"
 #include "Enemy/EnemyBattleState.h"
 #include "GameFramework/Pawn.h"
 #include "Player/BattlePlayerState.h"
@@ -87,9 +88,9 @@ public:
 	void MulticastInitOtherClassPointer();
 
 	//--------------------AP System--------------------
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	int32 maxActionPoints = 5;
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
+	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintReadOnly, Category = "Phase")
 	int32 curAP = 0;
 
 	void InitAPUI();
@@ -125,6 +126,7 @@ public:
 	{
 		if (!CanUseSkill(cost))
 		{
+			NET_PRINTLOG(TEXT("cost : %d, ap : %d "), cost, curAP);
 			UE_LOG(LogTemp, Warning, TEXT("Not enough AP"));
 			return false;
 		}
@@ -161,6 +163,8 @@ public:
 	void PlayerRupture(FHitResult& hitInfo);
 
 	// Player 대미지 전달 함수
+	UFUNCTION(Server, Reliable)
+	void Server_PlayerApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
 	UFUNCTION(NetMulticast, Reliable)
 	void PlayerApplyAttack(ABaseBattlePawn* targetUnit, EActionMode attackType = EActionMode::None);
 	// Enemy 대미지 전달 함수
@@ -339,13 +343,13 @@ public:
 	//-------------Rotation 처리--------------------
 	UPROPERTY(Replicated, EditAnywhere)
 	FRotator newRot;
-	UPROPERTY()
+	UPROPERTY(Replicated, EditAnywhere)
 	bool bWantsToAttack = false;
-	UPROPERTY()
+	UPROPERTY(Replicated, EditAnywhere)
 	bool bStartMontage = false;
 	UPROPERTY(Replicated, EditAnywhere)
 	FRotator smoothRot;
-	UPROPERTY()
+	UPROPERTY(Replicated, EditAnywhere)
 	ABaseBattlePawn* attackTarget;
 	
 	UPROPERTY(Replicated, EditAnywhere)
@@ -371,9 +375,26 @@ public:
 	void ServerRPC_UnitMove(const FVector& loc);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_UnitMove(const FVector& loc);
+
+	// 공격 하기전 회전
 	void UnitAttackBeforeRoatation(class ABaseBattlePawn* unit);
+
+	// Unit 공격
 	void UnitAttack(class ABaseBattlePawn* unit);
-	
+
+	// Player 공격 동기화
+	UFUNCTION(Server, Reliable)
+	void Server_PlayerBaseAttack(class ABattlePlayer* player);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayerBaseAttack(class ABattlePlayer* player);
+
+	// Enemy 공격 동기화
+	UPROPERTY(Replicated, EditAnywhere)
+	class UAnimMontage* enemyBaseAttack;
+	UFUNCTION(Server, Reliable)
+	void Server_EnemyBaseAttack(class ABaseEnemy* enemy);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_EnemyBaseAttack(class ABaseEnemy* enemy);
 	//------------- UI --------------
 	//-------------Unit 이름, HP, Armor 세팅------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
@@ -384,15 +405,20 @@ public:
 	void BillboardBattleUnitStateUI();
 	void OnMouseHover();
 	//------------Print Skill UI --------
+	UPROPERTY(Replicated, EditAnywhere)
 	FString curSkillName = "";
-
+	
 	void SkillNameJudgment(const EActionMode curAction);
+	UFUNCTION(Server, Reliable)
+	void Server_SkillName(const EActionMode curAction);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCast_SkillName(const EActionMode curAction);
 	//-----------Player Anim Instace---------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABaseEnemy* targetEnemy;
 
 	//-----------Enemy Anim Instace---------------------
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim)
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = Anim)
 	class ABattlePlayer* targetPlayer;
 
 	//-------------Enemy Name----------------

@@ -80,7 +80,7 @@ void ABaseEnemy::MoveToPlayer(AGridTile* targetPlayerTile)
 			UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"),*UEnum::GetValueAsString(enemyAnim->actionMode));
 		}
 
-		phaseManager->turnManager->OnTurnEnd();
+		// phaseManager->turnManager->OnTurnEnd();
 
 		UE_LOG(LogTemp, Warning, TEXT("BaseEnemy : MoveToPlayer - currentTile == goalTile"));
 		return;
@@ -129,15 +129,16 @@ void ABaseEnemy::FindAndAttackPlayer()
 	FVector centerPos = GetActorLocation();
 	float detectRadius = 200.0f;
 	// Debug sphere로 주변 탐색
-	DrawDebugSphere(
-		GetWorld(),
-		centerPos,
-		detectRadius,
-		16,
-		FColor::Red,
-		false,
-		0.1f
-	);
+	// DrawDebugSphere(
+	// 	GetWorld(),
+	// 	centerPos,
+	// 	detectRadius,
+	// 	16,
+	// 	FColor::Red,
+	// 	false,
+	// 	0
+	// );
+	
 	TArray<FOverlapResult> overlaps;
 	FCollisionQueryParams queryParams;
 	queryParams.AddIgnoredActor(this);
@@ -150,20 +151,21 @@ void ABaseEnemy::FindAndAttackPlayer()
 		FCollisionShape::MakeSphere(detectRadius),
 		queryParams
 	);
+	
 	for (auto& overlap : overlaps)
 	{
 		// 탐색 했을 때 그 객체가 Player라면
 		if (ABattlePlayer* detectedPlayer = Cast<ABattlePlayer>(overlap.GetActor()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Detected Player"));
-			// 플레이어가 있다면 공격
-			EnemyApplyAttack(detectedPlayer, EActionMode::Poison);
+			// 플레이어가 있다면 대상에 추가
+			targetPlayer = detectedPlayer;
+			attackTarget = targetPlayer;
+			FString s = " ";
+			NET_PRINTLOG(TEXT("attackPlayer %s, targetPlayer %s"), attackTarget != nullptr ? *attackTarget->GetActorNameOrLabel() : *s, targetPlayer != nullptr ? *targetPlayer->GetActorNameOrLabel() : *s);
 			break;
 		}
 	}
-
-	// 끝났으면 턴 종료 처리
-	phaseManager->turnManager->OnTurnEnd();
 }
 
 void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
@@ -200,7 +202,10 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	if (action.skill != "")
 	{
 		EnemyActionList(actionRequest.action.skill);
-		attackTarget = FindUnitById(action.target_character_id);
+		// attackTarget = FindUnitById(action.target_character_id);
+		// targetPlayer = Cast<ABattlePlayer>(attackTarget);
+		// FString s = " ";
+		// NET_PRINTLOG(TEXT("attackPlayer %s, targetPlayer %s"), attackTarget != nullptr ? *attackTarget->GetActorNameOrLabel() : *s, targetPlayer != nullptr ? *targetPlayer->GetActorNameOrLabel() : *s);
 		bWantsToAttack = true;
 		bStartMontage = true;
 	}
@@ -210,21 +215,13 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([&]()
 	{
 		phaseManager->turnManager->OnTurnEnd();	
-	}), 1.5f, false);
+	}), 2.5f, false);
 }
 
 void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 {
 	// 1. 이동 처리
-	// enemy actionmode 업데이트
-	currentActionMode = EActionMode::Move;
 	
-	if (enemyAnim)
-	{
-		MultiCastRPC_UpdateEnemyAnim(currentActionMode);
-		UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemyAnim->actionMode));
-	}
-
 	int32 targetX = actionMove[0];
 	int32 targetY = actionMove[1];
 
@@ -232,10 +229,10 @@ void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 	if (gridTileManager)
 	{
 		goalTile = gridTileManager->GetTile(targetX, targetY);
-		FString netLog = FString::Printf(TEXT("%s(%s) : myTile(%d,%d) goalTile(%d,%d)"), *GetName(), *MyName, currentTile->gridCoord.X, currentTile->gridCoord.Y, targetX, targetY);
-		phaseManager->AddNetLog(netLog);
+		// FString netLog = FString::Printf(TEXT("%s(%s) : myTile(%d,%d) goalTile(%d,%d)"), *GetName(), *MyName, currentTile->gridCoord.X, currentTile->gridCoord.Y, targetX, targetY);
+		// phaseManager->AddNetLog(netLog);
 		
-		NET_PRINTLOG(TEXT("ABaseEnemy::ActionMove : %s, goalTile : %s"), *netLog, goalTile ? *goalTile->GetActorNameOrLabel() : TEXT("nullptr"));
+		// NET_PRINTLOG(TEXT("ABaseEnemy::ActionMove : %s, goalTile : %s"), *netLog, goalTile ? *goalTile->GetActorNameOrLabel() : TEXT("nullptr"));
 		if (goalTile)
 		{
 			// Player쪽으로 이동 실행
@@ -356,13 +353,13 @@ void ABaseEnemy::EnemyActionList(const FString& actionName)
 ABaseBattlePawn* ABaseEnemy::FindUnitById(const FString& Id)
 {
 	TArray<AActor*> foundUnits;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ABaseBattlePawn::StaticClass(),foundUnits);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABattlePlayer::StaticClass(),foundUnits);
 
 	for (AActor* actor : foundUnits)
 	{
-		if (ABaseBattlePawn* unit = Cast<ABaseBattlePawn>(actor))
+		if (ABattlePlayer* unit = Cast<ABattlePlayer>(actor))
 		{
-			if (unit->GetName() == Id)
+			if (unit->MyName == Id)
 			{
 				return unit;
 			}

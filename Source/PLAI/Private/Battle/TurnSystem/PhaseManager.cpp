@@ -192,11 +192,15 @@ void AUPhaseManager::SetUnitQueue()
 
 	SortUnitQueue();
 
-	if (turnManager)
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
 	{
-		turnManager->Multicast_AddOrderUnit();
-		NET_PRINTLOG(TEXT(" AUPhaseManager::SetUnitQueue : turnManager->Multicast_AddOrderUnit"));
-	}
+		if (turnManager)
+		{
+			turnManager->Multicast_AddOrderUnit();
+			NET_PRINTLOG(TEXT("Delayed Multicast_AddOrderUnit 호출"));
+		}
+	}, 0.5f, false);
 	
 	for (int i = 0; i < unitQueue.Num(); i++)
 	{

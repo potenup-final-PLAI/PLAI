@@ -3,6 +3,7 @@
 
 #include "Enemy/BattleEnemyAnimInstance.h"
 
+#include "Battle/Util/DebugHeader.h"
 #include "Battle/Util/BattleType/BattleTypes.h"
 #include "Enemy/BaseEnemy.h"
 #include "Net/UnrealNetwork.h"
@@ -46,7 +47,7 @@ void UBattleEnemyAnimInstance::AnimNotify_BaseAttackPoint()
 	}
 
 	battleEnemy->EnemyApplyAttack(battleEnemy->targetPlayer,EActionMode::BaseAttack);
-
+	NET_PRINTLOG(TEXT("Enemy %s"), *battleEnemy->GetActorNameOrLabel());
 	battleEnemy->targetPlayer = nullptr;
 	battleEnemy->attackTarget = nullptr;
 }
