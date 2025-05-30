@@ -73,8 +73,6 @@ void AMonSpawn::SpawnMonster()
 	// int32 FactoryCount = MonsterFactory.Num();
 	// if (FactoryCount <= 0)
 	// { UE_LOG(LogTemp, Warning, TEXT("SpawnMonster: MonsterFactory가 비어 있습니다.")); return; }
-
-	
 	
 	MyTimer([this]()
 	{
