@@ -149,21 +149,14 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	// Hover UI 띄우기 위한 함수
 	OnMouseHover();
 	
-	// AStar가 끝났을 때 그 위치로 이동 나온 방향으로 이동
-	// if (bIsMoving && pathArray.IsValidIndex(currentPathIndex))
-	// {
-	// 	// 이동 시 회전 처리
-	// 	UnitRotation(this);
-	// 	UnitMove(this);
-	// }
-	// ✅ 플레이어: 클라이언트가 소유한 경우
+	// 플레이어: 클라이언트가 소유한 경우
 	if (IsLocallyControlled() && bIsMoving && pathArray.IsValidIndex(currentPathIndex))
 	{
 		UnitRotation(this);
 		UnitMove(this); // Client → ServerRPC 호출 (OK)
 	}
 
-	// ✅ 적 유닛: 서버가 직접 처리
+	// 적 유닛: 서버가 직접 처리
 	if (HasAuthority() && !IsPlayerControlled() && bIsMoving && pathArray.IsValidIndex(currentPathIndex))
 	{
 		UnitRotation(this);
@@ -1568,8 +1561,9 @@ void ABaseBattlePawn::UnitAttackBeforeRoatation(class ABaseBattlePawn* unit)
 				FRotator currentRot = player->meshComp->GetRelativeRotation();
 				targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
 				newRot = FMath::RInterpTo(currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
-				player->meshComp->SetRelativeRotation(newRot);
-
+				// player->meshComp->SetRelativeRotation(newRot);
+				ServerRPC_UnitRotation(newRot);
+				
 				// 회전이 다 됐는지 체크
 				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
 				{
@@ -1584,8 +1578,9 @@ void ABaseBattlePawn::UnitAttackBeforeRoatation(class ABaseBattlePawn* unit)
 				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
 				targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
 				newRot = FMath::RInterpTo(currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
-				enemy->meshComp->SetRelativeRotation(newRot);
-
+				// enemy->meshComp->SetRelativeRotation(newRot);
+				
+				ServerRPC_UnitRotation(newRot);
 				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
 				{
 					UnitAttack(enemy);
