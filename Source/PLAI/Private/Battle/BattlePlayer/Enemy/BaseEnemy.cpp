@@ -128,16 +128,6 @@ void ABaseEnemy::FindAndAttackPlayer()
 {
 	FVector centerPos = GetActorLocation();
 	float detectRadius = 200.0f;
-	// Debug sphere로 주변 탐색
-	// DrawDebugSphere(
-	// 	GetWorld(),
-	// 	centerPos,
-	// 	detectRadius,
-	// 	16,
-	// 	FColor::Red,
-	// 	false,
-	// 	0
-	// );
 	
 	TArray<FOverlapResult> overlaps;
 	FCollisionQueryParams queryParams;
@@ -176,9 +166,7 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		UE_LOG(LogTemp, Warning, TEXT("actionRequest not for this enemy: %s"), *this->GetName());
 		return;
 	}
-
 	// 0. 턴 종료하라고 오면 턴 종료
-	
 	
 	const FBattleAction& action = actionRequest.action;
 	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"), *actionRequest.current_character_id);
@@ -202,10 +190,6 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	if (action.skill != "")
 	{
 		EnemyActionList(actionRequest.action.skill);
-		// attackTarget = FindUnitById(action.target_character_id);
-		// targetPlayer = Cast<ABattlePlayer>(attackTarget);
-		// FString s = " ";
-		// NET_PRINTLOG(TEXT("attackPlayer %s, targetPlayer %s"), attackTarget != nullptr ? *attackTarget->GetActorNameOrLabel() : *s, targetPlayer != nullptr ? *targetPlayer->GetActorNameOrLabel() : *s);
 		bWantsToAttack = true;
 		bStartMontage = true;
 	}
@@ -221,7 +205,6 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 {
 	// 1. 이동 처리
-	
 	int32 targetX = actionMove[0];
 	int32 targetY = actionMove[1];
 

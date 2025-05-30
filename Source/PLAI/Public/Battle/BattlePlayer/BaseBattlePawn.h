@@ -96,6 +96,8 @@ public:
 	void InitAPUI();
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_AddAP(class ABattlePlayer* player);
+	UFUNCTION(Server, Reliable)
+	void Server_UpdateAP(class ABaseBattlePawn* unit, int32 ap);
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_InitAPUI();
 	

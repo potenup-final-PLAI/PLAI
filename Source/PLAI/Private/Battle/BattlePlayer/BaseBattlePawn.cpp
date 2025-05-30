@@ -594,12 +594,8 @@ void ABaseBattlePawn::PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUn
 
 	UE_LOG(LogTemp, Warning, TEXT("Player Attack Enemy"));
 	int32 atk = player->attack;
-	int32 weapon = 0;
 	float critical = player->critical_Rate;
 	float criticalDamage = player->critical_Damage;
-	int32 personality = 0;
-	int32 status_effect = 0;
-	int32 damage = 0;
 
 	// 스킬 계수 및 추가 효과
 	float skillMultiplier = 1.0f;
@@ -612,7 +608,6 @@ void ABaseBattlePawn::PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUn
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
 		}
-	
 		player->AddStatusEffect(EStatusEffect::Poison, 3);
 		break;
 	case EActionMode::Fatal:
@@ -1570,7 +1565,6 @@ void ABaseBattlePawn::UnitAttackBeforeRoatation(class ABaseBattlePawn* unit)
 				FRotator currentRot = player->meshComp->GetRelativeRotation();
 				targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
 				newRot = FMath::RInterpTo(currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
-				// player->meshComp->SetRelativeRotation(newRot);
 				ServerRPC_UnitRotation(newRot);
 				
 				// 회전이 다 됐는지 체크
@@ -1587,9 +1581,9 @@ void ABaseBattlePawn::UnitAttackBeforeRoatation(class ABaseBattlePawn* unit)
 				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
 				targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
 				newRot = FMath::RInterpTo(currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
-				// enemy->meshComp->SetRelativeRotation(newRot);
-				
 				ServerRPC_UnitRotation(newRot);
+
+				// 회전이 다 됐는지 체크
 				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
 				{
 					UnitAttack(enemy);
@@ -1980,7 +1974,17 @@ void ABaseBattlePawn::InitAPUI()
 
 void ABaseBattlePawn::ClientRPC_AddAP_Implementation(class ABattlePlayer* player)
 {
-	if (IsLocallyControlled()) player->GetAP();
+	if (IsLocallyControlled())
+	{
+		player->GetAP();
+		// 서버도 클라가 가지고 있는 AP 업데이트
+		Server_UpdateAP(player, player->curAP);
+	}
+}
+
+void ABaseBattlePawn::Server_UpdateAP_Implementation(class ABaseBattlePawn* unit, int32 ap)
+{
+	unit->curAP = ap;
 }
 
 void ABaseBattlePawn::MultiCastRPC_InitAPUI_Implementation()
