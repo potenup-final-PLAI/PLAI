@@ -118,6 +118,13 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, smoothRot);
 	DOREPLIFETIME(ABaseBattlePawn, newLoc);
 	DOREPLIFETIME(ABaseBattlePawn, newRot);
+	DOREPLIFETIME(ABaseBattlePawn, curSkillName);
+	DOREPLIFETIME(ABaseBattlePawn, bWantsToAttack);
+	DOREPLIFETIME(ABaseBattlePawn, bStartMontage);
+	DOREPLIFETIME(ABaseBattlePawn, attackTarget);
+	DOREPLIFETIME(ABaseBattlePawn, targetPlayer);
+	DOREPLIFETIME(ABaseBattlePawn, maxActionPoints);
+	DOREPLIFETIME(ABaseBattlePawn, curAP);
 
 }
 
@@ -172,8 +179,8 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
-	FString str = FString::Printf(TEXT("%s,(%d,%d)"), *MyName, currentTile ? currentTile->gridCoord.X : -1, currentTile ? currentTile->gridCoord.Y : -1);
-	DrawDebugString(GetWorld(), GetActorLocation(), str, nullptr, FColor::Yellow, 0, true);
+	// FString str = FString::Printf(TEXT("%s,(%d,%d)"), *MyName, currentTile ? currentTile->gridCoord.X : -1, currentTile ? currentTile->gridCoord.Y : -1);
+	// DrawDebugString(GetWorld(), GetActorLocation(), str, nullptr, FColor::Yellow, 0, true);
 	
 }
 
@@ -236,7 +243,8 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),*UEnum::GetValueAsString(curSkillState));
 
 		// UI에 띄울 스킬 이름 저장 
-		SkillNameJudgment(curSkillState);
+		// SkillNameJudgment(curSkillState);
+		Server_SkillName(curSkillState);
 		
 		switch (curSkillState)
 		{
@@ -374,18 +382,18 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 		}
 	}
 	// 공격 대상이 player라면
-	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitActor))
-	{
-		targetPlayer = player;
-		attackTarget = targetPlayer;
-		bWantsToAttack = true;
-
-		if (thisAsEnemy)
-		{
-			thisAsEnemy->ServerRPC_UpdateEnemyAnim(thisAsEnemy->currentActionMode);
-			thisAsEnemy->bStartMontage = true;
-		}
-	}
+	// else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitActor))
+	// {
+	// 	targetPlayer = player;
+	// 	attackTarget = targetPlayer;
+	// 	bWantsToAttack = true;
+	// 	NET_PRINTLOG(TEXT("targetPlayer = %s"), *targetPlayer->GetActorNameOrLabel());
+	// 	if (thisAsEnemy)
+	// 	{
+	// 		thisAsEnemy->ServerRPC_UpdateEnemyAnim(thisAsEnemy->currentActionMode);
+	// 		thisAsEnemy->bStartMontage = true;
+	// 	}
+	// }
 }
 
 
@@ -395,22 +403,20 @@ void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		if (enemy->enemyAnim)
+		// if (enemy->enemyAnim)
+		// {
+		// 	enemy->enemyAnim->actionMode = currentActionMode;
+		// }
+		// enemy->ServerRPC_UpdateEnemyAnim(enemy->currentActionMode);
+		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
-			enemy->enemyAnim->actionMode = currentActionMode;
+			targetEnemy = enemy;
+			attackTarget = targetEnemy;
+			bWantsToAttack = true;
+			
+			if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
+			else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Cast Enemy In"));
-		PlayerApplyAttack(enemy, EActionMode::Poison);
-		
-	}
-	// 공격 대상이 player라면
-	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
-		EnemyApplyAttack(player, EActionMode::Poison);
 	}
 }
 
@@ -419,20 +425,19 @@ void ABaseBattlePawn::PlayerFatal(FHitResult& hitInfo)
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		if (enemy->enemyAnim)
+		// if (enemy->enemyAnim)
+		// {
+		// 	enemy->enemyAnim->actionMode = currentActionMode;
+		// }
+		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
-			enemy->enemyAnim->actionMode = currentActionMode;
+			targetEnemy = enemy;
+			attackTarget = targetEnemy;
+			bWantsToAttack = true;
+			
+			if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
+			else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
 		}
-		EnemyApplyAttack(enemy, EActionMode::Fatal);
-	}
-	// 공격 대상이 player라면
-	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
-		PlayerApplyAttack(player, EActionMode::Fatal);
 	}
 }
 
@@ -441,20 +446,19 @@ void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		if (enemy->enemyAnim)
+		// if (enemy->enemyAnim)
+		// {
+		// 	enemy->enemyAnim->actionMode = currentActionMode;
+		// }
+		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
-			enemy->enemyAnim->actionMode = currentActionMode;
+			targetEnemy = enemy;
+			attackTarget = targetEnemy;
+			bWantsToAttack = true;
+			
+			if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
+			else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
 		}
-		EnemyApplyAttack(enemy, EActionMode::Rupture);
-	}
-	// 공격 대상이 player라면
-	else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitInfo.GetActor()))
-	{
-		if (player->playerAnim)
-		{
-			player->playerAnim->actionMode = currentActionMode;
-		}
-		PlayerApplyAttack(player, EActionMode::Rupture);
 	}
 }
 
@@ -582,6 +586,11 @@ void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(class ABattleP
 	}
 }
 
+void ABaseBattlePawn::Server_PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUnit, EActionMode attackType)
+{
+	PlayerApplyAttack_Implementation(targetUnit, attackType);
+}
+
 void ABaseBattlePawn::PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUnit, EActionMode attackType)
 {
 	auto* player = Cast<ABattlePlayer>(this);
@@ -611,6 +620,7 @@ void ABaseBattlePawn::PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUn
 			UE_LOG(LogTemp, Warning, TEXT("Can't Use Skill"));
 			return;
 		}
+	
 		player->AddStatusEffect(EStatusEffect::Poison, 3);
 		break;
 	case EActionMode::Fatal:
@@ -734,8 +744,6 @@ void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode 
 		return;
 
 	default:
-		// EnemySkillList에서 고유 스킬 처리
-		// HandleEnemyUniqueSkill(enemy, player, attackType);
 		break;
 	}
 
@@ -1010,11 +1018,13 @@ void ABaseBattlePawn::PathFind()
 		if (!IsValid(currentTile))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s currentTile PathFind Error"),*GetName());
+			turnManager->OnTurnEnd();
 			return;
 		}
 		if (!IsValid(goalTile))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s goalTile PathFind Error"),*GetName());
+			turnManager->OnTurnEnd();
 			return;
 		}
 		// 목표 도달했으면 종료
@@ -1038,6 +1048,7 @@ void ABaseBattlePawn::PathFind()
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("길을 찾지 못했습니다"));
+	turnManager->OnTurnEnd();
 }
 
 void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
@@ -1068,53 +1079,116 @@ void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 
 void ABaseBattlePawn::BuildPath()
 {
-	
 	UE_LOG(LogTemp, Warning, TEXT("BuildPath: moveRange = %d"), moveRange);
 
-	// goalTile 또는 goalTile->parentTile 자체가 nullptr일 수 있다.
-	if (!goalTile || !goalTile->parentTile)
+	if (auto* player = Cast<ABattlePlayer>(this))
 	{
-		UE_LOG(LogTemp, Error,TEXT("BuildPath aborted: goalTile or parent is null"));
-		turnManager->OnTurnEnd();
-		return;
-	}
-	if (startTile == goalTile)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Start tile is same as goal tile"));
-		turnManager->OnTurnEnd();
-		return;
-	}
-
-	TSet<AGridTile*> visitePathTiles;
-	// 찾은 길 표시
-	AGridTile* temp = goalTile;
-
-	while (temp && temp->parentTile)
-	{
-		if (visitePathTiles.Contains(temp) || temp == temp->parentTile)
+		// goalTile 또는 goalTile->parentTile 자체가 nullptr일 수 있다.
+		if (!goalTile || !goalTile->parentTile)
 		{
-			UE_LOG(LogTemp, Warning,TEXT(" Infinite loop detected in BuildPath"));
-			break;
+			UE_LOG(LogTemp, Error,TEXT("BuildPath aborted: goalTile or parent is null"));
+			turnManager->OnTurnEnd();
+			return;
+		}
+		if (startTile == goalTile)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Start tile is same as goal tile"));
+			turnManager->OnTurnEnd();
+			return;
 		}
 
-		visitePathTiles.Add(temp);
-		pathArray.Insert(temp, 0); // 역방향으로 삽입
-		temp = temp->parentTile;
-	}
+		TSet<AGridTile*> visitePathTiles;
+		// 찾은 길 표시
+		AGridTile* temp = goalTile;
 
-	if (pathArray.Num() == 0)
+		while (temp && temp->parentTile)
+		{
+			if (visitePathTiles.Contains(temp) || temp == temp->parentTile)
+			{
+				UE_LOG(LogTemp, Warning,TEXT(" Infinite loop detected in BuildPath"));
+				break;
+			}
+
+			visitePathTiles.Add(temp);
+			pathArray.Insert(temp, 0); // 역방향으로 삽입
+			temp = temp->parentTile;
+		}
+
+		if (pathArray.Num() == 0)
+		{
+			turnManager->OnTurnEnd(); // 이동 실패 시 턴 종료
+			return;
+		}
+		
+		// 경로 저장 완료했으면 이동 시작
+		if (pathArray.Num() > moveRange)
+		{
+			UE_LOG(LogTemp, Warning,TEXT("Path too long! moveRange = %d, path length = %d"), moveRange, pathArray.Num());
+			// 최대 이동 가능 거리만큼 잘라 이동
+			pathArray.SetNum(moveRange); 
+		}
+	}
+	else if (auto* enemy = Cast<ABaseEnemy>(this))
 	{
-		turnManager->OnTurnEnd(); // 이동 실패 시 턴 종료
-		return;
-	}
+		// goalTile 또는 goalTile->parentTile 자체가 nullptr일 수 있다.
+		if (!goalTile || !goalTile->parentTile)
+		{
+			UE_LOG(LogTemp, Error,TEXT("BuildPath aborted: goalTile or parent is null"));
+			turnManager->OnTurnEnd();
+			return;
+		}
+		if (startTile == goalTile)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Start tile is same as goal tile"));
+			turnManager->OnTurnEnd();
+			return;
+		}
 
-	// 경로 저장 완료했으면 이동 시작
-	if (pathArray.Num() > moveRange)
-	{
-		UE_LOG(LogTemp, Warning,TEXT("Path too long! moveRange = %d, path length = %d"), moveRange, pathArray.Num());
-		pathArray.SetNum(moveRange); // 최대 이동 가능 거리만큼 잘라 이동
-	}
+		TSet<AGridTile*> visitePathTiles;
+		// 찾은 길 표시
+		AGridTile* temp = goalTile;
 
+		while (temp && temp->parentTile)
+		{
+			if (visitePathTiles.Contains(temp) || temp == temp->parentTile)
+			{
+				UE_LOG(LogTemp, Warning,TEXT(" Infinite loop detected in BuildPath"));
+				break;
+			}
+
+			visitePathTiles.Add(temp);
+			pathArray.Insert(temp, 0); // 역방향으로 삽입
+			temp = temp->parentTile;
+		}
+	
+		bool bCanReachGoalTile = pathArray.Last() == goalTile && pathArray.Num() <= moveRange;
+		if (bCanReachGoalTile)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("goalTile 직전까지 이동"));
+			pathArray.RemoveAt(pathArray.Num() - 1); // goalTile 제거
+		}
+
+		// pathArray에 개수가 moveRange보다 크면 mvoeRange만큼만 잘라서 이동
+		if (pathArray.Num() > moveRange)
+		{
+			UE_LOG(LogTemp, Warning,TEXT("Path too long! moveRange = %d, path length = %d"), moveRange, pathArray.Num());
+			// 최대 이동 가능 거리만큼 잘라 이동
+			pathArray.SetNum(moveRange); 
+		}
+
+		if (pathArray.Num() == 0)
+		{
+			bIsMoving = false;
+			enemy->FindAndAttackPlayer();
+			return;
+		}
+		
+		// enemy actionmode 업데이트
+		enemy->currentActionMode = EActionMode::Move;
+		enemy->MultiCastRPC_UpdateEnemyAnim(currentActionMode);
+		UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemy->enemyAnim->actionMode));
+	}
+	
 	// InitValues();
 	ClearGridTile();
 	bIsMoving = true;
@@ -1172,6 +1246,7 @@ void ABaseBattlePawn::Multicast_SeeMoveRange_Implementation()
 		}
 	}
 }
+
 void ABaseBattlePawn::SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles)
 {
 	tiles.Empty();
@@ -1330,6 +1405,16 @@ void ABaseBattlePawn::OnMouseHover()
 	}
 }
 
+void ABaseBattlePawn::Server_SkillName_Implementation(const EActionMode curAction)
+{
+	MultiCast_SkillName(curAction);
+}
+
+void ABaseBattlePawn::MultiCast_SkillName_Implementation(const EActionMode curAction)
+{
+	SkillNameJudgment(curAction);
+}
+
 void ABaseBattlePawn::SkillNameJudgment(const EActionMode curAction)
 {
 	switch (curAction)
@@ -1410,6 +1495,7 @@ void ABaseBattlePawn::MultiCastRPC_UnitRotation_Implementation(const FRotator& r
 
 void ABaseBattlePawn::UnitMove(class ABaseBattlePawn* unit)
 {
+	// tile의 로케이션을 가져오고 거기에 z축으로 80만큼 올려서 Player 위치에 맞게 설정
 	FVector targetLoc = pathArray[currentPathIndex]->GetActorLocation() + FVector(0, 0, 80);
 	FVector currentLoc = GetActorLocation();
 	
@@ -1516,71 +1602,95 @@ void ABaseBattlePawn::UnitAttack(class ABaseBattlePawn* unit)
 	{
 		if (player->bStartMontage)
 		{
-			// 회전 끝나고 몽타주 실행
-			player->playerAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
-			player->bStartMontage = false;
-			UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
-
-			// 어떤 스킬 사용했는지
-			if (player->curSkillName == "")
-			{
-				return;
-			}
-			player->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
-			player->battleUnitStateUI->SetPrintSkillName(player->curSkillName);
-			player->battleUnitStateUI->ShowPrintSkillNameUI();
-
-			FTimerHandle skillNameUIHandle;
-			GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
-			GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [player]()
-			{
-				if (player && player->battleUnitStateUI)
-				{
-					player->battleUnitStateUI->ShowBaseUI();
-					player->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
-				}
-			}, 2.0f, false);
+			// 플레이어 공격 동기화
+			Server_PlayerBaseAttack(player);
 		}
 	}
 	else if (auto* enemy = Cast<ABaseEnemy>(unit))
 	{
-		bWantsToAttack = false;
+		// bWantsToAttack = false;
 		if (enemy->bStartMontage)
 		{
-			// 회전 끝나고 몽타주 실행
-			if (enemy->enemyAnim)
-			{
-				enemy->enemyAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
-				UE_LOG(LogTemp, Warning, TEXT("EnemyBaseAttackAnimation"));
-
-				// 어떤 스킬 사용했는지
-				if (enemy->curSkillName == "")
-				{
-					return;
-				}
-				enemy->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
-				enemy->battleUnitStateUI->SetPrintSkillName(enemy->curSkillName);
-				enemy->battleUnitStateUI->ShowPrintSkillNameUI();
-
-				FTimerHandle skillNameUIHandle;
-				GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
-				GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [enemy]()
-				{
-					if (enemy && enemy->battleUnitStateUI)
-					{
-						enemy->battleUnitStateUI->ShowBaseUI();
-						enemy->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
-					}
-				}, 2.0f, false);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error,TEXT("enemy->enemyAnim is nullptr!"));
-			}
-			enemy->bStartMontage = false;
-			UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+			Server_EnemyBaseAttack(enemy);
 		}
 	}
+}
+
+void ABaseBattlePawn::Server_PlayerBaseAttack_Implementation(class ABattlePlayer* player)
+{
+	Multicast_PlayerBaseAttack(player);
+}
+
+void ABaseBattlePawn::Multicast_PlayerBaseAttack_Implementation(class ABattlePlayer* player)
+{
+	NET_PRINTLOG(TEXT("playerBaseAttack"));
+	// 회전 끝나고 몽타주 실행
+	player->playerAnim->PlayerAttackAnimation(TEXT("StartBaseAttack"));
+	player->bStartMontage = false;
+	UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+
+	// 어떤 스킬 사용했는지
+	if (player->curSkillName == "")
+	{
+		NET_PRINTLOG(TEXT("player->curSkillName == \"\" "));
+		return;
+	}
+	
+	player->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
+	player->battleUnitStateUI->SetPrintSkillName(player->curSkillName);
+	player->battleUnitStateUI->ShowPrintSkillNameUI();
+
+	FTimerHandle skillNameUIHandle;
+	GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
+	GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [player]()
+	{
+		if (player && player->battleUnitStateUI)
+		{
+			player->battleUnitStateUI->ShowBaseUI();
+			player->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+		}
+	}, 2.0f, false);
+}
+
+void ABaseBattlePawn::Server_EnemyBaseAttack_Implementation(class ABaseEnemy* enemy)
+{
+	Multicast_EnemyBaseAttack(enemy);
+}
+
+void ABaseBattlePawn::Multicast_EnemyBaseAttack_Implementation(class ABaseEnemy* enemy)
+{
+	// 회전 끝나고 몽타주 실행
+	if (enemy->enemyAnim)
+	{
+		enemy->enemyAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
+		UE_LOG(LogTemp, Warning, TEXT("EnemyBaseAttackAnimation"));
+
+		// 어떤 스킬 사용했는지
+		if (enemy->curSkillName == "")
+		{
+			return;
+		}
+		enemy->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
+		enemy->battleUnitStateUI->SetPrintSkillName(enemy->curSkillName);
+		enemy->battleUnitStateUI->ShowPrintSkillNameUI();
+
+		FTimerHandle skillNameUIHandle;
+		GetWorld()->GetTimerManager().ClearTimer(skillNameUIHandle);
+		GetWorld()->GetTimerManager().SetTimer(skillNameUIHandle, [enemy]()
+		{
+			if (enemy && enemy->battleUnitStateUI)
+			{
+				enemy->battleUnitStateUI->ShowBaseUI();
+				enemy->battleUnitStateComp->SetDrawSize(FVector2D(50, 10));
+			}
+		}, 2.0f, false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error,TEXT("enemy->enemyAnim is nullptr!"));
+	}
+	enemy->bStartMontage = false;
+	UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
 }
 
 void ABaseBattlePawn::InitEnemyState()
@@ -1804,8 +1914,7 @@ void ABaseBattlePawn::InitOtherClassPointer()
 		UE_LOG(LogTemp, Warning, TEXT("phaseManager is Set"));
 	}
 	// TurnManager
-	turnManager = Cast<ATurnManager>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
+	turnManager = Cast<ATurnManager>(UGameplayStatics::GetActorOfClass(GetWorld(), turnManagerFactory));
 	if (turnManager)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("turnManager is Set"));

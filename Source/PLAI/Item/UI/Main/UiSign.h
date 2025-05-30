@@ -53,6 +53,9 @@ public:
 	class UButton* ButtonSign;
 
 	UPROPERTY(meta = (BindWidget))
+	class UButton* ButtonExit;
+	
+	UPROPERTY(meta = (BindWidget))
 	class USizeBox* SignCompleteBox;
 
 	UPROPERTY(meta = (BindWidget))
@@ -74,4 +77,7 @@ public:
 
 	UFUNCTION()
 	void OnSignin();
+
+	UFUNCTION()
+	void OnExit();
 };

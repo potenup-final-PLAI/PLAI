@@ -204,8 +204,31 @@ void ABattlePlayer::MultiCastRPC_UpdatePlayerAnim_Implementation(EActionMode mod
 			case EActionMode::BaseAttack:
 				bStartMontage = true;
 				break;
+			case EActionMode::Poison:
+				playerAnim->PlayerAttackAnimation(TEXT("StartPoison"));
+				break;
+			case EActionMode::Fatal:
+				playerAnim->PlayerAttackAnimation(TEXT("StartFatal"));
+				break;
+			case EActionMode::Rupture:
+				playerAnim->PlayerAttackAnimation(TEXT("StartRupture"));
+				break;
+			default:
+				break;
 		}
 	}
 }
 
+void ABattlePlayer::Server_PlayerTryConsumeAP_Implementation(int32 amount)
+{
+	// if (CanConsumeAP(amount))
+	// {
+	// 	ApplyConsumeAP(amount);
+	// }
+	
+}
 
+void ABattlePlayer::Multicast_PlayerTryConsumeAP_Implementation(int32 amount)
+{
+	
+}
