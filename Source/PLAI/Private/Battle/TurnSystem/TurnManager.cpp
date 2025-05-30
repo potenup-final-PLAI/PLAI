@@ -137,7 +137,7 @@ void ATurnManager::OnTurnStart()
 	NET_PRINTLOG(TEXT("OnTurnStart"));
 	
 	// 기본 공격 초기화
-	curUnit->bBaseAttack = true;
+	curUnit->Multicast_ChangebBaseAttack(true);
 	
 	// 턴이 시작됐으면 턴 카운트 1 증가
 	turnCount++;

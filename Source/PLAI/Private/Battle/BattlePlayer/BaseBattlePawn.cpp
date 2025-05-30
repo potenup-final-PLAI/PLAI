@@ -168,8 +168,8 @@ void ABaseBattlePawn::Tick(float DeltaTime)
 	{
 		UnitAttackBeforeRoatation(this);
 	}
-	
-	
+
+	// if (!HasAuthority() && IsLocallyControlled()) NET_PRINTLOG(TEXT("bBaseAttack : %d"), bBaseAttack);
 	// UI 빌보드 처리
 	BillboardBattleUnitStateUI();
 	// FString str = FString::Printf(TEXT("%s,(%d,%d)"), *MyName, currentTile ? currentTile->gridCoord.X : -1, currentTile ? currentTile->gridCoord.Y : -1);
@@ -213,7 +213,7 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnMouseLeftClick is not my pawn"));
 		return;
 	}
-	NET_PRINTLOG(TEXT("%s OnMouseLeftClick"), *GetName());
+	
 	FVector start, end, dir;
 	FHitResult hitInfo;
 	FCollisionQueryParams params;
@@ -233,7 +233,6 @@ void ABaseBattlePawn::OnMouseLeftClick()
 		}
 		
 		EActionMode curSkillState = currentActionMode;
-		UE_LOG(LogTemp, Warning, TEXT("Test Click : Current Action Mode %s"),*UEnum::GetValueAsString(curSkillState));
 
 		// UI에 띄울 스킬 이름 저장 
 		// SkillNameJudgment(curSkillState);
@@ -254,7 +253,6 @@ void ABaseBattlePawn::OnMouseLeftClick()
 			break;
 		case EActionMode::BaseAttack:
 			PlayerBaseAttack(hitInfo);
-			UE_LOG(LogTemp, Warning, TEXT("OnMouseLeftClick BaseAttack"));
 			break;
 		case EActionMode::Poison:
 			PlayerPoison(hitInfo);
@@ -269,17 +267,16 @@ void ABaseBattlePawn::OnMouseLeftClick()
 	}
 }
 
-// void ABaseBattlePawn::OnRep_ActionModeChanged()
-// {
-// 	if (auto* player = Cast<ABattlePlayer>(this))
-// 	{
-// 		if (player->playerAnim) player->playerAnim->actionMode = currentActionMode;
-// 	}
-// 	else if (auto* enemy = Cast<ABaseEnemy>(this))
-// 	{
-// 		if (enemy->enemyAnim) enemy->enemyAnim->actionMode = currentActionMode;
-// 	}
-// }
+void ABaseBattlePawn::Server_ChangebBaseAttack_Implementation(bool bAttack)
+{
+	if (HasAuthority()) bBaseAttack = bAttack;
+	Multicast_ChangebBaseAttack(bAttack);
+}
+
+void ABaseBattlePawn::Multicast_ChangebBaseAttack_Implementation(bool bAttack)
+{
+	bBaseAttack = bAttack;
+}
 
 void ABaseBattlePawn::PlayerMove(FHitResult& hitInfo)
 {
@@ -354,7 +351,8 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 		return;
 	}
 
-	bBaseAttack = false;
+	// bBaseAttack = false;
+	Server_ChangebBaseAttack(false);
 
 	AActor* hitActor = hitInfo.GetActor();
 

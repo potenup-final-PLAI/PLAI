@@ -153,6 +153,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	bool bBaseAttack = true;
 
+	UFUNCTION(Server, Reliable)
+	void Server_ChangebBaseAttack(bool bAttack);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ChangebBaseAttack(bool bAttack);
+	
 	// 플레이어 스킬들
 	void PlayerMove(FHitResult& hitInfo);
 	UFUNCTION(Server, Reliable)
