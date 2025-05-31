@@ -127,6 +127,9 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, curAP);
 	DOREPLIFETIME(ABaseBattlePawn, nickName);
 	DOREPLIFETIME(ABaseBattlePawn, bBaseAttack);
+	DOREPLIFETIME(ABaseBattlePawn, directionToTarget);
+	DOREPLIFETIME(ABaseBattlePawn, desiredRot);
+	DOREPLIFETIME(ABaseBattlePawn, targetMeshRot);
 
 }
 
@@ -636,7 +639,8 @@ void ABaseBattlePawn::PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUn
 	}
 
 	// AP 감소 UI에 반영
-	InitAPUI();
+	if (HasAuthority()) MultiCastRPC_InitAPUI();
+	else Client_InitAPUI();
 	
 	CalculateAndApplyDamage(enemy, atk, skillMultiplier, critical, criticalDamage);
 
@@ -1973,6 +1977,11 @@ void ABaseBattlePawn::InitAPUI()
 	}
 }
 
+void ABaseBattlePawn::Client_InitAPUI_Implementation()
+{
+	InitAPUI();
+}
+
 void ABaseBattlePawn::ClientRPC_AddAP_Implementation(class ABattlePlayer* player)
 {
 	if (IsLocallyControlled())
@@ -2026,4 +2035,9 @@ void ABaseBattlePawn::MultiCastRPC_ClearGridTile_Implementation()
 {
 	// 타일 범위 띄워 놨었다면 지우기
 	this->ClearGridTile();
+}
+
+void ABaseBattlePawn::Multicast_UpdateAP_Implementation(int32 ap)
+{
+	curAP = ap;
 }

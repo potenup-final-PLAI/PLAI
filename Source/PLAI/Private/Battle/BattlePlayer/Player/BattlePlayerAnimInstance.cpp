@@ -45,10 +45,12 @@ void UBattlePlayerAnimInstance::AnimNotify_BaseAttackPoint()
 	
 	if (battlePlayer->HasAuthority())
 	{
+		NET_PRINTLOG(TEXT("HasAuthority EActionMode::BaseAttack"));
 		battlePlayer->PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::BaseAttack);
 	}
 	else if (!battlePlayer->HasAuthority() && battlePlayer->IsLocallyControlled())
 	{
+		NET_PRINTLOG(TEXT("!battlePlayer->HasAuthority() && battlePlayer->IsLocallyControlled() EActionMode::BaseAttack"));
 		battlePlayer->Server_PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::BaseAttack);
 	}
 
@@ -67,12 +69,15 @@ void UBattlePlayerAnimInstance::AnimNotify_PosionAttackPoint()
 	}
 	NET_PRINTLOG(TEXT("AnimNotify_PoisonAttackPoint"));
 	UGameplayStatics::PlaySoundAtLocation(this, battlePlayer->swordSound, battlePlayer->GetActorLocation());
+	
 	if (battlePlayer->HasAuthority())
 	{
+		NET_PRINTLOG(TEXT("battlePlayer->HasAuthority() EActionMode::Poison"));
 		battlePlayer->PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::Poison);
 	}
 	else if (!battlePlayer->HasAuthority() && battlePlayer->IsLocallyControlled())
 	{
+		NET_PRINTLOG(TEXT("!battlePlayer->HasAuthority() && battlePlayer->IsLocallyControlled() EActionMode::Poison"));
 		battlePlayer->Server_PlayerApplyAttack(battlePlayer->targetEnemy, EActionMode::Poison);
 	}
 
