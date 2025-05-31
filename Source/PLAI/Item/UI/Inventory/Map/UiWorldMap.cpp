@@ -55,7 +55,6 @@ void UUiWorldMap::SetRefreshPlayerList()
 			{
 				if (!TP -> IsLocallyControlled())return;
 				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
-
 				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
 				TestPlayers.Add(TP);
 				if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon->Slot))
@@ -78,13 +77,14 @@ void UUiWorldMap::SetPlayerIconMinimap()
 			SetRefreshPlayerList();
 			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap SetRefresh하고 한번더 체크 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;
 		}
-		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-		
+		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X)
+		                            / (WorldMaxFevtor.X - WorldMinFevtor.X);
+		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y)
+		                            / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
 		U = FMath::Clamp(U, 0.f, 1.f);
 		V = FMath::Clamp(V, 0.f, 1.f);
-
 		FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
+
 		float Yaw = TestPlayers[i]->GetActorRotation().Yaw;
 	
 		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
@@ -138,7 +138,6 @@ FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPoint
 	{
 		float Delta = -InMouseEvent.GetWheelDelta();  // +1 or -1
 		CurrentZoom = FMath::Clamp(CurrentZoom + Delta * 0.1, 0, 1);
-
 		if (MaterialMapDynamic)
 		{
 			if (bExtendMap == false)

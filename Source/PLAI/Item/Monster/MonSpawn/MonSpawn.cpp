@@ -28,7 +28,7 @@ void AMonSpawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	// SpawnMonster();
+	SpawnMonster();
 }
 
 
