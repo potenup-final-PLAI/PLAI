@@ -59,9 +59,10 @@ void UUIChaMain::SetUiChaStat(FUserFullInfo* UserFullInfo)
 		// }
 		UTextBlock* NewTB = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 		NewTB->SetText(FText::FromString(UserFullInfo->character_info.traits[index]));
-		
-		NewTB->SetFont(FSlateFontInfo(NewTB->GetFont().FontObject, 18));
-		TraitsName->AddChild(NewTB);
+
+        NewTB->SetFont(FSlateFontInfo(Traits->GetFont().FontObject,18));
+		// NewTB->SetFont(FSlateFontInfo(NewTB->GetFont().FontObject, 18));
+		TraitsStatNameBox->AddChild(NewTB);
 		index++;
 	}
 	
