@@ -126,6 +126,7 @@ void ABaseBattlePawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABaseBattlePawn, maxActionPoints);
 	DOREPLIFETIME(ABaseBattlePawn, curAP);
 	DOREPLIFETIME(ABaseBattlePawn, nickName);
+	DOREPLIFETIME(ABaseBattlePawn, bBaseAttack);
 
 }
 

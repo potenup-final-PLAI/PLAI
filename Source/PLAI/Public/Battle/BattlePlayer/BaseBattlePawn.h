@@ -152,7 +152,7 @@ public:
 	// UFUNCTION()
 	// void OnRep_ActionModeChanged();
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	bool bBaseAttack = true;
 
 	UFUNCTION(Server, Reliable)

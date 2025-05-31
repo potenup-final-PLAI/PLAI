@@ -192,15 +192,8 @@ void AUPhaseManager::SetUnitQueue()
 
 	SortUnitQueue();
 
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
-	{
-		if (turnManager)
-		{
-			turnManager->Multicast_AddOrderUnit();
-			NET_PRINTLOG(TEXT("Delayed Multicast_AddOrderUnit 호출"));
-		}
-	}, 0.5f, false);
+	// unitArray turnOrderArray에 세팅
+	turnOrderArray = unitQueue;
 	
 	for (int i = 0; i < unitQueue.Num(); i++)
 	{
@@ -272,16 +265,6 @@ void AUPhaseManager::TurnPorcessing(ABaseBattlePawn* unit)
 	}
 	turnManager->StartTurn();
 	
-	// if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
-	// {
-	// 	// 플레이어 턴 시작
-	// 	StartPlayerPhase();
-	// }
-	// else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
-	// {
-	// 	// 애너미 턴 시작
-	// 	StartEnemyPhase();
-	// }
 }
 
 void AUPhaseManager::StartPlayerPhase()
@@ -376,9 +359,6 @@ void AUPhaseManager::SetBeforeBattle()
 	{
 		return;
 	}
-
-	// unitArray turnOrderArray에 세팅
-	turnOrderArray = gridTileManager->unitArray;
 	
 	// girdTile에 저장해둔 unit들 순서대로 Possess해서 PlayerState 세팅
 	if (gridTileManager->unitArray.Num() > 0)
@@ -463,6 +443,7 @@ void AUPhaseManager::SetBeforeBattle()
 				}
 			}
 		}
+
 		// 유닛이 다 세팅되면 API 전송
 		TrySendInitialState();
 	}
@@ -879,11 +860,22 @@ void AUPhaseManager::DoingPopNextAliveUnit()
 			SetPhase(EBattlePhase::RoundEnd); // 또는 RoundEnd
 		return;
 	}
-	
+	// 현재 유닛에 tempUnit 세팅
 	turnManager->curUnit = tempUnit;
-
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+	{
+		if (turnManager)
+		{
+			turnManager->Multicast_AddOrderUnit();
+			NET_PRINTLOG(TEXT("Delayed Multicast_AddOrderUnit 호출"));
+		}
+	}, 0.5f, false);
+	
 	SetPhase(EBattlePhase::TurnProcessing);
-
+	
+	// tempUnit 클라쪽에도 업데이트
 	Multicast_PopNextAliveUnit(tempUnit);
 }
 

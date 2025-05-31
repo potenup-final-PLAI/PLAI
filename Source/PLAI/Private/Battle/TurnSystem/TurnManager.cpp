@@ -241,8 +241,8 @@ void ATurnManager::OnTurnEnd()
 	UE_LOG(LogTemp, Warning, TEXT("%s Turn End"), *curUnit->nickName);
 	
 	// 턴이 종료 되면 turnOrderArray에 0번을 빼서 orderUnit에 담아놓고 RmoveAt 후 다시 Add로 추가
-	// 순서 바꾸고 UI 갱신 호출
 	Multicast_RemoveOrderUnit();
+	// 순서 바꾸고 UI 갱신 호출
 	Multicast_AddOrderUnit();
 	
 	
