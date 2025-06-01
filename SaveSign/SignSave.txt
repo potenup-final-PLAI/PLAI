@@ -1787,6 +1787,30 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "user06@gmail.com",
+			"pw": "wanted",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "testuser01@gmail.com",
+			"pw": "wanted",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }

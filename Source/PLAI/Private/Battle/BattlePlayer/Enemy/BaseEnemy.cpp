@@ -128,16 +128,6 @@ void ABaseEnemy::FindAndAttackPlayer()
 {
 	FVector centerPos = GetActorLocation();
 	float detectRadius = 200.0f;
-	// Debug sphere로 주변 탐색
-	// DrawDebugSphere(
-	// 	GetWorld(),
-	// 	centerPos,
-	// 	detectRadius,
-	// 	16,
-	// 	FColor::Red,
-	// 	false,
-	// 	0
-	// );
 	
 	TArray<FOverlapResult> overlaps;
 	FCollisionQueryParams queryParams;
@@ -176,12 +166,13 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 		UE_LOG(LogTemp, Warning, TEXT("actionRequest not for this enemy: %s"), *this->GetName());
 		return;
 	}
-
 	// 0. 턴 종료하라고 오면 턴 종료
 	
-	
 	const FBattleAction& action = actionRequest.action;
-	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"), *actionRequest.current_character_id);
+	if (actionRequest.current_character_id != "")
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"), *actionRequest.current_character_id);
+	}
 
 	// 1. API로 받은 Enemy 이동
 	if (actionRequest.action.move_to.Num() != 0)
@@ -202,10 +193,6 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	if (action.skill != "")
 	{
 		EnemyActionList(actionRequest.action.skill);
-		// attackTarget = FindUnitById(action.target_character_id);
-		// targetPlayer = Cast<ABattlePlayer>(attackTarget);
-		// FString s = " ";
-		// NET_PRINTLOG(TEXT("attackPlayer %s, targetPlayer %s"), attackTarget != nullptr ? *attackTarget->GetActorNameOrLabel() : *s, targetPlayer != nullptr ? *targetPlayer->GetActorNameOrLabel() : *s);
 		bWantsToAttack = true;
 		bStartMontage = true;
 	}
@@ -221,7 +208,6 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 {
 	// 1. 이동 처리
-	
 	int32 targetX = actionMove[0];
 	int32 targetY = actionMove[1];
 
@@ -383,7 +369,10 @@ void ABaseEnemy::MulticastRPC_EnemyTile_Implementation(class AGridTile* enemyTil
 	currentTile = enemyTile;
 	Multicast_SeeMoveRange_Implementation();
 
-	NET_PRINTLOG(TEXT("enemy %s, enemy->currentTile %s"), *MyName, *currentTile->GetActorNameOrLabel());
+	if (currentTile)
+	{
+		NET_PRINTLOG(TEXT("enemy %s, enemy->currentTile %s"), *MyName, *currentTile->GetActorNameOrLabel());
+	}
 }
 
 void ABaseEnemy::ServerRPC_UpdateEnemyAnim_Implementation(EActionMode mode)
@@ -396,6 +385,6 @@ void ABaseEnemy::MultiCastRPC_UpdateEnemyAnim_Implementation(EActionMode mode)
 	if (enemyAnim)
 	{
 		enemyAnim->actionMode = mode;
-		NET_PRINTLOG(TEXT("호출한 객체 : %s, currentActionMode : %s, enemyAnim->actionMode : %s"), *GetActorNameOrLabel(), *UEnum::GetValueAsString(currentActionMode), *UEnum::GetValueAsString(enemyAnim->actionMode));
+		// NET_PRINTLOG(TEXT("호출한 객체 : %s, currentActionMode : %s, enemyAnim->actionMode : %s"), *GetActorNameOrLabel(), *UEnum::GetValueAsString(currentActionMode), *UEnum::GetValueAsString(enemyAnim->actionMode));
 	}
 }
