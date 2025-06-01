@@ -199,14 +199,12 @@ void ABaseBattlePawn::MultiCastRPC_SetBattlePlayerInfoUI_Implementation()
 void ABaseBattlePawn::MultiCastRPC_SetEnemyName_Implementation(class ABaseEnemy* enemy)
 {
 	// 이름 생성 및 로그 출력
-	int32 nameIndex = phaseManager->unitEnemyNameindex++;
-	FString name = FString::Printf(TEXT("엔트%d"), nameIndex);
-	UE_LOG(LogTemp, Warning, TEXT("Setting name to: %s"), *name);
+	nickName = FString::Printf(TEXT("엔트"));
     
 	// UI가 존재하는지 확인
 	if (enemy->battleUnitStateUI)
 	{
-		enemy->battleUnitStateUI->SetUnitName(name);
+		enemy->battleUnitStateUI->SetUnitName(nickName);
 		UE_LOG(LogTemp, Warning, TEXT("Name set on UI successfully"));
 	}
 }
@@ -1397,7 +1395,7 @@ void ABaseBattlePawn::OnMouseHover()
 
 		if (currentHovered && currentHovered->battleUnitStateUI)
 		{
-			currentHovered->battleUnitStateUI->SetUnitName(currentHovered->GetActorNameOrLabel());
+			currentHovered->battleUnitStateUI->SetUnitName(currentHovered->nickName);
 			currentHovered->battleUnitStateUI->UpdatePlayerHPUI(currentHovered->hp);
 			
 			currentHovered->battleUnitStateUI->ShowHoverUI();
@@ -1675,7 +1673,7 @@ void ABaseBattlePawn::Multicast_EnemyBaseAttack_Implementation(class ABaseEnemy*
 		// 어떤 스킬 사용했는지
 		if (enemy->curSkillName == "")
 		{
-			return;
+			enemy->curSkillName = TEXT("타격");
 		}
 		enemy->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
 		enemy->battleUnitStateUI->SetPrintSkillName(enemy->curSkillName);
