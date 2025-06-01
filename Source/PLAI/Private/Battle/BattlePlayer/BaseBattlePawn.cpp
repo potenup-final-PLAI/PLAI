@@ -189,7 +189,7 @@ void ABaseBattlePawn::MultiCastRPC_SetBattlePlayerInfoUI_Implementation()
 	{
 		if (pc && hud && hud->mainUI && hud->mainUI->WBP_Player)
 		{
-			FString name = player->GetActorNameOrLabel();
+			FString name = player->nickName;
 			hud->mainUI->WBP_Player->SetPlayerName(name);
 			hud->mainUI->WBP_Player->SetPlayerHPUI(player);
 		}

@@ -351,11 +351,7 @@ void AUPhaseManager::BattleEnd()
 	// {
 	// 	GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
 	// }
-	if (auto* endingCreditUI = CreateWidget<UEndingCredit>(GetWorld(), endingCreditFactory))
-	{
-		endingCreditUI->AddToViewport();
-		endingCreditUI->Mulitcast_PaidIn();
-	}
+	Multicast_EndingUI();
 }
 
 void AUPhaseManager::SetBeforeBattle()
@@ -906,5 +902,14 @@ void AUPhaseManager::AddNetLog(FString msg)
 	if (auto* httpActor = Cast<ABattleHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), httpActorFactory)))
 	{
 		httpActor->UpdateDebugLog(NetLog);
+	}
+}
+
+void AUPhaseManager::Multicast_EndingUI_Implementation()
+{
+	if (auto* endingCreditUI = CreateWidget<UEndingCredit>(GetWorld(), endingCreditFactory))
+	{
+		endingCreditUI->AddToViewport();
+		endingCreditUI->Mulitcast_PaidIn();
 	}
 }
