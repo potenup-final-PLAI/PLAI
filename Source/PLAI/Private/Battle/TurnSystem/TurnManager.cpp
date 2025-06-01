@@ -135,14 +135,14 @@ void ATurnManager::OnTurnStart()
 
 	// 턴 종료 초기화
 	bTurnEnded = false;
-	NET_PRINTLOG(TEXT("OnTurnStart"));
+	// NET_PRINTLOG(TEXT("OnTurnStart"));
 	
 	// 기본 공격 초기화
 	curUnit->Multicast_ChangebBaseAttack(true);
 	
 	// 턴이 시작됐으면 턴 카운트 1 증가
 	turnCount++;
-	UE_LOG(LogTemp, Warning, TEXT("Turn Count %d"), turnCount);
+	// UE_LOG(LogTemp, Warning, TEXT("Turn Count %d"), turnCount);
 
 	curUnit->MultiCastRPC_SetBattlePlayerInfoUI();
 
@@ -155,22 +155,22 @@ void ATurnManager::OnTurnStart()
 		player->ClientRPC_AddAP(player);
 		player->MultiCastRPC_InitAPUI();
 	
-		UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(),player->curAP);
+		// UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(),player->curAP);
 	}
 	// Enemy라면
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(curUnit))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnTurnStart"));
+		// UE_LOG(LogTemp, Warning, TEXT("BaseBattlePawn::OnTurnStart"));
 
 		// 턴 시작 시 AP 증가
 		enemy->GetAP();
-		UE_LOG(LogTemp, Warning, TEXT("enemy Current AP: %d"),enemy->curAP);
+		// UE_LOG(LogTemp, Warning, TEXT("enemy Current AP: %d"),enemy->curAP);
 
 		// 현재 위치에 타일을 가져와서
 		if (auto* tile = phaseManager->gridTileManager->FindCurrentTile(enemy->GetActorLocation()))
 		{
 			// 현재 타일 설정
-			NET_PRINTLOG(TEXT(""));
+			// NET_PRINTLOG(TEXT(""));
 			enemy->currentTile = tile;
 			enemy->MulticastRPC_EnemyTile(tile);
 		}
@@ -183,15 +183,14 @@ void ATurnManager::OnTurnStart()
 		FTimerHandle battleAPIHandle;
 		GetWorld()->GetTimerManager().SetTimer(battleAPIHandle,FTimerDelegate::CreateLambda([this, CapturedUnit]()
 		{
-			UE_LOG(LogTemp, Warning,TEXT("BaseBattlePawn::In Lambda"));
 			if (phaseManager)
 			{
-				UE_LOG(LogTemp,Warning,TEXT("BaseBattlePawn::turnManager, phaseManager is Set"));
+				// UE_LOG(LogTemp,Warning,TEXT("BaseBattlePawn::turnManager, phaseManager is Set"));
 				phaseManager->TrySendbattleState(CapturedUnit);
 			}
 		}), 1.0f, false);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
+	// UE_LOG(LogTemp, Warning, TEXT("%s Turn Start"), *GetName());
 }
 
 void ATurnManager::Multicast_AddOrderUnit_Implementation()
@@ -230,7 +229,7 @@ void ATurnManager::OnTurnEnd()
 		NET_PRINTLOG(TEXT("ABaseBattlePawn::OnTurnEnd : bTurnEnded true"));
 		return;
 	}
-	NET_PRINTLOG(TEXT("ABaseBattlePawn::OnTurnEnd : bTurnEnded false"));
+	// NET_PRINTLOG(TEXT("ABaseBattlePawn::OnTurnEnd : bTurnEnded false"));
 	
 	bTurnEnded = true;
 	

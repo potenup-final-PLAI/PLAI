@@ -137,13 +137,13 @@ void ABaseBattlePawn::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	
-	if (IsLocallyControlled())
-	{
-		if (this && this->currentTile)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("%s의 currentTile : %s"), *this->GetActorNameOrLabel(), *this->currentTile->GetActorNameOrLabel());
-		}
-	}
+	// if (IsLocallyControlled())
+	// {
+	// 	if (this && this->currentTile)
+	// 	{
+	// 		UE_LOG(LogTemp, Warning, TEXT("%s의 currentTile : %s"), *this->GetActorNameOrLabel(), *this->currentTile->GetActorNameOrLabel());
+	// 	}
+	// }
 }
 
 // Called every frame
@@ -205,7 +205,7 @@ void ABaseBattlePawn::MultiCastRPC_SetEnemyName_Implementation(class ABaseEnemy*
 	if (enemy->battleUnitStateUI)
 	{
 		enemy->battleUnitStateUI->SetUnitName(nickName);
-		UE_LOG(LogTemp, Warning, TEXT("Name set on UI successfully"));
+		// UE_LOG(LogTemp, Warning, TEXT("Name set on UI successfully"));
 	}
 }
 
@@ -394,7 +394,7 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 
 void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 {
-	UE_LOG(LogTemp, Warning, TEXT("PlayerPoison In"));
+	// UE_LOG(LogTemp, Warning, TEXT("PlayerPoison In"));
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
@@ -460,7 +460,7 @@ void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
 void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 {
 	// player HP가 0보다 크다면
-	UE_LOG(LogTemp, Warning, TEXT("In GetDamage"));
+	// UE_LOG(LogTemp, Warning, TEXT("In GetDamage"));
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(unit))
 	{
 		if (!battleUnitStateUI)
@@ -516,13 +516,13 @@ void ABaseBattlePawn::MultiCastRPC_EnemyGetDamage_Implementation(class ABaseEnem
 	if (!IsValid(enemy) || enemy->IsPendingKillPending()) return;
 	// 피를 깎는다.
 	enemy->hp = FMath::Max(0, enemy->hp - damage);
-	UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage, enemy->hp);
+	// UE_LOG(LogTemp, Warning, TEXT("Damage : %d, enemyHP : %d"), damage, enemy->hp);
 	// UI HP 업데이트
 	enemy->battleUnitStateUI->UpdateHP(enemy->hp, enemy);
 
 	// 공격 몽타주 실행
 	enemy->enemyAnim->PlayHitMotionAnimation(TEXT("StartHitMotion"));
-	UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
+	// UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
 
 	// Actor 위치 옮기고 UI Actor 보이게
 	FVector loc = FVector(enemy->GetActorLocation().X, enemy->GetActorLocation().Y,enemy->GetActorLocation().Z + 250);
@@ -538,7 +538,7 @@ void ABaseBattlePawn::MultiCastRPC_EnemyGetDamage_Implementation(class ABaseEnem
 		enemy->enemyLifeState = ELifeState::Dead;
 		// enemy Anim에 State 세팅
 		enemy->enemyAnim->lifeState = ELifeState::Dead;
-		UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),*UEnum::GetValueAsString(enemy->enemyLifeState));
+		// UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"),*UEnum::GetValueAsString(enemy->enemyLifeState));
 	}
 	// 대미지를 줬다면 현재 공격 상태를 None으로 초기화
 	if (auto* anim = Cast<UBattleEnemyAnimInstance>(enemy->meshComp->GetAnimInstance()))
@@ -553,7 +553,7 @@ void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(class ABattleP
 	
 	// 피를 깎는다.
 	player->hp = FMath::Max(0, player->hp - damage);
-	UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage, player->hp);
+	// UE_LOG(LogTemp, Warning, TEXT("Damage : %d, playerHP : %d"), damage, player->hp);
 		
 	// HP를 UI에 업데이트
 	// BattlePlayerInfo HP 업데이트
@@ -561,7 +561,7 @@ void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(class ABattleP
 	player->hud->mainUI->WBP_Player->PlayerUpdateHP(player, player->hp);
 
 	player->playerAnim->PlayHitMotionAnimation(TEXT("StartPlayerHitMotion"));
-	UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
+	// UE_LOG(LogTemp, Warning, TEXT("anim Set! Hit Animation !!"));
 
 	// Actor 위치 옮기고 UI Actor 보이게
 	FVector loc = FVector(player->GetActorLocation().X,player->GetActorLocation().Y,player->GetActorLocation().Z + 250);
@@ -577,7 +577,7 @@ void ABaseBattlePawn::MultiCastRPC_PlayerGetDamage_Implementation(class ABattleP
 		player->playerLifeState = ELifeState::Dead;
 		// playerAnim에 세팅
 		player->playerAnim->lifeState = ELifeState::Dead;
-		UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(player->playerLifeState));
+		// UE_LOG(LogTemp, Warning, TEXT("Enemy Dead %s"), *UEnum::GetValueAsString(player->playerLifeState));
 	}
 }
 
@@ -595,7 +595,7 @@ void ABaseBattlePawn::PlayerApplyAttack_Implementation(ABaseBattlePawn* targetUn
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Player Attack Enemy"));
+	// UE_LOG(LogTemp, Warning, TEXT("Player Attack Enemy"));
 	int32 atk = player->attack;
 	float critical = player->critical_Rate;
 	float criticalDamage = player->critical_Damage;
@@ -657,7 +657,7 @@ void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode 
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning,TEXT("[EnemyApplyAttack] Enemy %s attacking Player %s"),*enemy->GetName(), *player->GetName());
+	// UE_LOG(LogTemp, Warning,TEXT("[EnemyApplyAttack] Enemy %s attacking Player %s"),*enemy->GetName(), *player->GetName());
 
 	int32 atk = enemy->attack;
 	float critical = enemy->critical_Rate;
@@ -680,7 +680,6 @@ void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode 
 		{
 			return;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("In Poison"));
 		enemy->AddStatusEffect(EStatusEffect::Poison, 3);
 		break;
 
@@ -748,7 +747,7 @@ void ABaseBattlePawn::EnemyApplyAttack(ABaseBattlePawn* targetUnit, EActionMode 
 
 void ABaseBattlePawn::CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk, float skillMultiplier, float criticalRate, float criticalDamage)
 {
-	UE_LOG(LogTemp, Warning, TEXT("In Calculate"));
+	// UE_LOG(LogTemp, Warning, TEXT("In Calculate"));
 	int32 damage = 0;
 	int32 chance = FMath::RoundToInt(criticalRate * 100.0f);
 	int32 roll = FMath::RandRange(1, 100);
@@ -756,12 +755,12 @@ void ABaseBattlePawn::CalculateAndApplyDamage(ABaseBattlePawn* target, int32 atk
 	if (bool bIsCrit = roll <= chance)
 	{
 		damage = (atk * skillMultiplier) * criticalDamage;
-		UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
+		// UE_LOG(LogTemp, Warning, TEXT("Critical Damage : %d"), damage);
 	}
 	else
 	{
 		damage = atk * skillMultiplier;
-		UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
+		// UE_LOG(LogTemp, Warning, TEXT("Damage : %d"), damage);
 	}
 
 	GetDamage(target, damage);
@@ -775,7 +774,7 @@ void ABaseBattlePawn::AddStatusEffect(EStatusEffect newEffect, int32 duration)
 		activeStatusEffects[newEffect] = FMath::Max(activeStatusEffects[newEffect], duration);
 		// UEnum로그를 찍기 위해 enum 메타데이터를 얻어서 Log찍는 과정 
 		UEnum* enumPtr = StaticEnum<EStatusEffect>();
-		if (enumPtr) UE_LOG(LogTemp, Warning,TEXT("In AddStatusEffect : %s, Duration : %d"),*enumPtr->GetNameStringByValue(static_cast<int64>(newEffect)), activeStatusEffects[newEffect]);
+		// if (enumPtr) UE_LOG(LogTemp, Warning,TEXT("In AddStatusEffect : %s, Duration : %d"),*enumPtr->GetNameStringByValue(static_cast<int64>(newEffect)), activeStatusEffects[newEffect]);
 	}
 	else
 	{
@@ -908,8 +907,8 @@ void ABaseBattlePawn::WeakeningProcess()
 	// 음수 방지
 	atk = FMath::Max(0, atk - decreaseAtkAmount);
 	def = FMath::Max(0, def - decreaseDefAmount);
-	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
-	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), def);
+	// UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
+	// UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), def);
 }
 
 void ABaseBattlePawn::VulnerableProcess()
@@ -918,7 +917,7 @@ void ABaseBattlePawn::VulnerableProcess()
 	int32& def = defense;
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.5f);
 	def = FMath::Max(0, def - decreaseDefAmount);
-	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
+	// UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
 }
 
 void ABaseBattlePawn::AngryProcess()
@@ -927,7 +926,7 @@ void ABaseBattlePawn::AngryProcess()
 	int32& atk = attack;
 	int32 decreaseAtkAmount = FMath::RoundToInt(atk * 0.5f);
 	atk = FMath::Max(0, atk - decreaseAtkAmount);
-	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
+	// UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
 }
 
 void ABaseBattlePawn::BleedingProcess()
@@ -936,7 +935,7 @@ void ABaseBattlePawn::BleedingProcess()
 	int32& def = defense;
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.2f);
 	def = FMath::Max(0, def - decreaseDefAmount);
-	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
+	// UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
 }
 
 void ABaseBattlePawn::WeakeningEnemyProcess(class ABaseEnemy* enemy)
@@ -951,8 +950,8 @@ void ABaseBattlePawn::WeakeningEnemyProcess(class ABaseEnemy* enemy)
 	// 음수 방지
 	atk = FMath::Max(0, atk - decreaseAtkAmount);
 	def = FMath::Max(0, def - decreaseDefAmount);
-	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
-	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), def);
+	// UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
+	// UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), def);
 }
 
 void ABaseBattlePawn::VulnerableEnemyProcess(class ABaseEnemy* enemy)
@@ -961,7 +960,7 @@ void ABaseBattlePawn::VulnerableEnemyProcess(class ABaseEnemy* enemy)
 	int32& def = enemy->defense;
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.5f);
 	def = FMath::Max(0, def - decreaseDefAmount);
-	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
+	// UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
 }
 
 void ABaseBattlePawn::AngryEnemyProcess(class ABaseEnemy* enemy)
@@ -970,7 +969,7 @@ void ABaseBattlePawn::AngryEnemyProcess(class ABaseEnemy* enemy)
 	int32& atk = enemy->attack;
 	int32 decreaseAtkAmount = FMath::RoundToInt(atk * 0.5f);
 	atk = FMath::Max(0, atk - decreaseAtkAmount);
-	UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
+	// UE_LOG(LogTemp, Warning, TEXT("WeakeningProcess : %d"), atk);
 }
 
 void ABaseBattlePawn::BleedingEnemyProcess(class ABaseEnemy* enemy)
@@ -979,7 +978,7 @@ void ABaseBattlePawn::BleedingEnemyProcess(class ABaseEnemy* enemy)
 	int32& def = enemy->defense;
 	int32 decreaseDefAmount = FMath::RoundToInt(def * 0.2f);
 	def = FMath::Max(0, def - decreaseDefAmount);
-	UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
+	// UE_LOG(LogTemp, Warning, TEXT("VulnerableProcess : %d"), def);
 }
 
 void ABaseBattlePawn::PathFind()
@@ -995,8 +994,8 @@ void ABaseBattlePawn::PathFind()
 
 	while (openArray.Num() > 0 && safetyCounter++ < maxSafetyCount)
 	{
-		NET_PRINTLOG(TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),pathArray.Num(), moveRange);
-		NET_PRINTLOG(TEXT("Final bIsMoving = %s"), bIsMoving ? TEXT("true") : TEXT("false"));
+		// NET_PRINTLOG(TEXT("BuildPath: pathArray.Num = %d, moveRange = %d"),pathArray.Num(), moveRange);
+		// NET_PRINTLOG(TEXT("Final bIsMoving = %s"), bIsMoving ? TEXT("true") : TEXT("false"));
 		if (safetyCounter > maxSafetyCount)
 		{
 			NET_PRINTLOG(TEXT("Path Safe Break"));
@@ -1074,7 +1073,7 @@ void ABaseBattlePawn::AddOpenByOffset(FIntPoint offset)
 
 void ABaseBattlePawn::BuildPath()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BuildPath: moveRange = %d"), moveRange);
+	// UE_LOG(LogTemp, Warning, TEXT("BuildPath: moveRange = %d"), moveRange);
 
 	if (auto* player = Cast<ABattlePlayer>(this))
 	{
@@ -1187,7 +1186,7 @@ void ABaseBattlePawn::BuildPath()
 		// enemy actionmode 업데이트
 		enemy->currentActionMode = EActionMode::Move;
 		enemy->MultiCastRPC_UpdateEnemyAnim(currentActionMode);
-		UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemy->enemyAnim->actionMode));
+		// UE_LOG(LogTemp, Warning,TEXT("Processing anim actionMode Update !! %s"), *UEnum::GetValueAsString(enemy->enemyAnim->actionMode));
 	}
 	
 	// InitValues();
@@ -1628,11 +1627,11 @@ void ABaseBattlePawn::Server_PlayerBaseAttack_Implementation(class ABattlePlayer
 
 void ABaseBattlePawn::Multicast_PlayerBaseAttack_Implementation(class ABattlePlayer* player)
 {
-	NET_PRINTLOG(TEXT("playerBaseAttack"));
+	// NET_PRINTLOG(TEXT("playerBaseAttack"));
 	// 회전 끝나고 몽타주 실행
 	player->playerAnim->PlayerAttackAnimation(TEXT("StartBaseAttack"));
 	player->bStartMontage = false;
-	UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+	// UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
 
 	// 어떤 스킬 사용했는지
 	if (player->curSkillName == "")
@@ -1668,12 +1667,12 @@ void ABaseBattlePawn::Multicast_EnemyBaseAttack_Implementation(class ABaseEnemy*
 	if (enemy->enemyAnim)
 	{
 		enemy->enemyAnim->PlayBaseAttackAnimation(TEXT("StartBaseAttack"));
-		UE_LOG(LogTemp, Warning, TEXT("EnemyBaseAttackAnimation"));
+		// UE_LOG(LogTemp, Warning, TEXT("EnemyBaseAttackAnimation"));
 
 		// 어떤 스킬 사용했는지
 		if (enemy->curSkillName == "")
 		{
-			enemy->curSkillName = TEXT("타격");
+			return;
 		}
 		enemy->battleUnitStateComp->SetDrawSize(FVector2D(150, 100));
 		enemy->battleUnitStateUI->SetPrintSkillName(enemy->curSkillName);
@@ -1695,7 +1694,7 @@ void ABaseBattlePawn::Multicast_EnemyBaseAttack_Implementation(class ABaseEnemy*
 		UE_LOG(LogTemp, Error,TEXT("enemy->enemyAnim is nullptr!"));
 	}
 	enemy->bStartMontage = false;
-	UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
+	// UE_LOG(LogTemp, Warning, TEXT("Play BaseAttack"));
 }
 
 void ABaseBattlePawn::InitEnemyState()
@@ -1713,14 +1712,14 @@ void ABaseBattlePawn::InitEnemyState()
 		// 애너미 스킬 세팅
 		InitEnemySkills();
 		
-		for (const FString trait : enemy->traits)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Trait : %s"), *trait);
-		}
-		for (const FString skill : enemy->skills)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Skill : %s"), *skill);
-		}
+		// for (const FString trait : enemy->traits)
+		// {
+		// 	UE_LOG(LogTemp, Warning, TEXT("Trait : %s"), *trait);
+		// }
+		// for (const FString skill : enemy->skills)
+		// {
+		// 	UE_LOG(LogTemp, Warning, TEXT("Skill : %s"), *skill);
+		// }
 		// 기본 스텟 설정(엔트)
 		enemy->hp = 90;
 		enemy->attack = 10;
@@ -1740,15 +1739,15 @@ void ABaseBattlePawn::InitEnemyState()
 		// enemy에 moveRange 세팅 작업
 		enemy->moveRange = FMath::Max(1, enemy->moveRange);
 		
-		UE_LOG(LogTemp, Warning,TEXT("Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "", crit : %f, crit_Damge : %f, spd : %d"),
-			   enemy->hp,
-			   enemy->attack,
-			   enemy->defense,
-			   enemy->resistance,
-			   enemy->moveRange,
-			   enemy->critical_Rate,
-			   enemy->critical_Damage,
-			   enemy->speed);
+		// UE_LOG(LogTemp, Warning,TEXT("Enemy State Set hp : %d, atk : %d, def : %d, res : %d, mov : %d, "", crit : %f, crit_Damge : %f, spd : %d"),
+		// 	   enemy->hp,
+		// 	   enemy->attack,
+		// 	   enemy->defense,
+		// 	   enemy->resistance,
+		// 	   enemy->moveRange,
+		// 	   enemy->critical_Rate,
+		// 	   enemy->critical_Damage,
+		// 	   enemy->speed);
 		
 		// enemy 이름 세팅
 		MultiCastRPC_SetEnemyName_Implementation(enemy);
@@ -1971,7 +1970,7 @@ void ABaseBattlePawn::InitAPUI()
 	// 현재 턴 유닛이 Player인 경우에만
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
 	{
-		NET_PRINTLOG(TEXT("Player name : %s, turnManager->curUnit : %d"), *player->GetActorNameOrLabel(), player->curAP);
+		// NET_PRINTLOG(TEXT("Player name : %s, turnManager->curUnit : %d"), *player->GetActorNameOrLabel(), player->curAP);
 		for (int32 i = 0; i < player->curAP; ++i)
 		{
 			hud->mainUI->AddAP(); // AP UI 하나씩 추가

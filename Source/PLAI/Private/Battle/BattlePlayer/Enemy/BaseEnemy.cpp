@@ -169,7 +169,10 @@ void ABaseEnemy::ProcessAction(const FActionRequest& actionRequest)
 	// 0. 턴 종료하라고 오면 턴 종료
 	
 	const FBattleAction& action = actionRequest.action;
-	UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"), *actionRequest.current_character_id);
+	if (actionRequest.current_character_id != "")
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Processing action for: %s"), *actionRequest.current_character_id);
+	}
 
 	// 1. API로 받은 Enemy 이동
 	if (actionRequest.action.move_to.Num() != 0)
@@ -366,7 +369,10 @@ void ABaseEnemy::MulticastRPC_EnemyTile_Implementation(class AGridTile* enemyTil
 	currentTile = enemyTile;
 	Multicast_SeeMoveRange_Implementation();
 
-	NET_PRINTLOG(TEXT("enemy %s, enemy->currentTile %s"), *MyName, *currentTile->GetActorNameOrLabel());
+	if (currentTile)
+	{
+		NET_PRINTLOG(TEXT("enemy %s, enemy->currentTile %s"), *MyName, *currentTile->GetActorNameOrLabel());
+	}
 }
 
 void ABaseEnemy::ServerRPC_UpdateEnemyAnim_Implementation(EActionMode mode)
@@ -379,6 +385,6 @@ void ABaseEnemy::MultiCastRPC_UpdateEnemyAnim_Implementation(EActionMode mode)
 	if (enemyAnim)
 	{
 		enemyAnim->actionMode = mode;
-		NET_PRINTLOG(TEXT("호출한 객체 : %s, currentActionMode : %s, enemyAnim->actionMode : %s"), *GetActorNameOrLabel(), *UEnum::GetValueAsString(currentActionMode), *UEnum::GetValueAsString(enemyAnim->actionMode));
+		// NET_PRINTLOG(TEXT("호출한 객체 : %s, currentActionMode : %s, enemyAnim->actionMode : %s"), *GetActorNameOrLabel(), *UEnum::GetValueAsString(currentActionMode), *UEnum::GetValueAsString(enemyAnim->actionMode));
 	}
 }
