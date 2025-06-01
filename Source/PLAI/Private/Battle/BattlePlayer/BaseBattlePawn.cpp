@@ -1473,7 +1473,8 @@ void ABaseBattlePawn::UnitRotation(class ABaseBattlePawn* unit)
 		FRotator currentRot = player->meshComp->GetRelativeRotation();
 		FRotator desireRot(0.f, targetRot.Yaw + yawOffset, 0.f);
 		smoothRot = FMath::RInterpTo(currentRot, desireRot, GetWorld()->GetDeltaSeconds(), interpSpeed);
-		ServerRPC_UnitRotation(smoothRot);
+		if (!HasAuthority() && IsLocallyControlled()) ServerRPC_UnitRotation(smoothRot);
+		else if (HasAuthority()) MultiCastRPC_UnitRotation(smoothRot);
 	}
 	// Enemy 회전
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
@@ -1481,7 +1482,7 @@ void ABaseBattlePawn::UnitRotation(class ABaseBattlePawn* unit)
 		FRotator currentRot = enemy->meshComp->GetRelativeRotation();
 		FRotator desireRot(0.f, targetRot.Yaw + yawOffset, 0.f);
 		smoothRot = FMath::RInterpTo(currentRot, desireRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
-		ServerRPC_UnitRotation(smoothRot);
+		if (HasAuthority()) ServerRPC_UnitRotation(smoothRot);
 	}
 }
 
@@ -1507,7 +1508,7 @@ void ABaseBattlePawn::UnitMove(class ABaseBattlePawn* unit)
 	// ServerRPC_UnitMove(newLoc); *
 
 	// 플레이어 : RPC로 서버 동기화 요청
-	if (IsLocallyControlled())
+	if (!HasAuthority() && IsLocallyControlled())
 	{
 		ServerRPC_UnitMove(newLoc);
 	}
@@ -1525,7 +1526,7 @@ void ABaseBattlePawn::UnitMove(class ABaseBattlePawn* unit)
 			if (auto* player = Cast<ABattlePlayer>(this))
 			{
 				player->currentActionMode = EActionMode::None;
-				if (IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
+				if (!HasAuthority() && IsLocallyControlled()) player->Server_UpdatePlayerAnim(player->currentActionMode);
 				else if (HasAuthority()) player->MultiCastRPC_UpdatePlayerAnim(player->currentActionMode);
 			}
 			else if (auto* enemy = Cast<ABaseEnemy>(this))
@@ -1571,7 +1572,8 @@ void ABaseBattlePawn::UnitAttackBeforeRoatation(class ABaseBattlePawn* unit)
 				FRotator currentRot = player->meshComp->GetRelativeRotation();
 				targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
 				newRot = FMath::RInterpTo(currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
-				ServerRPC_UnitRotation(newRot);
+				if (HasAuthority()) player->MultiCastRPC_UnitRotation(newRot);
+				else if (!HasAuthority() && IsLocallyControlled()) player->ServerRPC_UnitRotation(newRot);
 				
 				// 회전이 다 됐는지 체크
 				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
@@ -1587,7 +1589,8 @@ void ABaseBattlePawn::UnitAttackBeforeRoatation(class ABaseBattlePawn* unit)
 				FRotator currentRot = enemy->meshComp->GetRelativeRotation();
 				targetMeshRot = FRotator(0.f, desiredRot.Yaw + yawOffset, 0.f);
 				newRot = FMath::RInterpTo(currentRot, targetMeshRot, GetWorld()->GetDeltaSeconds(),interpSpeed);
-				ServerRPC_UnitRotation(newRot);
+				if (HasAuthority()) enemy->MultiCastRPC_UnitRotation(newRot);
+				// ServerRPC_UnitRotation(newRot);
 
 				// 회전이 다 됐는지 체크
 				if (FMath::Abs(FMath::FindDeltaAngleDegrees(newRot.Yaw, targetMeshRot.Yaw)) < 1.f)
