@@ -357,7 +357,8 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 	}
 
 	// bBaseAttack = false;
-	Server_ChangebBaseAttack(false);
+	if (HasAuthority()) Multicast_ChangebBaseAttack(false);
+	else if (!HasAuthority() && IsLocallyControlled()) Server_ChangebBaseAttack(false);
 
 	AActor* hitActor = hitInfo.GetActor();
 

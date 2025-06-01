@@ -10,6 +10,7 @@
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
 #include "Battle/UI/CycleAndTurn.h"
+#include "Battle/UI/EndingCredit.h"
 #include "Battle/UI/MainBattleUI.h"
 #include "Battle/UI/WorldDamageUIActor.h"
 #include "Battle/Util/DebugHeader.h"
@@ -126,7 +127,7 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 		break;
 	case EBattlePhase::BattleEnd:
 		// 끝났을 때 결과에 대한 UI 보여주면 될듯함.
-		//BattleEnd();
+		BattleEnd();
 		break;
 	default:
 		break;
@@ -346,9 +347,14 @@ void AUPhaseManager::BattleEnd()
 {
 	turnManager->SetTurnState(ETurnState::None);
 	UE_LOG(LogTemp, Warning, TEXT("End Battle"));
-	if (HasAuthority())
+	// if (HasAuthority())
+	// {
+	// 	GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
+	// }
+	if (auto* endingCreditUI = CreateWidget<UEndingCredit>(GetWorld(), endingCreditFactory))
 	{
-		GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
+		endingCreditUI->AddToViewport();
+		endingCreditUI->Mulitcast_PaidIn();
 	}
 }
 
@@ -699,7 +705,7 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		else
 		{
 			player->hp = 100;
-			player->attack = 7;
+			player->attack = 200;
 			player->defense = 10;
 			player->resistance = 7;
 			player->moveRange = 5;
