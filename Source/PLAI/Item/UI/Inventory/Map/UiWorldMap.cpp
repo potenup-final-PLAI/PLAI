@@ -53,7 +53,7 @@ void UUiWorldMap::SetRefreshPlayerList()
 		{
 			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
 			{
-				if (!TP -> IsLocallyControlled())return;
+				// if (!TP -> IsLocallyControlled())return;
 				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
 
 				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
@@ -89,13 +89,27 @@ void UUiWorldMap::SetPlayerIconMinimap()
 	
 		if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
 		{
-			MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
-			MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
-
-			if (bExtendMap == true)
-			{ CanvasSlot->SetPosition(PixelPos); }
+			// MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
+			// MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+			if (TestPlayers[i]->InvenComp && TestPlayers[i]->InvenComp->MenuInven && TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWorldMap &&
+				TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWorldMap == this)
+			{
+				CanvasSlot->SetPosition(FVector2d(125,125));
+				MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
+				MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
+			}
 			else
-			{ CanvasSlot->SetPosition(FVector2d(125,125)); }
+			{
+				// CanvasSlot->SetPosition(PixelPos);
+			}
+			if (bExtendMap == true)
+			{
+				CanvasSlot->SetPosition(PixelPos);
+			}
+			// else
+			// {
+			// 	CanvasSlot->SetPosition(FVector2d(125,125));
+			// }
 		}
 		else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 	}
@@ -120,7 +134,7 @@ void UUiWorldMap::ExtendMap()
 		}
 		else
 		{
-			MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.5);
+			MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.4);
 			CanvasSlot->SetSize(MiniMapSizeS);
 			CanvasSlot->SetAnchors(FAnchors(1,1));
 			CanvasSlot->SetPosition(FVector2D(-10,-10));
