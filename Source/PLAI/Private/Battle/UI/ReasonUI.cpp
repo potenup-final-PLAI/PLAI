@@ -8,5 +8,6 @@
 
 void UReasonUI::SetText(FString text)
 {
-	txt_Reason->SetText(FText::FromString(text));
+	FString s = FString::Printf(TEXT("엔트 : %s"), *text);
+	txt_Reason->SetText(FText::FromString(s));
 }
