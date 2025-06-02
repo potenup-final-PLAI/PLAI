@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UIWorldMapGuide.h"
 #include "UiWorldPlayerIcon.h"
 #include "Blueprint/UserWidget.h"
 #include "UiWorldMap.generated.h"
@@ -24,6 +25,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	UMaterialInstanceDynamic* MaterialMapDynamic;
 
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* MaterialInterfaceMiniMapGuide;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInstanceDynamic* MaterialDynamicMiniMapGuide;
+
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* MiniMapCanvas;
 
@@ -37,10 +44,20 @@ public:
 	class UMenuInven* MenuInven;
 
 	UPROPERTY(EditAnywhere)
+	class AGameStateOpen* GameStateOpen;
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUiWorldPlayerIcon>UiWorldPlayerIconFactory;
 
 	UPROPERTY(EditAnywhere)
 	class UUiWorldPlayerIcon* UIWorldPlayerIcon;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUIWorldMapGuide>UIWorldMapGuideFactory;
+	
+	UPROPERTY(EditAnywhere)
+	class UUIWorldMapGuide* UIWorldMapGuideIcon;
+
 
 	UPROPERTY(EditAnywhere)
 	TArray<class ATestPlayer*>TestPlayers;
@@ -48,6 +65,9 @@ public:
 	void SetRefreshPlayerList();
 	
 	void SetPlayerIconMinimap();
+
+	void CreateGuideIconMinimap();
+	void SetGuideIconMinimap();
 	
 	UPROPERTY(EditAnywhere)
 	FVector2D WorldMinFevtor = FVector2D(-22700.0, -21260.0);

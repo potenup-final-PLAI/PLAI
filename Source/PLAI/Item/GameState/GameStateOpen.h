@@ -36,6 +36,11 @@ public:
 	void NextRound();
 
 	UPROPERTY(EditAnywhere)
+	TArray<AActor*>MiniMapGuideActors;
+
+	void FindMiniMapGuideIcon();
+
+	UPROPERTY(EditAnywhere)
 	FTimerHandle TimerHandle;
 	UPROPERTY(EditAnywhere)
 	float TimerSecond;
