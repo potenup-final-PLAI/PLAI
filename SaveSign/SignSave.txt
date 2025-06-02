@@ -1823,6 +1823,102 @@
 			{
 				"itemStructs": []
 			}
+		},
+		{
+			"id": "user05@gmail.com",
+			"pw": "1",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "user5@w.w",
+			"pw": "w",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "u@w.w",
+			"pw": "w",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "99@w.w",
+			"pw": "w",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "smk@gmail.com",
+			"pw": "1",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "asd@w.w",
+			"pw": "w",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "asd@gmail.com",
+			"pw": "w",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "qwe@gmail.com",
+			"pw": "1",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
 		}
 	]
 }
