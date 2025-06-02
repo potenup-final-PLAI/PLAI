@@ -6,6 +6,7 @@
 #include "Battle/Util/DebugHeader.h"
 #include "Battle/Util/BattleType/BattleTypes.h"
 #include "Enemy/BaseEnemy.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/BattlePlayer.h"
 
@@ -18,14 +19,7 @@ void UBattleEnemyAnimInstance::NativeBeginPlay()
 void UBattleEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-
-	// if (auto* player = Cast<ABaseBattlePawn>(TryGetPawnOwner()))
-	// {
-	// 	// 전방방향 벡터 구하기
-	// 	FVector velocity = player->GetVelocity();
-	// 	FVector forward = player->GetActorForwardVector();
-	// 	moveSpeed = FVector::DotProduct(velocity, forward);
-	// }
+	
 }
 
 void UBattleEnemyAnimInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -46,8 +40,13 @@ void UBattleEnemyAnimInstance::AnimNotify_BaseAttackPoint()
 		return;
 	}
 
-	battleEnemy->EnemyApplyAttack(battleEnemy->targetPlayer,EActionMode::BaseAttack);
+	// 사운드 재생
+	UGameplayStatics::PlaySoundAtLocation(this, battleEnemy->attackSound, battleEnemy->GetActorLocation());
+	// Enemy 대미지 입히기
+	battleEnemy->EnemyApplyAttack(battleEnemy->targetPlayer, EActionMode::BaseAttack);
+	
 	NET_PRINTLOG(TEXT("Enemy %s"), *battleEnemy->GetActorNameOrLabel());
+	
 	battleEnemy->targetPlayer = nullptr;
 	battleEnemy->attackTarget = nullptr;
 }

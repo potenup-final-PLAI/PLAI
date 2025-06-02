@@ -24,10 +24,8 @@ void UMainBattleUI::AddAP()
 
 void UMainBattleUI::AddReason(FString dialogue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("IN AddReason"));
 	if (UReasonUI* reason = CreateWidget<UReasonUI>(GetWorld(), reasonFactory))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Cast Reason"));
 		reason->SetText(dialogue);
 		SB_Reason->AddChild(reason);
 	}
@@ -35,7 +33,6 @@ void UMainBattleUI::AddReason(FString dialogue)
 
 void UMainBattleUI::AddOrder(const TArray<class ABaseBattlePawn*> unitArray)
 {
-	NET_PRINTLOG(TEXT("IN AddOrder"));
 	// 시작할 때 원래 있던 UI 초기화
 	HB_TurnOrder->ClearChildren();
 

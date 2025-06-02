@@ -96,6 +96,10 @@ public:
 	void InitAPUI();
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_AddAP(class ABattlePlayer* player);
+	UFUNCTION(Server, Reliable)
+	void Server_UpdateAP(class ABaseBattlePawn* unit, int32 ap);
+	UFUNCTION(Client, Reliable)
+	void Client_InitAPUI();
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_InitAPUI();
 	
@@ -132,10 +136,12 @@ public:
 		}
 		// 호출하는 대상에 ap를 받아서 AP 증감처리 
 		curAP = FMath::Max(0, curAP - cost);
+		Multicast_UpdateAP(curAP);
 		// 처리된 ap를 다시 호출한 대상 AP에 업데이트
 		return true;
 	}
-	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdateAP(int32 ap);
 	//------------Turn System-----------------
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ATurnManager> turnManagerFactory;
@@ -150,9 +156,14 @@ public:
 	// UFUNCTION()
 	// void OnRep_ActionModeChanged();
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	bool bBaseAttack = true;
 
+	UFUNCTION(Server, Reliable)
+	void Server_ChangebBaseAttack(bool bAttack);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ChangebBaseAttack(bool bAttack);
+	
 	// 플레이어 스킬들
 	void PlayerMove(FHitResult& hitInfo);
 	UFUNCTION(Server, Reliable)
@@ -332,7 +343,7 @@ public:
 	UPROPERTY(Replicated, EditAnywhere)
 	float moveSpeed = 300.0f;
 	
-	UPROPERTY(ReplicatedUsing = OnRep_TargetLoc, EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	FVector newLoc;
 
 	UFUNCTION()
@@ -389,8 +400,6 @@ public:
 	void Multicast_PlayerBaseAttack(class ABattlePlayer* player);
 
 	// Enemy 공격 동기화
-	UPROPERTY(Replicated, EditAnywhere)
-	class UAnimMontage* enemyBaseAttack;
 	UFUNCTION(Server, Reliable)
 	void Server_EnemyBaseAttack(class ABaseEnemy* enemy);
 	UFUNCTION(NetMulticast, Reliable)
@@ -449,7 +458,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_ClearGridTile();
 	
-	
+	UPROPERTY(Replicated, EditAnywhere)
+	FString nickName = "";
 };
 
 

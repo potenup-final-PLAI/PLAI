@@ -87,7 +87,7 @@ void ABattlePlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	
-	UE_LOG(LogTemp, Warning,TEXT("NewController : %s"), *NewController->GetActorNameOrLabel());
+	// UE_LOG(LogTemp, Warning,TEXT("NewController : %s"), *NewController->GetActorNameOrLabel());
 	
 }
 
@@ -100,7 +100,7 @@ void ABattlePlayer::NotifyControllerChanged()
 
 	if (ppc)
 	{
-		NET_PRINTLOG(TEXT("ABattlePlayer::NotifyControllerChanged"));
+		// NET_PRINTLOG(TEXT("ABattlePlayer::NotifyControllerChanged"));
 		//그 객체를 이용해서 EnhanceInputLocalPlayerSubSystem을 가져온다.
 		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(ppc->GetLocalPlayer());
 		if (subSys)
@@ -134,7 +134,7 @@ void ABattlePlayer::ClearDebugNetLog()
 
 void ABattlePlayer::Server_OnClickedMove_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Move"));
+	// UE_LOG(LogTemp, Warning, TEXT("Move"));
 	// 애니메이션 세팅
 	currentActionMode = EActionMode::Move;
 
@@ -142,7 +142,7 @@ void ABattlePlayer::Server_OnClickedMove_Implementation()
 	
 	// 범위 보이게 설정
 	Multicast_SeeMoveRange();
-	UE_LOG(LogTemp, Warning, TEXT("move_Range %d"), moveRange);
+	// UE_LOG(LogTemp, Warning, TEXT("move_Range %d"), moveRange);
 }
 
 void ABattlePlayer::Server_OnClickedTurnEnd_Implementation()
@@ -161,14 +161,13 @@ void ABattlePlayer::Server_OnClickedTurnEnd_Implementation()
 	this->currentActionMode = EActionMode::TurnEnd;
 	
 	// 플레이어 턴 종료
-	NET_PRINTLOG(TEXT("Click Turn End Player"));
+	// NET_PRINTLOG(TEXT("Click Turn End Player"));
 	turnManager->bTurnEnded = false;
 	turnManager->OnTurnEnd();
 }
 
 void ABattlePlayer::Server_OnClickedBaseAttack_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("FirstSkill"));
 	currentActionMode = EActionMode::BaseAttack;
 }
 
@@ -196,7 +195,7 @@ void ABattlePlayer::MultiCastRPC_UpdatePlayerAnim_Implementation(EActionMode mod
 	if (playerAnim)
 	{
 		playerAnim->actionMode = mode;
-		NET_PRINTLOG(TEXT("호출한 객체 : %s, currentActionMode : %s, playerAnim->actionMode : %s"), *GetActorNameOrLabel(), *UEnum::GetValueAsString(currentActionMode), *UEnum::GetValueAsString(playerAnim->actionMode));
+		// NET_PRINTLOG(TEXT("호출한 객체 : %s, currentActionMode : %s, playerAnim->actionMode : %s"), *GetActorNameOrLabel(), *UEnum::GetValueAsString(currentActionMode), *UEnum::GetValueAsString(playerAnim->actionMode));
 		switch (mode)
 		{
 			case EActionMode::Move:
@@ -217,18 +216,4 @@ void ABattlePlayer::MultiCastRPC_UpdatePlayerAnim_Implementation(EActionMode mod
 				break;
 		}
 	}
-}
-
-void ABattlePlayer::Server_PlayerTryConsumeAP_Implementation(int32 amount)
-{
-	// if (CanConsumeAP(amount))
-	// {
-	// 	ApplyConsumeAP(amount);
-	// }
-	
-}
-
-void ABattlePlayer::Multicast_PlayerTryConsumeAP_Implementation(int32 amount)
-{
-	
 }
