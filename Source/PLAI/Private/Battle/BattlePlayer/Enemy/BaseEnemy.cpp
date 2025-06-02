@@ -231,23 +231,22 @@ void ABaseEnemy::ActionMove(const TArray<int32>& actionMove)
 void ABaseEnemy::InitActionMap()
 {
 	ActionMap.Add(TEXT("타격"), EActionMode::BaseAttack);
-	ActionMap.Add(TEXT("마비의 일격"), EActionMode::Paralysis);
-	ActionMap.Add(TEXT("몸통 박치기"), EActionMode::Charge);
 	ActionMap.Add(TEXT("맹독 공격"), EActionMode::Poison);
-	ActionMap.Add(TEXT("취약 타격"), EActionMode::Vulnerable);
-	ActionMap.Add(TEXT("약화의 일격"), EActionMode::Weakening);
 	ActionMap.Add(TEXT("치명 일격"), EActionMode::Fatal);
 	ActionMap.Add(TEXT("파열 참격"), EActionMode::Rupture);
-	ActionMap.Add(TEXT("대지 가르기"), EActionMode::Unique_EarthBreak);
-	ActionMap.Add(TEXT("독침 찌르기"), EActionMode::Unique_PoisonSting);
-	ActionMap.Add(TEXT("단단한 갑각"), EActionMode::Unique_Harden);
-	ActionMap.Add(TEXT("생존 본능"), EActionMode::Unique_Instinct);
-	ActionMap.Add(TEXT("유연한 자세"), EActionMode::Unique_Flexibility);
-	ActionMap.Add(TEXT("전투 준비"), EActionMode::BattleCry);
-	ActionMap.Add(TEXT("방어 지휘"), EActionMode::Unique_DefenseOrder);
-	ActionMap.Add(TEXT("포효"), EActionMode::Roar);
-	ActionMap.Add(TEXT("광란 유도"), EActionMode::Unique_Enrage);
-	ActionMap.Add(TEXT("전투의 외침"), EActionMode::BattleCry);
+	// ActionMap.Add(TEXT("마비의 일격"), EActionMode::Paralysis);
+	// ActionMap.Add(TEXT("몸통 박치기"), EActionMode::Charge);
+	// ActionMap.Add(TEXT("취약 타격"), EActionMode::Vulnerable);
+	// ActionMap.Add(TEXT("약화의 일격"), EActionMode::Weakening);
+	// ActionMap.Add(TEXT("대지 가르기"), EActionMode::Unique_EarthBreak);
+	// ActionMap.Add(TEXT("독침 찌르기"), EActionMode::Unique_PoisonSting);
+	// ActionMap.Add(TEXT("단단한 갑각"), EActionMode::Unique_Harden);
+	// ActionMap.Add(TEXT("생존 본능"), EActionMode::Unique_Instinct);
+	// ActionMap.Add(TEXT("유연한 자세"), EActionMode::Unique_Flexibility);
+	// ActionMap.Add(TEXT("전투 준비"), EActionMode::BattleCry);
+	// ActionMap.Add(TEXT("방어 지휘"), EActionMode::Unique_DefenseOrder);
+	// ActionMap.Add(TEXT("포효"), EActionMode::Roar);
+	// ActionMap.Add(TEXT("광란 유도"), EActionMode::Unique_Enrage);
 }
 
 void ABaseEnemy::EnemyActionList(const FString& actionName)
