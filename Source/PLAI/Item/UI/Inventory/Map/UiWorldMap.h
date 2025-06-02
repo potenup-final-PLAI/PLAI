@@ -65,6 +65,8 @@ public:
 	void SetRefreshPlayerList();
 	
 	void SetPlayerIconMinimap();
+
+	void NextQuestMinimap();
 	
 	UPROPERTY(EditAnywhere)
 	FVector2D WorldMinFevtor = FVector2D(-22700.0, -21260.0);
@@ -76,11 +78,14 @@ public:
 	FVector2D MiniMapSizeS = FVector2D(250.0,250.0);
 	UPROPERTY(EditAnywhere)
 	FVector2D MiniMapSizeL = FVector2D(750.0,750.0);
+
+	UPROPERTY(EditAnywhere)
+	int32 QuestIndex = 0;
 	
 	UPROPERTY(EditAnywhere)
 	FVector2D OrigPosition;
 	UPROPERTY(EditAnywhere)
-	bool      bExtendMap = false;
+	bool bExtendMap = false;
 	void ExtendMap();
 
 	UPROPERTY(EditAnywhere)

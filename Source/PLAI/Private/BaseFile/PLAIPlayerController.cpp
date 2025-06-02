@@ -110,7 +110,8 @@ void APLAIPlayerController::SetupInputComponent()
 	// Add Input Mapping Context
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
-		Subsystem->AddMappingContext(DefaultMappingContext,1);
+		Subsystem->AddMappingContext(DefaultMappingContext,0);
+		Subsystem->AddMappingContext(TestPlayerMappingContext,1);
 	}
 
 	// Set up action bindings
@@ -139,8 +140,8 @@ void APLAIPlayerController::OnInputStarted()
 	StopMovement();
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{
-		TestPlayer->InputComp->SetMappingContext();
-		TestPlayer->InputComp->BindInputActions();
+		// TestPlayer->InputComp->SetMappingContext();
+		// TestPlayer->InputComp->BindInputActions();
 	}
 }
 

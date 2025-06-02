@@ -52,9 +52,11 @@ void UInputComp::BeginPlay()
 
     if (!Pc) return;
 
-	BindInputActions();
-	SetMappingContext();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&UInputComp::BindInputActions,1,false);
+	// BindInputActions();
 	
+	// SetMappingContext();
 	// FTimerHandle TimerHandle;
 	// GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 	// {},1.0f,false);
@@ -103,10 +105,6 @@ void UInputComp::SetMappingContext()
 void UInputComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	// if (TestPlayer->IsLocallyControlled() && Pc->WasInputKeyJustPressed(EKeys::T))
-	// { FString JsonString;
-	// 	FJsonObjectConverter::UStructToJsonObjectString(TestPlayer->LoginComp->UserFullInfo,JsonString);
-	// 	UE_LOG(LogTemp,Warning,TEXT("InputComp TKey JsonString [%s]"),*JsonString) }
 }
 
 void UInputComp::On_Equip()

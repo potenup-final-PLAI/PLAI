@@ -130,7 +130,23 @@ void UUiWorldMap::SetPlayerIconMinimap()
 
 		if (MiniMapCanvasIcon->GetChildrenCount() < i+TestPlayers.Num())return;
 		if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i+TestPlayers.Num())->Slot))
-		{ CanvasSlot->SetPosition(PixelPos); }
+		{
+			if (bExtendMap == true)
+			{
+				CanvasSlot->SetPosition(PixelPos);
+			}
+			// else
+			// {
+			// 	if (UUIWorldMapGuide* Icon = Cast<UUIWorldMapGuide>(MiniMapCanvasIcon->GetChildAt(i+TestPlayers.Num())))
+			// 	{
+			// 		Icon->SetRenderOpacity(0.5);
+			// 	}
+			// 	else
+			// 	{
+			// 		UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer UWidget Minimap 캐스팅 실패 Error"));
+			// 	}
+			// }
+		}
 	}
 }
 
@@ -153,14 +169,41 @@ void UUiWorldMap::ExtendMap()
 		}
 		else
 		{
+			NextQuestMinimap();
+			
 			MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.4);
 			CanvasSlot->SetSize(MiniMapSizeS);
 			CanvasSlot->SetAnchors(FAnchors(1,1));
 			CanvasSlot->SetPosition(FVector2D(-10,-10));
-			// CanvasSlot->SetPosition(FVector2D(0,0));
 			CanvasSlot->SetAlignment(FVector2D(1,1));
 			MiniMapSize = MiniMapSizeS;;
 			bExtendMap = false;
+		}
+	}
+}
+
+
+void UUiWorldMap::NextQuestMinimap()
+{
+	QuestIndex++;
+	for (int i = 0; i < GameStateOpen->MiniMapGuideActors.Num(); i++)
+	{
+		if (UUIWorldMapGuide* Icon = Cast<UUIWorldMapGuide>(MiniMapCanvasIcon->GetChildAt(i+TestPlayers.Num())))
+		{
+			if (QuestIndex == TestPlayers.Num()+i)
+			{
+				Icon->SetRenderScale(FVector2d(2.0f,2.0f));
+				Icon->SetRenderOpacity(1.0);
+			}
+			else
+			{
+				Icon->SetRenderScale(FVector2d(1.0f,1.0f));
+				Icon->SetRenderOpacity(0.3);
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::NextQuestMinimap 캐스팅 Error"));
 		}
 	}
 }
