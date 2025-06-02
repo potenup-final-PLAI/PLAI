@@ -571,12 +571,13 @@ void UInvenComp::TurnReward()
 	
 				Server_GetItem(*ItemStructTable);
 			}
+			
 			FTimerHandle TurnRewardTimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(TurnRewardTimerHandle,[this, RandGold]()
 			{
 				if (UiTurnReward)
 				{
-					TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
+					// TestPlayer->LoginComp->UserFullInfo.inventory_info.gold += RandGold;
 					TestPlayer->LogItemComp->GetEquipInfo();
 					TestPlayer->LogItemComp->GetInvenInfo();
 			
