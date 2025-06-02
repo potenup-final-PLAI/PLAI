@@ -64,6 +64,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	bool bBattle = false;
+
+	UPROPERTY(EditAnywhere)
+	UChildActorComponent* QuestActorComponent;
 	
 	FVector RandLocation();
 	

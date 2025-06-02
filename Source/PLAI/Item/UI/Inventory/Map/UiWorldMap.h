@@ -8,6 +8,19 @@
 #include "Blueprint/UserWidget.h"
 #include "UiWorldMap.generated.h"
 
+class AQuestOrderActor;
+
+UENUM(BlueprintType)
+enum class EQuestType : uint8
+{
+	A_GetEquip,
+	B_NetNpcHearty,
+	C_NetNpcScared,
+	D_Store,
+	E_MonsterTurn,
+	F_Store
+};
+
 /**
  * 
  */
@@ -17,7 +30,11 @@ class PLAI_API UUiWorldMap : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	// UUiWorldMap(const FObjectInitializer& FOI);
+	UPROPERTY(EditAnywhere)
+	EQuestType QuestType;
+
+	UPROPERTY(EditAnywhere)
+	TArray<AQuestOrderActor*> QuestActors;
 
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* MaterialMapInterface;
@@ -57,8 +74,7 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class UUIWorldMapGuide* UIWorldMapGuideIcon;
-
-
+	
 	UPROPERTY(EditAnywhere)
 	TArray<class ATestPlayer*>TestPlayers;
 	
@@ -92,6 +108,7 @@ public:
 	float CurrentZoom = 0.5f; 
 
 	virtual void NativeConstruct() override;
+	void NextQuestType();
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

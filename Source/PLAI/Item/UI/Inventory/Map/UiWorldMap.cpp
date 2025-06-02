@@ -3,6 +3,7 @@
 
 #include "UiWorldMap.h"
 
+#include "QuestOrderActor.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Image.h"
@@ -10,10 +11,35 @@
 #include "PLAI/Item/UI/Inventory/Map/UiWorldPlayerIcon.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/GameState/GameStateOpen.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
+
+void UUiWorldMap::NextQuestType()
+{
+	switch (QuestType)
+	{
+	case EQuestType::A_GetEquip:
+		break;
+		
+	case EQuestType::B_NetNpcHearty:
+		break;
+
+	case EQuestType::C_NetNpcScared:
+		break;
+
+	case EQuestType::D_Store:
+		break;
+
+	case EQuestType::E_MonsterTurn:
+		break;
+
+	case EQuestType::F_Store:
+		break;
+	} 
+}
 
 void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -63,19 +89,40 @@ void UUiWorldMap::SetRefreshPlayerList()
 		}
 	}
 	
-	for (int i = 0; i < GameStateOpen->MiniMapGuideActors.Num(); i++)
+	// for (int i = 0; i < GameStateOpen->MiniMapGuideActors.Num(); i++)
+	// {
+	// 	UIWorldMapGuideIcon = CreateWidget<UUIWorldMapGuide>(GetWorld(),UIWorldMapGuideFactory);
+	// 	if (UIWorldMapGuideIcon) { MiniMapCanvasIcon->AddChild(UIWorldMapGuideIcon); }
+	// 	
+	// 	if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldMapGuideIcon->Slot))
+	// 	{
+	// 		Icon->SetAlignment(FVector2D(0.5,0.5));
+	// 		Icon->SetSize(FVector2d(60,60));
+	// 	}
+	// }
+
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AQuestOrderActor::StaticClass(),Actors);
+	for (int i = 0; i < Actors.Num(); i++)
 	{
-		UIWorldMapGuideIcon = CreateWidget<UUIWorldMapGuide>(GetWorld(),UIWorldMapGuideFactory);
+		if (AQuestOrderActor* QuestActor = Cast<AQuestOrderActor>(Actors[i]))
+		{
+			QuestActors.Add(QuestActor);
+			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap AQuestOrderActor 몇명 ? [%d] 이름? [%s]"),i,
+			*UEnum::GetValueAsString(QuestActor->QuestType))
+		}
+	}
+
+	for (int i = 0; i < QuestActors.Num(); i++)
+	{
+	    UIWorldMapGuideIcon = CreateWidget<UUIWorldMapGuide>(GetWorld(),UIWorldMapGuideFactory);
 		if (UIWorldMapGuideIcon) { MiniMapCanvasIcon->AddChild(UIWorldMapGuideIcon); }
-		
 		if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldMapGuideIcon->Slot))
 		{
 			Icon->SetAlignment(FVector2D(0.5,0.5));
 			Icon->SetSize(FVector2d(60,60));
 		}
 	}
-
-	
 }
 
 void UUiWorldMap::SetPlayerIconMinimap()
@@ -135,17 +182,6 @@ void UUiWorldMap::SetPlayerIconMinimap()
 			{
 				CanvasSlot->SetPosition(PixelPos);
 			}
-			// else
-			// {
-			// 	if (UUIWorldMapGuide* Icon = Cast<UUIWorldMapGuide>(MiniMapCanvasIcon->GetChildAt(i+TestPlayers.Num())))
-			// 	{
-			// 		Icon->SetRenderOpacity(0.5);
-			// 	}
-			// 	else
-			// 	{
-			// 		UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer UWidget Minimap 캐스팅 실패 Error"));
-			// 	}
-			// }
 		}
 	}
 }
@@ -185,25 +221,23 @@ void UUiWorldMap::ExtendMap()
 
 void UUiWorldMap::NextQuestMinimap()
 {
-	QuestIndex++;
 	for (int i = 0; i < GameStateOpen->MiniMapGuideActors.Num(); i++)
 	{
+		if (GameStateOpen->MiniMapGuideActors.Num() > MiniMapCanvasIcon->GetChildrenCount()) return;
+		
 		if (UUIWorldMapGuide* Icon = Cast<UUIWorldMapGuide>(MiniMapCanvasIcon->GetChildAt(i+TestPlayers.Num())))
 		{
-			if (QuestIndex == TestPlayers.Num()+i)
-			{
-				Icon->SetRenderScale(FVector2d(2.0f,2.0f));
-				Icon->SetRenderOpacity(1.0);
-			}
-			else
-			{
-				Icon->SetRenderScale(FVector2d(1.0f,1.0f));
-				Icon->SetRenderOpacity(0.3);
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::NextQuestMinimap 캐스팅 Error"));
+			// if (QuestIndex == TestPlayers.Num()+i)
+			// {
+			//  QuestIndex++;
+			// 	Icon->SetRenderScale(FVector2d(2.0f,2.0f));
+			// 	Icon->SetRenderOpacity(1.0);
+			// }
+			// else
+			// {
+			// 	Icon->SetRenderScale(FVector2d(1.0f,1.0f));
+			// 	Icon->SetRenderOpacity(0.3);
+			// }
 		}
 	}
 }

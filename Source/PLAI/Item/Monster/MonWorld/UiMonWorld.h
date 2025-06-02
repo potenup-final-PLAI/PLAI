@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "PLAI/Item/Npc/NpcCharacter.h"
 #include "UiMonWorld.generated.h"
 
+enum class EQuestType : uint8;
 /**
  * 
  */
@@ -33,5 +35,5 @@ public:
 
 	virtual void NativeConstruct() override;
 
-	void ChangeNpcPersonality();
+	// void ChangeNpcPersonality();
 };
