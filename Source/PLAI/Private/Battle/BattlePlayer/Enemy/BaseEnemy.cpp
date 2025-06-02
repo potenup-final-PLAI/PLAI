@@ -366,13 +366,8 @@ bool ABaseEnemy::TryConsumeAP(int32 amount)
 
 void ABaseEnemy::MulticastRPC_EnemyTile_Implementation(class AGridTile* enemyTile)
 {
-	currentTile = enemyTile;
+	if (IsValid(enemyTile) && IsValid(currentTile)) currentTile = enemyTile;
 	Multicast_SeeMoveRange_Implementation();
-
-	if (currentTile)
-	{
-		NET_PRINTLOG(TEXT("enemy %s, enemy->currentTile %s"), *MyName, *currentTile->GetActorNameOrLabel());
-	}
 }
 
 void ABaseEnemy::ServerRPC_UpdateEnemyAnim_Implementation(EActionMode mode)
