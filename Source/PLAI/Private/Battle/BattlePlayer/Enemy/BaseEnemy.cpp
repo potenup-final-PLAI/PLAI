@@ -376,7 +376,7 @@ void ABaseEnemy::ServerRPC_UpdateEnemyAnim_Implementation(EActionMode mode)
 
 void ABaseEnemy::MultiCastRPC_UpdateEnemyAnim_Implementation(EActionMode mode)
 {
-	if (enemyAnim)
+	if (IsValid(enemyAnim))
 	{
 		enemyAnim->actionMode = mode;
 		// NET_PRINTLOG(TEXT("호출한 객체 : %s, currentActionMode : %s, enemyAnim->actionMode : %s"), *GetActorNameOrLabel(), *UEnum::GetValueAsString(currentActionMode), *UEnum::GetValueAsString(enemyAnim->actionMode));

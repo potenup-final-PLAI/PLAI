@@ -172,11 +172,9 @@ void ATurnManager::OnTurnStart()
 			// 현재 타일 설정
 			// NET_PRINTLOG(TEXT(""));
 			enemy->currentTile = tile;
+			// 이동 범위 보이게
 			enemy->MulticastRPC_EnemyTile(tile);
 		}
-		
-		// 이동 범위 보이게
-		enemy->Multicast_SeeMoveRange();
 		
 		ABaseBattlePawn* CapturedUnit = curUnit;
 

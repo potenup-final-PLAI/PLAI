@@ -1231,7 +1231,6 @@ void ABaseBattlePawn::Multicast_SeeMoveRange_Implementation()
 {
 	TArray<FIntPoint> tiles;
 
-	// 서버에서만 로직 수행
 	SeeMoveRange(moveRange, tiles);
 
 	highlightedTiles.Empty();
@@ -1269,7 +1268,7 @@ void ABaseBattlePawn::SeeMoveRange(int32 move_Range, TArray<FIntPoint>& tiles)
 				if (tile)
 				{
 					tiles.Add(FIntPoint(x, y));
-					highlightedTiles.Add(tile); // 서버용 저장
+					highlightedTiles.Add(tile);
 				}
 			}
 		}
@@ -1728,7 +1727,7 @@ void ABaseBattlePawn::InitEnemyState()
 		enemy->moveRange = FMath::RandRange(3, 10);
 		enemy->critical_Rate = 1.0f;
 		enemy->critical_Damage = 1.5f;
-		enemy->speed = FMath::RandRange(1, 10);
+		enemy->speed = FMath::RandRange(1, 9);
 
 		// 성격에 따른 값 추가 세팅
 		ApplyTraitModifiers(enemy);

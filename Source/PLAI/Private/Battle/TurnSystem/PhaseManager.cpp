@@ -685,6 +685,8 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 			player->critical_Rate = gi->UserFullInfoGiStat.character_info.stats.critical_rate;
 			player->critical_Damage = gi->UserFullInfoGiStat.character_info.stats.critical_damage;
 			player->speed = gi->UserFullInfoGiStat.character_info.stats.speed;
+			if (player->speed < 10)
+				player->speed = 10;
 			// 최대 HP 설정
 			player->maxHP = gi->UserFullInfoGiStat.character_info.stats.hp;
 
