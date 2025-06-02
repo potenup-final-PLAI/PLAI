@@ -20,7 +20,6 @@ void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	Super::NativeTick(MyGeometry, InDeltaTime);
 	
 	SetPlayerIconMinimap();
-	SetGuideIconMinimap();
 }
 
 void UUiWorldMap::NativeConstruct()
@@ -34,6 +33,7 @@ void UUiWorldMap::NativeConstruct()
 	MiniMap->SetBrushFromMaterial(MaterialMapDynamic);
 
     SetRefreshPlayerList();
+	
 	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
 	{ TestPlayer->InputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap); }
 	
@@ -45,26 +45,37 @@ void UUiWorldMap::SetRefreshPlayerList()
 	TestPlayers.Empty();
 	MiniMapCanvasIcon->GetAllChildren().Empty();
 	
-	if (AGameStateBase* GS = GetWorld()->GetGameState())
+	for (APlayerState* PS : GameStateOpen->PlayerArray)
 	{
-		for (APlayerState* PS : GS->PlayerArray)
+		if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
 		{
-			if (ATestPlayer* TP = Cast<ATestPlayer>(PS->GetPawn()))
-			{
-				// if (!TP -> IsLocallyControlled())return;
-				UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
+			// if (!TP -> IsLocallyControlled())return;
+			UIWorldPlayerIcon = CreateWidget<UUiWorldPlayerIcon>(GetWorld(),UiWorldPlayerIconFactory);
 
-				MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
-				TestPlayers.Add(TP);
-				if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon->Slot))
-				{
-					Icon->SetAlignment(FVector2D(0.5,0.5));
-					Icon->SetSize(FVector2d(60,60));
-				}
-				UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetRefreshPlayerList() 플레이어 갯수[%i]"),TestPlayers.Num());
+			MiniMapCanvasIcon->AddChild(UIWorldPlayerIcon);
+			TestPlayers.Add(TP);
+			if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldPlayerIcon->Slot))
+			{
+				Icon->SetAlignment(FVector2D(0.5,0.5));
+				Icon->SetSize(FVector2d(60,60));
 			}
+			UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetRefreshPlayerList() 플레이어 갯수[%i]"),TestPlayers.Num());
 		}
 	}
+	
+	for (int i = 0; i < GameStateOpen->MiniMapGuideActors.Num(); i++)
+	{
+		UIWorldMapGuideIcon = CreateWidget<UUIWorldMapGuide>(GetWorld(),UIWorldMapGuideFactory);
+		if (UIWorldMapGuideIcon) { MiniMapCanvasIcon->AddChild(UIWorldMapGuideIcon); }
+		
+		if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldMapGuideIcon->Slot))
+		{
+			Icon->SetAlignment(FVector2D(0.5,0.5));
+			Icon->SetSize(FVector2d(60,60));
+		}
+	}
+
+	
 }
 
 void UUiWorldMap::SetPlayerIconMinimap()
@@ -102,82 +113,30 @@ void UUiWorldMap::SetPlayerIconMinimap()
 		}
 		else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 	}
-}
-
-void UUiWorldMap::CreateGuideIconMinimap()
-{
+	
 	for (int i = 0; i < GameStateOpen->MiniMapGuideActors.Num(); i++)
 	{
-		UIWorldMapGuideIcon = CreateWidget<UUIWorldMapGuide>(GetWorld(),UIWorldMapGuideFactory);
-		if (UIWorldMapGuideIcon)
-		{
-			MiniMapCanvasIcon->AddChild(UIWorldMapGuideIcon);
-			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::CreateGuideIconMinimap 성공"));
-		}
-		else
-		{
-			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::CreateGuideIconMinimap 실패"));
-		}
-
-		if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldMapGuideIcon->Slot))
-		{
-			Icon->SetAlignment(FVector2D(0.5,0.5));
-			Icon->SetSize(FVector2d(60,60));
-		}
-	}
-}
-
-
-
-void UUiWorldMap::SetGuideIconMinimap()
-{
-	// float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-	// float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-	// 	
-	// U = FMath::Clamp(U, 0.f, 1.f);
-	// V = FMath::Clamp(V, 0.f, 1.f);
-	//
-	// FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
-	// float Yaw = TestPlayers[i]->GetActorRotation().Yaw;
-	//
-	// if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
-	// {
-	// 	if (TestPlayers[i]->InvenComp && TestPlayers[i]->InvenComp->MenuInven && TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWorldMap &&
-	// 		TestPlayers[i]->InvenComp->MenuInven->Wbp_UiWorldMap == this)
-	// 	{
-	// 		CanvasSlot->SetPosition(FVector2d(125,125));
-	// 		MiniMapCanvasIcon->GetChildAt(i)->SetRenderTransformAngle(Yaw - 90);
-	// 		MaterialMapDynamic->SetVectorParameterValue(TEXT("CenterOffset"),FLinearColor(U, V, 0.f, 0.f));
-	// 	}
-	// 		
-	// 	if (bExtendMap == true)
-	// 	{
-	// 		CanvasSlot->SetPosition(PixelPos);
-	// 	}
-	// }
-	for (int i = 0; i < GameStateOpen->MiniMapGuideActors.Num(); i++)
-	{
+		if (!GameStateOpen->MiniMapGuideActors[i]) return;
+		
 		FVector Location = GameStateOpen->MiniMapGuideActors[i]->GetActorLocation();
 		
 		float U = (Location.X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
 		float V = (Location.Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
-		FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
 
 		U = FMath::Clamp(U, 0.f, 1.f);
 		V = FMath::Clamp(V, 0.f, 1.f);
+		
+		FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
 
-		if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i)->Slot))
-		{
-			CanvasSlot->SetPosition(PixelPos);
-		}
+		if (MiniMapCanvasIcon->GetChildrenCount() < i+TestPlayers.Num())return;
+		if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i+TestPlayers.Num())->Slot))
+		{ CanvasSlot->SetPosition(PixelPos); }
 	}
 }
 
 void UUiWorldMap::ExtendMap()
  {
 	SetRefreshPlayerList();
-	
-	CreateGuideIconMinimap();
 	
 	if (auto* CanvasSlot = Cast<UCanvasPanelSlot>(MenuInven->Wbp_UiWorldMap->Slot))
 	{

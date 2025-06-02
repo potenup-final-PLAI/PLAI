@@ -65,9 +65,6 @@ public:
 	void SetRefreshPlayerList();
 	
 	void SetPlayerIconMinimap();
-
-	void CreateGuideIconMinimap();
-	void SetGuideIconMinimap();
 	
 	UPROPERTY(EditAnywhere)
 	FVector2D WorldMinFevtor = FVector2D(-22700.0, -21260.0);

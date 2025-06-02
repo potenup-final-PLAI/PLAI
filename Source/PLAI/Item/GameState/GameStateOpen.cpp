@@ -17,6 +17,11 @@ void AGameStateOpen::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AGameStateOpen::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
 void AGameStateOpen::NextPlayerTurn(ATurnPlayer* TurnPlayer)
 {
 	if (TurnPlayers.Num() <= 0) { return; }

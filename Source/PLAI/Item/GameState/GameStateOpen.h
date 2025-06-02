@@ -20,6 +20,8 @@ public:
 	AGameStateOpen();
 
 	virtual void BeginPlay() override;
+	
+	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
 	TArray<ATurnPlayer*> TurnPlayers;
@@ -32,9 +34,7 @@ public:
 	
 	void FindMonsterTurn();
 	void NextMonsterTurn();
-
-	void NextRound();
-
+	
 	UPROPERTY(EditAnywhere)
 	TArray<AActor*>MiniMapGuideActors;
 
