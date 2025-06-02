@@ -31,7 +31,7 @@ class PLAI_API UUiWorldMap : public UUserWidget
 
 public:
 	UPROPERTY(EditAnywhere)
-	EQuestType QuestType;
+	EQuestType QuestType = EQuestType::A_GetEquip;
 
 	UPROPERTY(EditAnywhere)
 	TArray<AQuestOrderActor*> QuestActors;
@@ -49,10 +49,10 @@ public:
 	UMaterialInstanceDynamic* MaterialDynamicMiniMapGuide;
 
 	UPROPERTY(meta = (BindWidget))
-	class UCanvasPanel* MiniMapCanvas;
+	class UCanvasPanel* MiniMapCanvasIcon;
 
 	UPROPERTY(meta = (BindWidget))
-	class UCanvasPanel* MiniMapCanvasIcon;
+	class UCanvasPanel* MiniMapCanvasIconQuest;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* MiniMap;
@@ -81,8 +81,6 @@ public:
 	void SetRefreshPlayerList();
 	
 	void SetPlayerIconMinimap();
-
-	void NextQuestMinimap();
 	
 	UPROPERTY(EditAnywhere)
 	FVector2D WorldMinFevtor = FVector2D(-22700.0, -21260.0);
@@ -108,7 +106,10 @@ public:
 	float CurrentZoom = 0.5f; 
 
 	virtual void NativeConstruct() override;
+	
 	void NextQuestType();
+	void NextQuestMinimap(EQuestType Quest = EQuestType::A_GetEquip);
+	
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

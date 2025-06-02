@@ -29,9 +29,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	EQuestType QuestType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
-	int32 QuestID;
-
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* NiagaraCompQuest;
 };

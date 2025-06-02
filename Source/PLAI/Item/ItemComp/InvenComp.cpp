@@ -115,6 +115,9 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 					if (bStartEquip == false)
 					{
 						bStartEquip = true;
+
+						MenuInven->Wbp_UiWorldMap->NextQuestMinimap(EQuestType::B_NetNpcHearty);
+						
 						Start->UiNpcStart->StartJobText->SetText(FText::FromString(TestPlayer->LoginComp->UserFullInfo.character_info.job));
 						FlipflopStart = true;
 						if (TestPlayer->LoginComp->UserFullInfo.character_info.job == FString("warrior"))
@@ -134,6 +137,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			{
 				if (FlipflopStore == false)
 				{
+					MenuInven->Wbp_UiWorldMap->NextQuestMinimap(EQuestType::E_MonsterTurn);
 					Store->StoreInven->SetVisibility(ESlateVisibility::Visible);
 					FlipflopStore = true;
 				}
@@ -543,6 +547,8 @@ void UInvenComp::TurnReward()
 	{
 		if (WorldGi->MonsterType == EMonsterType::Monster)
 		{
+            
+			
 			UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
 			UiTurnReward->AddToViewport();
 

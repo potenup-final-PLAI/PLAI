@@ -19,7 +19,7 @@ void ANpcStore::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Item = ItemFactory->GetDefaultObject<AItem>();
+	// Item = ItemFactory->GetDefaultObject<AItem>();
 
 	StoreInven = CreateWidget<UStoreInven>(GetWorld(),StoreInvenFactory);
 	StoreInven->AddToViewport(0);

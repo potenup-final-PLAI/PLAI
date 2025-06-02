@@ -14,29 +14,46 @@
 #include "Kismet/GameplayStatics.h"
 #include "PLAI/Item/GameState/GameStateOpen.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
+#include "PLAI/Item/Monster/MonWorld/MonWorld.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
 
 void UUiWorldMap::NextQuestType()
 {
+	// if (QuestType != EQuestType::E_MonsterTurn)
+	// {
+	// 	QuestType = static_cast<EQuestType>(static_cast<int32>(QuestType) + 1);
+	// 	UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 현재 QuestType 이름? [%s]"),*UEnum::GetValueAsString(QuestType))
+	// }
+	// else
+	// {
+	// 	QuestType = static_cast<EQuestType>(0);
+	// }
+	
 	switch (QuestType)
 	{
 	case EQuestType::A_GetEquip:
+		NextQuestMinimap(EQuestType::A_GetEquip);
 		break;
 		
 	case EQuestType::B_NetNpcHearty:
+		NextQuestMinimap(EQuestType::B_NetNpcHearty);
 		break;
 
 	case EQuestType::C_NetNpcScared:
+		NextQuestMinimap(EQuestType::C_NetNpcScared);
 		break;
 
 	case EQuestType::D_Store:
+		NextQuestMinimap(EQuestType::D_Store);
 		break;
 
 	case EQuestType::E_MonsterTurn:
+		NextQuestMinimap(EQuestType::E_MonsterTurn);
 		break;
 
 	case EQuestType::F_Store:
+		NextQuestMinimap(EQuestType::D_Store);
 		break;
 	} 
 }
@@ -51,7 +68,7 @@ void UUiWorldMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 void UUiWorldMap::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+	
 	GameStateOpen = Cast<AGameStateOpen>(GetWorld()->GetGameState());
 	GameStateOpen->FindMiniMapGuideIcon();
 	
@@ -64,6 +81,10 @@ void UUiWorldMap::NativeConstruct()
 	{ TestPlayer->InputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap); }
 	
 	MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.5);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	{ NextQuestMinimap(EQuestType::A_GetEquip);},1.0f,false);
 }
 
 void UUiWorldMap::SetRefreshPlayerList()
@@ -88,18 +109,9 @@ void UUiWorldMap::SetRefreshPlayerList()
 			UE_LOG(LogTemp, Warning, TEXT("UIWorldMap::SetRefreshPlayerList() 플레이어 갯수[%i]"),TestPlayers.Num());
 		}
 	}
-	
-	// for (int i = 0; i < GameStateOpen->MiniMapGuideActors.Num(); i++)
-	// {
-	// 	UIWorldMapGuideIcon = CreateWidget<UUIWorldMapGuide>(GetWorld(),UIWorldMapGuideFactory);
-	// 	if (UIWorldMapGuideIcon) { MiniMapCanvasIcon->AddChild(UIWorldMapGuideIcon); }
-	// 	
-	// 	if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldMapGuideIcon->Slot))
-	// 	{
-	// 		Icon->SetAlignment(FVector2D(0.5,0.5));
-	// 		Icon->SetSize(FVector2d(60,60));
-	// 	}
-	// }
+
+	QuestActors.Empty();
+	MiniMapCanvasIconQuest->GetAllChildren().Empty();
 
 	TArray<AActor*> Actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AQuestOrderActor::StaticClass(),Actors);
@@ -108,15 +120,16 @@ void UUiWorldMap::SetRefreshPlayerList()
 		if (AQuestOrderActor* QuestActor = Cast<AQuestOrderActor>(Actors[i]))
 		{
 			QuestActors.Add(QuestActor);
-			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap AQuestOrderActor 몇명 ? [%d] 이름? [%s]"),i,
-			*UEnum::GetValueAsString(QuestActor->QuestType))
 		}
 	}
 
 	for (int i = 0; i < QuestActors.Num(); i++)
 	{
 	    UIWorldMapGuideIcon = CreateWidget<UUIWorldMapGuide>(GetWorld(),UIWorldMapGuideFactory);
-		if (UIWorldMapGuideIcon) { MiniMapCanvasIcon->AddChild(UIWorldMapGuideIcon); }
+		if (UIWorldMapGuideIcon)
+		{
+			MiniMapCanvasIconQuest->AddChild(UIWorldMapGuideIcon);
+		}
 		if (UCanvasPanelSlot* Icon = Cast<UCanvasPanelSlot>(UIWorldMapGuideIcon->Slot))
 		{
 			Icon->SetAlignment(FVector2D(0.5,0.5));
@@ -161,11 +174,9 @@ void UUiWorldMap::SetPlayerIconMinimap()
 		else { UE_LOG(LogTemp,Warning,TEXT("UiWorldMap::SetPlayer MinmapVector Error")); }
 	}
 	
-	for (int i = 0; i < GameStateOpen->MiniMapGuideActors.Num(); i++)
+	for (int i = 0; i < QuestActors.Num(); i++)
 	{
-		if (!GameStateOpen->MiniMapGuideActors[i]) return;
-		
-		FVector Location = GameStateOpen->MiniMapGuideActors[i]->GetActorLocation();
+		FVector Location = QuestActors[i]->GetActorLocation();
 		
 		float U = (Location.X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
 		float V = (Location.Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
@@ -175,8 +186,7 @@ void UUiWorldMap::SetPlayerIconMinimap()
 		
 		FVector2D PixelPos = FVector2D(U * MiniMapSize.X, V * MiniMapSize.Y);
 
-		if (MiniMapCanvasIcon->GetChildrenCount() < i+TestPlayers.Num())return;
-		if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIcon->GetChildAt(i+TestPlayers.Num())->Slot))
+		if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MiniMapCanvasIconQuest->GetChildAt(i)->Slot))
 		{
 			if (bExtendMap == true)
 			{
@@ -205,8 +215,6 @@ void UUiWorldMap::ExtendMap()
 		}
 		else
 		{
-			NextQuestMinimap();
-			
 			MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.4);
 			CanvasSlot->SetSize(MiniMapSizeS);
 			CanvasSlot->SetAnchors(FAnchors(1,1));
@@ -219,27 +227,35 @@ void UUiWorldMap::ExtendMap()
 }
 
 
-void UUiWorldMap::NextQuestMinimap()
+void UUiWorldMap::NextQuestMinimap(EQuestType Quest)
 {
-	for (int i = 0; i < GameStateOpen->MiniMapGuideActors.Num(); i++)
+	UE_LOG(LogTemp,Warning,TEXT("UiWorldMap NextQuest [%s]"),*UEnum::GetValueAsString(Quest))
+	for (int i = 0; i < QuestActors.Num(); i++)
 	{
-		if (GameStateOpen->MiniMapGuideActors.Num() > MiniMapCanvasIcon->GetChildrenCount()) return;
-		
-		if (UUIWorldMapGuide* Icon = Cast<UUIWorldMapGuide>(MiniMapCanvasIcon->GetChildAt(i+TestPlayers.Num())))
+		if (UUIWorldMapGuide* Icon = Cast<UUIWorldMapGuide>(MiniMapCanvasIconQuest->GetChildAt(i)))
 		{
-			// if (QuestIndex == TestPlayers.Num()+i)
-			// {
-			//  QuestIndex++;
-			// 	Icon->SetRenderScale(FVector2d(2.0f,2.0f));
-			// 	Icon->SetRenderOpacity(1.0);
-			// }
-			// else
-			// {
-			// 	Icon->SetRenderScale(FVector2d(1.0f,1.0f));
-			// 	Icon->SetRenderOpacity(0.3);
-			// }
+			if (QuestActors[i]->QuestType == Quest)
+			{
+				Icon->SetRenderScale(FVector2D(2.f));
+				Icon->SetRenderOpacity(1);
+			}
+			else
+			{
+				Icon->SetRenderScale(FVector2D(0.5));
+				Icon->SetRenderOpacity(0.5);
+			}
 		}
 	}
+	
+	// if (QuestType != EQuestType::E_MonsterTurn)
+	// {
+	// 	QuestType = static_cast<EQuestType>(static_cast<int32>(QuestType) + 1);
+	// 	UE_LOG(LogTemp,Warning,TEXT("UiWorldMap 현재 QuestType 이름? [%s]"),*UEnum::GetValueAsString(QuestType))
+	// }
+	// else
+	// {
+	// 	QuestType = static_cast<EQuestType>(0);
+	// }
 }
 
 FReply UUiWorldMap::NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)

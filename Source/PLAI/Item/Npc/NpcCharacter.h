@@ -56,4 +56,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UChildActorComponent* QuestActorComponent;
+
+	UPROPERTY(EditAnywhere)
+	bool bQuest = false;
 };

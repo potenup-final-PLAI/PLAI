@@ -27,6 +27,7 @@
 #include "PLAI/Item/UI/Character/UIChaStat.h"
 #include "PLAI/Item/UI/Inventory/EquipInven/EquipInven.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
+#include "PLAI/Item/UI/Inventory/Map/QuestOrderActor.h"
 #include "PLAI/Item/UI/Main/UIChaMain.h"
 #include "PLAI/Item/UI/Main/UiChaView.h"
 #include "PLAI/Item/UI/Main/UIinitMain.h"
@@ -117,6 +118,17 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			    {
 			    	if (bQuest == true)
 			    	{
+			    		if (AQuestOrderActor* QuestOrderActor = Cast<AQuestOrderActor>(NpcNet->QuestActorComponent->GetChildActor()))
+			    		{
+			    			if (QuestOrderActor->QuestType == EQuestType::B_NetNpcHearty)
+			    			{
+			    				TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestMinimap(EQuestType::C_NetNpcScared);
+			    			}
+			    			else if (QuestOrderActor->QuestType == EQuestType::C_NetNpcScared)
+			    			{
+			    				TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestMinimap(EQuestType::D_Store);
+			    			}
+			    		}
 			    		NpcNet->OpenQuest();
 			    		bQuest = false;
 			    	}
