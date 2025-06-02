@@ -148,7 +148,15 @@ void ABattleHttpActor::HttpPost(FEnvironmentState environmentState,FBattleTurnSt
 		// 실패
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("통신 실패 : %d"), Response->GetResponseCode());
+			if (Response->GetResponseCode())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("통신 실패 : %d"), Response->GetResponseCode());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Response 코드 없음"));
+			}
+			
 		}
 	});
 	

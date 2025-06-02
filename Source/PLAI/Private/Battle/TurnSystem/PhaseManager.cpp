@@ -10,6 +10,7 @@
 #include "Battle/TurnSystem/TurnManager.h"
 #include "Battle/UI/BattleHUD.h"
 #include "Battle/UI/CycleAndTurn.h"
+#include "Battle/UI/EndingCredit.h"
 #include "Battle/UI/MainBattleUI.h"
 #include "Battle/UI/WorldDamageUIActor.h"
 #include "Battle/Util/DebugHeader.h"
@@ -69,10 +70,7 @@ void AUPhaseManager::UpdateCycleUI()
 {
 	if (!pc || !hud || !hud->mainUI)
 	{
-		UE_LOG(LogTemp, Warning,
-		       TEXT(
-			       "AUPhaseManager::UpdateCycleUI : !pc || !hud || !hud->mainUI"
-		       ));
+		UE_LOG(LogTemp, Warning,TEXT("AUPhaseManager::UpdateCycleUI : !pc || !hud || !hud->mainUI"));
 		return;
 	}
 
@@ -94,7 +92,7 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 {
 	currentPhase = phase;
 
-	NET_PRINTLOG(TEXT("AUPhaseManager::SetPhase currentPhase : %s"), *UEnum::GetValueAsString(phase));
+	// NET_PRINTLOG(TEXT("AUPhaseManager::SetPhase currentPhase : %s"), *UEnum::GetValueAsString(phase));
 
 	switch (currentPhase)
 	{
@@ -102,12 +100,12 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 		break;
 	case EBattlePhase::BattleStart:
 		// 전투에 필요한 초기화 작업 InitBattle();로 정의
-		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : BattleStart State"));
+		// UE_LOG(LogTemp, Warning, TEXT("PhaseManager : BattleStart State"));
 		InitBattle();
 		break;
 	case EBattlePhase::RoundStart:
 		// 속도를 기반으로 유닛 정렬 작업 및 다음 턴 시작
-		UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundStart State"));
+		// UE_LOG(LogTemp, Warning, TEXT("PhaseManager : RoundStart State"));
 		SetCycle();
 		// Unit Queue에 세팅
 		SetUnitQueue();
@@ -121,12 +119,12 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 	case EBattlePhase::RoundEnd:
 		// 턴 카운트 초기화
 		turnManager->turnCount = 0;
-		UE_LOG(LogTemp, Warning,TEXT("PhaseManager : RoundEnd State Turn CNT : %d"),turnManager->turnCount);
+		// UE_LOG(LogTemp, Warning,TEXT("PhaseManager : RoundEnd State Turn CNT : %d"),turnManager->turnCount);
 		SetPhase(EBattlePhase::RoundStart);
 		break;
 	case EBattlePhase::BattleEnd:
 		// 끝났을 때 결과에 대한 UI 보여주면 될듯함.
-		//BattleEnd();
+		BattleEnd();
 		break;
 	default:
 		break;
@@ -135,7 +133,7 @@ void AUPhaseManager::SetPhase(EBattlePhase phase)
 
 void AUPhaseManager::InitBattle()
 {
-	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : InitBattle"));
+	// UE_LOG(LogTemp, Warning, TEXT("PhaseManager : InitBattle"));
 	// 사이클 시작
 	SetPhase(EBattlePhase::RoundStart);
 }
@@ -171,7 +169,7 @@ void AUPhaseManager::SetUnitQueue()
 
 			unitQueue.Add(pawn);
 			httpUnitQueue.Add(pawn);
-			UE_LOG(LogTemp, Warning, TEXT("Queue Add: %s"), *pawn->GetName());
+			// UE_LOG(LogTemp, Warning, TEXT("Queue Add: %s"), *pawn->GetName());
 		}
 	}
 
@@ -192,21 +190,14 @@ void AUPhaseManager::SetUnitQueue()
 
 	SortUnitQueue();
 
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
-	{
-		if (turnManager)
-		{
-			turnManager->Multicast_AddOrderUnit();
-			NET_PRINTLOG(TEXT("Delayed Multicast_AddOrderUnit 호출"));
-		}
-	}, 0.5f, false);
+	// unitArray turnOrderArray에 세팅
+	turnOrderArray = unitQueue;
 	
-	for (int i = 0; i < unitQueue.Num(); i++)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UnitName %s Unit Speed : %d"),
-		       *unitQueue[i]->GetActorNameOrLabel(), unitQueue[i]->speed);
-	}
+	// for (int i = 0; i < unitQueue.Num(); i++)
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("UnitName %s Unit Speed : %d"),
+	// 	       *unitQueue[i]->GetActorNameOrLabel(), unitQueue[i]->speed);
+	// }
 }
 
 void AUPhaseManager::SortUnitQueue()
@@ -226,7 +217,7 @@ void AUPhaseManager::SortUnitTurnEnd()
 		{
 			unitQueue.Remove(pawn);
 			httpUnitQueue.Remove(pawn);
-			UE_LOG(LogTemp, Warning,TEXT("Removed dead unit from future queue: %s"),*pawn->MyName);
+			// UE_LOG(LogTemp, Warning,TEXT("Removed dead unit from future queue: %s"),*pawn->MyName);
 		}
 	}
 }
@@ -235,10 +226,10 @@ ABaseBattlePawn* AUPhaseManager::PopNextAliveUnit()
 {
 	if (unitQueue.Num() > 0)
 	{
-		for (int i = 0; i < unitQueue.Num(); i++)
-		{
-			NET_PRINTLOG(TEXT("UnitName %s Unit Speed : %d"), *unitQueue[i]->MyName, unitQueue[i]->speed);
-		}
+		// for (int i = 0; i < unitQueue.Num(); i++)
+		// {
+		// 	NET_PRINTLOG(TEXT("UnitName %s Unit Speed : %d"), *unitQueue[i]->MyName, unitQueue[i]->speed);
+		// }
 		
 		ABaseBattlePawn* candidate = unitQueue[0];
 		if (candidate->hp > 0)
@@ -258,7 +249,7 @@ void AUPhaseManager::StartBattle()
 {
 	DoingPopNextAliveUnit();
 	
-	NET_PRINTLOG(TEXT("AUPhaseManager::StartBattle"));
+	// NET_PRINTLOG(TEXT("AUPhaseManager::StartBattle"));
 }
 
 void AUPhaseManager::TurnPorcessing(ABaseBattlePawn* unit)
@@ -272,23 +263,13 @@ void AUPhaseManager::TurnPorcessing(ABaseBattlePawn* unit)
 	}
 	turnManager->StartTurn();
 	
-	// if (ABattlePlayer* player = Cast<ABattlePlayer>(turnManager->curUnit))
-	// {
-	// 	// 플레이어 턴 시작
-	// 	StartPlayerPhase();
-	// }
-	// else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(turnManager->curUnit))
-	// {
-	// 	// 애너미 턴 시작
-	// 	StartEnemyPhase();
-	// }
 }
 
 void AUPhaseManager::StartPlayerPhase()
 {
 	if (!HasAuthority()) return;
-	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : Start PlayerPhase"));
-	UE_LOG(LogTemp, Warning, TEXT("PlayerTurn Start Unit Name : %s"),*turnManager->curUnit->GetActorNameOrLabel());
+	// UE_LOG(LogTemp, Warning, TEXT("PhaseManager : Start PlayerPhase"));
+	// UE_LOG(LogTemp, Warning, TEXT("PlayerTurn Start Unit Name : %s"),*turnManager->curUnit->GetActorNameOrLabel());
 
 	// 주기가 5거나 보다 크다면
 	if (cycle > 5)
@@ -315,7 +296,7 @@ void AUPhaseManager::ServerRPC_EndPlayerPhase_Implementation()
 
 	// 큐에 유닛이 있다면
 	DoingPopNextAliveUnit();
-	UE_LOG(LogTemp, Warning, TEXT("End Player Phase"));
+	// UE_LOG(LogTemp, Warning, TEXT("End Player Phase"));
 }
 
 // void AUPhaseManager::StartEnemyPhase()
@@ -351,22 +332,23 @@ void AUPhaseManager::ServerRPC_EndEnemyPhase_Implementation()
 	// 턴 종료 State로 변경
 	turnManager->SetTurnState(ETurnState::TurnEnd);
 
-	UE_LOG(LogTemp, Warning, TEXT("PhaseManager : EndEnemyPhase"));
+	// UE_LOG(LogTemp, Warning, TEXT("PhaseManager : EndEnemyPhase"));
 
 	// 유닛이 있다면 처음 유닛을 현재 유닛으로 지정하고 큐에 저장된 유닛을 지운다.
 	DoingPopNextAliveUnit();
 
-	UE_LOG(LogTemp, Warning, TEXT("%s : End Enemy Phase"), *turnManager->curUnit->MyName);
+	// UE_LOG(LogTemp, Warning, TEXT("%s : End Enemy Phase"), *turnManager->curUnit->MyName);
 }
 
 void AUPhaseManager::BattleEnd()
 {
 	turnManager->SetTurnState(ETurnState::None);
-	UE_LOG(LogTemp, Warning, TEXT("End Battle"));
-	if (HasAuthority())
-	{
-		GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
-	}
+	// UE_LOG(LogTemp, Warning, TEXT("End Battle"));
+	// if (HasAuthority())
+	// {
+	// 	GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
+	// }
+	Multicast_EndingUI();
 }
 
 void AUPhaseManager::SetBeforeBattle()
@@ -376,9 +358,6 @@ void AUPhaseManager::SetBeforeBattle()
 	{
 		return;
 	}
-
-	// unitArray turnOrderArray에 세팅
-	turnOrderArray = gridTileManager->unitArray;
 	
 	// girdTile에 저장해둔 unit들 순서대로 Possess해서 PlayerState 세팅
 	if (gridTileManager->unitArray.Num() > 0)
@@ -463,6 +442,7 @@ void AUPhaseManager::SetBeforeBattle()
 				}
 			}
 		}
+
 		// 유닛이 다 세팅되면 API 전송
 		TrySendInitialState();
 	}
@@ -476,7 +456,7 @@ void AUPhaseManager::TrySendInitialState()
 
 		if (auto* httpActor = Cast<ABattleHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), httpActorFactory)))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Start Battle API"));
+			// UE_LOG(LogTemp, Warning, TEXT("Start Battle API"));
 			httpActor->HttpPost(envData);
 		}
 	}
@@ -484,7 +464,7 @@ void AUPhaseManager::TrySendInitialState()
 
 FEnvironmentState AUPhaseManager::SetStartBattleAPI()
 {
-	UE_LOG(LogTemp, Warning, TEXT("SSetStartBattleAPI In !!!"));
+	// UE_LOG(LogTemp, Warning, TEXT("SSetStartBattleAPI In !!!"));
 	FEnvironmentState env;
 
 	TArray<AActor*> unitArr;
@@ -493,13 +473,13 @@ FEnvironmentState AUPhaseManager::SetStartBattleAPI()
 	int32 i = 0;
 	for (AActor* actor : unitArr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("for문 In !!! "));
+		// UE_LOG(LogTemp, Warning, TEXT("for문 In !!! "));
 		if (ABaseBattlePawn* unit = Cast<ABaseBattlePawn>(actor))
 		{
 			
-			UE_LOG(LogTemp, Warning, TEXT("unit is ABaseBattlePawn !!! "));
+			// UE_LOG(LogTemp, Warning, TEXT("unit is ABaseBattlePawn !!! "));
 
-			UE_LOG(LogTemp, Warning, TEXT("Set API Data !!!"));
+			// UE_LOG(LogTemp, Warning, TEXT("Set API Data !!!"));
 			FCharacterData charData;
 			charData.id =  unit->GetName();
 			FString name = unit->MyName;
@@ -547,8 +527,8 @@ FEnvironmentState AUPhaseManager::SetStartBattleAPI()
 			}
 
 			env.characters.Add(charData);
-			UE_LOG(LogTemp, Warning, TEXT("char id : %s name : %s, type : %s"),*charData.id, *charData.name, *charData.type);
-			UE_LOG(LogTemp, Warning, TEXT("Traits : %s, Skills : %s"),*FString::Join(charData.traits, TEXT(", ")),*FString::Join(charData.skills, TEXT(", ")));
+			// UE_LOG(LogTemp, Warning, TEXT("char id : %s name : %s, type : %s"),*charData.id, *charData.name, *charData.type);
+			// UE_LOG(LogTemp, Warning, TEXT("Traits : %s, Skills : %s"),*FString::Join(charData.traits, TEXT(", ")),*FString::Join(charData.skills, TEXT(", ")));
 		}
 		++i;
 	}
@@ -557,7 +537,7 @@ FEnvironmentState AUPhaseManager::SetStartBattleAPI()
 	env.terrain = TEXT("desert");
 	env.weather = TEXT("sunny");
 
-	UE_LOG(LogTemp, Warning, TEXT("terrain : %s, weather : %s"), *env.terrain,*env.weather);
+	// UE_LOG(LogTemp, Warning, TEXT("terrain : %s, weather : %s"), *env.terrain,*env.weather);
 	return env;
 }
 
@@ -718,7 +698,7 @@ void AUPhaseManager::SetStatus(ABaseBattlePawn* unit)
 		else
 		{
 			player->hp = 100;
-			player->attack = 7;
+			player->attack = 200;
 			player->defense = 10;
 			player->resistance = 7;
 			player->moveRange = 5;
@@ -833,7 +813,7 @@ void AUPhaseManager::PlayerReady(APlayerController* playerControl)
 	// if (GetWorld()->GetGameState()->PlayerArray.Num() <= readyCount)
 	if (readyCount >= GetWorld()->GetGameState()->PlayerArray.Num())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("모든 플레이어 준비 완료 → 전투 시작"));
+		// UE_LOG(LogTemp, Warning, TEXT("모든 플레이어 준비 완료 → 전투 시작"));
 
 		for (FConstPlayerControllerIterator it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
 		{
@@ -879,11 +859,22 @@ void AUPhaseManager::DoingPopNextAliveUnit()
 			SetPhase(EBattlePhase::RoundEnd); // 또는 RoundEnd
 		return;
 	}
-	
+	// 현재 유닛에 tempUnit 세팅
 	turnManager->curUnit = tempUnit;
-
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+	{
+		if (turnManager)
+		{
+			turnManager->Multicast_AddOrderUnit();
+			// NET_PRINTLOG(TEXT("Delayed Multicast_AddOrderUnit 호출"));
+		}
+	}, 0.5f, false);
+	
 	SetPhase(EBattlePhase::TurnProcessing);
-
+	
+	// tempUnit 클라쪽에도 업데이트
 	Multicast_PopNextAliveUnit(tempUnit);
 }
 
@@ -908,5 +899,14 @@ void AUPhaseManager::AddNetLog(FString msg)
 	if (auto* httpActor = Cast<ABattleHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), httpActorFactory)))
 	{
 		httpActor->UpdateDebugLog(NetLog);
+	}
+}
+
+void AUPhaseManager::Multicast_EndingUI_Implementation()
+{
+	if (auto* endingCreditUI = CreateWidget<UEndingCredit>(GetWorld(), endingCreditFactory))
+	{
+		endingCreditUI->AddToViewport();
+		endingCreditUI->Mulitcast_PaidIn();
 	}
 }

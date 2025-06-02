@@ -76,11 +76,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_UpdatePlayerAnim(EActionMode mode);
 
-	UFUNCTION(Server, Reliable)
-	void Server_PlayerTryConsumeAP(int32 amount);
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_PlayerTryConsumeAP(int32 amount);
-
 
 	// Sound
 	UPROPERTY(EditAnywhere)

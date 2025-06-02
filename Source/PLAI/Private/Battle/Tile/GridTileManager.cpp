@@ -85,7 +85,7 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 
 	// PlayerController 수만큼 좌표 확보
 	TArray<APlayerState*> playerStates = GetWorld()->GetGameState()->PlayerArray;
-	UE_LOG(LogTemp, Warning, TEXT("playerStates : %d"), playerStates.Num());
+	// UE_LOG(LogTemp, Warning, TEXT("playerStates : %d"), playerStates.Num());
 	
 	TArray<FIntPoint> playerCoords = RandomCoords(playerStates.Num(), allCoords);
 	
@@ -111,11 +111,11 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 		ABattlePlayerController* battlePC = Cast<ABattlePlayerController>(ps->GetPlayerController());
 		if (battlePC)
 		{
-			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("Before player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
+			// if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("Before player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
 			player->SetOwner(battlePC);
 			if (HasAuthority())  battlePC->Possess(player);
 			player->MultiCastRPC_SetMyName(i);
-			if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("After player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
+			// if (player->GetOwner() != nullptr) UE_LOG(LogTemp, Warning, TEXT("After player Owner %s, Player : %s"), *player->GetOwner()->GetActorNameOrLabel(), *player->GetActorNameOrLabel());
 		
 			player->ForceNetUpdate(); // 복제 보장
 			playerControllers.Add(battlePC);
@@ -172,7 +172,7 @@ void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 				FVector spawnLoc = gridTile->GetActorLocation() + FVector(0.f, 0.f, 80.f);
 				if (auto* enemy = GetWorld()->SpawnActor<ABaseEnemy>(enemyFactory, spawnLoc, FRotator::ZeroRotator))
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Spawning enemy %s at tile coord (%d, %d), tile = %s, tile location = %s"), *enemy->GetName(), coord.X, coord.Y, *gridTile->GetName(), *gridTile->GetActorLocation().ToString());
+					// UE_LOG(LogTemp, Warning, TEXT("Spawning enemy %s at tile coord (%d, %d), tile = %s, tile location = %s"), *enemy->GetName(), coord.X, coord.Y, *gridTile->GetName(), *gridTile->GetActorLocation().ToString());
 					// 위 내용과 동일
 					enemy->speed = FMath::RandRange(1, 10);
 					enemy->currentTile = gridTile;
@@ -326,5 +326,5 @@ void AGridTileManager::MulticastRPC_InitClientMap_Implementation(const TArray<FT
 		}
 	}
 	
-	UE_LOG(LogTemp, Warning, TEXT("클라이언트 타일 맵 초기화 완료: %d개"), map.Num());
+	// UE_LOG(LogTemp, Warning, TEXT("클라이언트 타일 맵 초기화 완료: %d개"), map.Num());
 }

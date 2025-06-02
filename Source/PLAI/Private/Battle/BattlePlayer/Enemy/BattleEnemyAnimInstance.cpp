@@ -19,14 +19,7 @@ void UBattleEnemyAnimInstance::NativeBeginPlay()
 void UBattleEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-
-	// if (auto* player = Cast<ABaseBattlePawn>(TryGetPawnOwner()))
-	// {
-	// 	// 전방방향 벡터 구하기
-	// 	FVector velocity = player->GetVelocity();
-	// 	FVector forward = player->GetActorForwardVector();
-	// 	moveSpeed = FVector::DotProduct(velocity, forward);
-	// }
+	
 }
 
 void UBattleEnemyAnimInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -46,10 +39,14 @@ void UBattleEnemyAnimInstance::AnimNotify_BaseAttackPoint()
 		UE_LOG(LogTemp, Warning, TEXT("battlePlayer Or targetEnemy Nullptr"));
 		return;
 	}
+
+	// 사운드 재생
 	UGameplayStatics::PlaySoundAtLocation(this, battleEnemy->attackSound, battleEnemy->GetActorLocation());
+	// Enemy 대미지 입히기
+	battleEnemy->EnemyApplyAttack(battleEnemy->targetPlayer, EActionMode::BaseAttack);
 	
-	battleEnemy->EnemyApplyAttack(battleEnemy->targetPlayer,EActionMode::BaseAttack);
 	NET_PRINTLOG(TEXT("Enemy %s"), *battleEnemy->GetActorNameOrLabel());
+	
 	battleEnemy->targetPlayer = nullptr;
 	battleEnemy->attackTarget = nullptr;
 }

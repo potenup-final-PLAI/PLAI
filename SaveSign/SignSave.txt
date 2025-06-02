@@ -1789,8 +1789,32 @@
 			}
 		},
 		{
-			"id": "1@w.w",
-			"pw": "w",
+			"id": "as@gmail.com",
+			"pw": "as",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "as@gmail.com",
+			"pw": "as",
+			"itemStructsEquip":
+			{
+				"itemStructs": []
+			},
+			"itemStructsInven":
+			{
+				"itemStructs": []
+			}
+		},
+		{
+			"id": "as@gmail.com",
+			"pw": "as",
 			"itemStructsEquip":
 			{
 				"itemStructs": []
