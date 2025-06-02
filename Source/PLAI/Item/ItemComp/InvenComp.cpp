@@ -547,7 +547,7 @@ void UInvenComp::TurnReward()
 	{
 		if (WorldGi->MonsterType == EMonsterType::Monster)
 		{
-            
+            MenuInven->Wbp_UiWorldMap->NextQuestMinimap(EQuestType::D_Store);
 			
 			UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
 			UiTurnReward->AddToViewport();

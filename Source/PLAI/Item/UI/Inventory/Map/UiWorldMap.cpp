@@ -236,6 +236,10 @@ void UUiWorldMap::NextQuestMinimap(EQuestType Quest)
 		{
 			if (QuestActors[i]->QuestType == Quest)
 			{
+				if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+				{
+					TestPlayer->QuestLocation = QuestActors[i]->GetActorLocation();
+				}
 				Icon->SetRenderScale(FVector2D(2.f));
 				Icon->SetRenderOpacity(1);
 			}
