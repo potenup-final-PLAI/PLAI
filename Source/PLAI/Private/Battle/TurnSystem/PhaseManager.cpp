@@ -344,11 +344,11 @@ void AUPhaseManager::BattleEnd()
 {
 	turnManager->SetTurnState(ETurnState::None);
 	// UE_LOG(LogTemp, Warning, TEXT("End Battle"));
-	// if (HasAuthority())
-	// {
-	// 	GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
-	// }
-	Multicast_EndingUI();
+	if (HasAuthority())
+	{
+		GetWorld()->ServerTravel(TEXT("/Game/Mk_Item/Mk_WorldPartition?listen"));
+	}
+	// Multicast_EndingUI();
 }
 
 void AUPhaseManager::SetBeforeBattle()
