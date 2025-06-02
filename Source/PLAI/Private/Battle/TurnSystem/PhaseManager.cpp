@@ -211,14 +211,20 @@ void AUPhaseManager::SortUnitQueue()
 
 void AUPhaseManager::SortUnitTurnEnd()
 {
+	TArray<ABaseBattlePawn*> deadUnits;
+
 	for (auto* pawn : unitQueue)
 	{
 		if (pawn->hp <= 0)
 		{
-			unitQueue.Remove(pawn);
-			httpUnitQueue.Remove(pawn);
-			// UE_LOG(LogTemp, Warning,TEXT("Removed dead unit from future queue: %s"),*pawn->MyName);
+			deadUnits.Add(pawn);
 		}
+	}
+
+	for (auto* deadPawn : deadUnits)
+	{
+		unitQueue.Remove(deadPawn);
+		httpUnitQueue.Remove(deadPawn);
 	}
 }
 
