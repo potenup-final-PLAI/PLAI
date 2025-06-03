@@ -12,6 +12,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/GameState/GameStateOpen.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/Monster/MonWorld/MonWorld.h"
@@ -71,7 +72,8 @@ void UUiWorldMap::NextQuestType(EQuestType Quest)
 
 	case EQuestType::F_Store:
 		NextQuestMinimap(EQuestType::D_Store);
-		MenuInven->Wbp_UiQuest->NextQuest(6,FString(""),FString(""));
+		MenuInven->Wbp_UiQuest->NextQuest(6,FString(TEXT("상점에서 장비를 사고 착용해보자")),
+			FString(TEXT("획득한 전리품을 팔고 골드를 이용해서 전설장비 무기,망토 장비를 사보고 [ E ], [ I ] 키를눌러 착용해보자 ")));
 		break;
 	} 
 }
@@ -100,9 +102,18 @@ void UUiWorldMap::NativeConstruct()
 	
 	MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.5);
 
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-	{ NextQuestType(EQuestType::A_GetEquip);},1.0f,false);
+	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+	{
+		UE_LOG(LogTemp,Warning,TEXT("UiWolrdMap WorldGi 있다"))
+		if (WorldGi->bFirstQuest == false)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("UiWolrdMap WorldGi bFirstQuest == false"))
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+			{NextQuestType(EQuestType::A_GetEquip);},1.0f,false);
+			WorldGi->bFirstQuest = true;
+		}
+	}
 }
 
 void UUiWorldMap::SetRefreshPlayerList()
@@ -265,7 +276,10 @@ void UUiWorldMap::NextQuestMinimap(EQuestType Quest)
 				Icon->SetRenderOpacity(1);
 
 				if (!IsValid(Icon)) return;
-				GetWorld()->GetTimerManager().SetTimer(Icon->TimerHandle,[this,Icon]()
+
+				
+				
+				GetWorld()->GetTimerManager().SetTimer(Icon->TimerHandle,FTimerDelegate::CreateWeakLambda(this, [this,Icon]()
 				{
 					Icon->CurrentTime += GetWorld()->GetDeltaSeconds();
 					Icon->SetRenderScale(FVector2D(0.5 + Icon->CurrentTime * 0.5));
@@ -274,7 +288,7 @@ void UUiWorldMap::NextQuestMinimap(EQuestType Quest)
 					{
 						Icon->CurrentTime = 0;
 					}
-				},0.02f,true);
+				}),0.02f,true);
 			}
 			else
 			{

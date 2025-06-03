@@ -12,6 +12,7 @@
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputComp/InputComp.h"
+#include "PLAI/Item/GameInstance/WorldGi.h"
 #include "PLAI/Item/ItemComp/CreComp.h"
 #include "PLAI/Item/ItemComp/InvenComp.h"
 #include "PLAI/Item/ItemComp/ItemComp.h"
@@ -19,6 +20,7 @@
 #include "PLAI/Item/Login/LoginComp.h"
 #include "PLAI/Item/Login/LogItemComp.h"
 #include "PLAI/Item/UI/Inventory/Map/UiWorldMap.h"
+#include "PLAI/Item/UI/Inventory/Quest/UiQuest.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 #include "TurnComp/TurnComp.h"
 

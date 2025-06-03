@@ -16,7 +16,7 @@ void UUiQuest::NextQuest(int32 QuestNum, FString QuestTitle, FString QuestConten
 	QuestContentBlock->SetText(FText::FromString(QuestContent));
 
 	if (!IsValid(this)) return;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,FTimerDelegate::CreateWeakLambda(this, [this]()
 	{
 		CurrentTime += GetWorld()->GetDeltaSeconds();
 		QuestName->SetRenderOpacity( CurrentTime * 0.33 );
@@ -28,7 +28,7 @@ void UUiQuest::NextQuest(int32 QuestNum, FString QuestTitle, FString QuestConten
 			QuestName->SetRenderOpacity(0);
 			QuestContentBlock->SetRenderOpacity(0);
 		}
-	},0.02f,true);
+	}),0.02f,true);
 
 	for (int i = 0; i < QuestBox->GetChildrenCount(); i++)
 	{

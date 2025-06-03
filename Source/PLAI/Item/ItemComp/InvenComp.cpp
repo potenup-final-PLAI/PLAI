@@ -144,9 +144,17 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			{
 				if (FlipflopStore == false)
 				{
-					MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::E_MonsterTurn);
 					Store->StoreInven->SetVisibility(ESlateVisibility::Visible);
 					FlipflopStore = true;
+					
+					if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+					{
+						if (WorldGi->bFourthQuest == false)
+						{
+							MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::E_MonsterTurn);
+							WorldGi->bFourthQuest = true;
+						}
+					}
 				}
 				else
 				{
@@ -554,8 +562,6 @@ void UInvenComp::TurnReward()
 	{
 		if (WorldGi->MonsterType == EMonsterType::Monster)
 		{
-            MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::D_Store);
-			
 			UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
 			UiTurnReward->AddToViewport();
 
@@ -595,6 +601,7 @@ void UInvenComp::TurnReward()
 					TestPlayer->LogItemComp->GetInvenInfo();
 			
 					UiTurnReward->RemoveFromParent();
+					MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::F_Store);
 					UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
 				}
 			},1.5f,false);
