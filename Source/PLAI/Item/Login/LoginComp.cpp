@@ -116,27 +116,22 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		    {
 			    if (ANpcNet * NpcNet = Cast<ANpcNet>(Hit.GetActor()))
 			    {
-			    	if (bQuest == true)
+			    	if (NpcNet->UIPost == nullptr)
 			    	{
+			    		NpcNet->OpenQuest();
 			    		if (AQuestOrderActor* QuestOrderActor = Cast<AQuestOrderActor>(NpcNet->QuestActorComponent->GetChildActor()))
 			    		{
 			    			if (QuestOrderActor->QuestType == EQuestType::B_NetNpcHearty)
-			    			{
-			    				TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::C_NetNpcScared);
-			    			}
+			    			{ TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::C_NetNpcScared); }
 			    			else if (QuestOrderActor->QuestType == EQuestType::C_NetNpcScared)
-			    			{
-			    				TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::D_Store);
-			    			}
+			    			{ TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::D_Store); }
 			    		}
-			    		NpcNet->OpenQuest();
-			    		bQuest = false;
 			    	}
 			    	else
 			    	{
 			    		if (!NpcNet || !NpcNet->UIPost) return;
 			    		NpcNet->UIPost->RemoveFromParent();
-			    		bQuest = true;
+			    		NpcNet->UIPost = nullptr;
 			    	}
 			    }
 		    }
@@ -509,4 +504,28 @@ void ULoginComp::OnWebSocketClosed(int32 StatusCode, const FString& Reason, bool
 // 	ConnectWebSocket();
 // 	UE_LOG(LogTemp,Display,TEXT("Input B 웹소켓 연결 Key JustPressed"));
 // }
+// }
+
+
+// if (bQuest == true)
+// {
+// 	if (AQuestOrderActor* QuestOrderActor = Cast<AQuestOrderActor>(NpcNet->QuestActorComponent->GetChildActor()))
+// 	{
+// 		if (QuestOrderActor->QuestType == EQuestType::B_NetNpcHearty)
+// 		{
+// 			TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::C_NetNpcScared);
+// 		}
+// 		else if (QuestOrderActor->QuestType == EQuestType::C_NetNpcScared)
+// 		{
+// 			TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::D_Store);
+// 		}
+// 	}
+// 	NpcNet->OpenQuest();
+// 	bQuest = false;
+// }
+// else
+// {
+// 	if (!NpcNet || !NpcNet->UIPost) return;
+// 	NpcNet->UIPost->RemoveFromParent();
+// 	bQuest = true;
 // }
