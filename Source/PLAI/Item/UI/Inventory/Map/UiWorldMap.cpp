@@ -240,11 +240,22 @@ void UUiWorldMap::NextQuestMinimap(EQuestType Quest)
 				{
 					TestPlayer->QuestLocation = QuestActors[i]->GetActorLocation();
 				}
-				Icon->SetRenderScale(FVector2D(2.f));
+				Icon->SetRenderScale(FVector2D(1.2f));
 				Icon->SetRenderOpacity(1);
+				GetWorld()->GetTimerManager().SetTimer(Icon->TimerHandle,[this,Icon]()
+				{
+					Icon->CurrentTime += GetWorld()->GetDeltaSeconds();
+					Icon->SetRenderScale(FVector2D(0.5 + Icon->CurrentTime));
+					Icon->SetRenderOpacity(0.5 + Icon->CurrentTime*0.5);
+					if (Icon->CurrentTime > 1)
+					{
+						Icon->CurrentTime = 0;
+					}
+				},0.02f,true);
 			}
 			else
 			{
+				GetWorld()->GetTimerManager().ClearTimer(Icon->TimerHandle);
 				Icon->SetRenderScale(FVector2D(0.5));
 				Icon->SetRenderOpacity(0.5);
 			}

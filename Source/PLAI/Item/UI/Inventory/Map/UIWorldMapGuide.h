@@ -13,4 +13,11 @@ UCLASS()
 class PLAI_API UUIWorldMapGuide : public UUserWidget
 {
 	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	FTimerHandle TimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float CurrentTime = 0.0f;
 };
