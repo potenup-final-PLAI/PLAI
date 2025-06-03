@@ -910,11 +910,4 @@ void AUPhaseManager::AddNetLog(FString msg)
 	}
 }
 
-void AUPhaseManager::Multicast_EndingUI_Implementation()
-{
-	if (auto* endingCreditUI = CreateWidget<UEndingCredit>(GetWorld(), endingCreditFactory))
-	{
-		endingCreditUI->AddToViewport();
-		endingCreditUI->Mulitcast_PaidIn();
-	}
-}
+
