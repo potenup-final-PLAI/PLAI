@@ -107,11 +107,11 @@ void AGameStateOpen::FindMiniMapGuideIcon()
 	AActor* Actor = UGameplayStatics::GetActorOfClass(GetWorld(),AMonWorld::StaticClass());
 	MiniMapGuideActors.Add(Actor);
 
-	for (int i = 0; i < MiniMapGuideActors.Num(); i++)
-	{
-		UE_LOG(LogTemp,Warning,TEXT("GameState MiniMapGuideActors 이름은[%s] 위치는 [%s]"),*MiniMapGuideActors[i]->GetName(),
-			*MiniMapGuideActors[i]->GetActorLocation().ToString());
-	}
+	// for (int i = 0; i < MiniMapGuideActors.Num(); i++)
+	// {
+	// 	UE_LOG(LogTemp,Warning,TEXT("GameState MiniMapGuideActors 이름은[%s] 위치는 [%s]"),*MiniMapGuideActors[i]->GetName(),
+	// 		*MiniMapGuideActors[i]->GetActorLocation().ToString());
+	// }
 }
 
 
