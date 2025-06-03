@@ -33,11 +33,11 @@ void UUiQuest::NextQuest(int32 QuestNum, FString QuestTitle, FString QuestConten
 	{
 		if (UTextBlock* Text =  Cast<UTextBlock>(QuestBox->GetChildAt(i)))
 		{
-			UE_LOG(LogTemp,Display,TEXT("UIQuest 퀘스트가 생성된거 순서? [%d] : 이름?[%s]"),i,*Text->GetText().ToString());
+			// UE_LOG(LogTemp,Display,TEXT("UIQuest 퀘스트가 생성된거 순서? [%d] : 이름?[%s]"),i,*Text->GetText().ToString());
 			
 			if (Text->GetText().ToString() == QuestContent)
 			{
-				UE_LOG(LogTemp,Display,TEXT("UIQuest 이미 퀘스트가 생성됨 : %s"),*Text->GetText().ToString());
+				// UE_LOG(LogTemp,Display,TEXT("UIQuest 이미 퀘스트가 생성됨 : %s"),*Text->GetText().ToString());
 				return;
 			}
 		}

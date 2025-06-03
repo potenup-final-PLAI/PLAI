@@ -44,13 +44,13 @@ void UUiWorldMap::NextQuestType(EQuestType Quest)
 	case EQuestType::B_NetNpcHearty:
 		NextQuestMinimap(EQuestType::B_NetNpcHearty);
 		MenuInven->Wbp_UiQuest->NextQuest(2,FString(TEXT("마을 사람들과 친해지기 1")),
-			FString(TEXT("마을의 활기찬 자경단 Npc와 대화하세요")));
+			FString(TEXT("마을의 활기찬 자경단 Npc에게 [파란디온]에 대해 물어봐주세요")));
 		break;
 
 	case EQuestType::C_NetNpcScared:
 		NextQuestMinimap(EQuestType::C_NetNpcScared);
 		MenuInven->Wbp_UiQuest->NextQuest(3,FString(TEXT("마을 사람들과 친해지기 2")),
-			FString(TEXT("겁에질린 마을 Npc의 마음을 달래주세요")));
+			FString(TEXT("겁에질린 마을 Npc에게 [파란디온] 에대해 물어봐 주세요")));
 		break;
 
 	case EQuestType::D_Store:

@@ -213,11 +213,7 @@ void UInputComp::On_LeftMouseStart()
 		}
 	}
 	
-	// 턴제 플레이어
-	// if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(Hit.GetActor()))
-	// {
-	// 	
-	// }
+	
 	TestPlayer->GetController()->StopMovement();
 	TimeCamera = 0;
 }
