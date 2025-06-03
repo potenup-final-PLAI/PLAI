@@ -95,6 +95,11 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		SetGold(100000);
 	}
 
+	if (TestPlayer->IsLocallyControlled() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Seven))
+	{
+		MenuInven->Wbp_UiQuest->NextQuest(0,FString("Chapter1"),FString("QuesContentt"));
+	}
+
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
 	{

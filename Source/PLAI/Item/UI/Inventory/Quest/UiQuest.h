@@ -15,5 +15,26 @@ class PLAI_API UUiQuest : public UUserWidget
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(EditAnywhere)
+	FTimerHandle TimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float CurrentTime = 0.0;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* QuestName;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* QuestContentBlock;
+
+	UPROPERTY(meta = (BindWidget))
+	class UVerticalBox* QuestBoxVertical;
+
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* QuestBox;
 	
+	void NextQuest(int32 QuestNum, FString QuestTitle, FString QuestContent);
+
+	virtual void NativeConstruct() override;
 };

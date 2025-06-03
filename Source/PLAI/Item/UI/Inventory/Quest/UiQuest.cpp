@@ -2,3 +2,55 @@
 
 
 #include "UiQuest.h"
+
+#include <string>
+
+#include "Blueprint/WidgetTree.h"
+#include "Components/ScrollBox.h"
+#include "Components/TextBlock.h"
+
+void UUiQuest::NextQuest(int32 QuestNum, FString QuestTitle, FString QuestContent)
+{
+	FString String = FString::Printf(TEXT("%d Quest : %s"), QuestNum,*QuestTitle);
+	QuestName->SetText(FText::FromString(String));
+	QuestContentBlock->SetText(FText::FromString(QuestContent));
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+	{
+		CurrentTime += GetWorld()->GetDeltaSeconds();
+		QuestName->SetRenderOpacity( CurrentTime * 0.33 );
+		QuestContentBlock->SetRenderOpacity( CurrentTime * 0.33 );
+		if (CurrentTime > 5)
+		{
+			CurrentTime = 0;
+			GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+			QuestName->SetRenderOpacity(0);
+			QuestContentBlock->SetRenderOpacity(0);
+		}
+	},0.02f,true);
+	
+	UTextBlock* QuestText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+	QuestText->SetText(FText::FromString(FString::Printf(TEXT("%d %s"),QuestNum,*QuestTitle)));
+	QuestText->SetColorAndOpacity(FLinearColor::Yellow);
+	QuestText->SetFont(FSlateFontInfo(QuestText->GetFont().FontObject,24));
+	QuestBox->AddChild(QuestText);
+	
+	UTextBlock* QuestTextContent = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+	QuestTextContent->SetText(FText::FromString(QuestContent));
+	QuestTextContent->SetColorAndOpacity(FLinearColor::Yellow);
+	QuestTextContent->SetFont(FSlateFontInfo(QuestTextContent->GetFont().FontObject,18));
+	QuestBox->AddChild(QuestTextContent);
+	
+	UTextBlock* QuestTextEmpty = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+	QuestBox->AddChild(QuestTextEmpty);
+	
+	// QuestBox->AddChild(QuestName);
+}
+
+void UUiQuest::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	QuestName->SetRenderOpacity(0.0f);
+	QuestContentBlock->SetRenderOpacity(0.0f);
+}

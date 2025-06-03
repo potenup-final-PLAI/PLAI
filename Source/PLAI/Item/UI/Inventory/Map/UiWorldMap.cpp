@@ -17,8 +17,9 @@
 #include "PLAI/Item/Monster/MonWorld/MonWorld.h"
 #include "PLAI/Item/TestPlayer/TestPlayer.h"
 #include "PLAI/Item/TestPlayer/InputComp/InputComp.h"
+#include "PLAI/Item/UI/Inventory/Quest/UiQuest.h"
 
-void UUiWorldMap::NextQuestType()
+void UUiWorldMap::NextQuestType(EQuestType Quest)
 {
 	// if (QuestType != EQuestType::E_MonsterTurn)
 	// {
@@ -29,31 +30,44 @@ void UUiWorldMap::NextQuestType()
 	// {
 	// 	QuestType = static_cast<EQuestType>(0);
 	// }
+	QuestType = Quest;
 	
 	switch (QuestType)
 	{
 	case EQuestType::A_GetEquip:
 		NextQuestMinimap(EQuestType::A_GetEquip);
+		MenuInven->Wbp_UiQuest->NextQuest(1,FString("전설의 검을 뽑다"),
+			FString("M 키를 눌러 전설의 검 위치를 확인후 검을 뽑아 장비를 획득하고 [E] 와 "
+		   "[S] 키를 눌러 장비를 확인하세요"));
 		break;
 		
 	case EQuestType::B_NetNpcHearty:
 		NextQuestMinimap(EQuestType::B_NetNpcHearty);
+		MenuInven->Wbp_UiQuest->NextQuest(2,FString("마을 사람들과 친해지기 1"),
+			FString("마을의 활기찬 자경단 Npc와 대화하세요"));
 		break;
 
 	case EQuestType::C_NetNpcScared:
 		NextQuestMinimap(EQuestType::C_NetNpcScared);
+		MenuInven->Wbp_UiQuest->NextQuest(3,FString("마을 사람들과 친해지기 2"),
+			FString("겁에질린 마을 Npc의 마음을 달래주세요"));
 		break;
 
 	case EQuestType::D_Store:
 		NextQuestMinimap(EQuestType::D_Store);
+		MenuInven->Wbp_UiQuest->NextQuest(4,FString("마을 상점 이용하기"),
+			FString("상점 Npc를 클릭하여 구매가능 아이템을 구매해보세요"));
 		break;
 
 	case EQuestType::E_MonsterTurn:
 		NextQuestMinimap(EQuestType::E_MonsterTurn);
+		MenuInven->Wbp_UiQuest->NextQuest(5,FString("마을을 위협하는 몬스터를 처치하자"),
+			FString(""));
 		break;
 
 	case EQuestType::F_Store:
 		NextQuestMinimap(EQuestType::D_Store);
+		MenuInven->Wbp_UiQuest->NextQuest(6,FString(""),FString(""));
 		break;
 	} 
 }

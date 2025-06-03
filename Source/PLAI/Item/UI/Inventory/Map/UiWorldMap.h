@@ -107,7 +107,7 @@ public:
 
 	virtual void NativeConstruct() override;
 	
-	void NextQuestType();
+	void NextQuestType(EQuestType Quest);
 	void NextQuestMinimap(EQuestType Quest = EQuestType::A_GetEquip);
 	
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
