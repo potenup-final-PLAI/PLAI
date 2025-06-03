@@ -50,4 +50,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> enemyOrderFactory;
 	void AddOrder(const TArray<class ABaseBattlePawn*> unitArray);
+
+	//-------------- Who Turn UI------------------
+
+	UPROPERTY(meta = (BindWidget))
+	class UWhoTurn* WBP_WhoTurn;
 };

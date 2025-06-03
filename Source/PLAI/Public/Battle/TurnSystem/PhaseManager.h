@@ -185,10 +185,5 @@ public:
 	void ClearNetLog();
 	void AddNetLog(FString msg);
 
-	//------------Ending---------------
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UEndingCredit> endingCreditFactory;
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_EndingUI();
+	
 };
