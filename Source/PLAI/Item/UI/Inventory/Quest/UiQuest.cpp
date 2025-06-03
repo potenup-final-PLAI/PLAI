@@ -15,6 +15,7 @@ void UUiQuest::NextQuest(int32 QuestNum, FString QuestTitle, FString QuestConten
 	QuestName->SetText(FText::FromString(String));
 	QuestContentBlock->SetText(FText::FromString(QuestContent));
 
+	if (!IsValid(this)) return;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 	{
 		CurrentTime += GetWorld()->GetDeltaSeconds();
@@ -78,4 +79,10 @@ void UUiQuest::NativeConstruct()
 
 	QuestName->SetRenderOpacity(0.0f);
 	QuestContentBlock->SetRenderOpacity(0.0f);
+}
+
+void UUiQuest::NativeDestruct()
+{
+	Super::NativeDestruct();
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }

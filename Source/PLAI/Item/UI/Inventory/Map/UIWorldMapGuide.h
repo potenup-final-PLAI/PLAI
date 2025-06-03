@@ -20,4 +20,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float CurrentTime = 0.0f;
+
+	virtual void NativeDestruct() override;
 };

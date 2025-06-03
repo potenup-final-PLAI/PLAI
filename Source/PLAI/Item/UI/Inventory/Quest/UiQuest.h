@@ -37,4 +37,5 @@ public:
 	void NextQuest(int32 QuestNum, FString QuestTitle, FString QuestContent);
 
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 };

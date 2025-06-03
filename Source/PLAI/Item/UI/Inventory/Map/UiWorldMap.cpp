@@ -21,6 +21,10 @@
 
 void UUiWorldMap::NextQuestType(EQuestType Quest)
 {
+	if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
+	{
+		if (!TestPlayer->IsLocallyControlled()) return;
+	}
 	// if (QuestType != EQuestType::E_MonsterTurn)
 	// {
 	// 	QuestType = static_cast<EQuestType>(static_cast<int32>(QuestType) + 1);
@@ -251,7 +255,6 @@ void UUiWorldMap::NextQuestMinimap(EQuestType Quest)
 		if (UUIWorldMapGuide* Icon = Cast<UUIWorldMapGuide>(MiniMapCanvasIconQuest->GetChildAt(i)))
 		{
 			if (!IsValid(Icon)) return;
-			
 			if (QuestActors[i]->QuestType == Quest)
 			{
 				if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
@@ -260,6 +263,8 @@ void UUiWorldMap::NextQuestMinimap(EQuestType Quest)
 				}
 				Icon->SetRenderScale(FVector2D(1.2f));
 				Icon->SetRenderOpacity(1);
+
+				if (!IsValid(Icon)) return;
 				GetWorld()->GetTimerManager().SetTimer(Icon->TimerHandle,[this,Icon]()
 				{
 					Icon->CurrentTime += GetWorld()->GetDeltaSeconds();

@@ -2,3 +2,10 @@
 
 
 #include "UIWorldMapGuide.h"
+
+void UUIWorldMapGuide::NativeDestruct()
+{
+	Super::NativeDestruct();
+
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+}

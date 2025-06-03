@@ -87,6 +87,7 @@ void AGameStateOpen::NextMonsterTurn()
 	}
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 	{
+	
 		TimerSecond += GetWorld()->GetDeltaSeconds();
 		if (TimerSecond > 2)
 		{
