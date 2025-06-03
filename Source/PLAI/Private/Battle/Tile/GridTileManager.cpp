@@ -48,6 +48,8 @@ void AGridTileManager::Tick(float DeltaTime)
 }
 void AGridTileManager::ServerRPC_InitGridTile_Implementation()
 {
+	if (!HasAuthority()) return;
+	
 	TArray<FIntPoint> allCoords;
 	allCoords.Reserve(625);
 
