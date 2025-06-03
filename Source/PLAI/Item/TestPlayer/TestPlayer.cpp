@@ -65,13 +65,23 @@ void ATestPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CurrentTime += DeltaTime;
-	NiagaraComp->SetWorldRotation((QuestLocation-GetActorLocation()).GetSafeNormal().Rotation());
-	NiagaraComp->SetWorldLocation(GetActorLocation() + (QuestLocation-GetActorLocation()).GetSafeNormal() * (600 + 600 * CurrentTime));
-	if (CurrentTime > 1)
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	
+	if (CurrentTime > 1) { CurrentTime = 0; }
+	
+	RotateTime += GetWorld()->GetDeltaSeconds();
+	if (RotateTime > 2) { RotateTime = 0; }
+
+	if (FVector::Dist(GetActorLocation(), QuestLocation) < 1500)
 	{
-		CurrentTime = 0;
+		NiagaraComp->SetWorldLocation(FVector(0,0,200)+QuestLocation + 250*FRotator(0,RotateTime*180,0).Vector() );
 	}
+	else
+	{
+		NiagaraComp->SetWorldRotation((QuestLocation-GetActorLocation()).GetSafeNormal().Rotation());
+		NiagaraComp->SetWorldLocation(GetActorLocation() + (QuestLocation-GetActorLocation()).GetSafeNormal() * (600 + 600 * CurrentTime));
+	}
+	
 }
 
 // Called to bind functionality to input

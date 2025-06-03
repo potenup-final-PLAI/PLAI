@@ -122,11 +122,11 @@ void ULoginComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			    		{
 			    			if (QuestOrderActor->QuestType == EQuestType::B_NetNpcHearty)
 			    			{
-			    				TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestMinimap(EQuestType::C_NetNpcScared);
+			    				TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::C_NetNpcScared);
 			    			}
 			    			else if (QuestOrderActor->QuestType == EQuestType::C_NetNpcScared)
 			    			{
-			    				TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestMinimap(EQuestType::D_Store);
+			    				TestPlayer->InvenComp->MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::D_Store);
 			    			}
 			    		}
 			    		NpcNet->OpenQuest();

@@ -123,7 +123,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 					{
 						bStartEquip = true;
 
-						MenuInven->Wbp_UiWorldMap->NextQuestMinimap(EQuestType::B_NetNpcHearty);
+						MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::B_NetNpcHearty);
 						
 						Start->UiNpcStart->StartJobText->SetText(FText::FromString(TestPlayer->LoginComp->UserFullInfo.character_info.job));
 						FlipflopStart = true;
@@ -144,7 +144,7 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 			{
 				if (FlipflopStore == false)
 				{
-					MenuInven->Wbp_UiWorldMap->NextQuestMinimap(EQuestType::E_MonsterTurn);
+					MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::E_MonsterTurn);
 					Store->StoreInven->SetVisibility(ESlateVisibility::Visible);
 					FlipflopStore = true;
 				}
@@ -554,7 +554,7 @@ void UInvenComp::TurnReward()
 	{
 		if (WorldGi->MonsterType == EMonsterType::Monster)
 		{
-            MenuInven->Wbp_UiWorldMap->NextQuestMinimap(EQuestType::D_Store);
+            MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::D_Store);
 			
 			UiTurnReward = CreateWidget<class UUiTurnReward>(GetWorld(),UUiTurnRewardFactory);
 			UiTurnReward->AddToViewport();

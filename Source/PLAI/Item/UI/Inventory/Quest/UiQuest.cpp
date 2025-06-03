@@ -28,23 +28,48 @@ void UUiQuest::NextQuest(int32 QuestNum, FString QuestTitle, FString QuestConten
 			QuestContentBlock->SetRenderOpacity(0);
 		}
 	},0.02f,true);
+
+	for (int i = 0; i < QuestBox->GetChildrenCount(); i++)
+	{
+		if (UTextBlock* Text =  Cast<UTextBlock>(QuestBox->GetChildAt(i)))
+		{
+			UE_LOG(LogTemp,Display,TEXT("UIQuest 퀘스트가 생성된거 순서? [%d] : 이름?[%s]"),i,*Text->GetText().ToString());
+			
+			if (Text->GetText().ToString() == QuestContent)
+			{
+				UE_LOG(LogTemp,Display,TEXT("UIQuest 이미 퀘스트가 생성됨 : %s"),*Text->GetText().ToString());
+				return;
+			}
+		}
+	}
+
+	for (int i = 0; i < QuestBox->GetChildrenCount(); i++)
+	{
+		if (UTextBlock* Text =  Cast<UTextBlock>(QuestBox->GetChildAt(i)))
+		{
+			Text->SetColorAndOpacity(FLinearColor::White);
+			Text->SetRenderOpacity(0.5);
+		}
+	}
 	
 	UTextBlock* QuestText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 	QuestText->SetText(FText::FromString(FString::Printf(TEXT("%d %s"),QuestNum,*QuestTitle)));
-	QuestText->SetColorAndOpacity(FLinearColor::Yellow);
+	QuestText->SetColorAndOpacity(FLinearColor::White);
 	QuestText->SetFont(FSlateFontInfo(QuestText->GetFont().FontObject,24));
+	QuestText->SetShadowColorAndOpacity(FLinearColor::Black);
 	QuestBox->AddChild(QuestText);
 	
 	UTextBlock* QuestTextContent = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 	QuestTextContent->SetText(FText::FromString(QuestContent));
-	QuestTextContent->SetColorAndOpacity(FLinearColor::Yellow);
+	QuestTextContent->SetColorAndOpacity(FLinearColor::White);
 	QuestTextContent->SetFont(FSlateFontInfo(QuestTextContent->GetFont().FontObject,18));
+	QuestText->SetShadowColorAndOpacity(FLinearColor::Black);
+	QuestTextContent->SetAutoWrapText(true);
 	QuestBox->AddChild(QuestTextContent);
+	QuestBox->ScrollToEnd();
 	
 	UTextBlock* QuestTextEmpty = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
 	QuestBox->AddChild(QuestTextEmpty);
-	
-	// QuestBox->AddChild(QuestName);
 }
 
 void UUiQuest::NativeConstruct()

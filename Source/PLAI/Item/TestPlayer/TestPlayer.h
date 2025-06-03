@@ -66,6 +66,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float CurrentTime = 0.0f;
+	UPROPERTY(EditAnywhere)
+	float RotateTime = 0.0f;
 
 	bool bCameraChane = false;
 };
