@@ -147,8 +147,10 @@ void UUiWorldMap::SetPlayerIconMinimap()
 			SetRefreshPlayerList();
 			UE_LOG(LogTemp,Warning,TEXT("UiWorldMap SetRefresh하고 한번더 체크 플레이어 갯수 [%d] 없냐?"),TestPlayers.Num()) return;
 		}
-		float U = (TestPlayers[i]->GetActorLocation().X - WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
-		float V = (TestPlayers[i]->GetActorLocation().Y - WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
+		float U = (TestPlayers[i]->GetActorLocation().X -
+			WorldMinFevtor.X) / (WorldMaxFevtor.X - WorldMinFevtor.X);
+		float V = (TestPlayers[i]->GetActorLocation().Y -
+			WorldMinFevtor.Y) / (WorldMaxFevtor.Y - WorldMinFevtor.Y);
 		
 		U = FMath::Clamp(U, 0.f, 1.f);
 		V = FMath::Clamp(V, 0.f, 1.f);
@@ -234,6 +236,8 @@ void UUiWorldMap::NextQuestMinimap(EQuestType Quest)
 	{
 		if (UUIWorldMapGuide* Icon = Cast<UUIWorldMapGuide>(MiniMapCanvasIconQuest->GetChildAt(i)))
 		{
+			if (!IsValid(Icon)) return;
+			
 			if (QuestActors[i]->QuestType == Quest)
 			{
 				if (ATestPlayer* TestPlayer = Cast<ATestPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter()))
@@ -245,9 +249,9 @@ void UUiWorldMap::NextQuestMinimap(EQuestType Quest)
 				GetWorld()->GetTimerManager().SetTimer(Icon->TimerHandle,[this,Icon]()
 				{
 					Icon->CurrentTime += GetWorld()->GetDeltaSeconds();
-					Icon->SetRenderScale(FVector2D(0.5 + Icon->CurrentTime));
-					Icon->SetRenderOpacity(0.5 + Icon->CurrentTime*0.5);
-					if (Icon->CurrentTime > 1)
+					Icon->SetRenderScale(FVector2D(0.5 + Icon->CurrentTime * 0.5));
+					Icon->SetRenderOpacity(0.5 + Icon->CurrentTime*0.25);
+					if (Icon->CurrentTime > 2)
 					{
 						Icon->CurrentTime = 0;
 					}

@@ -24,6 +24,7 @@
 #include "PLAI/Item/UI/Inventory/InputUi/InputUi.h"
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
+#include "PLAI/Item/UI/Inventory/Quest/UiQuest.h"
 #include "PLAI/Item/UI/Inventory/QuickInven/QuickInven.h"
 #include "PLAI/Item/UI/Inventory/UiCre/UiCre.h"
 #include "PLAI/Item/UI/Slot/SlotCre.h"
@@ -101,6 +102,7 @@ void UUIChaMain::OnLoadMeInfo()
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UIChaStat->SetVisibility(ESlateVisibility::Hidden);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 	UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
+	// UiMain->LoginComp->TestPlayer->InvenComp->MenuInven->Wbp_UiQuest->SetVisibility(ESlateVisibility::Hidden);
 	
 	UiMain->LoginComp->HttpMePost();
 	

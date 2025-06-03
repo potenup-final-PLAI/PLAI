@@ -67,7 +67,7 @@ void ATestPlayer::Tick(float DeltaTime)
 
 	CurrentTime += DeltaTime;
 	NiagaraComp->SetWorldRotation((QuestLocation-GetActorLocation()).GetSafeNormal().Rotation());
-	NiagaraComp->SetWorldLocation(GetActorLocation() + (QuestLocation-GetActorLocation()).GetSafeNormal() * (300 + 200*CurrentTime));
+	NiagaraComp->SetWorldLocation(GetActorLocation() + (QuestLocation-GetActorLocation()).GetSafeNormal() * (600 + 600 * CurrentTime));
 	if (CurrentTime > 1)
 	{
 		CurrentTime = 0;
@@ -79,4 +79,3 @@ void ATestPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
-
