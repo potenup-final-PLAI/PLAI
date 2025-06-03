@@ -10,6 +10,7 @@
 #include "Battle/TurnSystem/PhaseManager.h"
 #include "Battle/UI/BattleHUD.h"
 #include "Battle/UI/MainBattleUI.h"
+#include "Battle/UI/WhoTurn.h"
 #include "Battle/Util/DebugHeader.h"
 #include "Enemy/BaseEnemy.h"
 #include "Engine/Engine.h"
@@ -152,10 +153,11 @@ void ATurnManager::OnTurnStart()
 	// Player라면
 	if (ABattlePlayer* player = Cast<ABattlePlayer>(curUnit))
 	{
+		// AP UI 생성
 		player->ClientRPC_AddAP(player);
 		player->MultiCastRPC_InitAPUI();
-	
-		// UE_LOG(LogTemp, Warning, TEXT("%s -> curAP : %d"), *player->GetName(),player->curAP);
+		player->Client_PlayTurnAnimation();
+		
 	}
 	// Enemy라면
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(curUnit))

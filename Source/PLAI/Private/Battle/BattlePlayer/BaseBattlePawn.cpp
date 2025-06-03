@@ -353,7 +353,6 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 		UE_LOG(LogTemp, Warning, TEXT("Use BaseAttack Before"));
 		return;
 	}
-
 	// bBaseAttack = false;
 	if (HasAuthority()) Multicast_ChangebBaseAttack(false);
 	else if (!HasAuthority() && IsLocallyControlled()) Server_ChangebBaseAttack(false);
@@ -362,10 +361,15 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 
 	ABattlePlayer* thisAsPlayer = Cast<ABattlePlayer>(this);
 	ABaseEnemy*   thisAsEnemy  = Cast<ABaseEnemy>(this);
-
+	
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitActor))
 	{
+		if (enemy->hp <= 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("enemy->hp <= 0"));
+			return;
+		}
 		targetEnemy = enemy;
 		attackTarget = targetEnemy;
 		bWantsToAttack = true;
@@ -376,35 +380,23 @@ void ABaseBattlePawn::PlayerBaseAttack(FHitResult& hitInfo)
 			else if (HasAuthority()) thisAsPlayer->MultiCastRPC_UpdatePlayerAnim(thisAsPlayer->currentActionMode);
 		}
 	}
-	// 공격 대상이 player라면
-	// else if (ABattlePlayer* player = Cast<ABattlePlayer>(hitActor))
-	// {
-	// 	targetPlayer = player;
-	// 	attackTarget = targetPlayer;
-	// 	bWantsToAttack = true;
-	// 	NET_PRINTLOG(TEXT("targetPlayer = %s"), *targetPlayer->GetActorNameOrLabel());
-	// 	if (thisAsEnemy)
-	// 	{
-	// 		thisAsEnemy->ServerRPC_UpdateEnemyAnim(thisAsEnemy->currentActionMode);
-	// 		thisAsEnemy->bStartMontage = true;
-	// 	}
-	// }
 }
 
 
 void ABaseBattlePawn::PlayerPoison(FHitResult& hitInfo)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("PlayerPoison In"));
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		// if (enemy->enemyAnim)
-		// {
-		// 	enemy->enemyAnim->actionMode = currentActionMode;
-		// }
-		// enemy->ServerRPC_UpdateEnemyAnim(enemy->currentActionMode);
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
+			if (player->curAP < 1) return;
+			if (enemy->hp <= 0)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("enemy->hp <= 0"));
+				return;
+			}
+			
 			targetEnemy = enemy;
 			attackTarget = targetEnemy;
 			bWantsToAttack = true;
@@ -420,12 +412,15 @@ void ABaseBattlePawn::PlayerFatal(FHitResult& hitInfo)
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		// if (enemy->enemyAnim)
-		// {
-		// 	enemy->enemyAnim->actionMode = currentActionMode;
-		// }
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
+			if (player->curAP < 2) return;
+			if (enemy->hp <= 0)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("enemy->hp <= 0"));
+				return;
+			}
+			
 			targetEnemy = enemy;
 			attackTarget = targetEnemy;
 			bWantsToAttack = true;
@@ -441,12 +436,14 @@ void ABaseBattlePawn::PlayerRupture(FHitResult& hitInfo)
 	// 공격 대상이 enemy라면
 	if (ABaseEnemy* enemy = Cast<ABaseEnemy>(hitInfo.GetActor()))
 	{
-		// if (enemy->enemyAnim)
-		// {
-		// 	enemy->enemyAnim->actionMode = currentActionMode;
-		// }
 		if (ABattlePlayer* player = Cast<ABattlePlayer>(this))
 		{
+			if (player->curAP < 2) return;
+			if (enemy->hp <= 0)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("enemy->hp <= 0"));
+				return;
+			}
 			targetEnemy = enemy;
 			attackTarget = targetEnemy;
 			bWantsToAttack = true;
@@ -483,6 +480,11 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Player) : !player->playerAnim"));
 			return;
 		}
+		if (player->hp <= 0)
+		{
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Player) : player->hp <= 0"));
+			return;
+		}
 		MultiCastRPC_PlayerGetDamage(player, damage);
 	}
 	else if (ABaseEnemy* enemy = Cast<ABaseEnemy>(unit))
@@ -505,6 +507,11 @@ void ABaseBattlePawn::GetDamage(ABaseBattlePawn* unit, int32 damage)
 		if (!enemy->enemyAnim)
 		{
 			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Enemy) : !Enemy->playerAnim"));
+			return;
+		}
+		if (enemy->hp <= 0)
+		{
+			UE_LOG(LogTemp, Warning,TEXT("GetDamage(Enemy) : enemy->hp <= 0"));
 			return;
 		}
 		MultiCastRPC_EnemyGetDamage(enemy, damage);
@@ -1984,7 +1991,7 @@ void ABaseBattlePawn::Client_InitAPUI_Implementation()
 
 void ABaseBattlePawn::ClientRPC_AddAP_Implementation(class ABattlePlayer* player)
 {
-	if (IsLocallyControlled())
+	if (IsLocallyControlled() && IsValid(player))
 	{
 		player->GetAP();
 		// 서버도 클라가 가지고 있는 AP 업데이트

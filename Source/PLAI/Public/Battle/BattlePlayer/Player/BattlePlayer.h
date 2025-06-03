@@ -83,6 +83,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class USoundBase* ruptureSound;
+
+
+	//-----------------Who Turn------------------
+	UFUNCTION(Client, Reliable)
+	void Client_PlayTurnAnimation();
+	
 };
 
 

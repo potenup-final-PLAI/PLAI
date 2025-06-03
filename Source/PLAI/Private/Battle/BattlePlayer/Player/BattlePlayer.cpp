@@ -7,6 +7,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "Battle/TurnSystem/BattlePlayerController.h"
 #include "Battle/TurnSystem/PhaseManager.h"
+#include "Battle/UI/BattleHUD.h"
+#include "Battle/UI/MainBattleUI.h"
+#include "Battle/UI/WhoTurn.h"
 #include "Battle/Util/DebugHeader.h"
 #include "Components/RectLightComponent.h"
 #include "Components/SpotLightComponent.h"
@@ -132,6 +135,14 @@ void ABattlePlayer::ClearDebugNetLog()
 	phaseManager->ClearNetLog();
 }
 
+void ABattlePlayer::Client_PlayTurnAnimation_Implementation()
+{
+	if (hud && hud->mainUI && hud->mainUI->WBP_WhoTurn)
+	{
+		hud->mainUI->WBP_WhoTurn->PlayWhoTurnAnimation();
+	}
+}
+
 void ABattlePlayer::Server_OnClickedMove_Implementation()
 {
 	// UE_LOG(LogTemp, Warning, TEXT("Move"));
@@ -217,3 +228,4 @@ void ABattlePlayer::MultiCastRPC_UpdatePlayerAnim_Implementation(EActionMode mod
 		}
 	}
 }
+
