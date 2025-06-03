@@ -186,13 +186,20 @@ void USlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent&
 
 	if (ItemDetail == nullptr && ItemStructTable.ItemTop != -1)
 	{
-		FVector2d MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld()) + FVector2d(-100,100);
+		FVector2d MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
 		ItemDetail = CreateWidget<UItemDetail>(GetWorld(),ItemDetailFactory);
 		if (ItemDetail)
 		{
-			ItemDetail->AddToViewport();
+			FVector2D ViewportSize;
+			GEngine->GameViewport->GetViewportSize(ViewportSize);
+
+			FVector2D CenterPos = ViewportSize * 0.5f;
+
+			ItemDetail->AddToViewport(10);
 			ItemDetail->SetItemDetail(ItemStructTable);
-			ItemDetail->SetPositionInViewport(MousePos);
+			
+			// ItemDetail->SetPositionInViewport(MousePos);
+			ItemDetail->SetPositionInViewport(CenterPos + FVector2D(-250,-250), false);
 		}
 	}
 }

@@ -58,5 +58,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USceneCaptureComponent2D* CaptureComp;
 
+	UPROPERTY(EditAnywhere)
+	class UNiagaraComponent* NiagaraComp;
+
+	UPROPERTY(EditAnywhere)
+	FVector QuestLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere)
+	float CurrentTime = 0.0f;
+	UPROPERTY(EditAnywhere)
+	float RotateTime = 0.0f;
+
 	bool bCameraChane = false;
 };

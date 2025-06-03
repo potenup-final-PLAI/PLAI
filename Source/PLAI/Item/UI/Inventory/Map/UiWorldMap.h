@@ -3,9 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UIWorldMapGuide.h"
 #include "UiWorldPlayerIcon.h"
 #include "Blueprint/UserWidget.h"
 #include "UiWorldMap.generated.h"
+
+class AQuestOrderActor;
+
+UENUM(BlueprintType)
+enum class EQuestType : uint8
+{
+	A_GetEquip,
+	B_NetNpcHearty,
+	C_NetNpcScared,
+	D_Store,
+	E_MonsterTurn,
+	F_Store
+};
 
 /**
  * 
@@ -16,7 +30,11 @@ class PLAI_API UUiWorldMap : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	// UUiWorldMap(const FObjectInitializer& FOI);
+	UPROPERTY(EditAnywhere)
+	EQuestType QuestType = EQuestType::A_GetEquip;
+
+	UPROPERTY(EditAnywhere)
+	TArray<AQuestOrderActor*> QuestActors;
 
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* MaterialMapInterface;
@@ -24,11 +42,17 @@ public:
 	UPROPERTY(EditAnywhere)
 	UMaterialInstanceDynamic* MaterialMapDynamic;
 
-	UPROPERTY(meta = (BindWidget))
-	class UCanvasPanel* MiniMapCanvas;
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* MaterialInterfaceMiniMapGuide;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInstanceDynamic* MaterialDynamicMiniMapGuide;
 
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* MiniMapCanvasIcon;
+
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* MiniMapCanvasIconQuest;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* MiniMap;
@@ -37,11 +61,20 @@ public:
 	class UMenuInven* MenuInven;
 
 	UPROPERTY(EditAnywhere)
+	class AGameStateOpen* GameStateOpen;
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUiWorldPlayerIcon>UiWorldPlayerIconFactory;
 
 	UPROPERTY(EditAnywhere)
 	class UUiWorldPlayerIcon* UIWorldPlayerIcon;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUIWorldMapGuide>UIWorldMapGuideFactory;
+	
+	UPROPERTY(EditAnywhere)
+	class UUIWorldMapGuide* UIWorldMapGuideIcon;
+	
 	UPROPERTY(EditAnywhere)
 	TArray<class ATestPlayer*>TestPlayers;
 	
@@ -59,17 +92,24 @@ public:
 	FVector2D MiniMapSizeS = FVector2D(250.0,250.0);
 	UPROPERTY(EditAnywhere)
 	FVector2D MiniMapSizeL = FVector2D(750.0,750.0);
+
+	UPROPERTY(EditAnywhere)
+	int32 QuestIndex = 0;
 	
 	UPROPERTY(EditAnywhere)
 	FVector2D OrigPosition;
 	UPROPERTY(EditAnywhere)
-	bool      bExtendMap = false;
+	bool bExtendMap = false;
 	void ExtendMap();
 
 	UPROPERTY(EditAnywhere)
 	float CurrentZoom = 0.5f; 
 
 	virtual void NativeConstruct() override;
+	
+	void NextQuestType(EQuestType Quest);
+	void NextQuestMinimap(EQuestType Quest = EQuestType::A_GetEquip);
+	
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

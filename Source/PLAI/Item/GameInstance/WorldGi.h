@@ -109,6 +109,11 @@ public:
 	EMonsterType MonsterType;
 
 	UPROPERTY(EditAnywhere)
+	bool bFirstQuest = false;
+	UPROPERTY(EditAnywhere)
+	bool bFourthQuest = false;
+
+	UPROPERTY(EditAnywhere)
 	FString NpcPersonality = FString(TEXT("NpcPersonality"));
 
 	void EquipActor(AActor* MyActor);

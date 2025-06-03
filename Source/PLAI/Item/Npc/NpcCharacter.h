@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PLAI/Item/UI/Inventory/Map/UiWorldMap.h"
 #include "PLAI/Item/UI/Npc/UiNpc.h"
 #include "NpcCharacter.generated.h"
 
+
+class AQuestOrderActor;
 class ATestPlayer;
 
 UCLASS()
@@ -32,6 +35,7 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	class TSubclassOf<UUiNpc>UiNpcFactory;
+	
 	UPROPERTY(EditAnywhere)
 	class UUiNpc* UiNpc;
 
@@ -49,4 +53,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UNiagaraComponent* NiagaraComp;
+
+	UPROPERTY(EditAnywhere)
+	UChildActorComponent* QuestActorComponent;
+
+	UPROPERTY(EditAnywhere)
+	bool bQuest = false;
 };

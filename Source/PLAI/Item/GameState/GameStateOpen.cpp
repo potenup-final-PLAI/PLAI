@@ -4,6 +4,8 @@
 #include "GameStateOpen.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "PLAI/Item/Monster/MonWorld/MonWorld.h"
+#include "PLAI/Item/Npc/NpcNet.h"
 #include "PLAI/Item/Turn/TurnMoster/TurnMonsterFsm.h"
 
 AGameStateOpen::AGameStateOpen()
@@ -13,6 +15,11 @@ AGameStateOpen::AGameStateOpen()
 void AGameStateOpen::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AGameStateOpen::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 void AGameStateOpen::NextPlayerTurn(ATurnPlayer* TurnPlayer)
@@ -89,11 +96,23 @@ void AGameStateOpen::NextMonsterTurn()
 	},0.02f,true);
 }
 
-void AGameStateOpen::NextRound()
+void AGameStateOpen::FindMiniMapGuideIcon()
 {
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ANpcCharacter::StaticClass(),Actors);
+	for (int i = 0; i < Actors.Num(); i++)
+	{
+		MiniMapGuideActors.Add(Actors[i]);
+	}
+	AActor* Actor = UGameplayStatics::GetActorOfClass(GetWorld(),AMonWorld::StaticClass());
+	MiniMapGuideActors.Add(Actor);
+
+	// for (int i = 0; i < MiniMapGuideActors.Num(); i++)
+	// {
+	// 	UE_LOG(LogTemp,Warning,TEXT("GameState MiniMapGuideActors 이름은[%s] 위치는 [%s]"),*MiniMapGuideActors[i]->GetName(),
+	// 		*MiniMapGuideActors[i]->GetActorLocation().ToString());
+	// }
 }
-
-
 
 
 // int32 Index = Actors.IndexOfByKey(SomeActor);

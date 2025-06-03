@@ -25,14 +25,6 @@ void UUiMonWorld::NativeConstruct()
 	Button_Yes->OnClicked.AddDynamic(this,&UUiMonWorld::OnButtonYes);
 }
 
-// void UUiMonWorld::ChangeNpcPersonality()
-// {
-// 	if(UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
-// 	{
-// 		WorldGi->NpcPersonality = FString(TEXT("승리에 취한"));
-// 	}
-// }
-
 void UUiMonWorld::OnButtonYes()
 {
 	if (TestPlayer)
@@ -83,3 +75,11 @@ void UUiMonWorld::OnButtonNo()
 
 // UE_LOG(LogTemp,Warning,TEXT("UUiMonWorld:: Gi->쉴드값 넣기 닉넴 [%s] 쉴드값 [%d]"),
 // 	*WorldGi->UserShields.UserShields[0].UserName,WorldGi->UserShields.UserShields[0].UserShield);
+
+// void UUiMonWorld::ChangeNpcPersonality()
+// {
+// 	if(UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+// 	{
+// 		WorldGi->NpcPersonality = FString(TEXT("승리에 취한"));
+// 	}
+// }

@@ -50,6 +50,9 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UUiWorldMap* Wbp_UiWorldMap;
+	
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UUiQuest* Wbp_UiQuest;
 
 	virtual void NativeConstruct() override;
 };

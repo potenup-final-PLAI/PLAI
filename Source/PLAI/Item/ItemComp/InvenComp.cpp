@@ -26,6 +26,7 @@
 #include "PLAI/Item/UI/Inventory/ItemDetail/ItemDetail.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemGold.h"
 #include "PLAI/Item/UI/Inventory/ItemInven/ItemInven.h"
+#include "PLAI/Item/UI/Inventory/Quest/UiQuest.h"
 #include "PLAI/Item/UI/Inventory/QuickInven/QuickInven.h"
 #include "PLAI/Item/UI/Inventory/StoreInven/StoreInven.h"
 #include "PLAI/Item/UI/Inventory/UiCre/UiCre.h"
@@ -66,6 +67,7 @@ void UInvenComp::BeginPlay()
 				MenuInven->WBP_InputUi->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->Wbp_UiChaLevelUp->SetVisibility(ESlateVisibility::Hidden);
 				MenuInven->WBP_QuickInven->SetVisibility(ESlateVisibility::Hidden);
+				// MenuInven->Wbp_UiQuest->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
 	}
@@ -93,6 +95,11 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		SetGold(100000);
 	}
 
+	if (TestPlayer->IsLocallyControlled() && ItemDataTable && PC->WasInputKeyJustPressed(EKeys::Seven))
+	{
+		MenuInven->Wbp_UiQuest->NextQuest(0,FString("Chapter1"),FString("QuesContentt"));
+	}
+
 	
 	if (PC && TestPlayer->IsLocallyControlled() && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
 	{
@@ -115,6 +122,9 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 					if (bStartEquip == false)
 					{
 						bStartEquip = true;
+
+						MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::B_NetNpcHearty);
+						
 						Start->UiNpcStart->StartJobText->SetText(FText::FromString(TestPlayer->LoginComp->UserFullInfo.character_info.job));
 						FlipflopStart = true;
 						if (TestPlayer->LoginComp->UserFullInfo.character_info.job == FString("warrior"))
@@ -136,6 +146,15 @@ void UInvenComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 				{
 					Store->StoreInven->SetVisibility(ESlateVisibility::Visible);
 					FlipflopStore = true;
+					
+					if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
+					{
+						if (WorldGi->bFourthQuest == false)
+						{
+							MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::E_MonsterTurn);
+							WorldGi->bFourthQuest = true;
+						}
+					}
 				}
 				else
 				{
@@ -582,6 +601,7 @@ void UInvenComp::TurnReward()
 					TestPlayer->LogItemComp->GetInvenInfo();
 			
 					UiTurnReward->RemoveFromParent();
+					MenuInven->Wbp_UiWorldMap->NextQuestType(EQuestType::F_Store);
 					UE_LOG(LogTemp,Warning,TEXT("InvenComp 턴제 리워드 1.5초뒤 UI 삭제"))
 				}
 			},1.5f,false);

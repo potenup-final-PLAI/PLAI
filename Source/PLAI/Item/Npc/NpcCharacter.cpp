@@ -23,6 +23,9 @@ ANpcCharacter::ANpcCharacter()
 	
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>("Niagara");
 	NiagaraComp->SetupAttachment(RootComponent);
+
+	QuestActorComponent = CreateDefaultSubobject<UChildActorComponent>("QuestActor");
+	QuestActorComponent->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
