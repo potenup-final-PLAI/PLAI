@@ -42,8 +42,8 @@ void UUiWorldMap::NextQuestType(EQuestType Quest)
 	case EQuestType::A_GetEquip:
 		NextQuestMinimap(EQuestType::A_GetEquip);
 		MenuInven->Wbp_UiQuest->NextQuest(1,FString(TEXT("전설의 검을 뽑다")),
-			FString(TEXT("[ M ] 키를 눌러 전설의 검 위치를 확인후 검을 뽑아 장비를 획득하고 [ E ] 와 "
-		   "[ S ] 키를 눌러 장비를 확인하세요")));
+			FString(TEXT("[ M ] 키를 눌러 전설의 검 위치를 확인후 검을 뽑아 장비를 획득하고 "
+				"[ E ] 와 ""[ S ] 키를 눌러 장비를 확인하세요")));
 		break;
 		
 	case EQuestType::B_NetNpcHearty:
@@ -101,16 +101,17 @@ void UUiWorldMap::NativeConstruct()
 	{ TestPlayer->InputComp->OnInputMap.BindUObject(this, &UUiWorldMap::ExtendMap); }
 	
 	MaterialMapDynamic->SetScalarParameterValue(TEXT("ZoomFactor"), 0.5);
-
+	
 	if (UWorldGi* WorldGi = Cast<UWorldGi>(GetWorld()->GetGameInstance()))
 	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+		{NextQuestType(EQuestType::A_GetEquip);},1.0f,false);
+		
 		UE_LOG(LogTemp,Warning,TEXT("UiWolrdMap WorldGi 있다"))
 		if (WorldGi->bFirstQuest == false)
 		{
 			UE_LOG(LogTemp,Warning,TEXT("UiWolrdMap WorldGi bFirstQuest == false"))
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
-			{NextQuestType(EQuestType::A_GetEquip);},1.0f,false);
 			WorldGi->bFirstQuest = true;
 		}
 	}
